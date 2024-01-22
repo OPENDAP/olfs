@@ -10,12 +10,10 @@
 // The 'buildscript' block holds what gradle needs to run the build script
 buildscript {
     repositories {
-        //Required repos
+        // Required repos
         mavenCentral()
     }
     dependencies {
-        // Required dependency for spring-boot plugin
-        // jhrg classpath 'org.springframework.boot:spring-boot-gradle-plugin:2.1.0.RELEASE'
         classpath group: 'org.apache.ant', name: 'ant', version: '1.9.4'
     }
 }
@@ -25,9 +23,14 @@ plugins {
     id 'war'
     id 'eclipse'
     id 'idea'
-    id "org.sonarqube" version "3.3"
+    // Updated the version from 3.3. Needed to get the sonar target working. jhrg 1/22/24
+    id 'org.sonarqube' version '4.4.1.3373'
 }
 
+// While these properties are inside a 'sonarqube' block, the task is called 'sonar.' jhrg 1/22/24
+// The sonarqube block is outside the buildscript block.
+// See https://docs.sonarqube.org/latest/analysis/scan/sonarscanner-for-gradle/
+//  jhrg 1/22/24
 sonarqube {
     properties {
         property "sonar.sourceEncoding", "UTF-8"
@@ -56,7 +59,6 @@ if (hasProperty('buildScan')) {
 group = 'org.opendap'
 description = 'The OLFs build'
 
-// version = '0.1.0-SNAPSHOT'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
@@ -99,7 +101,7 @@ ext {
 
 tasks.register('showInfo') {
     group = 'info'
-    description = 'Dsiplay additional project properties - used to control version numbers'
+    description = 'Display additional project properties - used to control version numbers'
 
     println 'DEPLOYMENT_CONTEXT: ' + project.DEPLOYMENT_CONTEXT
     println 'NGAP_DEPLOYMENT_CONTEXT: ' + project.NGAP_DEPLOYMENT_CONTEXT
@@ -167,7 +169,7 @@ sourceSets {
         }
 
         war {
-            baseName = 'ngap'
+            archiveBaseName = 'ngap'
 
             // Copy/filter the various resource files
             dependsOn 'copyHyraxResources'
@@ -183,8 +185,8 @@ sourceSets {
 
 dependencies {
     // The biggest difference I see between the gradle file written by Slav for the Snyk
-    // integration and my olf 'Feedback' project is the use of 'compile' versus
-    // 'implemetation' in the dependencies. I'll leave some of the old lines in here as
+    // integration and my old 'Feedback' project is the use of 'compile' versus
+    // 'implementation' in the dependencies. I'll leave some of the old lines in here as
     // comments.
     // NB: https://docs.gradle.org/current/userguide/declaring_dependencies.html
     // jhrg 9/8/21
@@ -242,7 +244,7 @@ dependencies {
     implementation group: 'org.jvnet.ogc', name: 'ows-v_2_0', version: '2.6.1'
 
 
-    implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
+    // implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
     implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.6'
     implementation group: 'javax.annotation', name: 'javax.annotation-api', version: '1.3.2'
     implementation group: 'javax.activation', name: 'activation', version: '1.1.1'
@@ -317,26 +319,15 @@ task init_dir {
     doLast {
         mkdir "${project.build_dir}"
         mkdir "${project.build_classes}"
-//        mkdir "${project.'build_docs'}"
-//        mkdir "${project.'build_run'}"
     }
 
-}
-
-// Substitute the version information before compilation
-compileJava {
-    doFirst {
-        println 'HYRAX_VERSION: ' + project.HYRAX_VERSION
-    }
-
-    dependsOn 'substituteVersionInfo'
 }
 
 // See: https://docs.gradle.org/current/userguide/war_plugin.html
 // We want to make multiple war files (opendap, ROOT, ngap) I think. This answer shows how:
 // given that https://stackoverflow.com/questions/13077694/create-multiple-war-files-with-different-dependencies-in-gradle
 war {
-    baseName = 'opendap'
+    archiveBaseName = 'opendap'
 
     // Copy/filter the various resource files
     dependsOn 'copyHyraxResources'
@@ -348,8 +339,8 @@ war {
 }
 
 task buildOpendapWar(type: War, dependsOn: classes){
-    baseName = 'opendap_server'
-    destinationDir = file("$buildDir/dist")
+    archiveBaseName = 'opendap_server'
+    destinationDirectory = file("$buildDir/dist")
 
     group = 'warBuilds'
     description = 'Build the Opendap Server war'
@@ -357,6 +348,7 @@ task buildOpendapWar(type: War, dependsOn: classes){
     // Copy/filter the various resource files
     dependsOn 'copyHyraxResources'
     dependsOn 'copyDocResources'
+    dependsOn 'copyNgapResources'
     dependsOn 'copyWCSResources'
 
     // Use the file in build/resources to populate the war file's resources
@@ -365,8 +357,8 @@ task buildOpendapWar(type: War, dependsOn: classes){
 
 task buildNgapWar(type: War, dependsOn: classes){
     dependsOn configurations.ngapDep
-    baseName = 'opendap_ngap'
-    destinationDir = file("$buildDir/dist")
+    archiveBaseName = 'opendap_ngap'
+    destinationDirectory = file("$buildDir/dist")
 
     group = 'warBuilds'
     description = 'Build the Opendap Ngap war.'
@@ -382,8 +374,8 @@ task buildNgapWar(type: War, dependsOn: classes){
 }
 
 task buildRobotsWar(type: War, dependsOn: classes){
-    baseName = 'opendap_robots'
-    destinationDir = file("$buildDir/dist")
+    archiveBaseName = 'opendap_robots'
+    destinationDirectory = file("$buildDir/dist")
 
     group = 'warBuilds'
     description = 'Build the Opendap Robots war.'

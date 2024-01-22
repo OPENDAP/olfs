@@ -5,14 +5,14 @@
 dist: focal
 
 # Use the docker container-based build systems
-sudo: false
+# sudo: false # deprecated. jhrg 1/19/24
 
 language: java
 
 services:
   - docker
 
-# safelist
+# safe list
 branches:
   only:
     - master
@@ -62,16 +62,11 @@ install:
   - nvm install 12.13.0
   - npm install -g snyk
   - npm install -g snyk-gradle-plugin
-#  - dpkg -L junit
-  - dpkg -L ant
 
-# We need the gradlescan target because we can't run simultaneous
-# sonarscans without encountering a race condition at sonarcloud.io
 stages:
   - name: build
   - name: test
   - name: scan
-  - name: gradlescan
   - name: snappah
     if: type != pull_request OR branch =~ ^(.*-test-deploy)$
   - name: hyrax-docker-trigger
@@ -92,43 +87,21 @@ cache:
 jobs:
   include:
 
-    - stage: disabled
-      name: "jdk8"
-      jdk: openjdk8
+    - stage: build
+      name: "jdk17"
+      jdk: openjdk17
       script:
         - export STAGE=build
         - ant -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build show server
 
     - stage: build
-      name: "jdk11"
-      jdk: openjdk11
+      name: "gradle (jdk17)"
+      jdk: openjdk17
       script:
         - export STAGE=build
-        - ant -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build show server
-
-    - stage: build
-      name: "gradle (jdk11)"
-      jdk: openjdk11
-      script:
-        - export STAGE=build
-        - ./gradlew --version
-        - ./gradlew tasks
-        - ./gradlew war
-
-
-    - stage: disabled
-      name: "jdk7"
-      jdk: openjdk7
-      script:
-        - export STAGE=test
-        - ant show check
-
-    - stage: disabled
-      name: "jdk8"
-      jdk: openjdk8
-      script:
-        - export STAGE=test
-        - ant show check
+        - gradle --version
+        - gradle tasks
+        - gradle war
 
     - stage: disabled
       name: "jdk11"
@@ -137,36 +110,40 @@ jobs:
         - export STAGE=test
         - ant show check
 
+    # I think doesn't work because the sonarscan/sonarqube 'ant task' s no longer supported. jhrg 1/22/24
     - stage: disabled
-      name: "sonarscan (jdk11)"
-      jdk: openjdk11
+      name: "sonarscan (jdk17)"
+      jdk: openjdk17
       addons: sonarcloud
       script:
         - export STAGE=scan
         - export ANT_OPTS="-Xms256m -Xmx8g"
         - ant -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build show server
-        - travis_wait 45 ant -Dsonar.login=$SONAR_LOGIN -Dsonar.qualitygate.timeout=2700 -Dsonar.qualitygate.wait=true show sonar
+        - travis_wait 45 ant -Dsonar.token=$SONAR_LOGIN -Dsonar.qualitygate.timeout=2700 -Dsonar.qualitygate.wait=true show sonar
         - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=opendap-olfs | grep "QUALITY GATE PASS"
 
     - stage: scan
-      name: "synk (jdk11)"
-      jdk: openjdk11
+      name: "synk (jdk17)"
+      jdk: openjdk17
       script:
         - export STAGE=scan
         - echo $STAGE
         - ./run-snyk.sh
 
     - stage: scan
-      name: "gradle sonarscan (jdk11)"
-      jdk: openjdk11
+      name: "gradle sonarscan (jdk17)"
+      jdk: openjdk17
+      addons: sonarcloud
       script:
         - export STAGE=scan
-        - travis_wait 30 ./gradlew buildDists sonarqube -Dsonar.login=$SONAR_LOGIN -Dsonar.qualitygate.timeout=1800 -Dsonar.login=$SONAR_LOGIN -Dsonar.qualitygate.wait=true
+        # Various edits to the build.gradle file to get this to work. jhrg 1/22/24
+        # - travis_wait 30 gradle buildDists sonarqube -Dsonar.token=$SONAR_LOGIN -Dsonar.qualitygate.timeout=1800 -Dsonar.qualitygate.wait=true
+        - travis_wait 30 gradle sonar -Dsonar.login=$SONAR_LOGIN -Dsonar.qualitygate.timeout=1800 -Dsonar.qualitygate.wait=true
         - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=opendap-olfs | grep "QUALITY GATE PASS"
 
     - stage: snappah
-      name: "olfs-snapshot (jdk11)"
-      jdk: openjdk11
+      name: "olfs-snapshot (jdk17)"
+      jdk: openjdk17
       script:
         - export STAGE=snappah
         - echo "STAGE is ${STAGE}"
@@ -180,8 +157,8 @@ jobs:
         - ls -l ${TRAVIS_BUILD_DIR}/package/
 
     - stage: snappah
-      name: "olfs-build-number (jdk11)"
-      jdk: openjdk11
+      name: "olfs-build-number (jdk17)"
+      jdk: openjdk17
       script:
         - export STAGE=snappah
         - echo "STAGE is ${STAGE}"
@@ -195,8 +172,8 @@ jobs:
         - ls -l ${TRAVIS_BUILD_DIR}/package/
 
     - stage: snappah
-      name: "ngap-snapshot (jdk11)"
-      jdk: openjdk11
+      name: "ngap-snapshot (jdk17)"
+      jdk: openjdk17
       script:
         - export STAGE=snappah
         - echo "STAGE is ${STAGE}"
@@ -210,8 +187,8 @@ jobs:
         - ls -l ${TRAVIS_BUILD_DIR}/package/
 
     - stage: snappah
-      name: "ngap-build-number (jdk11)"
-      jdk: openjdk11
+      name: "ngap-build-number (jdk17)"
+      jdk: openjdk17
       script:
         - export STAGE=snappah
         - echo "STAGE is ${STAGE}"
@@ -225,8 +202,8 @@ jobs:
         - ls -l ${TRAVIS_BUILD_DIR}/package/
 
     - stage: snappah
-      name: "build_dmrpp-snapshot (jdk11)"
-      jdk: openjdk11
+      name: "build_dmrpp-snapshot (jdk17)"
+      jdk: openjdk17
       script:
         - export STAGE=snappah
         - echo "STAGE is ${STAGE}"
@@ -240,8 +217,8 @@ jobs:
         - ls -l ${TRAVIS_BUILD_DIR}/package/
 
     - stage: snappah
-      name: "build_dmrpp-build-number (jdk11)"
-      jdk: openjdk11
+      name: "build_dmrpp-build-number (jdk17)"
+      jdk: openjdk17
       script:
         - export STAGE=snappah
         - echo "STAGE is ${STAGE}"
@@ -254,12 +231,11 @@ jobs:
         - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
         - ls -l ${TRAVIS_BUILD_DIR}/package/
 
-
-      # The hyrax-docker-trigger stage grabs the hyrax-docker project, sets the current
-      # snapshot time and pushes the result to GitHub. This push triggers TravisCI
-      # to build the Docker containers for all of the Hyrax snapshot products.
-      # I moved this into it's own stage instead of after_deploy so that it would
-      # reliably run once after everything else worked. -ndp 3/10/21
+    # The hyrax-docker-trigger stage grabs the hyrax-docker project, sets the current
+    # snapshot time and pushes the result to GitHub. This push triggers TravisCI
+    # to build the Docker containers for all the Hyrax snapshot products.
+    # I moved this into its own stage instead of after_deploy so that it would
+    # reliably run once after everything else worked. -ndp 3/10/21
     - stage: hyrax-docker-trigger
       name: "Triggering hyrax-docker snapshot build"
       script:
@@ -267,22 +243,6 @@ jobs:
         - echo $STAGE
         - source ./travis/compute_build_tags.sh
         - ./travis/trigger-hyrax-docker.sh
-
-
-
-# before_deploy:
-#
-# Get creds for pushing snapshots to w.o.o.
-#- if  test "$STAGE" = "snappah";
-#    then
-#        ls -l ./travis;
-#        openssl aes-256-cbc -K $encrypted_fa37b851f33a_key -iv $encrypted_fa37b851f33a_iv -in ./travis/woo_deploy_rsa_enc -out /tmp/woo_deploy_rsa -d;
-#        eval "$(ssh-agent -s)";
-#        chmod 600 /tmp/woo_deploy_rsa;
-#        ssh-add /tmp/woo_deploy_rsa;
-#    fi
-
-
 
 # The "deploy" section copies the snapshot build product to our S3 bucket
 deploy:
@@ -295,19 +255,3 @@ deploy:
     on:
       all_branches: true
       condition: $STAGE =~ ^snappah$
-
-
-  # Push snapshot files to w.o.o
-  # - provider: script
-  #  skip_cleanup: true
-  #  script:
-  #    - scp -v $TRAVIS_BUILD_DIR/package/* $WOO_UID@www.opendap.org:/httpdocs/webdav/pub/olfs;
-  #  on:
-  #    branch: master
-  #    condition: $STAGE =~ ^snappah$
-
-
-
-
-
-    
