@@ -110,7 +110,8 @@ jobs:
         - export STAGE=test
         - ant show check
 
-    - stage: scan
+    # I think doesn't work because the sonarscan/sonarqube 'ant task' s no longer supported. jhrg 1/22/24
+    - stage: disabled
       name: "sonarscan (jdk17)"
       jdk: openjdk17
       addons: sonarcloud

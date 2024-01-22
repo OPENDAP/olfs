@@ -10,12 +10,10 @@
 // The 'buildscript' block holds what gradle needs to run the build script
 buildscript {
     repositories {
-        //Required repos
+        // Required repos
         mavenCentral()
     }
     dependencies {
-        // Required dependency for spring-boot plugin
-        // jhrg classpath 'org.springframework.boot:spring-boot-gradle-plugin:2.1.0.RELEASE'
         classpath group: 'org.apache.ant', name: 'ant', version: '1.9.4'
     }
 }
@@ -56,7 +54,6 @@ if (hasProperty('buildScan')) {
 group = 'org.opendap'
 description = 'The OLFs build'
 
-// version = '0.1.0-SNAPSHOT'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
@@ -99,7 +96,7 @@ ext {
 
 tasks.register('showInfo') {
     group = 'info'
-    description = 'Dsiplay additional project properties - used to control version numbers'
+    description = 'Display additional project properties - used to control version numbers'
 
     println 'DEPLOYMENT_CONTEXT: ' + project.DEPLOYMENT_CONTEXT
     println 'NGAP_DEPLOYMENT_CONTEXT: ' + project.NGAP_DEPLOYMENT_CONTEXT
@@ -357,6 +354,7 @@ task buildOpendapWar(type: War, dependsOn: classes){
     // Copy/filter the various resource files
     dependsOn 'copyHyraxResources'
     dependsOn 'copyDocResources'
+    dependsOn 'copyNgapResources'
     dependsOn 'copyWCSResources'
 
     // Use the file in build/resources to populate the war file's resources
