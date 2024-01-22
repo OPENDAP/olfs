@@ -62,7 +62,6 @@ install:
   - nvm install 12.13.0
   - npm install -g snyk
   - npm install -g snyk-gradle-plugin
-  - dpkg -L ant
 
 stages:
   - name: build
@@ -133,6 +132,7 @@ jobs:
     - stage: scan
       name: "gradle sonarscan (jdk17)"
       jdk: openjdk17
+      addons: sonarcloud
       script:
         - export STAGE=scan
         - travis_wait 30 gradle buildDists sonarqube -Dsonar.token=$SONAR_LOGIN -Dsonar.qualitygate.timeout=1800 -Dsonar.qualitygate.wait=true
