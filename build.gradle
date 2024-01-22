@@ -23,10 +23,14 @@ plugins {
     id 'war'
     id 'eclipse'
     id 'idea'
-    // id "org.sonarqube" version "3.3"
-    id "org.sonarqube" version "4.3.1.3277"
+    // Updated the version from 3.3. Needed to get the sonar target working. jhrg 1/22/24
+    id 'org.sonarqube' version '4.4.1.3373'
 }
 
+// While these properties are inside a 'sonarqube' block, the task is called 'sonar.' jhrg 1/22/24
+// The sonarqube block is outside the buildscript block.
+// See https://docs.sonarqube.org/latest/analysis/scan/sonarscanner-for-gradle/
+//  jhrg 1/22/24
 sonarqube {
     properties {
         property "sonar.sourceEncoding", "UTF-8"
@@ -315,19 +319,8 @@ task init_dir {
     doLast {
         mkdir "${project.build_dir}"
         mkdir "${project.build_classes}"
-//        mkdir "${project.'build_docs'}"
-//        mkdir "${project.'build_run'}"
     }
 
-}
-
-// Substitute the version information before compilation
-compileJava {
-    doFirst {
-        println 'HYRAX_VERSION: ' + project.HYRAX_VERSION
-    }
-
-    dependsOn 'substituteVersionInfo'
 }
 
 // See: https://docs.gradle.org/current/userguide/war_plugin.html
