@@ -183,8 +183,8 @@ sourceSets {
 
 dependencies {
     // The biggest difference I see between the gradle file written by Slav for the Snyk
-    // integration and my olf 'Feedback' project is the use of 'compile' versus
-    // 'implemetation' in the dependencies. I'll leave some of the old lines in here as
+    // integration and my old 'Feedback' project is the use of 'compile' versus
+    // 'implementation' in the dependencies. I'll leave some of the old lines in here as
     // comments.
     // NB: https://docs.gradle.org/current/userguide/declaring_dependencies.html
     // jhrg 9/8/21
@@ -242,7 +242,7 @@ dependencies {
     implementation group: 'org.jvnet.ogc', name: 'ows-v_2_0', version: '2.6.1'
 
 
-    implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
+    // implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
     implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.6'
     implementation group: 'javax.annotation', name: 'javax.annotation-api', version: '1.3.2'
     implementation group: 'javax.activation', name: 'activation', version: '1.1.1'
