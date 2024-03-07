@@ -62,11 +62,6 @@ public class BESError extends OPeNDAPException {
 
     private Logger d_log;
 
-    private String _adminEmail;
-    private String _message;
-    private String _file;
-    private String _line;
-
     public static final String BES_ERROR = "BESError";
 
     /**
@@ -116,21 +111,28 @@ public class BESError extends OPeNDAPException {
      * The BES timed out.
      *
      */
-    public static final int TIME_OUT              = 6;
+    public static final int TIME_OUT_ERROR = 6;
+
+    /**
+     * The BES encountered an HttpError, aka a service chain error when
+     * attempting to access a remote service.
+     *
+     */
+    public static final int HTTP_ERROR = 7;
 
 
     /**
      *
      */
-    private Document besErrorDoc = null;
+    private Element besErrorElement = null;
 
 
     /**
      *
-     * @param error
+     * @param besErrorDoc
      */
-    public BESError(Document error) {
-        this(error,new TextHtml());
+    public BESError(Document besErrorDoc) {
+        this(besErrorDoc,new TextHtml());
     }
 
 
@@ -139,33 +141,18 @@ public class BESError extends OPeNDAPException {
      */
     private BESError() {
         d_log = LoggerFactory.getLogger(this.getClass());
-        _adminEmail = "support@opendap.org";
-        _message = "Unknown Error";
-        _file = "Unknown File";
-        _line = "Unknown Line";
-        setBesErrorCode(INVALID_ERROR);
     }
 
 
     /**
      *
-     * @param error
+     * @param besErrorDoc
      * @param mt
      */
-    public BESError(Document error, MediaType mt) {
+    public BESError(Document besErrorDoc, MediaType mt) {
         this();
         setResponseMediaType(mt);
-
-        Iterator i = error.getDescendants(new ElementFilter(BES_ERROR));
-
-        if(i.hasNext()){
-            Element e = (Element)i.next();
-            e.detach();
-            error.detachRootElement();
-            error.setRootElement(e);
-        }
-
-        besErrorDoc = processError(error);
+        besErrorElement = getBESErrorElement(besErrorDoc);
 
 
     }
@@ -238,9 +225,9 @@ public class BESError extends OPeNDAPException {
             rawBesError = IOUtils.toString(is, HyraxStringEncoding.getCharset());
             is = new ByteArrayInputStream(rawBesError.getBytes(HyraxStringEncoding.getCharset()));
 
-            Document error = sb.build(is);
-            besErrorDoc = processError(error);
-            if (besErrorDoc == null) {
+            Document besErrorDoc = sb.build(is);
+            besErrorElement = getBESErrorElement(besErrorDoc);
+            if (besErrorElement == null) {
                 StringBuilder msg = new StringBuilder();
                 msg.append("ERROR - Failed to locate <BESError> object in XML document parsed from stream! ");
                 if(d_log.isDebugEnabled())
@@ -274,10 +261,7 @@ public class BESError extends OPeNDAPException {
      * @param message
      */
     private void becomeInvalidError(String message){
-
-        besErrorDoc = makeBesErrorDoc(INVALID_ERROR,message,null, null, -1);
-        processError(besErrorDoc);
-
+        besErrorElement = makeBesErrorElement(INVALID_ERROR,message,null, null, -1);
     }
 
     /**
@@ -302,9 +286,9 @@ public class BESError extends OPeNDAPException {
         try {
             Document edoc = sb.build(error);
 
-            besErrorDoc = processError(edoc);
+            besErrorElement = getBESErrorElement(edoc);
 
-            if(besErrorDoc ==null){
+            if(besErrorElement ==null){
                 becomeInvalidError("Unable to locate <BESError> object in stream.");
             }
 
@@ -313,64 +297,37 @@ public class BESError extends OPeNDAPException {
         }
     }
 
+/*
 
-    /**
-     * Returns the error code.
-     *
-     * @return the error code.
-     */
-    public final int getBesErrorCode() {
-        return _besErrorCode;
-    }
-    /**
-     * Sets the error code.
-     *
-     * @param code the error code.
-     */
-    public final void setBesErrorCode(int code) {
-        _besErrorCode = code;
-    }
-
-
-    /**
-     *
-     * @return
-     */
     public boolean notFound(){
         return getBesErrorCode()==NOT_FOUND_ERROR;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean forbidden(){
         return getBesErrorCode()==FORBIDDEN_ERROR;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean syntax(){
         return getBesErrorCode()==USER_SYNTAX_ERROR;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean internal(){
         return getBesErrorCode()==INTERNAL_FATAL_ERROR || getBesErrorCode()==INTERNAL_ERROR;
     }
+    public boolean httpError(){
+        return getBesErrorCode() == HTTP_ERROR;
+    }
+*/
 
 
     /**
      *
      * @return
      */
-    public int convertBesErrorCodeToHttpStatusCode(){
+    @Override
+    public int getHttpStatusCode(){
         int httpStatus;
+
         switch(getBesErrorCode()){
 
             case BESError.INTERNAL_ERROR:
@@ -393,9 +350,22 @@ public class BESError extends OPeNDAPException {
             // much stuff from something like fileout_netcdf we map the
             // BES timeout to BAD_REQUEST because the user can change their
             // request to make it work. ndp 2/2/2223
-            case BESError.TIME_OUT:
+            case BESError.TIME_OUT_ERROR:
             case BESError.USER_SYNTAX_ERROR:
                 httpStatus = HttpServletResponse.SC_BAD_REQUEST;
+                break;
+
+            case BESError.HTTP_ERROR:
+                String status = get_value("http_status");
+                try {
+                    httpStatus = Integer.parseUnsignedInt(status);
+                }
+                catch(NumberFormatException nfe){
+                    d_log.error("BESError is an instance of BesHttpError. " +
+                            "Yet, http_status has an un-parsable or non-integer" +
+                            " value. status: {}",status);
+                    httpStatus =HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+                }
                 break;
 
             default:
@@ -415,7 +385,7 @@ public class BESError extends OPeNDAPException {
      * @param line
      * @return
      */
-    private Document makeBesErrorDoc(int besErrorCode, String message, String admin, String file, int line) {
+    private Element makeBesErrorElement(int besErrorCode, String message, String admin, String file, int line) {
 
 
         Element besErrorElement = new Element("BESError", BES.BES_NS);
@@ -448,75 +418,77 @@ public class BESError extends OPeNDAPException {
             besErrorElement.addContent(locationElement);
 
         }
-        return new Document(besErrorElement);
+        return besErrorElement;
+    }
+
+    public String get_value(String key){
+        Element e = besErrorElement.getChild(key,BES_NS);
+        if(e!=null) {
+            return e.getTextTrim();
+        }
+        return null;
+    }
+
+    public String getAdmin(){
+        return get_value("Administrator");
+    }
+
+    public String getMessage(){
+        return get_value("Message");
+    }
+
+    private Element getLocationElement(){
+        return besErrorElement.getChild("Location",BES_NS);
+    }
+
+    public String getFile(){
+        Element location = besErrorElement.getChild("Location",BES_NS);
+        if(location!=null){
+            Element e = location.getChild("File",BES_NS);
+            if(e!=null){
+                return e.getTextTrim();
+            }
+        }
+        return null;
+    }
+    public String getLine(){
+        Element location = besErrorElement.getChild("Location",BES_NS);
+        if(location!=null){
+            Element e = location.getChild("Line",BES_NS);
+            if(e!=null){
+                return e.getTextTrim();
+            }
+        }
+        return null;
     }
 
 
-    /**
-     *
-     * @param error
-     */
-    private void processError(Element error){
-        try {
-            Element e;
-            // <Type>
-            e = error.getChild("Type",BES_NS);
-            if(e!=null){
-                String s = e.getTextTrim();
-                setBesErrorCode(Integer.valueOf(s));
+    public int getBesErrorCode(){
+        // <Type>
+        Element e = besErrorElement.getChild("Type",BES_NS);
+        if(e!=null){
+            String s = e.getTextTrim();
+            try {
+                return Integer.parseInt(s);
             }
-
-            // <Administrator>
-            e = error.getChild("Administrator",BES_NS);
-            if(e!=null){
-                _adminEmail = e.getTextTrim();
-            }
-
-            // <Message>
-            e = error.getChild("Message",BES_NS);
-            if(e!=null){
-                setErrorMessage(e.getTextTrim());
-            }
-
-            // <Location>
-            Element location = error.getChild("Location",BES_NS);
-            if(location!=null){
-                // <File>
-                e = error.getChild("File",BES_NS);
-                if(e!=null){
-                    _file = e.getTextTrim();
-                }
-                // <Line>
-                e = error.getChild("Line",BES_NS);
-                if(e!=null){
-                    _line = e.getTextTrim();
-                }
+            catch(NumberFormatException nfe){
+                d_log.error("BESError element has a non-integer value for Type: {}",s);
             }
         }
-        catch(NumberFormatException nfe){
-            setBesErrorCode(-1);
-        }
-
-        int httpStatus = convertBesErrorCodeToHttpStatusCode();
-        setHttpStatusCode(httpStatus);
-        // setErrorMessage(makeBesErrorMsg(error));
+        return -1;
     }
 
-
     /**
      *
-     * @param error
+     * @param besErrorDoc
      * @return
      */
-    private Document processError(Document error){
-        Iterator i = error.getDescendants(new ElementFilter(BES_ERROR));
+    private Element getBESErrorElement(Document besErrorDoc){
+        Iterator i = besErrorDoc.getDescendants(new ElementFilter(BES_ERROR));
         if(i.hasNext()){
             Element e = (Element)i.next();
             e.detach();
-            error.detachRootElement();
-            error.setRootElement(e);
-            processError(e);
-            return error;
+            return e;
         }
         else {
             return null;
