@@ -55,7 +55,6 @@ public class OPeNDAPException extends Exception {
 
     Logger _log;
 
-
     public static final String ERROR_RESPONSE_MEDIA_TYPE_KEY = "ErrorResponseMediaType";
 
 
@@ -165,9 +164,6 @@ public class OPeNDAPException extends Exception {
         _systemPath=null;
         _log = LoggerFactory.getLogger(this.getClass());
     }
-
-
-
 
 
 
@@ -362,7 +358,6 @@ public class OPeNDAPException extends Exception {
      * @return  The HTTP status code associated with the error.
      */
     public int getHttpStatusCode(){
-
         return _httpStatusCode;
     }
 
