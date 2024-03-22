@@ -133,15 +133,22 @@ public class Timer {
         if(!enabled.get())
             return;
 
-        procedure.end();
+        if(procedure != null) {
+            procedure.end();
 
-        StringBuilder threadLog = getThreadLog();
-        threadLog.append("STOPPED: ").append(procedure.end);
-        threadLog.append(" ns").append(mrk);
-        threadLog.append("ELAPSED: ").append(procedure.elapsedTime());
-        threadLog.append(" ms").append("]");
-        threadLog.append("\n");
-        log.info(threadLog.toString());
+            StringBuilder threadLog = getThreadLog();
+            threadLog.append("STOPPED: ").append(procedure.end);
+            threadLog.append(" ns").append(mrk);
+            threadLog.append("ELAPSED: ").append(procedure.elapsedTime());
+            threadLog.append(" ms").append("]");
+            threadLog.append("\n");
+            log.info(threadLog.toString());
+        }
+        else {
+            StringBuilder threadLog = getThreadLog();
+            threadLog.append("ERROR: Attempted to stop a null valued procedure.\n");
+            log.error(threadLog.toString());
+        }
     }
 
 
