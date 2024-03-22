@@ -297,27 +297,26 @@ public class BESError extends OPeNDAPException {
         }
     }
 
-/*
 
     public boolean notFound(){
-        return getBesErrorCode()==NOT_FOUND_ERROR;
+        return getHttpStatusCode() == HttpServletResponse.SC_NOT_FOUND;
     }
 
     public boolean forbidden(){
-        return getBesErrorCode()==FORBIDDEN_ERROR;
+        return getHttpStatusCode() == HttpServletResponse.SC_FORBIDDEN;
     }
 
     public boolean syntax(){
-        return getBesErrorCode()==USER_SYNTAX_ERROR;
+        return getHttpStatusCode() == HttpServletResponse.SC_BAD_REQUEST;
     }
 
     public boolean internal(){
-        return getBesErrorCode()==INTERNAL_FATAL_ERROR || getBesErrorCode()==INTERNAL_ERROR;
+        return getHttpStatusCode() == HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
     }
     public boolean httpError(){
         return getBesErrorCode() == HTTP_ERROR;
     }
-*/
+
 
 
     /**
