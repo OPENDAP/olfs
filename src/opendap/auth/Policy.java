@@ -39,6 +39,6 @@ public interface Policy {
     boolean evaluate(String roleId, String ResourceId, String queryString, String httpMethod);
 
     enum HTTP_METHOD {
-        GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
+        GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE, PATCH
     }
 }
