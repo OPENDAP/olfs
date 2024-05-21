@@ -37,7 +37,7 @@
 <%
 
     Logger log = LoggerFactory.getLogger("JavaServerPages");
-    RequestCache.openThreadCache();
+    RequestCache.open(request);
 
     String contextPath = request.getContextPath();
     log.debug("olfsLogView.jsp -  contextPath: "+contextPath);
@@ -200,5 +200,5 @@
 </body>
 </html>
 <%
-    RequestCache.closeThreadCache();
+    RequestCache.close();
 %>

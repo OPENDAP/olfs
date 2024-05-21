@@ -117,7 +117,7 @@ public class DispatchServlet extends HttpServlet {
 
             // Timer.enable()
 
-            RequestCache.openThreadCache();
+            // RequestCache.openRequestCache();
 
             log.debug("BEGIN");
 
@@ -172,7 +172,7 @@ public class DispatchServlet extends HttpServlet {
             } catch (Exception e) {
                 throw new ServletException(e);
             }
-            RequestCache.closeThreadCache();
+            // RequestCache.closeThreadCache();
             IS_INITIALIZED.set(true);
             log.info("END");
         } finally {
@@ -464,7 +464,8 @@ public class DispatchServlet extends HttpServlet {
         try {
             Procedure timedProcedure = Timer.start();
 
-            RequestCache.openThreadCache();
+            RequestCache.open(request);
+            String reqId = RequestCache.getRequestId();
 
             try {
 
@@ -473,15 +474,14 @@ public class DispatchServlet extends HttpServlet {
                     return;
                 }
 
-                int reqno = reqNumber.incrementAndGet();
-                ServletLogUtil.logServerAccessStart(request, ServletLogUtil.HYRAX_ACCESS_LOG_ID, "HTTP-GET", Long.toString(reqno));
+                ServletLogUtil.logServerAccessStart(request, ServletLogUtil.HYRAX_ACCESS_LOG_ID, "HTTP-GET", reqId);
 
                 if (redirectForServiceOnlyRequest(request, response))
                     return;
 
                 if (log.isDebugEnabled()) {
                     log.debug(Util.getMemoryReport());
-                    log.debug(ServletUtil.showRequest(request, reqno));
+                    log.debug(ServletUtil.showRequest(request, reqId));
                     log.debug(ServletUtil.probeRequest(this, request));
                     String msg = "Requested relative URL: '" + relativeUrl +
                             "' suffix: '" + ReqInfo.getRequestSuffix(request) +
@@ -520,7 +520,7 @@ public class DispatchServlet extends HttpServlet {
             }
         } finally {
             ServletLogUtil.logServerAccessEnd(request_status, ServletLogUtil.HYRAX_ACCESS_LOG_ID);
-            RequestCache.closeThreadCache();
+            RequestCache.close();
             log.info("Response completed.\n");
         }
 
@@ -561,14 +561,13 @@ public class DispatchServlet extends HttpServlet {
         try {
             try {
 
-                RequestCache.openThreadCache();
+                RequestCache.open(request);
+                String reqId = RequestCache.getRequestId();
 
-                int reqno = reqNumber.incrementAndGet();
-
-                ServletLogUtil.logServerAccessStart(request, ServletLogUtil.HYRAX_ACCESS_LOG_ID, "HTTP-POST", Long.toString(reqno));
+                ServletLogUtil.logServerAccessStart(request, ServletLogUtil.HYRAX_ACCESS_LOG_ID, "HTTP-POST", reqId);
 
                 if (log.isDebugEnabled()) {
-                    log.debug(ServletUtil.showRequest(request, reqno));
+                    log.debug(ServletUtil.showRequest(request, reqId));
                     String msg = "Requested relative URL: '" + relativeUrl +
                             "' suffix: '" + ReqInfo.getRequestSuffix(request) +
                             "' CE: '" + ReqInfo.getConstraintExpression(request) + "'";
@@ -603,7 +602,7 @@ public class DispatchServlet extends HttpServlet {
             }
         } finally {
             ServletLogUtil.logServerAccessEnd(httpStatus, ServletLogUtil.HYRAX_ACCESS_LOG_ID);
-            RequestCache.closeThreadCache();
+            RequestCache.close();
         }
     }
 
@@ -641,10 +640,8 @@ public class DispatchServlet extends HttpServlet {
     @Override
     protected long getLastModified(HttpServletRequest req) {
 
-        RequestCache.openThreadCache();
-
-        long reqno = reqNumber.incrementAndGet();
-        ServletLogUtil.logServerAccessStart(req, ServletLogUtil.HYRAX_LAST_MODIFIED_ACCESS_LOG_ID, "LastModified", Long.toString(reqno));
+        RequestCache.open(req);
+        ServletLogUtil.logServerAccessStart(req, ServletLogUtil.HYRAX_LAST_MODIFIED_ACCESS_LOG_ID, "LastModified", RequestCache.getRequestId());
 
         long lmt = new Date().getTime();
 
@@ -667,6 +664,8 @@ public class DispatchServlet extends HttpServlet {
         } finally {
             ServletLogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, ServletLogUtil.HYRAX_LAST_MODIFIED_ACCESS_LOG_ID);
             Timer.stop(timedProcedure);
+            // We don't RequestCache.close() here so that the cache is
+            // available for the doGet() method which comes next.
         }
         return lmt;
     }

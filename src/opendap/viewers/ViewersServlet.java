@@ -384,9 +384,11 @@ public class ViewersServlet extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) {
 
-        RequestCache.openThreadCache();
-        ServletLogUtil.logServerAccessStart(req, ServletLogUtil.HYRAX_ACCESS_LOG_ID, "HTTP-GET", Integer.toString(REQ_NUMBER.incrementAndGet()));
-        LOG.debug(ServletUtil.showRequest(req, REQ_NUMBER.get()));
+        RequestCache.open(req);
+        String reqId = RequestCache.getRequestId();
+
+        ServletLogUtil.logServerAccessStart(req, ServletLogUtil.HYRAX_ACCESS_LOG_ID, "HTTP-GET", reqId);
+        LOG.debug(ServletUtil.showRequest(req, reqId));
 
         Request dapRequest = new Request(this,req);
         User user = new User(req);
@@ -490,7 +492,7 @@ public class ViewersServlet extends HttpServlet {
         }
         finally {
             ServletLogUtil.logServerAccessEnd(requestStatus, ServletLogUtil.HYRAX_ACCESS_LOG_ID);
-            RequestCache.closeThreadCache();
+            RequestCache.close();
             // this.destroy(); // I commented this out because: WTF? Why? - ndp 03/05/2019
         }
     }

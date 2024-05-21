@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.UUID;
 
 /**
  * Created by IntelliJ IDEA.
@@ -47,9 +48,9 @@ import javax.servlet.http.HttpSession;
  */
 public class User {
 
-    private Logger log;
+    private final Logger log;
     private UserProfile userProfile;
-    private HttpServletRequest request;
+    private final HttpServletRequest request;
 
 
     public User(HttpServletRequest req){
@@ -98,4 +99,6 @@ public class User {
             return 0;
         }
     }
+
+
 }

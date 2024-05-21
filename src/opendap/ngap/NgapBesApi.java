@@ -34,6 +34,7 @@ import opendap.bes.BadConfigurationException;
 import opendap.bes.BesApi;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.RequestCache;
 import opendap.coreServlet.Util;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
@@ -133,9 +134,7 @@ public class NgapBesApi extends BesApi implements Cloneable {
         log.debug("Building request for BES ngap_module request. remoteDataSourceUrl: "+ remoteDataSourceUrl);
         Element e, request = new Element("request", BES.BES_NS);
 
-        String reqID = "["+Thread.currentThread().getName()+":"+
-                Thread.currentThread().getId()+":ngap_request]";
-        request.setAttribute("reqID",reqID);
+        request.setAttribute(REQUEST_ID, RequestCache.getRequestId());
 
         request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
 
@@ -250,10 +249,7 @@ public class NgapBesApi extends BesApi implements Cloneable {
 
         //String besDataSource = getBES(dataSource).trimPrefix(dataSource);
 
-        String reqID = Thread.currentThread().getName()+":"+ Thread.currentThread().getId();
-
-
-        request.setAttribute("reqID",reqID);
+        request.setAttribute(REQUEST_ID, RequestCache.getRequestId());
 
         request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
 

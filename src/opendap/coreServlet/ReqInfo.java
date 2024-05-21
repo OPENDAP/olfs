@@ -42,10 +42,7 @@ import java.io.StringWriter;
 import java.net.URLDecoder;
 import java.text.FieldPosition;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.Map;
-import java.util.SimpleTimeZone;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
@@ -927,6 +924,18 @@ public class ReqInfo {
         return requestUrlStr;
     }
 
+
+    public static String getRequestId(HttpServletRequest req){
+        String reqID;
+        reqID = req.getHeader("A-api-request-uuid");
+        if(reqID == null) {
+            UUID uuid = UUID.randomUUID();
+            reqID = Thread.currentThread().getName() +
+                    ":" + Thread.currentThread().getId() +
+                    ":" + uuid;
+        }
+        return reqID;
+    }
 
 }
 

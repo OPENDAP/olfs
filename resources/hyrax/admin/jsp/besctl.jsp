@@ -40,7 +40,7 @@
 <%
 
     Logger log = LoggerFactory.getLogger("JavaServerPages");
-    RequestCache.openThreadCache();
+    RequestCache.open(request);
 
     String contextPath = request.getContextPath();
     log.debug("besctl.jsp -  contextPath: "+contextPath);
@@ -718,5 +718,5 @@
 </body>
 </html>
 <%
-    RequestCache.closeThreadCache();
+    RequestCache.close();
 %>
