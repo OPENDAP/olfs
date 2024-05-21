@@ -258,7 +258,7 @@ public class Servlet extends HttpServlet {
         }
         finally {
             ServletLogUtil.logServerAccessEnd(request_status, ServletLogUtil.WCS_ACCESS_LOG_ID);
-            RequestCache.closeThreadCache();
+            RequestCache.close();
 
         }
     }
@@ -306,7 +306,7 @@ public class Servlet extends HttpServlet {
         }
         finally {
             ServletLogUtil.logServerAccessEnd(request_status, ServletLogUtil.WCS_ACCESS_LOG_ID);
-            RequestCache.closeThreadCache();
+            RequestCache.close();
 
         }
     }
@@ -314,10 +314,9 @@ public class Servlet extends HttpServlet {
     @Override
     protected long getLastModified(HttpServletRequest req) {
 
-        RequestCache.openThreadCache();
+        RequestCache.open(req);
+        ServletLogUtil.logServerAccessStart(req, ServletLogUtil.WCS_LAST_MODIFIED_ACCESS_LOG_ID, "LastModified", RequestCache.getRequestId());
 
-        long reqno = reqNumber.incrementAndGet();
-        ServletLogUtil.logServerAccessStart(req, ServletLogUtil.WCS_LAST_MODIFIED_ACCESS_LOG_ID, "LastModified", Long.toString(reqno));
         try {
             return new Date().getTime();
         } finally {

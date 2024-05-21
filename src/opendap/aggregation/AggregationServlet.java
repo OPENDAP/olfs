@@ -531,7 +531,7 @@ public class AggregationServlet extends HttpServlet {
             TransmitCoordinator tc = new ServletResponseTransmitCoordinator(response);
             ServletOutputStream out = response.getOutputStream();
 
-            RequestCache.openThreadCache();
+            RequestCache.open(request);
 
             String requestKind = Scrub.simpleString(request.getParameter("operation"));
             if (requestKind == null)
@@ -568,7 +568,7 @@ public class AggregationServlet extends HttpServlet {
             logError(t, "in doGet():");
         }
         finally {
-            RequestCache.closeThreadCache();
+            RequestCache.close();
         }
 
     }
@@ -602,7 +602,7 @@ public class AggregationServlet extends HttpServlet {
         log.debug("doHead() - BEGIN");
 
         try {
-            RequestCache.openThreadCache();
+            RequestCache.open(request);
             ServletOutputStream out = response.getOutputStream();
 
             String requestKind = Scrub.simpleString(request.getParameter("operation"));
@@ -644,7 +644,7 @@ public class AggregationServlet extends HttpServlet {
             logError(t, "in doHead():");
         }
         finally {
-            RequestCache.closeThreadCache();
+            RequestCache.close();
         }
 
 

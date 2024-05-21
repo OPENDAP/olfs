@@ -119,9 +119,8 @@ public class PDPService extends HttpServlet {
     @Override
     protected long getLastModified(HttpServletRequest req) {
         try {
-            RequestCache.openThreadCache();
-            long reqno = REQ_NUMBER.incrementAndGet();
-            ServletLogUtil.logServerAccessStart(req, ServletLogUtil.PDP_SERVICE_LAST_MODIFIED_LOG_ID, "LastModified", Long.toString(reqno));
+            RequestCache.open(req);
+            ServletLogUtil.logServerAccessStart(req, ServletLogUtil.PDP_SERVICE_LAST_MODIFIED_LOG_ID, "LastModified", RequestCache.getRequestId());
             return new Date().getTime();
 
         } finally {
@@ -163,9 +162,9 @@ public class PDPService extends HttpServlet {
         String msg = "";
         int status = HttpServletResponse.SC_FORBIDDEN;
 
-        RequestCache.openThreadCache();
+        RequestCache.open(request);
 
-        ServletLogUtil.logServerAccessStart(request, ServletLogUtil.PDP_SERVICE_ACCESS_LOG_ID, request.getMethod(), Integer.toString(REQ_NUMBER.incrementAndGet()));
+        ServletLogUtil.logServerAccessStart(request, ServletLogUtil.PDP_SERVICE_ACCESS_LOG_ID, request.getMethod(), RequestCache.getRequestId());
         try {
             if (!redirect(request, response)) {
 
@@ -227,7 +226,7 @@ public class PDPService extends HttpServlet {
         }
         finally {
             ServletLogUtil.logServerAccessEnd(status, ServletLogUtil.PDP_SERVICE_ACCESS_LOG_ID);
-            RequestCache.closeThreadCache();
+            RequestCache.close();
         }
     }
 

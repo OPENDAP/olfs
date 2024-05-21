@@ -27,6 +27,7 @@ package opendap.coreServlet;
 
 import org.slf4j.Logger;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -38,13 +39,14 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class RequestCache {
 
+    private static final String REQUEST_ID_KEY = "request-id";
 
-    private static Logger log;
+    private static final Logger log;
     static {
         log = org.slf4j.LoggerFactory.getLogger(RequestCache.class);
     }
 
-    private static ConcurrentHashMap<Thread, HashMap<String,CachedObj>> cache;
+    private static final ConcurrentHashMap<Thread, HashMap<String,CachedObj>> cache;
     static {
         cache = new ConcurrentHashMap<>();
     }
@@ -52,7 +54,7 @@ public class RequestCache {
     //private static long maxCacheTime = 10000; // in milliseconds
 
     private static class CachedObj {
-        private Object myObj;
+        private final Object myObj;
         Date creationTime;
         public CachedObj (Object o){
             myObj = o;
@@ -63,31 +65,42 @@ public class RequestCache {
             return (Date)creationTime.clone();
         }
         public Object getObj(){
-
-            if(myObj !=null)
-                return myObj;
-
-            return null;
+            return myObj;
         }
 
     }
 
-
-
-    public static void openThreadCache(){
+    /**
+     * Opens a new request cache for the current thread (one request per thread
+     * in Tomcat land). If the cache is already set up for this thread nothing
+     * is done. If a new cache is created then the request id is computed and
+     * added to the cache.
+     * @param request The request which is being serviced by the current thread.
+     */
+    public static void open(HttpServletRequest request){
 
         if(cache.containsKey(Thread.currentThread())){
             log.info("Request cache for thread: "+Thread.currentThread() +
                     " already exists. No need to create one.");
-
-            return;
         }
-        HashMap<String, CachedObj> hm = new HashMap<String, CachedObj>();
-        cache.put(Thread.currentThread(),hm);
-        log.info("Created request cache for thread: {}",Thread.currentThread());
+        else {
+            HashMap<String, CachedObj> hm = new HashMap<String, CachedObj>();
+            cache.put(Thread.currentThread(), hm);
+            log.info("Created request cache for thread: {}", Thread.currentThread());
+            String reqId = ReqInfo.getRequestId(request);
+            put(REQUEST_ID_KEY,reqId);
+        }
     }
 
-    public static void closeThreadCache(){
+    public static String getRequestId(){
+        Object id = get(REQUEST_ID_KEY);
+        if(id != null){
+            return (String)id;
+        }
+        return null;
+    }
+
+    public static void close(){
         int size = 0;
         Thread thisThread = Thread.currentThread();
         HashMap<String,CachedObj> value = cache.remove(thisThread);
@@ -101,12 +114,8 @@ public class RequestCache {
 
     public static void put(String key, Object o){
 
-
         CachedObj co = new CachedObj(o);
-
         HashMap<String, CachedObj> hm = cache.get(Thread.currentThread());
-
-
 
         if(hm == null) {
             log.warn("put() - Thread cache not initialized. {} object not cached under key '{}'", o.getClass().getName(),key);
@@ -114,54 +123,30 @@ public class RequestCache {
         }
 
         co = hm.put(key, co);
-
-
         if (co != null) {
             log.warn("put() - Response cache updated with new Object for key: \"" + key + "\"");
         } else {
             log.debug("put() - Response cache updated by adding new object to cache using key \"" +
                     key + "\"");
-
         }
-
     }
 
 
     public static Object get(String key){
 
         HashMap<String, CachedObj> hm = cache.get(Thread.currentThread());
-
         if(hm==null || key==null)
             return null;
 
         CachedObj co = hm.get(key);
-
-
         if(co!=null) {
             log.debug("Found cached document for key \""+ key+"\"");
-
-            /*
-            long now = new Date().getTime();
-            long elapsedCacheTime = now - co.getCreationTime().getTime();
-
-            if(elapsedCacheTime > maxCacheTime ){
-                log.info("Cached document expired "+ elapsedCacheTime+"ms old.");
-                hm.remove(key);
-                log.info("Cached document for  "+ key +" removed from cache.");
-                return null;
-            }
-            */
             return co.getObj();
-
         }
         else {
             log.debug("No Document cached for key \""+ key+"\"");
         }
-
-
         return null;
     }
-
-
 
 }

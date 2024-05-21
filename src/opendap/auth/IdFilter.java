@@ -173,12 +173,13 @@ public class IdFilter implements Filter {
         }
 
         try {
-            RequestCache.openThreadCache();
 
             HttpServletRequest request = (HttpServletRequest) sreq;
+            RequestCache.open(request);
+            String requestId = RequestCache.getRequestId();
+
             HttpServletRequest hsReq = request;
 
-            String requestId = this.getClass().getName()+"-" + counter.incrementAndGet();
             ServletLogUtil.logServerAccessStart(request,logName,request.getMethod(), requestId);
             // Get session, make new as needed.
             HttpSession session = hsReq.getSession(true);
@@ -354,7 +355,7 @@ public class IdFilter implements Filter {
             ServletLogUtil.logServerAccessEnd(200,logName);
         }
         finally {
-            RequestCache.closeThreadCache();
+            RequestCache.close();
         }
     }
 

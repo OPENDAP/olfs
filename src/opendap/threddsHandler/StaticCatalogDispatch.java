@@ -860,7 +860,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
         Procedure timedProc = Timer.start();
 
-        RequestCache.openThreadCache();
+        RequestCache.open(req);
 
         String catalogKey = null;
         try {

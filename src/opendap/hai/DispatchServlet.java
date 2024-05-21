@@ -170,9 +170,8 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
      *         since midnight January 1, 1970 GMT
      */
     protected long getLastModified(HttpServletRequest req) {
-        RequestCache.openThreadCache();
-        long reqno = reqNumber.incrementAndGet();
-        ServletLogUtil.logServerAccessStart(req, ServletLogUtil.ADMIN_ACCESS_LAST_MODIFIED_LOG_ID, "LastModified", Long.toString(reqno));
+        RequestCache.open(req);
+        ServletLogUtil.logServerAccessStart(req, ServletLogUtil.ADMIN_ACCESS_LAST_MODIFIED_LOG_ID, "LastModified", RequestCache.getRequestId());
         try {
             return new Date().getTime();
         }
@@ -246,7 +245,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
             }
         } finally {
             ServletLogUtil.logServerAccessEnd(request_status, ServletLogUtil.ADMIN_ACCESS_LOG_ID);
-            RequestCache.closeThreadCache();
+            RequestCache.close();
         }
     }
 
@@ -294,7 +293,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
             }
         } finally {
             ServletLogUtil.logServerAccessEnd(request_status, ServletLogUtil.ADMIN_ACCESS_LOG_ID);
-            RequestCache.closeThreadCache();
+            RequestCache.close();
         }
     }
 

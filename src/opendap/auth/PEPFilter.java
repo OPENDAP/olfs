@@ -41,7 +41,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
-import java.security.Principal;
 
 
 /**
@@ -136,10 +135,11 @@ public class PEPFilter implements Filter {
         }
         try {
 
-            RequestCache.openThreadCache();
 
 
             HttpServletRequest  hsReq = (HttpServletRequest)  request;
+            RequestCache.open(hsReq);
+
             HttpServletResponse hsRes = (HttpServletResponse) response;
 
             // If they are authenticated then we should be able to get the remoteUser() or UserPrinciple
@@ -197,7 +197,7 @@ public class PEPFilter implements Filter {
             throw new ServletException(e.getMessage(),e);
         }
         finally{
-            RequestCache.closeThreadCache();
+            RequestCache.close();
 
         }
 

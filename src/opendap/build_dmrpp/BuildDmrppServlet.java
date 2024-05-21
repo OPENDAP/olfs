@@ -159,10 +159,9 @@ public class BuildDmrppServlet extends HttpServlet {
     @Override
     public long getLastModified(HttpServletRequest req) {
 
-        RequestCache.openThreadCache();
+        RequestCache.open(req);
 
-        long reqno = reqNumber.incrementAndGet();
-        ServletLogUtil.logServerAccessStart(req, ServletLogUtil.BUILD_DMRPP_LAST_MODIFIED_LOG_ID, "LastModified", Long.toString(reqno));
+        ServletLogUtil.logServerAccessStart(req, ServletLogUtil.BUILD_DMRPP_LAST_MODIFIED_LOG_ID, "LastModified", RequestCache.getRequestId());
         try {
             if (ReqInfo.isServiceOnlyRequest(req))
                 return new Date().getTime();
@@ -215,7 +214,7 @@ public class BuildDmrppServlet extends HttpServlet {
             }
         } finally {
             ServletLogUtil.logServerAccessEnd(request_status, ServletLogUtil.BUILD_DMRPP_ACCESS_LOG_ID);
-            RequestCache.closeThreadCache();
+            RequestCache.close();
         }
     }
 

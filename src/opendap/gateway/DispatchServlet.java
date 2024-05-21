@@ -150,10 +150,8 @@ public class DispatchServlet extends HttpServlet {
     @Override
     public long getLastModified(HttpServletRequest req) {
 
-        RequestCache.openThreadCache();
-
-        long reqno = reqNumber.incrementAndGet();
-        ServletLogUtil.logServerAccessStart(req, ServletLogUtil.GATEWAY_ACCESS_LAST_MODIFIED_LOG_ID, "LastModified", Long.toString(reqno));
+        RequestCache.open(req);
+        ServletLogUtil.logServerAccessStart(req, ServletLogUtil.GATEWAY_ACCESS_LAST_MODIFIED_LOG_ID, "LastModified", RequestCache.getRequestId());
         try {
             if (ReqInfo.isServiceOnlyRequest(req))
                 return new Date().getTime();
@@ -207,7 +205,7 @@ public class DispatchServlet extends HttpServlet {
             }
         } finally {
             ServletLogUtil.logServerAccessEnd(request_status, ServletLogUtil.GATEWAY_ACCESS_LOG_ID);
-            RequestCache.closeThreadCache();
+            RequestCache.close();
         }
     }
 
