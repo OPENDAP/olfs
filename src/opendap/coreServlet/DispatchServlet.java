@@ -664,6 +664,8 @@ public class DispatchServlet extends HttpServlet {
         } finally {
             ServletLogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, ServletLogUtil.HYRAX_LAST_MODIFIED_ACCESS_LOG_ID);
             Timer.stop(timedProcedure);
+            // We don't RequestCache.close() here so that the cache is
+            // available for the doGet() method which comes next.
         }
         return lmt;
     }

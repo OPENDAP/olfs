@@ -198,7 +198,6 @@ public class PEPFilter implements Filter {
         }
         finally{
             RequestCache.close();
-
         }
 
     }

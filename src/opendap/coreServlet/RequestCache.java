@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * User: ndp
@@ -51,6 +52,10 @@ public class RequestCache {
         cache = new ConcurrentHashMap<>();
     }
 
+    private static final ReentrantLock lock;
+    static {
+        lock = new ReentrantLock();
+    }
     //private static long maxCacheTime = 10000; // in milliseconds
 
     private static class CachedObj {
@@ -90,14 +95,6 @@ public class RequestCache {
             String reqId = ReqInfo.getRequestId(request);
             put(REQUEST_ID_KEY,reqId);
         }
-    }
-
-    public static String getRequestId(){
-        Object id = get(REQUEST_ID_KEY);
-        if(id != null){
-            return (String)id;
-        }
-        return null;
     }
 
     public static void close(){
@@ -145,6 +142,21 @@ public class RequestCache {
         }
         else {
             log.debug("No Document cached for key \""+ key+"\"");
+        }
+        return null;
+    }
+
+    /**
+     * Every request cache instance has some type of request id. See
+     * opendap.coreServlet.ReqInfo.getRequestId() for more on how that's
+     * handled.
+     *
+     * @return
+     */
+    public static String getRequestId(){
+        Object id = get(REQUEST_ID_KEY);
+        if(id != null){
+            return (String)id;
         }
         return null;
     }

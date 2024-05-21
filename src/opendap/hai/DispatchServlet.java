@@ -177,6 +177,8 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
         }
         finally {
             ServletLogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, ServletLogUtil.ADMIN_ACCESS_LAST_MODIFIED_LOG_ID);
+            // We don't RequestCache.close() here so that the cache is
+            // available for the doGet() method which comes next.
         }
     }
 

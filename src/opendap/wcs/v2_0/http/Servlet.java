@@ -322,6 +322,8 @@ public class Servlet extends HttpServlet {
         } finally {
             ServletLogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, ServletLogUtil.WCS_LAST_MODIFIED_ACCESS_LOG_ID);
         }
+        // We don't RequestCache.close() here so that the cache is
+        // available for the doGet() method which comes next.
 
 
     }

@@ -826,8 +826,8 @@ public class StaticCatalogDispatch implements DispatchHandler {
                                            boolean sendResponse)
             throws Exception {
 
-        String relativeUrl = ReqInfo.getLocalUrl(request);
-        String dataSource = relativeUrl; //_besApi.getBesDataSourceID(relativeUrl,false);
+        String dataSource = ReqInfo.getLocalUrl(request);
+        //_besApi.getBesDataSourceID(relativeUrl,false);
         //String requestSuffixRegex = ReqInfo.getRequestSuffix(request);
 
         boolean threddsRequest = false;
