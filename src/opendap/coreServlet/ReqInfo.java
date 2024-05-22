@@ -924,16 +924,40 @@ public class ReqInfo {
         return requestUrlStr;
     }
 
+    /**
+     * A request header key/name to check for a request id.
+     */
+    public static final String REQUEST_UUID_KEY="a-api-request-uuid";
 
+    /**
+     * Returns the unique id of this request. If upstream service chain
+     * components have provided on in the request headers it will be sanitized
+     * and returned. Otherwise, a new request ID will be minted and returned.
+     * @param req
+     * @return
+     */
     public static String getRequestId(HttpServletRequest req){
         String reqID;
-        reqID = req.getHeader("A-api-request-uuid");
-        if(reqID == null) {
-            UUID uuid = UUID.randomUUID();
-            reqID = Thread.currentThread().getName() +
-                    ":" + Thread.currentThread().getId() +
-                    ":" + uuid;
+
+        reqID = req.getHeader(REQUEST_UUID_KEY);
+        if(reqID != null) {
+            // TODO Determine the allowed characters and associated format
+            //  for the REQUEST_UUID_KEY and use that to implement a closely
+            //  tailored Scrub method to use for sanitizing this input
+            reqID = Scrub.simpleString(reqID);
+            return reqID;
         }
+        // Add additional req.getHeader() calls for different keys as needed.
+
+
+        // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+        // DEFAULT
+        // No service chain request ID appears in the expected request headers
+        // so make a homegrown request_id and send it on.
+        UUID uuid = UUID.randomUUID();
+        reqID = Thread.currentThread().getName() +
+                "_" + Thread.currentThread().getId() +
+                "_" + uuid;
         return reqID;
     }
 
