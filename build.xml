@@ -277,6 +277,8 @@
     <property name="owasp-encoder.lib" value="encoder-1.2.2.jar"/>
     <property name="owasp-encoder-jsp.lib" value="encoder-jsp-1.2.2.jar"/>
 
+    <property name="aws-java-sdk-ec2.lib" value="aws-java-sdk-ec2-1.12.734.jar"/>
+    <property name="aws-java-sdk-logs.lib" value="aws-java-sdk-logs-1.12.734.jar"/>
 
     <!-- WCS Libs -->
     <property name="ogc-wcs.lib" value="wcs-v_2_0-2.6.1.jar"/>
@@ -293,9 +295,6 @@
     <property name="javax.activation.lib" value="activation-1.1.1.jar"/>
 
     <property name="xlink.lib" value="xlink-v_1_0-1.4.0.jar"/>
-
-
-
 
     <!--
         These are the library jars used by Hyrax.
@@ -326,6 +325,9 @@
         <include name="${slf4j.lib}"/>
         <include name="${logback-core.lib}"/>
         <include name="${logback-classic.lib}"/>
+
+        <include name="${aws-java-sdk-ec2.lib}"/>
+        <include name="${aws-java-sdk-logs.lib}"/>
 
         <include name="${urlRewrite.lib}"/>
 
