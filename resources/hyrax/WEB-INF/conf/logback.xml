@@ -162,6 +162,16 @@
         </encoder>
     </appender>
 
+    <appender name="CLOUDWATCH" class="com.j256.cloudwatchlogbackappender.CloudWatchAppender">
+        <region>us-east-1</region>
+        <logGroup>your-log-group-name-here</logGroup>
+        <logStream>your-log-stream-name-here</logStream>
+        <layout>
+            <!-- possible layout pattern -->
+            <pattern>[%thread] %level %logger{20} - %msg%n%xThrowable</pattern>
+        </layout>
+    </appender>
+
     <!-- OPeNDAP Hyrax Logging -->
 
     <logger name="opendap" level="error" >
@@ -173,6 +183,7 @@
     <logger name="HyraxAccess" level="info">
         <appender-ref ref="HyraxAccessLog"/>
         <appender-ref ref="JsonAccessLog"/>
+        <appender-ref ref="CLOUDWATCH"/>
     </logger>
     <logger name="DocsAccess" level="info">
         <appender-ref ref="HyraxAccessLog"/>
