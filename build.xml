@@ -479,7 +479,7 @@
         <copy todir="${build.src}" filtering="true">
             <fileset dir="${src.dir}">
                 <!-- include all the java files -->
-                <include name="cloudwatchlogbackappender/**"/>
+                <include name="com/**"/>
                 <include name="opendap/**"/>
                 <include name="org/opendap/**"/>
 
@@ -496,7 +496,6 @@
                 <exclude name="opendap/async/**"/>
 
             </fileset>
-
         </copy>
 
 
