@@ -162,15 +162,18 @@
         </encoder>
     </appender>
 
-    <appender name="CLOUDWATCH" class="com.j256.cloudwatchlogbackappender.CloudWatchAppender">
+    <appender name="HyraxAWS" class="com.j256.cloudwatchlogbackappender.CloudWatchAppender">
         <region>us-east-1</region>
-        <logGroup>your-log-group-name-here</logGroup>
-        <logStream>your-log-stream-name-here</logStream>
+        <logGroup>HyraxCluster</logGroup>
+        <logStream>TestyTestTest</logStream>
+        <accessKeyId>XXXX</accessKeyId>
+        <secretKey>XXXX</secretKey>
         <layout>
-            <!-- possible layout pattern -->
-            <pattern>[%thread] %level %logger{20} - %msg%n%xThrowable</pattern>
+            <pattern>%uuid This is a test of the CloudWatchLogbackAppender</pattern>
         </layout>
+        <appender-ref ref="stdout" />
     </appender>
+
 
     <!-- OPeNDAP Hyrax Logging -->
 
