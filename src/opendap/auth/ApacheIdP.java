@@ -27,6 +27,7 @@
 package opendap.auth;
 
 import opendap.coreServlet.OPeNDAPException;
+import opendap.http.error.Forbidden;
 import opendap.logging.LogUtil;
 import org.jdom.Element;
 import org.slf4j.Logger;
@@ -105,15 +106,13 @@ public class ApacheIdP extends IdProvider {
     public boolean doLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         /**
-         * Redirect the user back to the their original requested resource.
+         * Redirect the user back to their original requested resource.
          */
         HttpSession session = request.getSession(false);
         String redirectUrl = null;
 
-        String uid = request.getRemoteUser();
-
+        String uid = Util.getUID(request);
         if (uid==null) {
-
             // Hmmm... The user has not logged in.
 
             StringBuilder msg = new StringBuilder();
@@ -151,6 +150,11 @@ public class ApacheIdP extends IdProvider {
         log.info("doLogin(): redirecting to {}",redirectUrl);
         response.sendRedirect(redirectUrl);
         return true;
+    }
+
+    @Override
+    public boolean doTokenAuthentication(HttpServletRequest request, UserProfile userProfile) throws IOException, Forbidden {
+        return false;
     }
 
 

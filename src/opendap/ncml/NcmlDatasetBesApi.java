@@ -111,6 +111,9 @@ public class NcmlDatasetBesApi extends BesApi implements Cloneable {
         if(user.getMaxResponseSize()>=0)
             request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,user.getMaxResponseSize()+""));
 
+        if(user.getMaxVariableSize()>=0)
+            request.addContent(setContextElement(MAX_VARIABLE_SIZE_CONTEXT,user.getMaxVariableSize()+""));
+
         Element ncmlDatasetContainer =  NcmlManager.getNcmlDatasetContainer(localDataSourceId);
 
         if(ncmlDatasetContainer!=null)

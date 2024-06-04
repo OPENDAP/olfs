@@ -1,4 +1,17 @@
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+# OLFS Version 1.18.14 (23 January 2024)
+#
+
+* OLFS now uses Java17 (jdk17)
+* Changed maxResponseSize type from int to long.
+* Units scalar set to 2^10 (kilobytes) when the
+    units value is junk.
+* preformatted text for 400 errors
+* Reduced beslistener pool from 200 to 25 for NGAP deployments
+* Fixes EDL token handling so that redirected are not issued
+    and session (aka cookie) management is not required of the client.
+
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 # OLFS Version 1.18.13 (25 July 2022)
 #
 

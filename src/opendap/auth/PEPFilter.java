@@ -41,7 +41,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
-import java.security.Principal;
 
 
 /**
@@ -136,10 +135,11 @@ public class PEPFilter implements Filter {
         }
         try {
 
-            RequestCache.openThreadCache();
 
 
             HttpServletRequest  hsReq = (HttpServletRequest)  request;
+            RequestCache.open(hsReq);
+
             HttpServletResponse hsRes = (HttpServletResponse) response;
 
             // If they are authenticated then we should be able to get the remoteUser() or UserPrinciple
@@ -150,22 +150,14 @@ public class PEPFilter implements Filter {
                 UserProfile userProfile = (UserProfile) session.getAttribute(IdFilter.USER_PROFILE);
                 if(userProfile!=null){
                     userId = userProfile.getUID();
-                    IdProvider ipd = userProfile.getIdP();
-                    authContext = ipd.getAuthContext();
+                    IdProvider idP = userProfile.getIdP();
+                    authContext = idP.getAuthContext();
                 }
             }
-
             if(userId==null) {
-                String remoteUser = hsReq.getRemoteUser();
-                if (remoteUser == null) {
-                    Principal userPrinciple = hsReq.getUserPrincipal();
-                    if (userPrinciple != null) {
-                        userId = userPrinciple.getName();
-                    }
-                } else {
-                    userId = remoteUser;
-                }
-                // @FIXME Deal with authContext for Tomacat and APache httpd authenticated users
+                userId = Util.getUID(hsReq);
+                // @FIXME Deal with authContext for Tomcat and Apache
+                //   httpd authenticated users
             }
 
             // So - Do they have to be authenticated?
@@ -178,6 +170,7 @@ public class PEPFilter implements Filter {
                 }
                 return;
             }
+
             // Are they allowed access?
             if (requestIsGranted(userId, authContext, hsReq)) {
                 // Yup, so we just move along...
@@ -204,8 +197,7 @@ public class PEPFilter implements Filter {
             throw new ServletException(e.getMessage(),e);
         }
         finally{
-            RequestCache.closeThreadCache();
-
+            RequestCache.close();
         }
 
     }

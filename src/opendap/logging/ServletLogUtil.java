@@ -31,6 +31,7 @@ import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
 import opendap.PathBuilder;
+import opendap.auth.UserProfile;
 import opendap.coreServlet.Scrub;
 import opendap.coreServlet.ServletUtil;
 import org.slf4j.Logger;
@@ -44,8 +45,11 @@ import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.security.Principal;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static opendap.auth.IdFilter.USER_PROFILE;
 
 
 /**
@@ -369,15 +373,18 @@ public class ServletLogUtil {
      */
     public static void logServerAccessStart(HttpServletRequest req, String logName,  String httpVerb, String reqID) {
 
+        ;
         HttpSession session = req.getSession(false);
-
 
         MDC.put(ID_KEY, reqID);
         MDC.put(SOURCE_KEY, httpVerb);
         MDC.put(HOST_KEY, req.getRemoteHost());
         MDC.put(SESSION_ID_KEY, (session == null) ? "-" : session.getId());
-        MDC.put(USER_ID_KEY, req.getRemoteUser() == null ? "-" : req.getRemoteUser() );
-        MDC.put(START_TIME_KEY, System.currentTimeMillis() + "");
+
+        String uid = opendap.auth.Util.getUID(req);
+        MDC.put(USER_ID_KEY, uid==null ? "-" : uid  );
+
+        MDC.put(START_TIME_KEY, Long.toString(System.currentTimeMillis()));
 
         String userAgent = Scrub.simpleString(req.getHeader("User-Agent"));
         MDC.put(USER_AGENT_KEY,  userAgent==null?"-":userAgent);

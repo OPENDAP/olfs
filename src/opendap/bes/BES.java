@@ -281,7 +281,19 @@ public class BES {
         return config.getMaxClients();
     }
 
-    public int getMaxResponseSize() {
+    /**
+     *
+     * @return The maximum size, in bytes, allowed in a response.
+     */
+    public long getMaxResponseSize() {
+        return config.getMaxResponseSize();
+    }
+
+    /**
+     *
+     * @return The maximum size, in bytes, for a variable in a response.
+     */
+    public long getMaxVariableSize() {
         return config.getMaxResponseSize();
     }
 
@@ -882,7 +894,7 @@ public class BES {
                 if (!result) {
                     // We got back an error object from the BES in the baos.
                     // We feed that to the BESError class to build the error object.
-                    log.debug("BESError: \n{}", errorOutputStream.toString(HyraxStringEncoding.getCharset().name()));
+                    log.debug("BESError: \n{}", errorOutputStream.toString(HyraxStringEncoding.getCharset()));
                     ByteArrayInputStream bais = new ByteArrayInputStream(errorOutputStream.toByteArray());
                     BESError besError = new BESError(bais);
 

@@ -25,5 +25,3 @@ echo " " >> olfs-$olfs_version.changes
 cat olfs-$olfs_version.changes ChangeLog >> foo
 mv foo ChangeLog
 
-
-

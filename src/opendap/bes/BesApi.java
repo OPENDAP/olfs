@@ -31,6 +31,7 @@ import opendap.auth.EarthDataLoginAccessToken;
 import opendap.auth.UserProfile;
 import opendap.bes.caching.BesNodeCache;
 import opendap.coreServlet.ByteArrayOutputStreamTransmitCoordinator;
+import opendap.coreServlet.RequestCache;
 import opendap.coreServlet.ResourceInfo;
 import opendap.coreServlet.TransmitCoordinator;
 import opendap.dap.User;
@@ -130,6 +131,7 @@ public class BesApi implements Cloneable {
     public static final String CLOUDY_DAP_CONTEXT = "cloudydap";
 
     public static final String MAX_RESPONSE_SIZE_CONTEXT = "max_response_size";
+    public static final String MAX_VARIABLE_SIZE_CONTEXT = "max_variable_size";
     public static final String CF_HISTORY_ENTRY_CONTEXT = "cf_history_entry";
     public static final String HISTORY_JSON_ENTRY_CONTEXT = "history_json_entry";
 
@@ -2327,8 +2329,7 @@ public class BesApi implements Cloneable {
 
 
         Element e, request = new Element("request", BES_NS);
-        request.setAttribute(REQUEST_ID,getRequestIdBase());
-
+        request.setAttribute(REQUEST_ID, RequestCache.getRequestId());
 
         request.addContent(setContextElement(XDAP_ACCEPT_CONTEXT, DEFAULT_XDAP_ACCEPT));
 
@@ -2345,6 +2346,9 @@ public class BesApi implements Cloneable {
 
         if(user.getMaxResponseSize()>=0)
             request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,user.getMaxResponseSize()+""));
+
+        if(user.getMaxVariableSize()>=0)
+            request.addContent(setContextElement(MAX_VARIABLE_SIZE_CONTEXT,user.getMaxVariableSize()+""));
 
         request.addContent(setContextElement(UID_CONTEXT,user.getUID()==null?"not_logged_in":user.getUID()));
 
@@ -2417,7 +2421,7 @@ public class BesApi implements Cloneable {
 
         Element e, request = new Element("request", BES_NS);
 
-        request.setAttribute(REQUEST_ID,getRequestIdBase());
+        request.setAttribute(REQUEST_ID, RequestCache.getRequestId());
 
         //----------------------------------------------------------------------
         // Added this bit for the cloudy dap experiment - ndp 1/19/17
@@ -2441,6 +2445,9 @@ public class BesApi implements Cloneable {
 
         if(user.getMaxResponseSize()>=0)
             request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,user.getMaxResponseSize()+""));
+
+        if(user.getMaxVariableSize()>=0)
+            request.addContent(setContextElement(MAX_VARIABLE_SIZE_CONTEXT,user.getMaxVariableSize()+""));
 
         request.addContent(setContextElement(UID_CONTEXT,user.getUID()==null?"not_logged_in":user.getUID()));
 
@@ -2481,7 +2488,7 @@ public class BesApi implements Cloneable {
     public  Document getSiteMapRequestDocument(String sitePrefix) {
 
         Element request = new Element("request", BES_NS);
-        request.setAttribute(REQUEST_ID,getRequestIdBase());
+        request.setAttribute(REQUEST_ID, RequestCache.getRequestId());
 
         request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
         request.addContent(setContextElement(ERRORS_CONTEXT,XML_ERRORS));
@@ -2530,7 +2537,7 @@ public class BesApi implements Cloneable {
 
 
         Element request = new Element("request", BES_NS);
-        request.setAttribute(REQUEST_ID,getRequestIdBase());
+        request.setAttribute(REQUEST_ID, RequestCache.getRequestId());
 
         request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
         request.addContent(setContextElement(ERRORS_CONTEXT,XML_ERRORS));
@@ -2546,11 +2553,8 @@ public class BesApi implements Cloneable {
 
 
     public Element showPathInfoRequestElement(String resource) {
-        Element e;
         Element spi = new Element("showW10nPathInfo",BES_NS);
-
         spi.setAttribute("node", resource);
-
         return spi;
     }
 
@@ -2584,7 +2588,7 @@ public class BesApi implements Cloneable {
 
 
         Element e, request = new Element("request", BES_NS);
-        request.setAttribute(REQUEST_ID,getRequestIdBase());
+        request.setAttribute(REQUEST_ID, RequestCache.getRequestId());
         request.addContent(setContextElement(ERRORS_CONTEXT,XML_ERRORS));
 
         e = new Element(type,BES_NS);
@@ -2740,10 +2744,6 @@ public class BesApi implements Cloneable {
 
     }
 
-    private static String getRequestIdBase(){
-        return "[thread:"+Thread.currentThread().getName()+"-"+ Thread.currentThread().getId()+"]";
-    }
-
 
 
     public String getBesCombinedTypeMatch()
@@ -2852,7 +2852,7 @@ public class BesApi implements Cloneable {
     public static Document getShowBesKeyRequestDocument(String besKey) {
 
         Element request = new Element("request", BES_NS);
-        request.setAttribute(REQUEST_ID,getRequestIdBase());
+        request.setAttribute(REQUEST_ID, RequestCache.getRequestId());
         request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
         request.addContent(setContextElement(ERRORS_CONTEXT,XML_ERRORS));
         request.addContent(showBesKeyRequestElement(besKey));

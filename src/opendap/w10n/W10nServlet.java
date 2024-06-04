@@ -88,9 +88,8 @@ public class W10nServlet extends HttpServlet   {
      */
     @Override
     protected long getLastModified(HttpServletRequest req) {
-        RequestCache.openThreadCache();
-        long reqno = _reqNumber.incrementAndGet();
-        ServletLogUtil.logServerAccessStart(req, ServletLogUtil.HYRAX_LAST_MODIFIED_ACCESS_LOG_ID, "LastModified", Long.toString(reqno));
+        RequestCache.open(req);
+        ServletLogUtil.logServerAccessStart(req, ServletLogUtil.HYRAX_LAST_MODIFIED_ACCESS_LOG_ID, "LastModified", RequestCache.getRequestId());
         long lmt = new Date().getTime();
         Procedure timedProcedure = Timer.start();
         try {
@@ -103,6 +102,8 @@ public class W10nServlet extends HttpServlet   {
         } finally {
             ServletLogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, ServletLogUtil.HYRAX_LAST_MODIFIED_ACCESS_LOG_ID);
             Timer.stop(timedProcedure);
+            // We don't RequestCache.close() here so that the cache is
+            // available for the doGet() method which comes next.
         }
         return lmt;
     }
@@ -119,12 +120,12 @@ public class W10nServlet extends HttpServlet   {
                     LicenseManager.sendLicenseExpiredPage(request,response);
                     return;
                 }
-                RequestCache.openThreadCache();
+                RequestCache.open(request);
 
-                int reqno = _reqNumber.incrementAndGet();
-                ServletLogUtil.logServerAccessStart(request, ServletLogUtil.HYRAX_ACCESS_LOG_ID, "HTTP-GET", Long.toString(reqno));
+                String reqId = RequestCache.getRequestId();
+                ServletLogUtil.logServerAccessStart(request, ServletLogUtil.HYRAX_ACCESS_LOG_ID, "HTTP-GET",reqId );
                 LOG.debug(Util.getMemoryReport());
-                LOG.debug(ServletUtil.showRequest(request, reqno));
+                LOG.debug(ServletUtil.showRequest(request, reqId));
                 //log.debug(AwsUtil.probeRequest(this, request));
                 if(redirectForServiceOnlyRequest(request,response))
                     return;
@@ -160,7 +161,7 @@ public class W10nServlet extends HttpServlet   {
         }
         finally {
             ServletLogUtil.logServerAccessEnd(request_status, ServletLogUtil.HYRAX_ACCESS_LOG_ID);
-            RequestCache.closeThreadCache();
+            RequestCache.close();
         }
 
         LOG.info(Timer.report());

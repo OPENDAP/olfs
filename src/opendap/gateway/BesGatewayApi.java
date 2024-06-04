@@ -32,6 +32,7 @@ import opendap.bes.BadConfigurationException;
 import opendap.bes.BesApi;
 import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
+import opendap.coreServlet.RequestCache;
 import opendap.coreServlet.Util;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
@@ -129,9 +130,7 @@ public class BesGatewayApi extends BesApi implements Cloneable {
         log.debug("Building request for BES gateway_module request. remoteDataSourceUrl: "+ remoteDataSourceUrl);
         Element e, request = new Element("request", BES.BES_NS);
 
-        String reqID = "["+Thread.currentThread().getName()+":"+
-                Thread.currentThread().getId()+":gateway_request]";
-        request.setAttribute("reqID",reqID);
+        request.setAttribute(REQUEST_ID, RequestCache.getRequestId());
 
 
         request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
@@ -147,6 +146,10 @@ public class BesGatewayApi extends BesApi implements Cloneable {
 
         if(user.getMaxResponseSize()>=0)
             request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,user.getMaxResponseSize()+""));
+
+        if(user.getMaxVariableSize()>=0)
+            request.addContent(setContextElement(MAX_VARIABLE_SIZE_CONTEXT,user.getMaxVariableSize()+""));
+
 
 
         request.addContent(setContainerElement("gatewayContainer","gateway",remoteDataSourceUrl,type));
@@ -192,10 +195,7 @@ public class BesGatewayApi extends BesApi implements Cloneable {
 
         //String besDataSource = getBES(dataSource).trimPrefix(dataSource);
 
-        String reqID = Thread.currentThread().getName()+":"+ Thread.currentThread().getId();
-
-
-        request.setAttribute("reqID",reqID);
+        request.setAttribute(REQUEST_ID, RequestCache.getRequestId());
 
         /**----------------------------------------------------------------------
          * Added this bit for the cloudy dap experiment - ndp 1/19/17
@@ -219,6 +219,9 @@ public class BesGatewayApi extends BesApi implements Cloneable {
 
         if(user.getMaxResponseSize()>=0)
             request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,user.getMaxResponseSize()+""));
+
+        if(user.getMaxVariableSize()>=0)
+            request.addContent(setContextElement(MAX_VARIABLE_SIZE_CONTEXT,user.getMaxVariableSize()+""));
 
 
         request.addContent(setContainerElement("gatewayContainer","gateway",remoteDataSourceUrl,type));

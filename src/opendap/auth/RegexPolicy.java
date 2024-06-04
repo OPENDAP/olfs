@@ -125,22 +125,26 @@ public class RegexPolicy implements Policy {
     public boolean evaluate(String roleId, String resourceId, String queryString, String httpMethod) {
 
         if(roleId==null || resourceId==null || queryString == null || httpMethod == null) {
-            log.error("evaluate() - Passing null values is not allowed. RETURNING FALSE");
+            log.error("Passing null values is not allowed. RETURNING FALSE");
             return false;
         }
 
         if(rolePattern.matcher(roleId).matches()){
             if(resourcePattern.matcher(resourceId).matches()){
                 if(queryStringPattern.matcher(queryString).matches()) {
-                    if (allowedActions.contains(HTTP_METHOD.valueOf(httpMethod))) {
-                        log.info("evaluate() - Policy Matched! RETURNING TRUE");
-                        return true;
+                    try {
+                        if (allowedActions.contains(HTTP_METHOD.valueOf(httpMethod))) {
+                            log.info("Policy Matched! RETURNING TRUE");
+                            return true;
+                        }
+                    }
+                    catch(java.lang.IllegalArgumentException iae){
+                        log.error("Invalid HTTP method '{}' is not allowed.", httpMethod);
                     }
                 }
             }
         }
-        log.info("evaluate() - Policy Did Not Match! RETURNING FALSE");
+        log.info("Policy Did Not Match! RETURNING FALSE");
         return false;
-
     }
 }

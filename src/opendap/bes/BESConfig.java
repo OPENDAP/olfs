@@ -52,7 +52,8 @@ public class BESConfig  {
     private  int     _BesAdminPort;
     private  int     _BesMaxClients;
     private  int     _BesMaxCommands;
-    private  int     _BesMaxResponseSize;
+    private  long     _BesMaxResponseSize;
+    private  long     _BesMaxVariableSize;
     private  String  _BesPrefix;
     private  int     _BesTimeOut;  // in ms
 
@@ -62,6 +63,10 @@ public class BESConfig  {
     //private  boolean   _usePersistentContentDocs;
     //private  Document  _OLFSConfigurationDoc;
 
+    public static final String MAX_VARIABLE_SIZE_ELEMENT_OLFS="maxVariableSize";
+    public static final String MAX_RESPONSE_SIZE_ELEMENT_OLFS="maxResponseSize";
+    public static final String UNITS_ATTRIBUTE_NAME="units";
+    public static final String MAX_TIME_OUT_ELEMENT_OLFS="timeOut";
 
     private BESConfig() {
         log = org.slf4j.LoggerFactory.getLogger(getClass());
@@ -73,6 +78,7 @@ public class BESConfig  {
         _BesMaxCommands = 2000;
         _BesPrefix = "/";
         _BesMaxResponseSize = 0;
+        _BesMaxVariableSize = 0;
         _BesNickName = null;
         _BesTimeOut = 300000; // 5 minutes in ms
     }
@@ -99,7 +105,8 @@ public class BESConfig  {
         copy._BesHost            = _BesHost;
         copy._BesPort            = _BesPort;
         copy._BesAdminPort       = _BesAdminPort;
-        copy._BesMaxResponseSize = _BesMaxResponseSize;
+        copy._BesMaxVariableSize = _BesMaxResponseSize;
+        copy._BesMaxResponseSize = _BesMaxVariableSize;
         copy._BesMaxClients      = _BesMaxClients;
         copy._BesMaxCommands     = _BesMaxCommands;
         copy._BesPrefix          = _BesPrefix;
@@ -210,20 +217,25 @@ public class BESConfig  {
 
 
 
-        Element maxResponseSize = besConfig.getChild("maxResponseSize");
+        Element maxResponseSize = besConfig.getChild(MAX_RESPONSE_SIZE_ELEMENT_OLFS);
         if( maxResponseSize!=null ){
-            setMaxResponseSize(maxResponseSize.getTextTrim());
+            String units = maxResponseSize.getAttributeValue(UNITS_ATTRIBUTE_NAME);
+            setMaxResponseSize(maxResponseSize.getTextTrim(),units);
             log.info("BES '{}' maxResponseSize set to {}",getPrefix(), getMaxResponseSize());
         }
 
-        Element timeOut = besConfig.getChild("timeOut");
+        Element maxVariableSize = besConfig.getChild(MAX_VARIABLE_SIZE_ELEMENT_OLFS);
+        if( maxVariableSize!=null ){
+            String units = maxVariableSize.getAttributeValue(UNITS_ATTRIBUTE_NAME);
+            setMaxVariableSize(maxVariableSize.getTextTrim(), units);
+            log.info("BES '{}' maxVariableSize set to {}",getPrefix(), getMaxVariableSize());
+        }
+
+        Element timeOut = besConfig.getChild(MAX_TIME_OUT_ELEMENT_OLFS);
         if( timeOut!=null ){
             setTimeOut(timeOut.getTextTrim());
-            log.info("BES '{}' maxResponseSize set to {}",getPrefix(), getMaxResponseSize());
+            log.info("BES '{}' timeOut set to {}",getPrefix(), getTimeOut());
         }
-
-
-
 
         //  <ClientPool maximum="10" maxCmds="2000"/>
 
@@ -344,6 +356,69 @@ public class BESConfig  {
         }
     }
 
+    /**
+     * Converts a units_str to a numerical value. Only the first character of
+     * the units string is examined in a case-insensitive manner.
+     * Allowed first character values are:
+     *   b - byte
+     *   k - kilobytes
+     *   m - megabytes
+     *   g - gigabytes
+     *   t - terabytes
+     *   p - petabytes
+     *   e - exabytes
+     *
+     * @param units_str
+     * @return
+     * @throws BadConfigurationException
+     */
+    private long get_units_scalar(String units_str) throws BadConfigurationException {
+        long scalar;
+
+        if(units_str==null || units_str.length()<1){
+            units_str="K";
+        }
+        char units_char = units_str.toLowerCase().toCharArray()[0];
+        switch (units_char)
+        {
+            case 'b': {
+                scalar = 1; // We want bytes so this is a no-op
+                break;
+            }
+            case 'k': {
+                scalar = 2^10; // kilobytes
+                break;
+            }
+            case 'm': {
+                scalar = 2^20; // Megabytes
+                break;
+            }
+            case 'g': {
+                scalar = 2^30; // Gigabytes
+                break;
+            }
+            case 't': {
+                scalar = 2^40; // Terabytes
+                break;
+            }
+            case 'p': {
+                scalar = 2^50; // Petabytes
+                break;
+            }
+            case 'e': {
+                scalar = 2^60; // Exabytes
+                break;
+            }
+            default: {
+                log.error("ERROR When attempting to set the Max Variable Size the value " +
+                                "of the 'units' attribute: {} was not recognized." +
+                                "Allowed values are B, K, M, G, T, P, or E. (case-insensitive)" +
+                                "Using default value of K (kilobytes)", units_str);
+                scalar = 2^10; // kilobytes
+            }
+        }
+        return scalar;
+    }
 
 
 
@@ -376,8 +451,13 @@ public class BESConfig  {
         Element adminPort = new Element("adminPort");
         adminPort.setText(String.valueOf(getAdminPort()));
 
-        Element maxResponseSize = new Element("maxResponseSize");
+        Element maxResponseSize = new Element(MAX_RESPONSE_SIZE_ELEMENT_OLFS);
+        maxResponseSize.setAttribute(UNITS_ATTRIBUTE_NAME, "b");
         adminPort.setText(String.valueOf(getMaxResponseSize()));
+
+        Element maxVariableSize = new Element(MAX_VARIABLE_SIZE_ELEMENT_OLFS);
+        maxVariableSize.setAttribute(UNITS_ATTRIBUTE_NAME, "b");
+        adminPort.setText(String.valueOf(getMaxVariableSize()));
 
 
         Element clientPool = new Element("ClientPool");
@@ -389,6 +469,7 @@ public class BESConfig  {
         bes.addContent(port);
         bes.addContent(adminPort);
         bes.addContent(maxResponseSize);
+        bes.addContent(maxVariableSize);
         bes.addContent(clientPool);
 
         return bes;
@@ -410,9 +491,34 @@ public class BESConfig  {
     public void setAdminPort(int port){ _BesAdminPort = port; }
     public int getAdminPort() { return _BesAdminPort; }
 
-    public void setMaxResponseSize(String maxResponseSize){ setMaxResponseSize(Integer.parseInt(maxResponseSize)); }
-    public void setMaxResponseSize(int maxResponseSize){ _BesMaxResponseSize = maxResponseSize; }
-    public int getMaxResponseSize() { return _BesMaxResponseSize; }
+    public void setMaxResponseSize(String maxResponseSize, String units)
+            throws BadConfigurationException {
+        long mvs = Long.parseLong(maxResponseSize) * get_units_scalar(units);
+        setMaxResponseSize(mvs);
+    }
+    public void setMaxResponseSize(long maxResponseSize){ _BesMaxResponseSize = maxResponseSize; }
+    public long getMaxResponseSize() { return _BesMaxResponseSize; }
+
+
+    public void setMaxVariableSize(String maxVariableSize, String units)
+            throws BadConfigurationException {
+        long mvs = Long.parseLong(maxVariableSize) * get_units_scalar(units);
+        setMaxVariableSize(mvs);
+    }
+
+    /**
+     * Sets the the maximum size, in bytes, allowed for an individual variable in a response.
+     *
+     * @param maxVariableSize The maximum size, in bytes, allowed for an individual variable
+     *                        in a response
+     */
+    public void setMaxVariableSize(long maxVariableSize){ _BesMaxVariableSize = maxVariableSize; }
+
+    /**
+     * @return The maximum size, in bytes, allowed for an individual variable in a response.
+     * If the value is zero, no limit will be enforced.
+     */
+    public long getMaxVariableSize() { return _BesMaxVariableSize; }
 
     /**
      *
@@ -499,7 +605,7 @@ public class BESConfig  {
      * BES configuration information to the OLFS.
      * @throws IOException When bad things happen
      */
-    public void userConfigure() throws IOException {
+    public void userConfigure() throws IOException, BadConfigurationException {
         userConfigure(this);
     }
 
@@ -516,7 +622,7 @@ public class BESConfig  {
      * @throws IOException When bad things happen
      */
 
-    public static void userConfigure(BESConfig bc) throws IOException {
+    public static void userConfigure(BESConfig bc) throws IOException, BadConfigurationException {
         boolean done = false;
         String k;
         BufferedReader kybrd = new BufferedReader(new InputStreamReader(System.in, HyraxStringEncoding.getCharset()));
@@ -559,7 +665,7 @@ public class BESConfig  {
         }
     }
 
-    public static void config(BESConfig bc) throws IOException {
+    public static void config(BESConfig bc) throws IOException, BadConfigurationException {
 
         String k;
         BufferedReader kybrd = new BufferedReader(new InputStreamReader(System.in, HyraxStringEncoding.getCharset()));
@@ -653,7 +759,7 @@ public class BESConfig  {
             System.out.print("[" + bc.getMaxResponseSize() + "]: ");
             k = kybrd.readLine();
             if (k!=null && !k.equals("")){
-                bc.setMaxResponseSize(k);
+                bc.setMaxResponseSize(k,"k");
                 done = true;
             }
             else if(bc.getMaxResponseSize()==-1)
@@ -661,9 +767,6 @@ public class BESConfig  {
             else
                 done = true;
         }
-
-
-
 
 
         done = false;

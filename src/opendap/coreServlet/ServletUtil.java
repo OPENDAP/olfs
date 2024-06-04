@@ -349,13 +349,13 @@ public class ServletUtil {
      * @param reqno The request number.
      * @return A string containing infformation about the passed HttpServletRequest req
      */
-    public static String showRequest(HttpServletRequest req, long reqno) {
+    public static String showRequest(HttpServletRequest req, String reqId) {
 
         StringBuilder sb = new StringBuilder();
 
         sb.append("\n-------------------------------------------\n");
         sb.append("showRequest()\n");
-        sb.append("  Request #").append(reqno).append("\n");
+        sb.append("  RequestId: ").append(reqId).append("\n");
         sb.append("  HttpServletRequest Object:\n");
         sb.append("    getServerName():          ").append(req.getServerName()).append("\n");
         sb.append("    getServerPort():          ").append(req.getServerPort()).append("\n");

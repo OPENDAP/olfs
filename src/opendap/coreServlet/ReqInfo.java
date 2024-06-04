@@ -42,16 +42,13 @@ import java.io.StringWriter;
 import java.net.URLDecoder;
 import java.text.FieldPosition;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.Map;
-import java.util.SimpleTimeZone;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static opendap.http.Util.PROTOCOL_TERMINATON;
+import static opendap.http.Util.PROTOCOL_TERMINATION;
 
 
 /**
@@ -864,11 +861,11 @@ public class ReqInfo {
             }
         }
         // We know that the values of the request headers CLOUD_FRONT_FORWARDED_PROTOCOL
-        // and X_FORWARDED_PROTOCOL don't end with the PROTOCOL_TERMINATON (aka "://")
-        // zso we check for the abscence of a trailing PROTOCOL_TERMINATON and add it
+        // and X_FORWARDED_PROTOCOL don't end with the PROTOCOL_TERMINATION (aka "://")
+        // zso we check for the absence of a trailing PROTOCOL_TERMINATION and add it
         // as needed.
-        if(!client_request_protcol.endsWith(PROTOCOL_TERMINATON)){
-            client_request_protcol += PROTOCOL_TERMINATON;
+        if(!client_request_protcol.endsWith(PROTOCOL_TERMINATION)){
+            client_request_protcol += PROTOCOL_TERMINATION;
         }
 
         // Determine which server port the client was accessing.
@@ -897,7 +894,7 @@ public class ReqInfo {
             requestUrlStr = req.getRequestURL().toString();
             if(!requestUrlStr.startsWith(client_request_protcol)){
                 // If protocols do not match then update the requestUrlStr to match client_request_protcol
-                int index = requestUrlStr.indexOf(PROTOCOL_TERMINATON) + PROTOCOL_TERMINATON.length();
+                int index = requestUrlStr.indexOf(PROTOCOL_TERMINATION) + PROTOCOL_TERMINATION.length();
                 requestUrlStr = client_request_protcol + requestUrlStr.substring(index);
             }
         }
@@ -927,6 +924,42 @@ public class ReqInfo {
         return requestUrlStr;
     }
 
+    /**
+     * A request header key/name to check for a request id.
+     */
+    public static final String REQUEST_UUID_KEY="a-api-request-uuid";
+
+    /**
+     * Returns the unique id of this request. If upstream service chain
+     * components have provided one in the request headers it will be sanitized
+     * and returned. Otherwise, a new request ID will be minted and returned.
+     * @param req
+     * @return
+     */
+    public static String getRequestId(HttpServletRequest req){
+        String reqID;
+
+        reqID = req.getHeader(REQUEST_UUID_KEY);
+        if(reqID != null) {
+            // TODO Determine the allowed characters and associated format
+            //  for the REQUEST_UUID_KEY and use that to implement a closely
+            //  tailored Scrub method to use for sanitizing this input
+            reqID = Scrub.simpleString(reqID);
+            return reqID;
+        }
+        // Add additional req.getHeader() calls for different keys as needed.
+
+
+        // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+        // DEFAULT
+        // No service chain request ID appears in the expected request headers
+        // so make a homegrown request_id and send it on.
+        UUID uuid = UUID.randomUUID();
+        reqID = Thread.currentThread().getName() +
+                "_" + Thread.currentThread().getId() +
+                "_" + uuid;
+        return reqID;
+    }
 
 }
 

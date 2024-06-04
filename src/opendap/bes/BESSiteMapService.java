@@ -65,7 +65,7 @@ public class BESSiteMapService extends HttpServlet {
             ServletLogUtil.initLogging(this);
             LOG.debug("init() start");
             // Timer.enable();
-            RequestCache.openThreadCache();
+            // RequestCache.openThreadCache();
 
 
             _dapServiceContext = getInitParameter("DapServiceContext");
@@ -101,7 +101,7 @@ public class BESSiteMapService extends HttpServlet {
             IS_INITIALIZED.set(true);
 
             LOG.info("init() complete.");
-            RequestCache.closeThreadCache();
+            // RequestCache.closeThreadCache();
         }
         finally {
             INIT_LOCK.unlock();
@@ -163,14 +163,14 @@ public class BESSiteMapService extends HttpServlet {
         int response_size = -1;
         try {
             Procedure timedProcedure = Timer.start();
-            RequestCache.openThreadCache();
+            RequestCache.open(request);
+            String reqId = RequestCache.getRequestId();
             try {
 
-                int reqno = REQ_NUMBER.incrementAndGet();
-                ServletLogUtil.logServerAccessStart(request, ServletLogUtil.SITEMAP_ACCESS_LOG_ID, "HTTP-GET", Long.toString(reqno));
+                ServletLogUtil.logServerAccessStart(request, ServletLogUtil.SITEMAP_ACCESS_LOG_ID, "HTTP-GET", reqId);
 
                 LOG.debug(Util.getMemoryReport());
-                LOG.debug(ServletUtil.showRequest(request, reqno));
+                LOG.debug(ServletUtil.showRequest(request, reqId));
                 LOG.debug(ServletUtil.probeRequest(this, request));
 
                 if (ReqInfo.isServiceOnlyRequest(request)) {
@@ -227,7 +227,7 @@ public class BESSiteMapService extends HttpServlet {
         }
         finally {
             ServletLogUtil.logServerAccessEnd(request_status, response_size, ServletLogUtil.SITEMAP_ACCESS_LOG_ID);
-            RequestCache.closeThreadCache();
+            RequestCache.close();
             LOG.info("Response completed.\n");
         }
         LOG.info("Timing Report: \n{}", Timer.report());
