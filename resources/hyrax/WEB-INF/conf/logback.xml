@@ -166,10 +166,10 @@
         <region>us-west-2</region>
         <logGroup>HyraxCluster</logGroup>
         <logStream>TestyTestTest</logStream>
-        <accessKeyId>XXXX</accessKeyId>
-        <secretKey>XXXX</secretKey>
+        <accessKeyId>XXXXXXX</accessKeyId>
+        <secretKey>XXXXXXXXX</secretKey>
         <layout>
-            <pattern>%uuid This is a test of the CloudWatchLogbackAppender</pattern>
+            <pattern>This is a test of the CloudWatchLogbackAppender</pattern>
         </layout>
         <appender-ref ref="stdout" />
     </appender>
