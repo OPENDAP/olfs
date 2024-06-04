@@ -163,7 +163,7 @@
     </appender>
 
     <appender name="HyraxAWS" class="com.j256.cloudwatchlogbackappender.CloudWatchAppender">
-        <region>us-east-1</region>
+        <region>us-west-2</region>
         <logGroup>HyraxCluster</logGroup>
         <logStream>TestyTestTest</logStream>
         <accessKeyId>XXXX</accessKeyId>
@@ -186,8 +186,9 @@
     <logger name="HyraxAccess" level="info">
         <appender-ref ref="HyraxAccessLog"/>
         <appender-ref ref="JsonAccessLog"/>
-        <appender-ref ref="CLOUDWATCH"/>
+        <appender-ref ref="HyraxAWS"/>
     </logger>
+
     <logger name="DocsAccess" level="info">
         <appender-ref ref="HyraxAccessLog"/>
     </logger>
