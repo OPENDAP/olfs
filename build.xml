@@ -281,6 +281,12 @@
     <property name="aws-java-sdk-ec2.lib" value="aws-java-sdk-ec2-1.12.734.jar"/>
     <property name="aws-java-sdk-logs.lib" value="aws-java-sdk-logs-1.12.734.jar"/>
 
+    <property name="jackson-core.lib" value="jackson-core-2.17.0.jar" />
+    <property name="jackson-databind.lib" value="jackson-databind-2.17.0.jar" />
+    <property name="jackson-annotations.lib" value="jackson-annotations-2.17.0.jar" />
+
+    <property name="joda-time.lib" value="joda-time-2.12.7.jar"/>
+
     <!-- WCS Libs -->
     <property name="ogc-wcs.lib" value="wcs-v_2_0-2.6.1.jar"/>
     <property name="ogc-gml.lib" value="gml-v_3_2_1-2.6.1.jar"/>
@@ -330,6 +336,12 @@
         <include name="${aws-java-sdk-core.lib}"/>
         <include name="${aws-java-sdk-ec2.lib}"/>
         <include name="${aws-java-sdk-logs.lib}"/>
+
+        <include name="${jackson-core.lib}"/>
+        <include name="${jackson-databind.lib}"/>
+        <include name="${jackson-annotations.lib}"/>
+
+        <include name="${joda-time.lib}"/>
 
         <include name="${urlRewrite.lib}"/>
 
