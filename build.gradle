@@ -214,6 +214,12 @@ dependencies {
     implementation group: 'aws-java-sdk-ec2', name: 'aws-java-sdk-ec2', version: '1.12.734'
     implementation group: 'aws-java-sdk-logs', name: 'aws-java-sdk-logs', version: '1.12.734'
 
+    implementation group: 'jackson', name: 'jackson-core', version: '2.17.0'
+    implementation group: 'jackson', name: 'jackson-databind', version: '2.17.0'
+    implementation group: 'jackson', name: 'jackson-annotations', version: '2.17.0'
+
+    implementation group: 'joda-time', name: 'joda-time', version: '2.12.7'
+
     implementation group: 'commons-cli', name: 'commons-cli', version: '1.2'
     implementation group: 'commons-codec', name: 'commons-codec', version: '1.13'
     implementation group: 'commons-httpclient', name: 'commons-httpclient', version: '3.1'
