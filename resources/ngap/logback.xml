@@ -162,6 +162,18 @@
         </encoder>
     </appender>
 
+    <appender name="HyraxNGAP" class="com.j256.cloudwatchlogbackappender.CloudWatchAppender">
+        <region>us-west-2</region>
+        <logGroup>HyraxCluster</logGroup>
+        <logStream>Hyrax-%instanceId</logStream>
+        <accessKeyId>AWS_ACCESS_KEY_ID</accessKeyId>
+        <secretKey>AWS_SECRET_KEY</secretKey>
+        <layout>
+            <pattern>{ "request_id": "%8X{ID}", "job_id": "%X{ident}", "user": "%X{userid}", "path": "%X{resourceID}", "time_completed":"%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}", "total_time": %8X{duration}, "http_response_code": %X{http_status}, "output_size": %X{size} }%n</pattern>
+        </layout>
+    </appender>
+
+
     <logger name="opendap" level="error">
         <appender-ref ref="ErrorLog"/>
     </logger>
@@ -169,6 +181,7 @@
 
     <logger name="HyraxAccess" level="info">
         <appender-ref ref="HyraxAccessLog"/>
+        <appender-ref ref="HyraxNGAP"/>
     </logger>
     <!-- logger name="HyraxLastModifiedAccess" level="info">
         <appender-ref ref="HyraxAccessLog"/>

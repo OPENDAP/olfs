@@ -404,8 +404,6 @@ public class ServletLogUtil {
             startMsg.append("QueryString: '").append(query).append("' ");
             startMsg.append("AccessLog: ").append(logName);
             log.info(startMsg.toString());
-            //Send log info to Cloud Metrics
-            //PATH: resources/hyrax/WEB-INF/conf/logback.xml
         }
     }
 
