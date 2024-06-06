@@ -150,31 +150,6 @@
         </encoder>
     </appender>
 
-    <appender name="JsonAccessLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <File>${logdir}/JsonAccess.log</File>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${logdir}/JsonAccess.%d{yyyy-MM-dd}.log</fileNamePattern>
-            <!-- keep 30 days worth of history -->
-            <MaxHistory>30</MaxHistory>
-        </rollingPolicy>
-        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>{ "request_id": "%8X{ID}", "job_id": "%X{ident}", "time_completed":"%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}", "total_time":"%8X{duration}", "http_response_code":"%X{http_status}", "output_size":"%X{size}" }%n</pattern>
-        </encoder>
-    </appender>
-
-    <appender name="HyraxAWS" class="com.j256.cloudwatchlogbackappender.CloudWatchAppender">
-        <region>us-west-2</region>
-        <logGroup>HyraxCluster</logGroup>
-        <logStream>TestyTestTest</logStream>
-        <accessKeyId>XXXXXXX</accessKeyId>
-        <secretKey>XXXXXXXXX</secretKey>
-        <layout>
-            <pattern>This is a test of the CloudWatchLogbackAppender</pattern>
-        </layout>
-        <appender-ref ref="stdout" />
-    </appender>
-
-
     <!-- OPeNDAP Hyrax Logging -->
 
     <logger name="opendap" level="error" >
@@ -185,10 +160,7 @@
     <!-- Access/Performance Logging -->
     <logger name="HyraxAccess" level="info">
         <appender-ref ref="HyraxAccessLog"/>
-        <appender-ref ref="JsonAccessLog"/>
-        <appender-ref ref="HyraxAWS"/>
     </logger>
-
     <logger name="DocsAccess" level="info">
         <appender-ref ref="HyraxAccessLog"/>
     </logger>
