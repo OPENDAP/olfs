@@ -162,6 +162,7 @@
         </encoder>
     </appender>
 
+
     <appender name="HyraxNGAP" class="com.j256.cloudwatchlogbackappender.CloudWatchAppender">
         <region>us-west-2</region>
         <logGroup>HyraxCluster</logGroup>
@@ -169,7 +170,16 @@
         <accessKeyId>AWS_ACCESS_KEY_ID</accessKeyId>
         <secretKey>AWS_SECRET_KEY</secretKey>
         <layout>
-            <pattern>{ "request_id": "%8X{ID}", "job_id": "%X{ident}", "user": "%X{userid}", "path": "%X{resourceID}", "time_completed":"%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}", "total_time": %8X{duration}, "http_response_code": %X{http_status}, "output_size": %X{size} }%n</pattern>
+            <!--
+               What follows is the pattern, verbatim, from the JsonAccessLog appender.
+            -->
+            <pattern>{ "request_id": "%8X{ID}", "job_id": "%X{ident}", "time_completed":"%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}", "total_time":"%8X{duration}", "http_response_code":"%X{http_status}", "output_size":"%X{size}" }%n</pattern>
+
+            <!--
+                What follows is a modification to the pattern that adds the path and the user id, these may not
+                conform to the "request" part of the metrics schema
+            -->
+            <!-- pattern>{ "request_id": "%8X{ID}", "job_id": "%X{ident}", "user": "%X{userid}", "path": "%X{resourceID}", "time_completed":"%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}", "total_time": %8X{duration}, "http_response_code": %X{http_status}, "output_size": %X{size} }%n</pattern -->
         </layout>
     </appender>
 
@@ -232,7 +242,7 @@
 
     <root level="error">
         <!--
-            This appender, HAI_DEBUG_LOGGER, is used by the Hyrax Admin interface
+            This appender, HAI_DEBUG_LOGGER, is used by the Hyrax Admin interface,
             and it must appear here in the root level in order to catch all the stuff,
             adn in order for the Java software to be able to locate it at run time.
         -->
