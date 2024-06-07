@@ -183,7 +183,7 @@
         <!--secretKey>AWS_SECRET_ACCESS_KEY</secretKey-->
         <layout>
             <!-- %X{resourceID} is the URL Path (in NGAP, nominally the 'restified path') -->
-            <pattern>{ "request_id": "%8X{ID}", "user_id": "%X{userid}", "rangeBeginDateTime": "N/A", "rangeEndDateTime":"N/A", "collectionId": "%X{resourceID}", "bbox": "N/A", "parameters": { "service_name": "hyrax", "service_provider": "OPeNDAP", "service_id": "From UMM-S Record" } }%n</pattern>
+            <pattern>{ "request_id": "%8X{ID}", "user_id": "%X{userid}", "rangeBeginDateTime": "N/A", "rangeEndDateTime":"N/A", "collectionId": "%X{resourceID}", "bbox": "N/A", "parameters": { "service_name": "hyrax", "service_provider": "OPeNDAP", "service_id": "hyrax_prod" } }%n</pattern>
         </layout>
     </appender>
 
