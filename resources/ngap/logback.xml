@@ -162,7 +162,6 @@
         </encoder>
     </appender>
 
-
     <!--
     NGAP Request Required Fields
     "required": [
@@ -178,34 +177,35 @@
     -->
     <appender name="CloudWatchRequestLogAppender" class="com.j256.cloudwatchlogbackappender.CloudWatchAppender">
         <region>us-west-2</region>
-        <logGroup>HyraxCluster</logGroup>
+        <logGroup>hyrax_request_log</logGroup>
         <logStream>hyrax-%instanceId</logStream>
         <accessKeyId>AWS_ACCESS_KEY_ID</accessKeyId>
         <secretKey>AWS_SECRET_ACCESS_KEY</secretKey>
         <layout>
-            <pattern>{ "request_id": "%8X{ID}", "user_id": "%X{userid}", "rangeBeginDateTime": "-", "rangeEndDateTime":"-", "collectionId": "%X{resourceID}", "bbox": "-", "parameters": { "service_name": "hyrax", "service_provider": "OPeNDAP", "service_id": "From UMM-S Record" } }%n</pattern>
+            <!-- %X{resourceID} is the URL Path (in NGAP, nominally the 'restified path') -->
+            <pattern>{ "request_id": "%8X{ID}", "user_id": "%X{userid}", "rangeBeginDateTime": "N/A", "rangeEndDateTime":"N/A", "collectionId": "%X{resourceID}", "bbox": "N/A", "parameters": { "service_name": "hyrax", "service_provider": "OPeNDAP", "service_id": "From UMM-S Record" } }%n</pattern>
         </layout>
     </appender>
 
     <!--
-    NGAP Response Required Fields
+    NGAP Response Required Fields. See: https://wiki.earthdata.nasa.gov/pages/viewpage.action?pageId=248026243
     "required": [
         "request_id",
         "job_ids",
         "http_response_code",
-        "time_completed",
+        "time_completed", (2022-05-04T09:13:20Z)
         "total_time",
         "output_size"
     ]
     -->
     <appender name="CloudWatchResponseLogAppender" class="com.j256.cloudwatchlogbackappender.CloudWatchAppender">
         <region>us-west-2</region>
-        <logGroup>HyraxCluster</logGroup>
+        <logGroup>hyrax_response_log</logGroup>
         <logStream>hyrax-%instanceId</logStream>
         <accessKeyId>AWS_ACCESS_KEY_ID</accessKeyId>
         <secretKey>AWS_SECRET_ACCESS_KEY</secretKey>
         <layout>
-            <pattern>{ "request_id": "%8X{ID}", "job_ids": ["Leroy Jenkins", "Homer Simpson", "Lovejoy", "Jimmy The Weasel"], "http_response_code": "%X{http_status}", "time_completed":"%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}", "total_time":"%8X{duration}", "output_size":"%X{size}" }%n</pattern>
+            <pattern>{ "request_id": "%8X{ID}", "job_ids": ["N/A"], "http_response_code": "%X{http_status}", "time_completed":"%d{yyyy-MM-dd'T'HH:mm:ssZ}", "total_time":"%8X{duration}", "output_size":"%X{size}" }%n</pattern>
         </layout>
     </appender>
 
