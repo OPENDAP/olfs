@@ -475,6 +475,9 @@ public class DispatchServlet extends HttpServlet {
                     return;
                 }
 
+                // @FIXME How can we push the determination down the execution
+                //   stack and into the NgapDispatchHandler, determine the collection id
+                //   and also normalize the start and stop access logging?
                 ServletLogUtil.mdcPut("collection_concept_id", "C765765123-PODAAC");
                 ServletLogUtil.logServerAccessStart(request, ServletLogUtil.HYRAX_ACCESS_LOG_ID, "HTTP-GET", reqId);
 
