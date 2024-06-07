@@ -179,8 +179,8 @@
         <region>us-west-2</region>
         <logGroup>hyrax_request_log</logGroup>
         <logStream>hyrax-%instanceId</logStream>
-        <accessKeyId>AWS_ACCESS_KEY_ID</accessKeyId>
-        <secretKey>AWS_SECRET_ACCESS_KEY</secretKey>
+        <!--accessKeyId>AWS_ACCESS_KEY_ID</accessKeyId-->
+        <!--secretKey>AWS_SECRET_ACCESS_KEY</secretKey-->
         <layout>
             <!-- %X{resourceID} is the URL Path (in NGAP, nominally the 'restified path') -->
             <pattern>{ "request_id": "%8X{ID}", "user_id": "%X{userid}", "rangeBeginDateTime": "N/A", "rangeEndDateTime":"N/A", "collectionId": "%X{resourceID}", "bbox": "N/A", "parameters": { "service_name": "hyrax", "service_provider": "OPeNDAP", "service_id": "From UMM-S Record" } }%n</pattern>
@@ -202,8 +202,8 @@
         <region>us-west-2</region>
         <logGroup>hyrax_response_log</logGroup>
         <logStream>hyrax-%instanceId</logStream>
-        <accessKeyId>AWS_ACCESS_KEY_ID</accessKeyId>
-        <secretKey>AWS_SECRET_ACCESS_KEY</secretKey>
+        <!--accessKeyId>AWS_ACCESS_KEY_ID</accessKeyId-->
+        <!--secretKey>AWS_SECRET_ACCESS_KEY</secretKey-->
         <layout>
             <pattern>{ "request_id": "%8X{ID}", "job_ids": ["N/A"], "http_response_code": "%X{http_status}", "time_completed":"%d{yyyy-MM-dd'T'HH:mm:ssZ}", "total_time":"%8X{duration}", "output_size":"%X{size}" }%n</pattern>
         </layout>
