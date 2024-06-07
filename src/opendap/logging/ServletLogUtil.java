@@ -522,9 +522,9 @@ public class ServletLogUtil {
             Logger cwResponseLog = org.slf4j.LoggerFactory.getLogger(CLOUDWATCH_RESPONSE_LOG);
             cwResponseLog.info("");
         }
-
         log.info("REQUEST COMPLETE - http_status: " + MDC.get(HTTP_STATUS_KEY) + " duration: "+ MDC.get(DURATION_KEY) + "  size: "+MDC.get(RESPONSE_SIZE_KEY));
 
+        cleanupMDC();
     }
 
     /**
