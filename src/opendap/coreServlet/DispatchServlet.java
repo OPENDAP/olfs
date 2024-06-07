@@ -139,9 +139,10 @@ public class DispatchServlet extends HttpServlet {
             Element config = configDoc.getRootElement();
 
             Element enableCombinedLog = config.getChild("EnableCombinedLog");
-            if(enableCombinedLog!=null){
-                ServletLogUtil.useCombinedLog(true);
-            }
+            ServletLogUtil.useCombinedLog(enableCombinedLog!=null);
+
+            Element useDualCWLogs = config.getChild("UseDualCloudWatchLogs");
+            ServletLogUtil.useDualCloudWatchLogs(useDualCWLogs!=null);
 
             boolean enablePost = false;
             Element postConfig = config.getChild("HttpPost");
@@ -459,7 +460,7 @@ public class DispatchServlet extends HttpServlet {
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
 
-        int request_status = HttpServletResponse.SC_OK;
+        int httpStatus = HttpServletResponse.SC_OK;
 
         try {
             Procedure timedProcedure = Timer.start();
@@ -474,6 +475,7 @@ public class DispatchServlet extends HttpServlet {
                     return;
                 }
 
+                ServletLogUtil.mdcPut("collection_concept_id", "C765765123-PODAAC");
                 ServletLogUtil.logServerAccessStart(request, ServletLogUtil.HYRAX_ACCESS_LOG_ID, "HTTP-GET", reqId);
 
                 if (redirectForServiceOnlyRequest(request, response))
@@ -499,14 +501,14 @@ public class DispatchServlet extends HttpServlet {
                     dh.handleRequest(request, response);
 
                 } else {
-                    request_status = OPeNDAPException.anyExceptionHandler(new NotFound("Failed to locate resource: " + relativeUrl), this, response);
+                    httpStatus = OPeNDAPException.anyExceptionHandler(new NotFound("Failed to locate resource: " + relativeUrl), this, response);
                 }
             } finally {
                 Timer.stop(timedProcedure);
             }
         } catch (Throwable t) {
             try {
-                request_status = OPeNDAPException.anyExceptionHandler(t, this, response);
+                httpStatus = OPeNDAPException.anyExceptionHandler(t, this, response);
             } catch (Throwable t2) {
                 try {
                     log.error("\n########################################################\n" +
@@ -515,11 +517,11 @@ public class DispatchServlet extends HttpServlet {
                             "This is the last error log attempt for this request.\n" +
                             "########################################################\n", t2);
                 } catch (Throwable t3) {
-                    // It's boned now.. Leave it be.
+                    // It's boned now... Leave it be.
                 }
             }
         } finally {
-            ServletLogUtil.logServerAccessEnd(request_status, ServletLogUtil.HYRAX_ACCESS_LOG_ID);
+            ServletLogUtil.logServerAccessEnd(httpStatus, ServletLogUtil.HYRAX_ACCESS_LOG_ID);
             RequestCache.close();
             log.info("Response completed.\n");
         }
