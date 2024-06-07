@@ -411,10 +411,10 @@ public class ServletLogUtil {
             startMsg.append("AccessLog: ").append(logName);
             log.info(startMsg.toString());
         }
-        if(logName.equals(HYRAX_ACCESS_LOG_ID)){
-            cloudWatchLogRequestStart();
+        if(logName.equals(HYRAX_ACCESS_LOG_ID) && useDualCloudWatchLogs.get()){
+            Logger cwRequestLog = org.slf4j.LoggerFactory.getLogger(CLOUDWATCH_REQUEST_LOG);
+            cwRequestLog.info("");
         }
-
     }
 
     /**
@@ -518,8 +518,9 @@ public class ServletLogUtil {
         Logger access_log = org.slf4j.LoggerFactory.getLogger(logName);
         access_log.info("");
 
-        if(logName.equals(HYRAX_ACCESS_LOG_ID)){
-            cloudWatchLogRequestComplete();
+        if(logName.equals(HYRAX_ACCESS_LOG_ID) && useDualCloudWatchLogs.get()){
+            Logger cwResponseLog = org.slf4j.LoggerFactory.getLogger(CLOUDWATCH_RESPONSE_LOG);
+            cwResponseLog.info("");
         }
 
         log.info("REQUEST COMPLETE - http_status: " + MDC.get(HTTP_STATUS_KEY) + " duration: "+ MDC.get(DURATION_KEY) + "  size: "+MDC.get(RESPONSE_SIZE_KEY));
@@ -569,20 +570,6 @@ public class ServletLogUtil {
 
     public static void useDualCloudWatchLogs(boolean value) {
         useDualCloudWatchLogs.set(value);
-    }
-
-    public static void cloudWatchLogRequestStart(){
-        if(useDualCloudWatchLogs.get()){
-            Logger cwRequestLog = org.slf4j.LoggerFactory.getLogger(CLOUDWATCH_REQUEST_LOG);
-            cwRequestLog.info("");
-        }
-    }
-
-    public static void cloudWatchLogRequestComplete(){
-        if(useDualCloudWatchLogs.get()){
-            Logger cwResponseLog = org.slf4j.LoggerFactory.getLogger(CLOUDWATCH_RESPONSE_LOG);
-            cwResponseLog.info("");
-        }
     }
 
     public static void mdcPut(String key, String value){
