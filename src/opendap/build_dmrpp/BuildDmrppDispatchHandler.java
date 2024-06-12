@@ -269,11 +269,11 @@ public class BuildDmrppDispatchHandler implements DispatchHandler {
         sos.println("<br/>");
         sos.println("hyrax version: " + Version.getHyraxVersionString()+" <br/>");
         Document besversion = null;
-        String failMsg = "bes version Acquisition Failed!";
+        String failMsg = "BES version acquisition failed!";
         try {
             besversion = BESManager.getBES("/").getVersionDocument();
         } catch (BESError | BadConfigurationException | JDOMException | PPTException | RuntimeException e){
-            log.info(failMsg);
+            log.info("Unable to acquire version document for BES. Caught {}, message: {}",e.getClass().getName(), e.getMessage());
             sos.println("bes version: " + failMsg + " <br/>");
         }
         if(besversion != null){
