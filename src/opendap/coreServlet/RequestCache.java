@@ -83,17 +83,28 @@ public class RequestCache {
      * @param request The request which is being serviced by the current thread.
      */
     public static void open(HttpServletRequest request){
-
-        if(cache.containsKey(Thread.currentThread())){
-            log.info("Request cache for thread: "+Thread.currentThread() +
+        Thread thisThread = Thread.currentThread();
+        if(cache.containsKey(thisThread)){
+            log.info("Request cache for thread: " + Thread.currentThread() +
                     " already exists. No need to create one.");
+            HashMap<String,CachedObj> tcache = cache.get(thisThread);
+            CachedObj idObj = tcache.get(REQUEST_ID_KEY);
+            if(idObj==null || !(idObj.getObj() instanceof String) ){
+                String reqId = ReqInfo.getRequestId(request);
+                put(REQUEST_ID_KEY,reqId);
+                log.info("Cached new request id: {}", reqId);
+            }
+            else {
+                log.info("Found existing request id: {}", ((String)idObj.getObj()));
+            }
         }
         else {
-            HashMap<String, CachedObj> hm = new HashMap<String, CachedObj>();
-            cache.put(Thread.currentThread(), hm);
-            log.info("Created request cache for thread: {}", Thread.currentThread());
+            HashMap<String, CachedObj> hm = new HashMap<>();
+            cache.put(thisThread, hm);
+            log.info("Created request cache for thread: {}", thisThread.getName());
             String reqId = ReqInfo.getRequestId(request);
             put(REQUEST_ID_KEY,reqId);
+            log.info("Cached new request id: {}", reqId);
         }
     }
 
@@ -151,7 +162,7 @@ public class RequestCache {
      * opendap.coreServlet.ReqInfo.getRequestId() for more on how that's
      * handled.
      *
-     * @return
+     * @return The request id being serviced by the current thread.
      */
     public static String getRequestId(){
         Object id = get(REQUEST_ID_KEY);
