@@ -62,8 +62,8 @@
     -->
 
     <!--
-    This appender, HAI_DEBUG_LOGGER, is used by the Hyrax Admin interface
-    and it must defined and added to the root logger in order to catch all the stuff,
+    This appender, HAI_DEBUG_LOGGER, is used by the Hyrax Admin interface,
+    and it must be defined and added to the root logger in order to catch all the stuff,
     and in order for the Java software to be able to locate it at run time.
     -->
     <appender name="HAI_DEBUG_LOGGER" class="ch.qos.logback.core.read.CyclicBufferAppender">
