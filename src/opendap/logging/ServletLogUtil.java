@@ -283,7 +283,7 @@ public class ServletLogUtil {
             configurator.doConfigure(logbackConfigFile);
             log.info("Configuration via {} successful.",configurator.getClass().getName());
         } catch (JoranException je) {
-            log.error("Caught {} Messge: ",je.getClass().getName(),je.getMessage());
+            log.error("Caught {} Message: {}",je.getClass().getName(),je.getMessage());
             StringWriter sw = new StringWriter();
             je.printStackTrace(new PrintWriter(sw));
             log.error("Stack trace: \n{}",sw.toString());
