@@ -1,12 +1,7 @@
 package com.j256.cloudwatchlogbackappender;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -420,7 +415,8 @@ public class CloudWatchAppender extends UnsynchronizedAppenderBase<ILoggingEvent
 				newEvent.addMarker(marker);
 			}
 		}
-		newEvent.setMDCPropertyMap(loggingEvent.getMDCPropertyMap());
+		Map mdcMap = loggingEvent.getMDCPropertyMap();
+		newEvent.setMDCPropertyMap(mdcMap);
 		if (message == null) {
 			newEvent.setMessage(loggingEvent.getMessage());
 		} else {
@@ -626,8 +622,14 @@ public class CloudWatchAppender extends UnsynchronizedAppenderBase<ILoggingEvent
 			}
 			AWSLogs client;
 			if (testAwsLogsClient == null) {
-				client = AWSLogsClientBuilder.standard().withCredentials(credentialProvider).withRegion(region).build();
-			} else {
+				if(MiscUtils.isBlank(accessKeyId)){
+					client = AWSLogsClientBuilder.defaultClient();
+				}
+				else {
+					client = AWSLogsClientBuilder.standard().withCredentials(credentialProvider).withRegion(region).build();
+				}
+			}
+			else {
 				client = testAwsLogsClient;
 			}
 			try {
