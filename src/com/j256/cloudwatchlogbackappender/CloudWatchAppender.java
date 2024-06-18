@@ -615,29 +615,39 @@ public class CloudWatchAppender extends UnsynchronizedAppenderBase<ILoggingEvent
 				secretKey = System.getProperty(AWS_SECRET_KEY_PROPERTY);
 			}
 			if (MiscUtils.isBlank(accessKeyId)) {
+				System.err.println("No credentials located, using DefaultAWSCredentialsProviderChain");
 				// if we are still blank then use the default credentials provider
 				credentialProvider = new DefaultAWSCredentialsProviderChain();
 			} else {
+				System.err.println("Credentials located, using AWSStaticCredentialsProvider");
 				credentialProvider = new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKeyId, secretKey));
 			}
 			AWSLogs client;
 			if (testAwsLogsClient == null) {
 				if(MiscUtils.isBlank(accessKeyId)){
+					// If no creds are provided then there may be an IAM Role
+					// assigned to the instance that allows processes running
+					// on it to write to CloudWatch logs without additional
+					// authentication. In order to make use of this scenario
+					// we need to use the default client.
 					client = AWSLogsClientBuilder.defaultClient();
 				}
 				else {
+					System.err.println("Credentials located, using AWSLogsClientBuilder.standard()");
 					client = AWSLogsClientBuilder.standard().withCredentials(credentialProvider).withRegion(region).build();
 				}
 			}
 			else {
 				client = testAwsLogsClient;
 			}
+			System.err.println("CloudWatchAppender is using "+ client.getClass().getName());
 			try {
 				lookupInstanceName(credentialProvider);
 			} catch (Exception e) {
 				appendEvent(Level.ERROR, "Problems looking up instance-name", e);
 			}
 			logStreamName = buildLogStreamName();
+			System.err.println("CloudWatchAppender is using logStream: "+ logStreamName);
 			verifyLogGroupExists(client);
 			verifyLogStreamExists(client);
 			awsLogsClient = client;
