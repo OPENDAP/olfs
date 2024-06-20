@@ -620,8 +620,10 @@ public class CloudWatchAppender extends UnsynchronizedAppenderBase<ILoggingEvent
 				secretKey = System.getProperty(AWS_SECRET_KEY_PROPERTY);
 			}
 			if (MiscUtils.isBlank(accessKeyId)) {
+				// When the host is assigned IAM roles that permit
+				// processes running on it to write to CloudWatch and
+				// query EC2, credentials can be omitted.
 				System.err.println("No credentials located, using DefaultAWSCredentialsProviderChain");
-				// if we are still blank then use the default credentials provider
 				credentialProvider = null;
 			} else {
 				System.err.println("Credentials located, using AWSStaticCredentialsProvider");
@@ -753,6 +755,10 @@ public class CloudWatchAppender extends UnsynchronizedAppenderBase<ILoggingEvent
 								.build();
 					}
 					else {
+						// When the EC2 instance is assign roles that permit
+						// processes running on it to write to CloudWatch and
+						// query EC2, credentials can be omitted and the
+						// default client may be used.
 						ec2Client = AmazonEC2ClientBuilder.defaultClient();
 					}
 				} else {
