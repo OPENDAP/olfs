@@ -622,7 +622,7 @@ public class CloudWatchAppender extends UnsynchronizedAppenderBase<ILoggingEvent
 			if (MiscUtils.isBlank(accessKeyId)) {
 				System.err.println("No credentials located, using DefaultAWSCredentialsProviderChain");
 				// if we are still blank then use the default credentials provider
-				credentialProvider = new DefaultAWSCredentialsProviderChain();
+				credentialProvider = null;
 			} else {
 				System.err.println("Credentials located, using AWSStaticCredentialsProvider");
 				credentialProvider = new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKeyId, secretKey));
@@ -746,10 +746,15 @@ public class CloudWatchAppender extends UnsynchronizedAppenderBase<ILoggingEvent
 			AmazonEC2 ec2Client = null;
 			try {
 				if (testAmazonEc2Client == null) {
-					ec2Client = AmazonEC2ClientBuilder.standard()
-							.withCredentials(credentialProvider)
-							.withRegion(region)
-							.build();
+					if(credentialProvider != null) {
+						ec2Client = AmazonEC2ClientBuilder.standard()
+								.withCredentials(credentialProvider)
+								.withRegion(region)
+								.build();
+					}
+					else {
+						ec2Client = AmazonEC2ClientBuilder.defaultClient();
+					}
 				} else {
 					ec2Client = testAmazonEc2Client;
 				}
