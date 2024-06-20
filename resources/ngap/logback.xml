@@ -179,10 +179,7 @@
         <region>us-west-2</region>
         <logGroup>hyrax_request_log</logGroup>
         <logStream>hyrax-%instanceId</logStream>
-        <!--accessKeyId>AWS_ACCESS_KEY_ID</accessKeyId-->
-        <!--secretKey>AWS_SECRET_ACCESS_KEY</secretKey-->
         <layout>
-            <!-- %X{resourceID} is the URL Path (in NGAP, nominally the 'restified path') -->
             <pattern>{ "request_id": "%8X{ID}", "user_id": "%X{userid}", "rangeBeginDateTime": "N/A", "rangeEndDateTime":"N/A", "collectionId": "%X{resourceID}", "bbox": "N/A", "parameters": { "service_name": "hyrax", "service_provider": "OPeNDAP", "service_id": "hyrax_prod" } }%n</pattern>
         </layout>
     </appender>
@@ -202,8 +199,6 @@
         <region>us-west-2</region>
         <logGroup>hyrax_response_log</logGroup>
         <logStream>hyrax-%instanceId</logStream>
-        <!--accessKeyId>AWS_ACCESS_KEY_ID</accessKeyId-->
-        <!--secretKey>AWS_SECRET_ACCESS_KEY</secretKey-->
         <layout>
             <pattern>{ "request_id": "%8X{ID}", "job_ids": ["N/A"], "http_response_code": "%X{http_status}", "time_completed":"%d{yyyy-MM-dd'T'HH:mm:ssZ}", "total_time":"%8X{duration}", "output_size":"%X{size}" }%n</pattern>
         </layout>
@@ -215,6 +210,26 @@
         <appender-ref ref="ErrorLog"/>
     </logger>
 
+    <logger name="HyraxAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+
+    <logger name="DocsAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+
+    <logger name="WCSAccess" level="info">
+        <appender-ref ref="HyraxAccessLog"/>
+    </logger>
+
+    <logger name="BesCommandLog" level="info">
+        <appender-ref ref="BESCommandLogAppender"/>
+    </logger>
+
+    <logger name="EDL_LOG" level="info">
+        <appender-ref ref="EdlLogAppender"/>
+    </logger>
+
     <logger name="CloudWatchRequestLog" level="info">
         <appender-ref ref="CloudWatchRequestLogAppender"/>
     </logger>
@@ -223,58 +238,6 @@
         <appender-ref ref="CloudWatchResponseLogAppender"/>
     </logger>
 
-
-    <logger name="HyraxAccess" level="info">
-        <appender-ref ref="HyraxAccessLog"/>
-    </logger>
-
-    <!-- logger name="HyraxLastModifiedAccess" level="info">
-        <appender-ref ref="HyraxAccessLog"/>
-    </logger -->
-
-    <logger name="DocsAccess" level="info">
-        <appender-ref ref="HyraxAccessLog"/>
-    </logger>
-    <logger name="SiteMapAccess" level="info">
-        <appender-ref ref="HyraxAccessLog"/>
-    </logger>
-    <logger name="PDPServiceAccess" level="info">
-        <appender-ref ref="HyraxAccessLog"/>
-    </logger>
-    <!-- logger name="PDPServiceLastModifiedAccess" level="info">
-        <appender-ref ref="HyraxAccessLog"/>
-    </logger -->
-    <logger name="HyraxGatewayAccess" level="info">
-        <appender-ref ref="HyraxAccessLog"/>
-    </logger>
-    <!-- logger name="HyraxGatewayLastModifiedAccess" level="info">
-        <appender-ref ref="HyraxAccessLog"/>
-    </logger -->
-    <logger name="HyraxAdminAccess" level="info">
-        <appender-ref ref="HyraxAccessLog"/>
-    </logger>
-    <!-- logger name="HyraxAdminLastModifiedAccess" level="info">
-        <appender-ref ref="HyraxAccessLog"/>
-    </logger -->
-    <logger name="S3ServiceAccess" level="info">
-        <appender-ref ref="HyraxAccessLog"/>
-    </logger>
-    <!-- logger name="S3ServiceLastModifiedAccess" level="info">
-        <appender-ref ref="HyraxAccessLog"/>
-    </logger -->
-    <logger name="WCSAccess" level="info">
-        <appender-ref ref="HyraxAccessLog"/>
-    </logger>
-    <!-- logger name="WCSLastModifiedAccess" level="info">
-        <appender-ref ref="HyraxAccessLog"/>
-    </logger -->
-    <logger name="BesCommandLog" level="info">
-        <appender-ref ref="BESCommandLogAppender"/>
-    </logger>
-
-    <logger name="EDL_LOG" level="info">
-        <appender-ref ref="EdlLogAppender"/>
-    </logger>
 
     <root level="error">
         <!--

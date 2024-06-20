@@ -258,6 +258,7 @@ public class ServletLogUtil {
         if (logbackFile != null) {
             log.info("Logback configuration using: {}", logbackFile);
             LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+            loggerContext.reset();
             attemptJoranConfiguration(logbackFile, loggerContext);
             if(log.isInfoEnabled()){
                 log.info("LoggerContext Follows: {}", logbackFile);
@@ -379,7 +380,6 @@ public class ServletLogUtil {
      */
     public static void logServerAccessStart(HttpServletRequest req, String logName,  String httpVerb, String reqID) {
 
-        ;
         HttpSession session = req.getSession(false);
 
         MDC.put(ID_KEY, reqID);

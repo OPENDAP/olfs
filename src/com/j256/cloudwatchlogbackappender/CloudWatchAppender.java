@@ -405,6 +405,7 @@ public class CloudWatchAppender extends UnsynchronizedAppenderBase<ILoggingEvent
 	 * Copy the event fields possible replacing the message if not null.
 	 */
 	private LoggingEvent copyEvent(ILoggingEvent loggingEvent, String message) {
+		System.err.println("CouldWatchAppender.copyEvent(): ILoggingEvent is an instance of " + loggingEvent.getClass().getName());
 		LoggingEvent newEvent = new LoggingEvent();
 		newEvent.setArgumentArray(loggingEvent.getArgumentArray());
 		newEvent.setLevel(loggingEvent.getLevel());
@@ -550,7 +551,11 @@ public class CloudWatchAppender extends UnsynchronizedAppenderBase<ILoggingEvent
 					stopMessagesThreadLocal.set(false);
 				}
 				if (exception != null) {
-					appendEvent(Level.ERROR, "Problems initializing cloudwatch writer", exception);
+					String msg = "CouldWatchAppender.writeEvents() - " +
+							"ERROR: Problems initializing cloudwatch writer. " +
+							"Message: " + exception.getMessage();
+					System.err.println(msg);
+					// appendEvent(Level.ERROR, msg, exception);
 				}
 			}
 
