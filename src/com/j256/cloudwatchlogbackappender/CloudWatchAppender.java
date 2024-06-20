@@ -749,6 +749,7 @@ public class CloudWatchAppender extends UnsynchronizedAppenderBase<ILoggingEvent
 		}
 
 		private void lookupInstanceName(AWSCredentialsProvider credentialProvider) {
+			String prolog = "CloudWatchWriter.lookupInstanceName() - ";
 			String instanceId = EC2MetadataUtils.getInstanceId();
 			if (instanceId == null) {
 				return;
@@ -762,7 +763,7 @@ public class CloudWatchAppender extends UnsynchronizedAppenderBase<ILoggingEvent
 								.withCredentials(credentialProvider)
 								.withRegion(region)
 								.build();
-						System.err.println("AWS credentials located, using AmazonEC2ClientBuilder.standard()");
+						System.err.println(prolog + "AWS credentials located, using AmazonEC2ClientBuilder.standard()");
 					}
 					else {
 						// When the EC2 instance is assigned roles that permit
@@ -770,7 +771,7 @@ public class CloudWatchAppender extends UnsynchronizedAppenderBase<ILoggingEvent
 						// query EC2, credentials can be omitted and the
 						// default client may be used.
 						ec2Client = AmazonEC2ClientBuilder.defaultClient();
-						System.err.println("No AWS credentials located, using AmazonEC2ClientBuilder.defaultClient()");
+						System.err.println(prolog + "No AWS credentials located, using AmazonEC2ClientBuilder.defaultClient()");
 					}
 				} else {
 					ec2Client = testAmazonEc2Client;
@@ -787,9 +788,9 @@ public class CloudWatchAppender extends UnsynchronizedAppenderBase<ILoggingEvent
 						return;
 					}
 				}
-				appendEvent(Level.INFO, "Could not find EC2 instance name in tags: " + tags, null);
+				appendEvent(Level.INFO, prolog + "Could not find EC2 instance name in tags: " + tags, null);
 			} catch (AmazonServiceException ase) {
-				appendEvent(Level.WARN, "Looking up EC2 instance-name threw", ase);
+				appendEvent(Level.WARN, prolog +"Looking up EC2 instance-name threw AmazonServiceException", ase);
 			} finally {
 				if (ec2Client != null) {
 					ec2Client.shutdown();
