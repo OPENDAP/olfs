@@ -13,7 +13,6 @@ import com.amazonaws.SDKGlobalConfiguration;
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2ClientBuilder;
 import com.amazonaws.services.ec2.model.DescribeTagsRequest;
@@ -405,7 +404,6 @@ public class CloudWatchAppender extends UnsynchronizedAppenderBase<ILoggingEvent
 	 * Copy the event fields possible replacing the message if not null.
 	 */
 	private LoggingEvent copyEvent(ILoggingEvent loggingEvent, String message) {
-		System.err.println("CouldWatchAppender.copyEvent(): ILoggingEvent is an instance of " + loggingEvent.getClass().getName());
 		LoggingEvent newEvent = new LoggingEvent();
 		newEvent.setArgumentArray(loggingEvent.getArgumentArray());
 		newEvent.setLevel(loggingEvent.getLevel());
@@ -416,7 +414,7 @@ public class CloudWatchAppender extends UnsynchronizedAppenderBase<ILoggingEvent
 				newEvent.addMarker(marker);
 			}
 		}
-		Map mdcMap = loggingEvent.getMDCPropertyMap();
+		Map<String, String> mdcMap = loggingEvent.getMDCPropertyMap();
 		newEvent.setMDCPropertyMap(mdcMap);
 		if (message == null) {
 			newEvent.setMessage(loggingEvent.getMessage());
@@ -623,11 +621,11 @@ public class CloudWatchAppender extends UnsynchronizedAppenderBase<ILoggingEvent
 				// When the host is assigned IAM roles that permit
 				// processes running on it to write to CloudWatch and
 				// query EC2, credentials can be omitted.
-				System.err.println("No credentials located, using DefaultAWSCredentialsProviderChain");
 				credentialProvider = null;
+				System.err.println("No AWS credentials located. credentialProvider is null");
 			} else {
-				System.err.println("Credentials located, using AWSStaticCredentialsProvider");
 				credentialProvider = new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKeyId, secretKey));
+				System.err.println("AWS credentials located, using AWSStaticCredentialsProvider");
 			}
 			AWSLogs client;
 			if (testAwsLogsClient == null) {
@@ -638,9 +636,10 @@ public class CloudWatchAppender extends UnsynchronizedAppenderBase<ILoggingEvent
 					// authentication. In order to make use of this scenario
 					// we need to use the default client.
 					client = AWSLogsClientBuilder.defaultClient();
+					System.err.println("No AWS credentials located, using AWSLogsClientBuilder.defaultClient()");
 				}
 				else {
-					System.err.println("Credentials located, using AWSLogsClientBuilder.standard()");
+					System.err.println("AWS credentials located, using AWSLogsClientBuilder.standard()");
 					client = AWSLogsClientBuilder.standard().withCredentials(credentialProvider).withRegion(region).build();
 				}
 			}
@@ -753,13 +752,15 @@ public class CloudWatchAppender extends UnsynchronizedAppenderBase<ILoggingEvent
 								.withCredentials(credentialProvider)
 								.withRegion(region)
 								.build();
+						System.err.println("AWS credentials located, using AmazonEC2ClientBuilder.standard()");
 					}
 					else {
-						// When the EC2 instance is assign roles that permit
+						// When the EC2 instance is assigned roles that permit
 						// processes running on it to write to CloudWatch and
 						// query EC2, credentials can be omitted and the
 						// default client may be used.
 						ec2Client = AmazonEC2ClientBuilder.defaultClient();
+						System.err.println("No AWS credentials located, using AmazonEC2ClientBuilder.defaultClient()");
 					}
 				} else {
 					ec2Client = testAmazonEc2Client;
