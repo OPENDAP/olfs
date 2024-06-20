@@ -1,5 +1,7 @@
 package com.j256.cloudwatchlogbackappender;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -531,6 +533,7 @@ public class CloudWatchAppender extends UnsynchronizedAppenderBase<ILoggingEvent
 		}
 
 		private void writeEvents(List<ILoggingEvent> events) {
+			String prolog = "CloudWatchWriter.writeEvents() - ";
 
 			if (!initialized) {
 				initialized = true;
@@ -549,21 +552,27 @@ public class CloudWatchAppender extends UnsynchronizedAppenderBase<ILoggingEvent
 					stopMessagesThreadLocal.set(false);
 				}
 				if (exception != null) {
-					String msg = "CouldWatchAppender.writeEvents() - " +
+					String msg = prolog +
 							"ERROR: Problems initializing cloudwatch writer. " +
 							"Message: " + exception.getMessage();
 					System.err.println(msg);
+					StringWriter writer = new StringWriter();
+					exception.printStackTrace(new PrintWriter(writer));
+					System.err.println(prolog + writer);
+
 					// appendEvent(Level.ERROR, msg, exception);
 				}
 			}
 
-			// if we didn't get an aws logs-client then just write to the emergency appender (if any)
+			// if we didn't get an aws logs-client then just write to the
+			// emergency appender (if any)
 			if (awsLogsClient == null) {
 				appendToEmergencyAppender(events);
 				return;
 			}
 
-			// we need this in case our RPC calls create log output which we don't want to then log again
+			// we need this in case our RPC calls create log output which we
+			// don't want to then log again
 			stopMessagesThreadLocal.set(true);
 			Exception exception = null;
 			try {
@@ -611,6 +620,7 @@ public class CloudWatchAppender extends UnsynchronizedAppenderBase<ILoggingEvent
 		}
 
 		private void createLogsClient() {
+			String prolog = "CloudWatchWriter.createLogsClient() - ";
 			AWSCredentialsProvider credentialProvider;
 			if (MiscUtils.isBlank(accessKeyId)) {
 				// try to use our class properties
@@ -622,10 +632,10 @@ public class CloudWatchAppender extends UnsynchronizedAppenderBase<ILoggingEvent
 				// processes running on it to write to CloudWatch and
 				// query EC2, credentials can be omitted.
 				credentialProvider = null;
-				System.err.println("No AWS credentials located. credentialProvider is null");
+				System.err.println(prolog + "No AWS credentials located. credentialProvider is null");
 			} else {
 				credentialProvider = new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKeyId, secretKey));
-				System.err.println("AWS credentials located, using AWSStaticCredentialsProvider");
+				System.err.println("prolog + AWS credentials located, using AWSStaticCredentialsProvider");
 			}
 			AWSLogs client;
 			if (testAwsLogsClient == null) {
@@ -636,24 +646,24 @@ public class CloudWatchAppender extends UnsynchronizedAppenderBase<ILoggingEvent
 					// authentication. In order to make use of this scenario
 					// we need to use the default client.
 					client = AWSLogsClientBuilder.defaultClient();
-					System.err.println("No AWS credentials located, using AWSLogsClientBuilder.defaultClient()");
+					System.err.println(prolog + "No AWS credentials located, using AWSLogsClientBuilder.defaultClient()");
 				}
 				else {
-					System.err.println("AWS credentials located, using AWSLogsClientBuilder.standard()");
+					System.err.println(prolog + "AWS credentials located, using AWSLogsClientBuilder.standard()");
 					client = AWSLogsClientBuilder.standard().withCredentials(credentialProvider).withRegion(region).build();
 				}
 			}
 			else {
 				client = testAwsLogsClient;
 			}
-			System.err.println("CloudWatchAppender is using "+ client.getClass().getName());
+			System.err.println(prolog + "CloudWatchAppender is using "+ client.getClass().getName());
 			try {
 				lookupInstanceName(credentialProvider);
 			} catch (Exception e) {
 				appendEvent(Level.ERROR, "Problems looking up instance-name", e);
 			}
 			logStreamName = buildLogStreamName();
-			System.err.println("CloudWatchAppender is using logStream: "+ logStreamName);
+			System.err.println(prolog + "CloudWatchAppender is using logStream: "+ logStreamName);
 			verifyLogGroupExists(client);
 			verifyLogStreamExists(client);
 			awsLogsClient = client;
