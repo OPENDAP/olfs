@@ -558,7 +558,7 @@ public class CloudWatchAppender extends UnsynchronizedAppenderBase<ILoggingEvent
 					System.err.println(msg);
 					StringWriter writer = new StringWriter();
 					exception.printStackTrace(new PrintWriter(writer));
-					System.err.println(prolog + writer);
+					System.err.println(prolog + "STACK TRACE \n" + writer);
 
 					// appendEvent(Level.ERROR, msg, exception);
 				}
@@ -635,7 +635,7 @@ public class CloudWatchAppender extends UnsynchronizedAppenderBase<ILoggingEvent
 				System.err.println(prolog + "No AWS credentials located. credentialProvider is null");
 			} else {
 				credentialProvider = new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKeyId, secretKey));
-				System.err.println("prolog + AWS credentials located, using AWSStaticCredentialsProvider");
+				System.err.println(prolog + "AWS credentials located, using AWSStaticCredentialsProvider");
 			}
 			AWSLogs client;
 			if (testAwsLogsClient == null) {
