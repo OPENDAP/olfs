@@ -93,7 +93,7 @@ ENVIRONMENTS. THE DEPLOYED VERSION MAY DIFFER FROM THIS STAND-IN
 
     </BESManager>
 
-    <BuildDmrppService  prefix="" />
+    <BuildDmrppService  prefix="/" />
 
     <!--
         HttpPost Support
