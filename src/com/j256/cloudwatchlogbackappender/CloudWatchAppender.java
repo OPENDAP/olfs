@@ -560,6 +560,10 @@ public class CloudWatchAppender extends UnsynchronizedAppenderBase<ILoggingEvent
 					exception.printStackTrace(new PrintWriter(writer));
 					System.err.println(prolog + "STACK TRACE \n" + writer);
 
+					// This I removed because this exception likely means that
+					// the log is not correctly configured/instantiated and
+					// trying to append to the log will cause a null pointer
+					// exception.
 					// appendEvent(Level.ERROR, msg, exception);
 				}
 			}
