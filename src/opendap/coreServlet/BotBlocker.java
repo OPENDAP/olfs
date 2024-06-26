@@ -216,19 +216,12 @@ public class BotBlocker implements DispatchHandler {
                               HttpServletResponse response)
             throws Exception {
 
-
         String msg = "Denied access to "+request.getRemoteAddr()+" because it is " +
                 "either on the list, or matches a blocking pattern.";
-
         log.info("handleRequest() - {}", LogUtil.scrubEntry(msg));
 
-
         throw new Forbidden(msg);
-
     }
-
-
-
 
 
 
@@ -241,7 +234,6 @@ public class BotBlocker implements DispatchHandler {
      */
     public long getLastModified(HttpServletRequest req) {
         return new Date().getTime();
-
     }
 
 
