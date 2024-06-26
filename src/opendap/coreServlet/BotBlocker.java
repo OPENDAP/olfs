@@ -145,40 +145,38 @@ public class BotBlocker implements DispatchHandler {
             throws Exception {
 
         String remoteAddr = request.getRemoteAddr();
-
         if(ipAddresses.contains(remoteAddr)){
             log.info("The ip address: {} is " +
                     "on the list of blocked addresses", LogUtil.scrubEntry(remoteAddr));
-
-            if(responseFiltering)
+            if(responseFiltering) {
+                log.warn("Blocking ip address: {}", LogUtil.scrubEntry(remoteAddr));
                 return isResponseBlocked(request);
+            }
+            else {
+                return true;
+            }
         }
-
         for(Pattern p: ipMatchPatterns){
             if(p.matcher(remoteAddr).matches()){
                 log.info("The ip address: {} matches the pattern: \"{}\"", LogUtil.scrubEntry(remoteAddr),p.pattern());
-
-                if(responseFiltering)
+                if(responseFiltering) {
                     return isResponseBlocked(request);
+                }
+                else {
+                    log.warn("Blocking ip address: {}", LogUtil.scrubEntry(remoteAddr));
+                    return true;
+                }
             }
         }
-
-
         return false;
-
-
     }
 
     public boolean isResponseBlocked(HttpServletRequest request) {
 
         String requestUrl = ReqInfo.getRequestUrlPath(request);
-
         boolean isBlocked;
-
         if (allowedResponsePatterns.isEmpty()) {
-
             isBlocked = false;
-
             for (Pattern blockedResponsePattern : blockedResponsePatterns) {
                 log.info("The request matches the blocked response regex pattern: \"" + blockedResponsePattern.pattern() + "\"");
                 if (blockedResponsePattern.matcher(requestUrl).matches()) {
@@ -187,17 +185,11 @@ public class BotBlocker implements DispatchHandler {
             }
         }
         else {
-
             isBlocked = true;
-
             for (Pattern allowedResponsePattern : allowedResponsePatterns) {
-
                 boolean allowedResponse = allowedResponsePattern.matcher(requestUrl).matches();
-
                 if (allowedResponse) {
-
                     isBlocked = false;
-
                     log.info("The request matches the allowed response regex pattern: \"" + allowedResponsePattern.pattern() + "\"");
                     for (Pattern blockedResponsePattern : blockedResponsePatterns) {
                         boolean blockedResponse = blockedResponsePattern.matcher(requestUrl).matches();
@@ -209,9 +201,7 @@ public class BotBlocker implements DispatchHandler {
                 }
             }
         }
-
         return isBlocked;
-
     }
 
 
