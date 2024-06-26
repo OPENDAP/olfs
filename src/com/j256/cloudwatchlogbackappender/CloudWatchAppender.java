@@ -412,10 +412,13 @@ public class CloudWatchAppender extends UnsynchronizedAppenderBase<ILoggingEvent
 		newEvent.setLoggerContextRemoteView(loggingEvent.getLoggerContextVO());
 		newEvent.setLoggerName(loggingEvent.getLoggerName());
 		if (loggingEvent.getMarkerList() != null) {
+			// added this conditional because it's possible for the
+			// MarkerList to be null  - ndp 6/2024
 			for (Marker marker : loggingEvent.getMarkerList()) {
 				newEvent.addMarker(marker);
 			}
 		}
+		// Broke out this returned variable to help with debuggin - ndp 6/2024
 		Map<String, String> mdcMap = loggingEvent.getMDCPropertyMap();
 		newEvent.setMDCPropertyMap(mdcMap);
 		if (message == null) {
@@ -552,6 +555,8 @@ public class CloudWatchAppender extends UnsynchronizedAppenderBase<ILoggingEvent
 					stopMessagesThreadLocal.set(false);
 				}
 				if (exception != null) {
+					// If we have an exception then we have to write a message
+					// to stderr because the log stack is not working.
 					String msg = prolog +
 							"ERROR: Problems initializing cloudwatch writer. " +
 							"Message: " + exception.getMessage();
@@ -568,14 +573,14 @@ public class CloudWatchAppender extends UnsynchronizedAppenderBase<ILoggingEvent
 				}
 			}
 
-			// if we didn't get an aws logs-client then just write to the
+			// If we didn't get an aws logs-client then just write to the
 			// emergency appender (if any)
 			if (awsLogsClient == null) {
 				appendToEmergencyAppender(events);
 				return;
 			}
 
-			// we need this in case our RPC calls create log output which we
+			// We need this in case our RPC calls create log output which we
 			// don't want to then log again
 			stopMessagesThreadLocal.set(true);
 			Exception exception = null;
@@ -648,7 +653,7 @@ public class CloudWatchAppender extends UnsynchronizedAppenderBase<ILoggingEvent
 					// assigned to the instance that allows processes running
 					// on it to write to CloudWatch logs without additional
 					// authentication. In order to make use of this scenario
-					// we need to use the default client.
+					// we need to use the default client. - ndp 6/2024
 					client = AWSLogsClientBuilder.defaultClient();
 					System.err.println(prolog + "No AWS credentials located, using AWSLogsClientBuilder.defaultClient()");
 				}
@@ -773,7 +778,7 @@ public class CloudWatchAppender extends UnsynchronizedAppenderBase<ILoggingEvent
 						// When the EC2 instance is assigned roles that permit
 						// processes running on it to write to CloudWatch and
 						// query EC2, credentials can be omitted and the
-						// default client may be used.
+						// default client may be used. - ndp 6/2024
 						ec2Client = AmazonEC2ClientBuilder.defaultClient();
 						System.err.println(prolog + "No AWS credentials located, using AmazonEC2ClientBuilder.defaultClient()");
 					}
