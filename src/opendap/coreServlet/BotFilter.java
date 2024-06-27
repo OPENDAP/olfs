@@ -47,9 +47,12 @@ public class BotFilter implements Filter {
     private static final String BLOCKED_RESPONSE_REGEX_ELEMENT_KEY = "BlockedResponseRegex";
     private static final String BOT_FILTER_LOG_NAME = "BotFilterLog";
 
+    private static final String imagesAndCssRegex = "^\\/(images|css)\\/.*$";
+
     private static org.slf4j.Logger log = null;
 
     private boolean initialized;
+    private boolean filterBlockedResponses;
 
     private final HashSet<String> ipAddresses;
     private final Vector<Pattern> ipMatchPatterns;
@@ -58,7 +61,6 @@ public class BotFilter implements Filter {
     private final Vector<Pattern> blockedResponsePatterns;
 
     private final Vector<Pattern> allowedResponsePatterns;
-    private boolean responseFiltering;
 
     public BotFilter() {
         log = org.slf4j.LoggerFactory.getLogger(BOT_FILTER_LOG_NAME);
@@ -68,7 +70,7 @@ public class BotFilter implements Filter {
         userAgentMatchPatterns = new Vector<>();
         allowedResponsePatterns = new Vector<>();
         blockedResponsePatterns = new Vector<>();
-        responseFiltering = false;
+        filterBlockedResponses = false;
     }
 
     /**
@@ -105,7 +107,13 @@ public class BotFilter implements Filter {
         }
     }
 
-
+    void processConfigMatchElements(Element config, String matchElementName, Vector<Pattern> matchPatterns){
+        for (Object o : config.getChildren(matchElementName)) {
+            String userAgentMatch = ((Element) o).getTextTrim();
+            Pattern uaP = Pattern.compile(userAgentMatch);
+            matchPatterns.add(uaP);
+        }
+    }
     /**
      * Reads the configuration state (if any) from the XML Element.
      * @param config
@@ -122,34 +130,36 @@ public class BotFilter implements Filter {
             }
 
             if (botFilterConfig != null) {
+                // Client Blocking
+                //
+                // Ingest the blocked ip addresses.
                 for (Object o : botFilterConfig.getChildren(IP_ADDRESS_ELEMENT_KEY)) {
                     String ipAddr = ((Element) o).getTextTrim();
                     ipAddresses.add(ipAddr);
                 }
-                for (Object o : botFilterConfig.getChildren(IP_MATCH_ELEMENT_KEY)) {
-                    String ipMatch = ((Element) o).getTextTrim();
-                    Pattern ipP = Pattern.compile(ipMatch);
-                    ipMatchPatterns.add(ipP);
-                }
-                for (Object o : botFilterConfig.getChildren(USER_AGENT_MATCH_ELEMENT_KEY)) {
-                    String userAgentMatch = ((Element) o).getTextTrim();
-                    Pattern uaP = Pattern.compile(userAgentMatch);
-                    userAgentMatchPatterns.add(uaP);
-                }
+                // Ingest the blocked ip address match regex expressions.
+                processConfigMatchElements(botFilterConfig,IP_MATCH_ELEMENT_KEY,ipMatchPatterns);
+                // Ingest the blocked user-agent match regex expressions.
+                processConfigMatchElements(botFilterConfig,USER_AGENT_MATCH_ELEMENT_KEY,userAgentMatchPatterns);
 
                 // Response filtering patterns
-                for (Object o : botFilterConfig.getChildren(ALLOWED_RESPONSE_REGEX_ELEMENT_KEY)) {
-                    String ipMatch = ((Element) o).getTextTrim();
-                    Pattern ipP = Pattern.compile(ipMatch);
-                    allowedResponsePatterns.add(ipP);
-                    responseFiltering = true;
+                //
+                // By default, we allow block clients to get images and CSS so
+                // that if the client is a browser the error pages will render.
+                // But if the element <BlockImagesAndCss /> is present in the
+                // config then we don't
+                Element blockImagesAndCss = botFilterConfig.getChild("BlockImagesAndCss");
+                if(blockImagesAndCss == null) {
+                    // We didn't get told to block images and css, so we allow it.
+                    Pattern imageAndCssPattern = Pattern.compile(imagesAndCssRegex);
+                    allowedResponsePatterns.add(imageAndCssPattern);
                 }
-                for (Object o : botFilterConfig.getChildren(BLOCKED_RESPONSE_REGEX_ELEMENT_KEY)) {
-                    String ipMatch = ((Element) o).getTextTrim();
-                    Pattern ipP = Pattern.compile(ipMatch);
-                    blockedResponsePatterns.add(ipP);
-                    responseFiltering = true;
-                }
+                // Process the allowed response regex elements
+                processConfigMatchElements(botFilterConfig,ALLOWED_RESPONSE_REGEX_ELEMENT_KEY,allowedResponsePatterns);
+                // Process the blocked response regex elements
+                processConfigMatchElements(botFilterConfig,BLOCKED_RESPONSE_REGEX_ELEMENT_KEY,blockedResponsePatterns);
+                // If we ended up with patterns then we know we have to filter responses.
+                filterBlockedResponses = !blockedResponsePatterns.isEmpty() || !allowedResponsePatterns.isEmpty();
             }
             initialized = true;
         }
@@ -249,7 +259,7 @@ public class BotFilter implements Filter {
 
         // If we aren't response filtering then the
         // answer is always yes, block that request.
-        if(!responseFiltering)
+        if(!filterBlockedResponses)
             return true;
 
         String requestUrl = ReqInfo.getLocalUrl(request);

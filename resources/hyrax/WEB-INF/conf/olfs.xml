@@ -239,17 +239,34 @@
 
 
     <!--
-        'Bot Blocker' - Used to block access from specific IP addresses
-        and by a range of IP addresses using a regular expression.
+        'Bot Filter' - Used to block client access from:
+        * Specific IP addresses
+        * A range of IP addresses using a regular expression.
+        * The User-Agent header via a regex.
+        And supports response filter by specifying an AllowedResponseRegex to
+        allow blocked clients access to specific parts of the service and via a
+        BlockedResponseRegex which prevents blocked clients from accessing
+        specific parts of the service.
     -->
-    <!-- BotFilter -->
-    <!-- <IpAddress>127.0.0.1</IpAddress> -->
-    <!-- This matches all IPv4 addresses, work yours out from here.... -->
+    <!-- <BotFilter> -->
+    <!--    <IpAddress>127.0.0.1</IpAddress> -->
+    <!-- The following matches all IPv4 addresses, work yours out from here.... -->
     <!-- <IpMatch>[012]?\d?\d\.[012]?\d?\d\.[012]?\d?\d\.[012]?\d?\d</IpMatch> -->
-    <!-- Any IP starting with 65.55 (MSN bots the don't respect robots.txt  -->
+    <!-- Any IP starting with 65.55 -->
     <!-- <IpMatch>65\.55\.[012]?\d?\d\.[012]?\d?\d</IpMatch>   -->
+    <!-- <AllowedResponseRegex>^\/(images|css)\/.*$</AllowedResponseRegex>   -->
+    <!-- <BlockedResponseRegex>^.*.(dap|dods)(.nc4?)?$</BlockedResponseRegex>   -->
     <!-- /BotFilter -->
-
+    <!--
+       This following test filter can be used to
+       test the blocker on a desktop dev system
+    -->
+    <!--
+    <BotFilter>
+        <IpAddress>127.0.0.1</IpAddress>
+        <IpAddress>0:0:0:0:0:0:0:1</IpAddress>
+    </BotFilter>
+    -->
 
     <!--
         'Timer' - Enables or disables the generation of internal timing metrics for the OLFS
