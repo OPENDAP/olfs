@@ -1,6 +1,7 @@
 package opendap.coreServlet;
 
 import opendap.logging.LogUtil;
+import opendap.logging.ServletLogUtil;
 import org.jdom.Document;
 import org.jdom.Element;
 
@@ -43,8 +44,9 @@ public class BotFilter implements Filter {
     private static final String IP_ADDRESS_ELEMENT_KEY = "IpAddress";
     private static final String IP_MATCH_ELEMENT_KEY = "IpMatch";
     private static final String USER_AGENT_MATCH_ELEMENT_KEY = "UserAgentMatch";
-    private static final String ALLOWED_RESPONSE_REGEX_ELEMENT_KEY = "allowedResponseRegex";
-    private static final String BLOCKED_RESPONSE_REGEX_ELEMENT_KEY = "blockedResponseRegex";
+    private static final String ALLOWED_RESPONSE_REGEX_ELEMENT_KEY = "AllowedResponseRegex";
+    private static final String BLOCKED_RESPONSE_REGEX_ELEMENT_KEY = "BlockedResponseRegex";
+    private static final String BOT_FILTER_LOG_NAME = "BotFilterLog";
 
     private static org.slf4j.Logger log = null;
 
@@ -60,7 +62,7 @@ public class BotFilter implements Filter {
     private boolean responseFiltering;
 
     public BotFilter() {
-        log = org.slf4j.LoggerFactory.getLogger(getClass());
+        log = org.slf4j.LoggerFactory.getLogger(BOT_FILTER_LOG_NAME);
         initialized = false;
         ipAddresses = new HashSet<>();
         ipMatchPatterns = new Vector<>();
@@ -172,12 +174,12 @@ public class BotFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest)servletRequest;
         HttpServletResponse response = (HttpServletResponse)servletResponse;
 
-        if(clientShouldBeBlocked(request)) {
+        if (clientShouldBeBlocked(request)) {
             String error403 = "/error/error403.jsp";
             ServletContext sc = request.getServletContext();
-            RequestDispatcher rd  = sc.getRequestDispatcher(error403);
+            RequestDispatcher rd = sc.getRequestDispatcher(error403);
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            rd.forward(request,response);
+            rd.forward(request, response);
         }
     }
 
@@ -198,13 +200,13 @@ public class BotFilter implements Filter {
         boolean blockIt = false;
         String remoteAddr = request.getRemoteAddr();
         if(ipAddresses.contains(remoteAddr)){
-            log.info("The ip address: {} is " +
+            log.debug("The ip address: {} is " +
                     "on the list of blocked addresses", LogUtil.scrubEntry(remoteAddr));
             blockIt = isResponseBlocked(request);
         }
         for(Pattern p: ipMatchPatterns){
             if(p.matcher(remoteAddr).matches()){
-                log.info("The ip address: {} matches the pattern: \"{}\"", LogUtil.scrubEntry(remoteAddr),p.pattern());
+                log.debug("The ip address: {} matches the pattern: \"{}\"", LogUtil.scrubEntry(remoteAddr),p.pattern());
                 blockIt = isResponseBlocked(request);
             }
         }
@@ -212,14 +214,26 @@ public class BotFilter implements Filter {
         if(userAgent != null) {
             for (Pattern p : userAgentMatchPatterns) {
                 if (p.matcher(userAgent).matches()) {
-                    log.info("The User-Agent header: {} matches the pattern: \"{}\"", LogUtil.scrubEntry(userAgent), p.pattern());
+                    log.debug("The User-Agent header: {} matches the pattern: \"{}\"", LogUtil.scrubEntry(userAgent), p.pattern());
                     blockIt = isResponseBlocked(request);
                 }
             }
         }
 
         if(blockIt) {
-            log.warn("Blocking ip address: {}", LogUtil.scrubEntry(remoteAddr));
+            String msg;
+            msg = "{ \"blocked\": {";
+            msg += "\"time\": " + System.currentTimeMillis() + ", ";
+            msg += "\"verb\": \"" + request.getMethod() + "\", ";
+            msg += "\"ip\": \"" + LogUtil.scrubEntry(remoteAddr) + "\", ";
+            msg += "\"path\": \"" + Scrub.urlContent(request.getRequestURI()) + "\", ";
+
+            String query = request.getQueryString();
+            if(query==null) query="";
+
+            msg += "\"query\": \"" + Scrub.simpleQueryString(query) + "\" ";
+            msg += "} } \n";
+            log.info(msg);
         }
 
         return blockIt;
@@ -232,12 +246,12 @@ public class BotFilter implements Filter {
         if(!responseFiltering)
             return true;
 
-        String requestUrl = ReqInfo.getRequestUrlPath(request);
+        String requestUrl = ReqInfo.getLocalUrl(request);
         boolean isBlocked;
         if (allowedResponsePatterns.isEmpty()) {
             isBlocked = false;
             for (Pattern blockedResponsePattern : blockedResponsePatterns) {
-                log.info("The request matches the blocked response regex pattern: \"" + blockedResponsePattern.pattern() + "\"");
+                log.debug("The request matches the blocked response regex pattern: \"" + blockedResponsePattern.pattern() + "\"");
                 if (blockedResponsePattern.matcher(requestUrl).matches()) {
                     isBlocked = true;
                 }
@@ -249,11 +263,11 @@ public class BotFilter implements Filter {
                 boolean allowedResponse = allowedResponsePattern.matcher(requestUrl).matches();
                 if (allowedResponse) {
                     isBlocked = false;
-                    log.info("The request matches the allowed response regex pattern: \"" + allowedResponsePattern.pattern() + "\"");
+                    log.debug("The request matches the allowed response regex pattern: \"" + allowedResponsePattern.pattern() + "\"");
                     for (Pattern blockedResponsePattern : blockedResponsePatterns) {
                         boolean blockedResponse = blockedResponsePattern.matcher(requestUrl).matches();
                         if (blockedResponse) {
-                            log.info("The request matches the blocked response regex pattern: \"" + blockedResponsePattern.pattern() + "\"");
+                            log.debug("The request matches the blocked response regex pattern: \"" + blockedResponsePattern.pattern() + "\"");
                             isBlocked = true;
                         }
                     }
