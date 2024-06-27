@@ -52,7 +52,7 @@ public class BotFilter implements Filter {
     private static final String BLOCKED_RESPONSE_REGEX_ELEMENT_KEY = "BlockedResponseRegex";
     private static final String BOT_FILTER_LOG_NAME = "BotFilterLog";
     private static final String BLOCK_IMAGES_AND_CSS_ELEMENT_NAME = "BlockImagesAndCss";
-    private static final String imagesAndCssRegex = "^\\/opendap\\/docs\\/(images|css)\\/.*$";
+    private static final String imagesAndCssRegex = "\\/docs\\/(images|css)\\/.*$";
 
     private static org.slf4j.Logger log = null;
 
@@ -98,7 +98,8 @@ public class BotFilter implements Filter {
                     log.warn(msg);
                 }
                 Document configDoc = ServletUtil.loadConfig(configFileName, filterConfig.getServletContext());
-                init(configDoc.getRootElement());
+                String contextPath = filterConfig.getServletContext().getContextPath();
+                init(configDoc.getRootElement(), contextPath);
             } catch (Exception se) {
                 log.warn("init() - INITIALIZATION HAS BEEN POSTPONED! FAILED TO INITIALIZE BotFilter! " +
                         "Caught {} Message: {} ", se.getClass().getName(), se.getMessage());
@@ -113,7 +114,7 @@ public class BotFilter implements Filter {
      * Reads the configuration state (if any) from the XML Element.
      * @param config
      */
-    private void init(Element config){
+    private void init(Element config,String contextPath ){
         initLock.lock();
         try {
             if(initialized) {
@@ -146,7 +147,11 @@ public class BotFilter implements Filter {
                 Element blockImagesAndCss = botFilterConfig.getChild(BLOCK_IMAGES_AND_CSS_ELEMENT_NAME);
                 if(blockImagesAndCss == null) {
                     // We didn't get told to block images and css, so we allow it.
-                    Pattern imageAndCssPattern = Pattern.compile(imagesAndCssRegex);
+                    while(contextPath.startsWith("/")){
+                        contextPath = contextPath.substring(1);
+                    }
+                    String regex = "^"+ (contextPath.isEmpty()?"":"\\/"+contextPath) + imagesAndCssRegex;
+                    Pattern imageAndCssPattern = Pattern.compile(regex);
                     allowedResponsePatterns.add(imageAndCssPattern);
                 }
                 // Process the allowed response regex elements
