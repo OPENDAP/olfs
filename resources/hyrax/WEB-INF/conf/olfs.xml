@@ -256,7 +256,7 @@
     <!-- <IpMatch>65\.55\.[012]?\d?\d\.[012]?\d?\d</IpMatch>   -->
     <!-- <AllowedResponseRegex>^\/(images|css)\/.*$</AllowedResponseRegex>   -->
     <!-- <BlockedResponseRegex>^.*.(dap|dods)(.nc4?)?$</BlockedResponseRegex>   -->
-    <!-- /BotFilter -->
+    <!-- </BotFilter> -->
     <!--
        This following test filter can be used to
        test the blocker on a desktop dev system
