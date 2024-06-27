@@ -247,6 +247,11 @@
         allow blocked clients access to specific parts of the service and via a
         BlockedResponseRegex which prevents blocked clients from accessing
         specific parts of the service.
+        By default the service will allow blocked clients to access the images
+        and css directories so that browsers can render the result error page.
+        If you want to force the service block access to the docs/images and
+        docs/css then include the element <BlockImagesAndCss /> in the BotFilter
+        definition.
     -->
     <!-- <BotFilter> -->
     <!--    <IpAddress>127.0.0.1</IpAddress> -->

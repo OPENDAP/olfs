@@ -29,6 +29,11 @@ import java.util.regex.Pattern;
  */
 public class BotFilter implements Filter {
 
+    private class ReturnValue {
+        boolean blockResponse;
+        String cause;
+    }
+
     private static final java.util.concurrent.locks.Lock initLock;
     static {
         initLock = new ReentrantLock();
@@ -46,7 +51,7 @@ public class BotFilter implements Filter {
     private static final String ALLOWED_RESPONSE_REGEX_ELEMENT_KEY = "AllowedResponseRegex";
     private static final String BLOCKED_RESPONSE_REGEX_ELEMENT_KEY = "BlockedResponseRegex";
     private static final String BOT_FILTER_LOG_NAME = "BotFilterLog";
-
+    private static final String BLOCK_IMAGES_AND_CSS_ELEMENT_NAME = "BlockImagesAndCss";
     private static final String imagesAndCssRegex = "^\\/(images|css)\\/.*$";
 
     private static org.slf4j.Logger log = null;
@@ -148,7 +153,7 @@ public class BotFilter implements Filter {
                 // that if the client is a browser the error pages will render.
                 // But if the element <BlockImagesAndCss /> is present in the
                 // config then we don't
-                Element blockImagesAndCss = botFilterConfig.getChild("BlockImagesAndCss");
+                Element blockImagesAndCss = botFilterConfig.getChild(BLOCK_IMAGES_AND_CSS_ELEMENT_NAME);
                 if(blockImagesAndCss == null) {
                     // We didn't get told to block images and css, so we allow it.
                     Pattern imageAndCssPattern = Pattern.compile(imagesAndCssRegex);
@@ -183,10 +188,11 @@ public class BotFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest)servletRequest;
         HttpServletResponse response = (HttpServletResponse)servletResponse;
 
-        if (requestShouldBeBlocked(request)) {
+        ReturnValue rv = requestShouldBeBlocked(request);
+        if (rv.blockResponse) {
 
             // Logs this blocked request to the BotFilterLog
-            log.info(makeBlockedRequestMessageJson(request));
+            log.info(makeBlockedRequestMessageJson(request, rv.cause));
 
             // Forward client to the 403 error response page.
             String error403 = "/error/error403.jsp";
@@ -204,25 +210,28 @@ public class BotFilter implements Filter {
 
     }
 
-
     /**
      *
      * @param request The request to be handled.
      * @return True if the IsoDispatchHandler can service the request, false
      * otherwise.
      */
-    public boolean requestShouldBeBlocked(HttpServletRequest request) {
-        boolean blockIt = false;
+    private ReturnValue requestShouldBeBlocked(HttpServletRequest request) {
+        ReturnValue rv = new ReturnValue();
+        rv.blockResponse = false;
+        rv.cause = null;
         String remoteAddr = request.getRemoteAddr();
         if(ipAddresses.contains(remoteAddr)){
             log.debug("The ip address: {} is " +
                     "on the list of blocked addresses", LogUtil.scrubEntry(remoteAddr));
-            blockIt = isResponseBlocked(request);
+            rv.blockResponse = isResponseBlocked(request);
+            rv.cause = "IpAddress";
         }
         for(Pattern p: ipMatchPatterns){
             if(p.matcher(remoteAddr).matches()){
                 log.debug("The ip address: {} matches the pattern: \"{}\"", LogUtil.scrubEntry(remoteAddr),p.pattern());
-                blockIt = isResponseBlocked(request);
+                rv.blockResponse = isResponseBlocked(request);
+                rv.cause = "IpMatch";
             }
         }
         String userAgent = request.getHeader("User-Agent");
@@ -230,32 +239,39 @@ public class BotFilter implements Filter {
             for (Pattern p : userAgentMatchPatterns) {
                 if (p.matcher(userAgent).matches()) {
                     log.debug("The User-Agent header: {} matches the pattern: \"{}\"", LogUtil.scrubEntry(userAgent), p.pattern());
-                    blockIt = isResponseBlocked(request);
+                    rv.blockResponse = isResponseBlocked(request);
+                    rv.cause = "UserAgentMatch";
                 }
             }
         }
-        return blockIt;
+        return rv;
     }
 
-    String makeBlockedRequestMessageJson(HttpServletRequest request){
+    String makeBlockedRequestMessageJson(HttpServletRequest request, String cause){
         String json_msg;
         json_msg = "{ \"blocked\": {";
         json_msg += "\"time\": " + System.currentTimeMillis() + ", ";
         json_msg += "\"verb\": \"" + request.getMethod() + "\", ";
         json_msg += "\"ip\": \"" + LogUtil.scrubEntry(request.getRemoteAddr()) + "\", ";
+
+        String userAgent = Scrub.simpleString(request.getHeader("User-Agent"));
+        if(userAgent == null) userAgent = "";
+        json_msg += "\"user_agent\": \"" + Scrub.urlContent(userAgent) + "\", ";
+
         json_msg += "\"path\": \"" + Scrub.urlContent(request.getRequestURI()) + "\", ";
 
         String query = request.getQueryString();
         if(query==null) query="";
+        json_msg += "\"query\": \"" + Scrub.simpleQueryString(query) + "\", ";
 
-        json_msg += "\"query\": \"" + Scrub.simpleQueryString(query) + "\" ";
+        json_msg += "\"cause\": \"" + cause + "\" ";
         json_msg += "} } \n";
         return json_msg;
     }
 
 
 
-    public boolean isResponseBlocked(HttpServletRequest request) {
+    private boolean isResponseBlocked(HttpServletRequest request) {
 
         // If we aren't response filtering then the
         // answer is always yes, block that request.
