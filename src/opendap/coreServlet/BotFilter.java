@@ -1,7 +1,6 @@
 package opendap.coreServlet;
 
 import opendap.logging.LogUtil;
-import opendap.logging.ServletLogUtil;
 import org.jdom.Document;
 import org.jdom.Element;
 
@@ -174,13 +173,19 @@ public class BotFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest)servletRequest;
         HttpServletResponse response = (HttpServletResponse)servletResponse;
 
-        if (clientShouldBeBlocked(request)) {
+        if (requestShouldBeBlocked(request)) {
+
+            // Logs this blocked request to the BotFilterLog
+            log.info(makeBlockedRequestMessageJson(request));
+
+            // Forward client to the 403 error response page.
             String error403 = "/error/error403.jsp";
             ServletContext sc = request.getServletContext();
             RequestDispatcher rd = sc.getRequestDispatcher(error403);
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             rd.forward(request, response);
         }
+        filterChain.doFilter(request, response);
     }
 
     @Override
@@ -196,7 +201,7 @@ public class BotFilter implements Filter {
      * @return True if the IsoDispatchHandler can service the request, false
      * otherwise.
      */
-    public boolean clientShouldBeBlocked(HttpServletRequest request) {
+    public boolean requestShouldBeBlocked(HttpServletRequest request) {
         boolean blockIt = false;
         String remoteAddr = request.getRemoteAddr();
         if(ipAddresses.contains(remoteAddr)){
@@ -219,25 +224,26 @@ public class BotFilter implements Filter {
                 }
             }
         }
-
-        if(blockIt) {
-            String json_msg;
-            json_msg = "{ \"blocked\": {";
-            json_msg += "\"time\": " + System.currentTimeMillis() + ", ";
-            json_msg += "\"verb\": \"" + request.getMethod() + "\", ";
-            json_msg += "\"ip\": \"" + LogUtil.scrubEntry(remoteAddr) + "\", ";
-            json_msg += "\"path\": \"" + Scrub.urlContent(request.getRequestURI()) + "\", ";
-
-            String query = request.getQueryString();
-            if(query==null) query="";
-
-            json_msg += "\"query\": \"" + Scrub.simpleQueryString(query) + "\" ";
-            json_msg += "} } \n";
-            log.info(json_msg);
-        }
-
         return blockIt;
     }
+
+    String makeBlockedRequestMessageJson(HttpServletRequest request){
+        String json_msg;
+        json_msg = "{ \"blocked\": {";
+        json_msg += "\"time\": " + System.currentTimeMillis() + ", ";
+        json_msg += "\"verb\": \"" + request.getMethod() + "\", ";
+        json_msg += "\"ip\": \"" + LogUtil.scrubEntry(request.getRemoteAddr()) + "\", ";
+        json_msg += "\"path\": \"" + Scrub.urlContent(request.getRequestURI()) + "\", ";
+
+        String query = request.getQueryString();
+        if(query==null) query="";
+
+        json_msg += "\"query\": \"" + Scrub.simpleQueryString(query) + "\" ";
+        json_msg += "} } \n";
+        return json_msg;
+    }
+
+
 
     public boolean isResponseBlocked(HttpServletRequest request) {
 
