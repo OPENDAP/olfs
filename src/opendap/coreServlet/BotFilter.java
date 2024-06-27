@@ -52,19 +52,16 @@ public class BotFilter implements Filter {
     private static final String BLOCKED_RESPONSE_REGEX_ELEMENT_KEY = "BlockedResponseRegex";
     private static final String BOT_FILTER_LOG_NAME = "BotFilterLog";
     private static final String BLOCK_IMAGES_AND_CSS_ELEMENT_NAME = "BlockImagesAndCss";
-    private static final String imagesAndCssRegex = "^\\/(images|css)\\/.*$";
+    private static final String imagesAndCssRegex = "^\\/opendap\\/docs\\/(images|css)\\/.*$";
 
     private static org.slf4j.Logger log = null;
 
     private boolean initialized;
     private boolean filterBlockedResponses;
-
     private final HashSet<String> ipAddresses;
     private final Vector<Pattern> ipMatchPatterns;
     private final Vector<Pattern> userAgentMatchPatterns;
-
     private final Vector<Pattern> blockedResponsePatterns;
-
     private final Vector<Pattern> allowedResponsePatterns;
 
     public BotFilter() {
@@ -112,13 +109,6 @@ public class BotFilter implements Filter {
         }
     }
 
-    void processConfigMatchElements(Element config, String matchElementName, Vector<Pattern> matchPatterns){
-        for (Object o : config.getChildren(matchElementName)) {
-            String userAgentMatch = ((Element) o).getTextTrim();
-            Pattern uaP = Pattern.compile(userAgentMatch);
-            matchPatterns.add(uaP);
-        }
-    }
     /**
      * Reads the configuration state (if any) from the XML Element.
      * @param config
@@ -211,15 +201,32 @@ public class BotFilter implements Filter {
     }
 
     /**
+     * This helper function is used by init(Element) to process the regex match
+     * expressions in the configuration.
      *
+     * @param config The coinfiuguration Element to use.
+     * @param matchElementName The name of the element(s) in the configuration
+     *                         to process.
+     * @param matchPatterns The Vector to which the new Patterns will be added.
+     */
+    void processConfigMatchElements(Element config, String matchElementName, Vector<Pattern> matchPatterns){
+        for (Object o : config.getChildren(matchElementName)) {
+            String userAgentMatch = ((Element) o).getTextTrim();
+            Pattern uaP = Pattern.compile(userAgentMatch);
+            matchPatterns.add(uaP);
+        }
+    }
+
+    /**
+     * Determines if the incoming request should be blocked.
      * @param request The request to be handled.
-     * @return True if the IsoDispatchHandler can service the request, false
-     * otherwise.
+     * @return Returns a ReturnValue which values set to indicated request block
+     * status and the cause, if blocked.
      */
     private ReturnValue requestShouldBeBlocked(HttpServletRequest request) {
         ReturnValue rv = new ReturnValue();
         rv.blockResponse = false;
-        rv.cause = null;
+        rv.cause = "Not Blocked";
         String remoteAddr = request.getRemoteAddr();
         if(ipAddresses.contains(remoteAddr)){
             log.debug("The ip address: {} is " +
@@ -247,7 +254,13 @@ public class BotFilter implements Filter {
         return rv;
     }
 
-    String makeBlockedRequestMessageJson(HttpServletRequest request, String cause){
+    /**
+     * Builds the json message for the BotFilter log file.
+     * @param request The request thatis being blocked.
+     * @param cause The cause of the blockage.
+     * @return The json message for the BotFilter log
+     */
+    private String makeBlockedRequestMessageJson(HttpServletRequest request, String cause){
         String json_msg;
         json_msg = "{ \"blocked\": {";
         json_msg += "\"time\": " + System.currentTimeMillis() + ", ";
@@ -255,13 +268,13 @@ public class BotFilter implements Filter {
         json_msg += "\"ip\": \"" + LogUtil.scrubEntry(request.getRemoteAddr()) + "\", ";
 
         String userAgent = Scrub.simpleString(request.getHeader("User-Agent"));
-        if(userAgent == null) userAgent = "";
+        if(userAgent == null) { userAgent = ""; }
         json_msg += "\"user_agent\": \"" + Scrub.urlContent(userAgent) + "\", ";
 
         json_msg += "\"path\": \"" + Scrub.urlContent(request.getRequestURI()) + "\", ";
 
         String query = request.getQueryString();
-        if(query==null) query="";
+        if(query==null) { query=""; }
         json_msg += "\"query\": \"" + Scrub.simpleQueryString(query) + "\", ";
 
         json_msg += "\"cause\": \"" + cause + "\" ";
@@ -270,7 +283,17 @@ public class BotFilter implements Filter {
     }
 
 
-
+    /**
+     * Used to determine if a response should be blocked. The assumption here
+     * is that the client is blocked (by IpAddress, IpMatch, or UserAgentMatch)
+     * and this method decides if the response should or should not be
+     * transmitted. Essentially, this is a blocked response filter. This is
+     * useful for things like allowing images and css (which by
+     * default will not be blocked) that are used by browsers to render the
+     * return error pages etc.
+     * @param request The blocked request
+     * @return True if the response should not be transmitted, false otherwise.
+     */
     private boolean isResponseBlocked(HttpServletRequest request) {
 
         // If we aren't response filtering then the
@@ -278,35 +301,40 @@ public class BotFilter implements Filter {
         if(!filterBlockedResponses)
             return true;
 
-        String requestUrl = ReqInfo.getLocalUrl(request);
-        boolean isBlocked;
+        String requestURI = request.getRequestURI();
         if (allowedResponsePatterns.isEmpty()) {
-            isBlocked = false;
-            for (Pattern blockedResponsePattern : blockedResponsePatterns) {
-                log.debug("The request matches the blocked response regex pattern: \"" + blockedResponsePattern.pattern() + "\"");
-                if (blockedResponsePattern.matcher(requestUrl).matches()) {
-                    isBlocked = true;
-                }
-            }
+            return matchMe(requestURI,blockedResponsePatterns);
         }
         else {
-            isBlocked = true;
             for (Pattern allowedResponsePattern : allowedResponsePatterns) {
-                boolean allowedResponse = allowedResponsePattern.matcher(requestUrl).matches();
+                boolean allowedResponse = allowedResponsePattern.matcher(requestURI).matches();
                 if (allowedResponse) {
-                    isBlocked = false;
-                    log.debug("The request matches the allowed response regex pattern: \"" + allowedResponsePattern.pattern() + "\"");
-                    for (Pattern blockedResponsePattern : blockedResponsePatterns) {
-                        boolean blockedResponse = blockedResponsePattern.matcher(requestUrl).matches();
-                        if (blockedResponse) {
-                            log.debug("The request matches the blocked response regex pattern: \"" + blockedResponsePattern.pattern() + "\"");
-                            isBlocked = true;
-                        }
-                    }
+                    return matchMe(requestURI,blockedResponsePatterns);
                 }
             }
         }
-        return isBlocked;
+        return true;
     }
+
+    /**
+     * Helper method to evaluate a Vector of regex match patterns against
+     * a candidateString
+     * @param candidateString The string to evaluate.
+     * @param matchPatterns The Vector of potential match patterns
+     * @return True if any pattern in matchPatterns matches the candidateString
+     */
+    boolean matchMe(String candidateString, Vector<Pattern> matchPatterns){
+        for (Pattern pattern : matchPatterns) {
+            boolean matched = pattern.matcher(candidateString).matches();
+            if (matched) {
+                log.debug("The candidate string " + candidateString +
+                        " matches the blocked response regex pattern: \""
+                        + pattern.pattern() + "\"");
+                return true;
+            }
+        }
+        return false;
+    }
+
 
 }

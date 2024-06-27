@@ -212,8 +212,6 @@
     -->
     <!-- RequireUserSelection /-->
 
-
-
     <!-- 
         'AddFileoutTypeSuffixToDownloadFilename' - When enabled the server will add 
         the file type suffix of the requested data format to the download file name.
@@ -247,7 +245,7 @@
         allow blocked clients access to specific parts of the service and via a
         BlockedResponseRegex which prevents blocked clients from accessing
         specific parts of the service.
-        By default the service will allow blocked clients to access the images
+        By default, the service will allow blocked clients to access the images
         and css directories so that browsers can render the result error page.
         If you want to force the service block access to the docs/images and
         docs/css then include the element <BlockImagesAndCss /> in the BotFilter
@@ -259,7 +257,8 @@
     <!-- <IpMatch>[012]?\d?\d\.[012]?\d?\d\.[012]?\d?\d\.[012]?\d?\d</IpMatch> -->
     <!-- Any IP starting with 65.55 -->
     <!-- <IpMatch>65\.55\.[012]?\d?\d\.[012]?\d?\d</IpMatch>   -->
-    <!-- <AllowedResponseRegex>^\/(images|css)\/.*$</AllowedResponseRegex>   -->
+    <!-- The following AllowedResponseRegex expression is the default -->
+    <!-- <AllowedResponseRegex>^\/opendap\/docs\/(images|css)\/.*$</AllowedResponseRegex>   -->
     <!-- <BlockedResponseRegex>^.*.(dap|dods)(.nc4?)?$</BlockedResponseRegex>   -->
     <!-- </BotFilter> -->
     <!--
