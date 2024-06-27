@@ -221,19 +221,19 @@ public class BotFilter implements Filter {
         }
 
         if(blockIt) {
-            String msg;
-            msg = "{ \"blocked\": {";
-            msg += "\"time\": " + System.currentTimeMillis() + ", ";
-            msg += "\"verb\": \"" + request.getMethod() + "\", ";
-            msg += "\"ip\": \"" + LogUtil.scrubEntry(remoteAddr) + "\", ";
-            msg += "\"path\": \"" + Scrub.urlContent(request.getRequestURI()) + "\", ";
+            String json_msg;
+            json_msg = "{ \"blocked\": {";
+            json_msg += "\"time\": " + System.currentTimeMillis() + ", ";
+            json_msg += "\"verb\": \"" + request.getMethod() + "\", ";
+            json_msg += "\"ip\": \"" + LogUtil.scrubEntry(remoteAddr) + "\", ";
+            json_msg += "\"path\": \"" + Scrub.urlContent(request.getRequestURI()) + "\", ";
 
             String query = request.getQueryString();
             if(query==null) query="";
 
-            msg += "\"query\": \"" + Scrub.simpleQueryString(query) + "\" ";
-            msg += "} } \n";
-            log.info(msg);
+            json_msg += "\"query\": \"" + Scrub.simpleQueryString(query) + "\" ";
+            json_msg += "} } \n";
+            log.info(json_msg);
         }
 
         return blockIt;
