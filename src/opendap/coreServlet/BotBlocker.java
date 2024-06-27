@@ -50,24 +50,23 @@ public class BotBlocker implements DispatchHandler {
 
     private boolean initialized;
 
+    private final HashSet<String> ipAddresses;
+    private final Vector<Pattern> ipMatchPatterns;
+    private final Vector<Pattern> userAgentMatchPatterns;
 
-    private HashSet<String> ipAddresses;
-    private Vector<Pattern> ipMatchPatterns;
+    private final Vector<Pattern> blockedResponsePatterns;
 
-    private Vector<Pattern> blockedResponsePatterns;
-
-
-    private Vector<Pattern> allowedResponsePatterns;
+    private final Vector<Pattern> allowedResponsePatterns;
     private boolean responseFiltering;
-
-
+    
     BotBlocker() {
         log = org.slf4j.LoggerFactory.getLogger(getClass());
         initialized = false;
-        ipAddresses = new HashSet<String>();
-        ipMatchPatterns = new Vector<Pattern>();
-        allowedResponsePatterns = new Vector<Pattern>();
-        blockedResponsePatterns = new Vector<Pattern>();
+        ipAddresses = new HashSet<>();
+        ipMatchPatterns = new Vector<>();
+        userAgentMatchPatterns = new Vector<>();
+        allowedResponsePatterns = new Vector<>();
+        blockedResponsePatterns = new Vector<>();
         responseFiltering = false;
     }
 
@@ -115,6 +114,13 @@ public class BotBlocker implements DispatchHandler {
                 Pattern ipP = Pattern.compile(ipMatch);
                 ipMatchPatterns.add(ipP);
             }
+            for (Object o : botBlockerConfig.getChildren("UserAgentMatch")) {
+                String userAgentMatch = ((Element) o).getTextTrim();
+                Pattern uaP = Pattern.compile(userAgentMatch);
+                userAgentMatchPatterns.add(uaP);
+            }
+
+            // Response filtering patterns
             for (Object o : botBlockerConfig.getChildren("allowedResponseRegex")) {
                 String ipMatch = ((Element) o).getTextTrim();
                 Pattern ipP = Pattern.compile(ipMatch);
@@ -156,6 +162,16 @@ public class BotBlocker implements DispatchHandler {
                 blockIt = isResponseBlocked(request);
             }
         }
+        String userAgent = request.getHeader("User-Agent");
+        if(userAgent != null) {
+            for (Pattern p : userAgentMatchPatterns) {
+                if (p.matcher(userAgent).matches()) {
+                    log.info("The User-Agent header: {} matches the pattern: \"{}\"", LogUtil.scrubEntry(userAgent), p.pattern());
+                    blockIt = isResponseBlocked(request);
+                }
+            }
+        }
+
         if(blockIt) {
             log.warn("Blocking ip address: {}", LogUtil.scrubEntry(remoteAddr));
         }
