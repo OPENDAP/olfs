@@ -208,17 +208,6 @@ public class DispatchServlet extends HttpServlet {
     /**
      * <Handler className="opendap.bes.VersionDispatchHandler" />
      * <p>
-     * <!-- Bot Blocker
-     * - This handler can be used to block access from specific IP addresses
-     * - and by a range of IP addresses using a regular expression.
-     * -->
-     * <!-- <Handler className="opendap.coreServlet.BotBlocker"> -->
-     * <!-- <IpAddress>127.0.0.1</IpAddress> -->
-     * <!-- This matches all IPv4 addresses, work yours out from here.... -->
-     * <!-- <IpMatch>[012]?\d?\d\.[012]?\d?\d\.[012]?\d?\d\.[012]?\d?\d</IpMatch> -->
-     * <!-- Any IP starting with 65.55 (MSN bots the don't respect robots.txt  -->
-     * <!-- <IpMatch>65\.55\.[012]?\d?\d\.[012]?\d?\d</IpMatch>   -->
-     * <!-- </Handler>  -->
      * <Handler className="opendap.ncml.NcmlDatasetDispatcher" />
      * <Handler className="opendap.threddsHandler.StaticCatalogDispatch">
      * <prefix>thredds</prefix>

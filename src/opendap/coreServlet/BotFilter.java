@@ -13,6 +13,20 @@ import java.util.Vector;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Pattern;
 
+
+/**
+ * BotFilter
+ * This implementation of the javax.servlet.Filter interface can be used to
+ * block access from specific IP addresses, by a range of IP addresses using
+ * a regular expression, or by the value of the requests User-Agent header using
+ * a regular expression.
+ * Ip addresses are specifed as one or more elements:
+ *   <IpAddress>127.0.0.1</IpAddress>
+ * Ip match regex are specified as zero or more IpMatch elements
+ *   <IpMatch>65\.55\.[012]?\d?\d\.[012]?\d?\d</IpMatch>
+ * and the user agent can be blocked using a UserAgentMatch element:
+ * 	 <UserAgentMatch>^.*facebookexternalhit.*$</UserAgentMatch>
+ */
 public class BotFilter implements Filter {
 
     private static final java.util.concurrent.locks.Lock initLock;
@@ -24,7 +38,8 @@ public class BotFilter implements Filter {
     private FilterConfig filterConfig;
     private static final String CONFIG_PARAMETER_KEY = "config";
     private static final String DEFAULT_CONFIG_FILENAME = "olfs.xml";
-    private static final String BOT_FILTER_ELEMENT_KEY = "BotBlocker";
+    private static final String BOT_FILTER_ELEMENT_KEY = "BotFilter";
+    private static final String BOT_BLOCKER_ELEMENT_KEY = "BotBlocker";
     private static final String IP_ADDRESS_ELEMENT_KEY = "IpAddress";
     private static final String IP_MATCH_ELEMENT_KEY = "IpMatch";
     private static final String USER_AGENT_MATCH_ELEMENT_KEY = "UserAgentMatch";
@@ -80,7 +95,7 @@ public class BotFilter implements Filter {
                 Document configDoc = ServletUtil.loadConfig(configFileName, filterConfig.getServletContext());
                 init(configDoc.getRootElement());
             } catch (Exception se) {
-                log.warn("init() - INITIALIZATION HAS BEEN POSTPONED! FAILED TO INITIALIZE BotBlocker! " +
+                log.warn("init() - INITIALIZATION HAS BEEN POSTPONED! FAILED TO INITIALIZE BotFilter! " +
                         "Caught {} Message: {} ", se.getClass().getName(), se.getMessage());
             }
         }
@@ -100,31 +115,35 @@ public class BotFilter implements Filter {
             if(initialized) {
                 return;
             }
-            Element botBlockerConfig = config.getChild(BOT_FILTER_ELEMENT_KEY);
-            if (botBlockerConfig != null) {
-                for (Object o : botBlockerConfig.getChildren(IP_ADDRESS_ELEMENT_KEY)) {
+            Element botFilterConfig = config.getChild(BOT_FILTER_ELEMENT_KEY);
+            if (botFilterConfig == null) {
+                botFilterConfig = config.getChild(BOT_BLOCKER_ELEMENT_KEY);
+            }
+
+            if (botFilterConfig != null) {
+                for (Object o : botFilterConfig.getChildren(IP_ADDRESS_ELEMENT_KEY)) {
                     String ipAddr = ((Element) o).getTextTrim();
                     ipAddresses.add(ipAddr);
                 }
-                for (Object o : botBlockerConfig.getChildren(IP_MATCH_ELEMENT_KEY)) {
+                for (Object o : botFilterConfig.getChildren(IP_MATCH_ELEMENT_KEY)) {
                     String ipMatch = ((Element) o).getTextTrim();
                     Pattern ipP = Pattern.compile(ipMatch);
                     ipMatchPatterns.add(ipP);
                 }
-                for (Object o : botBlockerConfig.getChildren(USER_AGENT_MATCH_ELEMENT_KEY)) {
+                for (Object o : botFilterConfig.getChildren(USER_AGENT_MATCH_ELEMENT_KEY)) {
                     String userAgentMatch = ((Element) o).getTextTrim();
                     Pattern uaP = Pattern.compile(userAgentMatch);
                     userAgentMatchPatterns.add(uaP);
                 }
 
                 // Response filtering patterns
-                for (Object o : botBlockerConfig.getChildren(ALLOWED_RESPONSE_REGEX_ELEMENT_KEY)) {
+                for (Object o : botFilterConfig.getChildren(ALLOWED_RESPONSE_REGEX_ELEMENT_KEY)) {
                     String ipMatch = ((Element) o).getTextTrim();
                     Pattern ipP = Pattern.compile(ipMatch);
                     allowedResponsePatterns.add(ipP);
                     responseFiltering = true;
                 }
-                for (Object o : botBlockerConfig.getChildren(BLOCKED_RESPONSE_REGEX_ELEMENT_KEY)) {
+                for (Object o : botFilterConfig.getChildren(BLOCKED_RESPONSE_REGEX_ELEMENT_KEY)) {
                     String ipMatch = ((Element) o).getTextTrim();
                     Pattern ipP = Pattern.compile(ipMatch);
                     blockedResponsePatterns.add(ipP);
