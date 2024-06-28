@@ -361,7 +361,7 @@ public class BotFilter implements Filter {
     private void jsonWarn(String msg){
         if(log.isWarnEnabled()) {
             String json_msg;
-            json_msg = "{ \"waring\": {";
+            json_msg = "{ \"warning\": {";
             json_msg += "\"time\": " + System.currentTimeMillis() + ", ";
             json_msg += "\"message\": \"" + StringEscapeUtils.escapeJson(msg) + "\" ";
             json_msg += "} }\n";
