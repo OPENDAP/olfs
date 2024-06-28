@@ -1,6 +1,7 @@
 package opendap.coreServlet;
 
 import opendap.logging.LogUtil;
+import org.apache.commons.text.StringEscapeUtils;
 import org.jdom.Document;
 import org.jdom.Element;
 
@@ -95,14 +96,16 @@ public class BotFilter implements Filter {
                     String msg = "init() - The web.xml configuration for " + getClass().getName() +
                             " does not contain an init-parameter named \"" + CONFIG_PARAMETER_KEY + "\" " +
                             "Using the DEFAULT name: " + configFileName;
-                    log.warn(msg);
+                    jsonWarn(msg);
                 }
                 Document configDoc = ServletUtil.loadConfig(configFileName, filterConfig.getServletContext());
                 String contextPath = filterConfig.getServletContext().getContextPath();
                 init(configDoc.getRootElement(), contextPath);
             } catch (Exception se) {
-                log.warn("init() - INITIALIZATION HAS BEEN POSTPONED! FAILED TO INITIALIZE BotFilter! " +
-                        "Caught {} Message: {} ", se.getClass().getName(), se.getMessage());
+                jsonWarn("init() - INITIALIZATION HAS BEEN POSTPONED! " +
+                        "FAILED TO INITIALIZE BotFilter! " +
+                        "Caught " + se.getClass().getName() +
+                        " Message: " + se.getMessage());
             }
         }
         finally {
@@ -234,14 +237,15 @@ public class BotFilter implements Filter {
         rv.cause = "Not Blocked";
         String remoteAddr = request.getRemoteAddr();
         if(ipAddresses.contains(remoteAddr)){
-            log.debug("The ip address: {} is " +
-                    "on the list of blocked addresses", LogUtil.scrubEntry(remoteAddr));
+            jsonDebug("The ip address: " + LogUtil.scrubEntry(remoteAddr) +
+                    " is on the list of blocked addresses.");
             rv.blockResponse = isResponseBlocked(request);
             rv.cause = "IpAddress";
         }
         for(Pattern p: ipMatchPatterns){
             if(p.matcher(remoteAddr).matches()){
-                log.debug("The ip address: {} matches the pattern: \"{}\"", LogUtil.scrubEntry(remoteAddr),p.pattern());
+                jsonDebug("The ip address: " + LogUtil.scrubEntry(remoteAddr) +
+                        " matches the pattern: \""+p.pattern()+"\"");
                 rv.blockResponse = isResponseBlocked(request);
                 rv.cause = "IpMatch";
             }
@@ -250,7 +254,9 @@ public class BotFilter implements Filter {
         if(userAgent != null) {
             for (Pattern p : userAgentMatchPatterns) {
                 if (p.matcher(userAgent).matches()) {
-                    log.debug("The User-Agent header: {} matches the pattern: \"{}\"", LogUtil.scrubEntry(userAgent), p.pattern());
+                    jsonDebug("The User-Agent header: " +
+                            LogUtil.scrubEntry(userAgent) +
+                            " matches the pattern: \""+ p.pattern() + "\"");
                     rv.blockResponse = isResponseBlocked(request);
                     rv.cause = "UserAgentMatch";
                 }
@@ -274,13 +280,13 @@ public class BotFilter implements Filter {
 
         String userAgent = Scrub.simpleString(request.getHeader("User-Agent"));
         if(userAgent == null) { userAgent = ""; }
-        json_msg += "\"user_agent\": \"" + Scrub.urlContent(userAgent) + "\", ";
+        json_msg += "\"user_agent\": \"" + StringEscapeUtils.escapeJson(userAgent) + "\", ";
 
-        json_msg += "\"path\": \"" + Scrub.urlContent(request.getRequestURI()) + "\", ";
+        json_msg += "\"path\": \"" + StringEscapeUtils.escapeJson(Scrub.urlContent(request.getRequestURI())) + "\", ";
 
         String query = request.getQueryString();
         if(query==null) { query=""; }
-        json_msg += "\"query\": \"" + Scrub.simpleQueryString(query) + "\", ";
+        json_msg += "\"query\": \"" + StringEscapeUtils.escapeJson(Scrub.simpleQueryString(query)) + "\", ";
 
         json_msg += "\"cause\": \"" + cause + "\" ";
         json_msg += "} } \n";
@@ -328,11 +334,11 @@ public class BotFilter implements Filter {
      * @param matchPatterns The Vector of potential match patterns
      * @return True if any pattern in matchPatterns matches the candidateString
      */
-    boolean matchMe(String candidateString, Vector<Pattern> matchPatterns){
+    private boolean matchMe(String candidateString, Vector<Pattern> matchPatterns){
         for (Pattern pattern : matchPatterns) {
             boolean matched = pattern.matcher(candidateString).matches();
             if (matched) {
-                log.debug("The candidate string " + candidateString +
+                jsonDebug("The candidate string " + candidateString +
                         " matches the blocked response regex pattern: \""
                         + pattern.pattern() + "\"");
                 return true;
@@ -341,5 +347,26 @@ public class BotFilter implements Filter {
         return false;
     }
 
+    private void jsonDebug(String msg){
+        if(log.isDebugEnabled()) {
+            String json_msg;
+            json_msg = "{ \"debug\": {";
+            json_msg += "\"time\": " + System.currentTimeMillis() + ", ";
+            json_msg += "\"message\": \"" + StringEscapeUtils.escapeJson(msg) + "\" ";
+            json_msg += "} }\n";
+            log.debug(json_msg);
+        }
+    }
+
+    private void jsonWarn(String msg){
+        if(log.isWarnEnabled()) {
+            String json_msg;
+            json_msg = "{ \"waring\": {";
+            json_msg += "\"time\": " + System.currentTimeMillis() + ", ";
+            json_msg += "\"message\": \"" + StringEscapeUtils.escapeJson(msg) + "\" ";
+            json_msg += "} }\n";
+            log.warn(json_msg);
+        }
+    }
 
 }
