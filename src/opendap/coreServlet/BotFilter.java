@@ -198,6 +198,7 @@ public class BotFilter implements Filter {
             RequestDispatcher rd = sc.getRequestDispatcher(error403);
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             rd.forward(request, response);
+            return;
         }
         filterChain.doFilter(request, response);
     }
