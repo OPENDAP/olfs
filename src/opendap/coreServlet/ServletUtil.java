@@ -26,15 +26,21 @@
 package opendap.coreServlet;
 
 
+import org.jdom.Document;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Enumeration;
@@ -159,6 +165,55 @@ public class ServletUtil {
         }
         return   false;
     }
+
+
+
+
+    /**
+     * Loads the configuration file specified in the servlet parameter
+     * ConfigFileName.
+     *
+     * @throws ServletException When the file is missing, unreadable, or fails
+     *
+     *                          to parse (as an XML document).
+     */
+    public static Document loadConfig(String confFileName, ServletContext servletContext) throws ServletException {
+
+        String filename = Scrub.fileName(ServletUtil.getConfigPath(servletContext) + confFileName);
+        String errorMsgBase = "Configuration file \"";
+
+        log.debug("Loading Configuration File: {}", filename);
+        try {
+
+            File confFile = new File(filename);
+            FileInputStream fis = new FileInputStream(confFile);
+
+            try {
+                // Parse the XML doc into a Document object.
+                SAXBuilder sb = new SAXBuilder();
+                Document configDoc = sb.build(fis);
+                log.debug("Configuration loaded and parsed.");
+                return configDoc;
+            } finally {
+                fis.close();
+            }
+        } catch (FileNotFoundException e) {
+            String msg = errorMsgBase + filename + "\" cannot be found.";
+            log.error(msg);
+            throw new ServletException(msg, e);
+        } catch (IOException e) {
+            String msg = errorMsgBase + filename + "\" is not readable.";
+            log.error(msg);
+            throw new ServletException(msg, e);
+        } catch (JDOMException e) {
+            String msg = errorMsgBase + filename + "\" cannot be parsed.";
+            log.error(msg);
+            throw new ServletException(msg, e);
+        }
+    }
+
+
+
 
 
     /**

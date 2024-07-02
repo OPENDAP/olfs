@@ -147,7 +147,7 @@
     <!-- logger name="opendap.coreServlet.DispatchServlet"    level="all"/ -->
     <logger name="opendap.coreServlet.Scrub"              level="all"/>
     <logger name="opendap.coreServlet.RequestCache"       level="all"/>
-    <logger name="opendap.coreServlet.BotBlocker"         level="all"/>
+    <logger name="opendap.coreServlet.BotFilter"         level="all"/>
     <logger name="opendap.coreServlet.PersistentConfigurationHandler"  level="all"/>
 
     <logger name="opendap.bes" level="error" />

@@ -37,7 +37,7 @@ import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.ResourceInfo;
 import opendap.coreServlet.Scrub;
 import opendap.logging.LogUtil;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
@@ -227,7 +227,7 @@ public class OlfsControlApi extends HttpResponder {
                         lines = Scrub.integerString(lines);
 
                     String log =  getOlfsLog(lines);
-                    log = StringEscapeUtils.escapeXml(log);
+                    log = StringEscapeUtils.escapeXml11(log);
                     sb.append(log);
                     break;
 

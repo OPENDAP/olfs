@@ -33,7 +33,7 @@ import opendap.coreServlet.HttpResponder;
 import opendap.coreServlet.ResourceInfo;
 import opendap.coreServlet.Scrub;
 import opendap.io.HyraxStringEncoding;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -359,7 +359,7 @@ public class BesControlApi extends HttpResponder {
                         String logContent =  bes.getLog(logLines);
                         logContent = besLogTailResponse(logContent);
 
-                        logContent = StringEscapeUtils.escapeXml(logContent);
+                        logContent = StringEscapeUtils.escapeXml11(logContent);
 
                         sb.append(logContent);
                         break;
