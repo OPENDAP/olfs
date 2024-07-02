@@ -303,6 +303,9 @@
 
     <property name="xlink.lib" value="xlink-v_1_0-1.4.0.jar"/>
 
+    <!-- Cloudwatch logback appender -->
+    <property name="cloudwathch-logback-appender.lib" value="cloudwatch-logback-appender-3.11.jar"/>
+
     <!--
         These are the library jars used by Hyrax.
     -->
