@@ -60,6 +60,7 @@ import static opendap.auth.IdFilter.USER_PROFILE;
 public class ServletLogUtil {
 
     public static final String HYRAX_ACCESS_LOG_ID = "HyraxAccess";
+
     public static final String HYRAX_LAST_MODIFIED_ACCESS_LOG_ID = "HyraxLastModifiedAccess";
 
     public static final String DOCS_ACCESS_LOG_ID = "DocsAccess";
@@ -84,8 +85,12 @@ public class ServletLogUtil {
     public static final String WCS_ACCESS_LOG_ID = "WCSAccess";
     public static final String WCS_LAST_MODIFIED_ACCESS_LOG_ID = "WCSLastModifiedAccess";
 
-    public static final String NGAP_ACCESS_LOG_ID = "HyraxNGAPAccess";
-    public static final String NGAP_ACCESS_LAST_MODIFIED_LOG_ID = "HyraxNGAPLastModifiedAccess";
+    public static final String CLOUDWATCH_REQUEST_LOG = "CloudWatchRequestLog";
+    public static final String CLOUDWATCH_RESPONSE_LOG = "CloudWatchResponseLog";
+
+
+
+
 
     private static final String ID_KEY = "ID";
     private static final String SOURCE_KEY = "SOURCE";
@@ -104,7 +109,8 @@ public class ServletLogUtil {
     private static final AtomicBoolean isLogInit = new AtomicBoolean(false);
     private static final ReentrantLock initLock =  new ReentrantLock();
 
-    private static AtomicBoolean useCombinedLog = new AtomicBoolean(false);
+    private static final AtomicBoolean useCombinedLog = new AtomicBoolean(false);
+    public static final AtomicBoolean useDualCloudWatchLogs = new AtomicBoolean(false);
 
 
     private static Logger log;
@@ -252,6 +258,7 @@ public class ServletLogUtil {
         if (logbackFile != null) {
             log.info("Logback configuration using: {}", logbackFile);
             LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+            loggerContext.reset();
             attemptJoranConfiguration(logbackFile, loggerContext);
             if(log.isInfoEnabled()){
                 log.info("LoggerContext Follows: {}", logbackFile);
@@ -277,7 +284,7 @@ public class ServletLogUtil {
             configurator.doConfigure(logbackConfigFile);
             log.info("Configuration via {} successful.",configurator.getClass().getName());
         } catch (JoranException je) {
-            log.error("Caught {} Messge: ",je.getClass().getName(),je.getMessage());
+            log.error("Caught {} Message: {}",je.getClass().getName(),je.getMessage());
             StringWriter sw = new StringWriter();
             je.printStackTrace(new PrintWriter(sw));
             log.error("Stack trace: \n{}",sw.toString());
@@ -373,7 +380,6 @@ public class ServletLogUtil {
      */
     public static void logServerAccessStart(HttpServletRequest req, String logName,  String httpVerb, String reqID) {
 
-        ;
         HttpSession session = req.getSession(false);
 
         MDC.put(ID_KEY, reqID);
@@ -404,6 +410,10 @@ public class ServletLogUtil {
             startMsg.append("QueryString: '").append(query).append("' ");
             startMsg.append("AccessLog: ").append(logName);
             log.info(startMsg.toString());
+        }
+        if(logName.equals(HYRAX_ACCESS_LOG_ID) && useDualCloudWatchLogs.get()){
+            Logger cwRequestLog = org.slf4j.LoggerFactory.getLogger(CLOUDWATCH_REQUEST_LOG);
+            cwRequestLog.info("");
         }
     }
 
@@ -508,6 +518,10 @@ public class ServletLogUtil {
         Logger access_log = org.slf4j.LoggerFactory.getLogger(logName);
         access_log.info("");
 
+        if(logName.equals(HYRAX_ACCESS_LOG_ID) && useDualCloudWatchLogs.get()){
+            Logger cwResponseLog = org.slf4j.LoggerFactory.getLogger(CLOUDWATCH_RESPONSE_LOG);
+            cwResponseLog.info("");
+        }
         log.info("REQUEST COMPLETE - http_status: " + MDC.get(HTTP_STATUS_KEY) + " duration: "+ MDC.get(DURATION_KEY) + "  size: "+MDC.get(RESPONSE_SIZE_KEY));
 
         cleanupMDC();
@@ -521,7 +535,7 @@ public class ServletLogUtil {
      * Of note is the fact that they do not recommend using MDC.clear() to do this. I think because MDC.clear() wipes
      * the MDC for all threads while MDC.remove() drops a set value for the current thread.
      */
-    private static void cleanupMDC(){
+    public static void cleanupMDC(){
 
         // -- -- -- -- -- -- -- -- -- -- -- -- -- --
         //
@@ -554,5 +568,16 @@ public class ServletLogUtil {
         useCombinedLog.set(value);
     }
 
+    public static void useDualCloudWatchLogs(boolean value) {
+        useDualCloudWatchLogs.set(value);
+    }
+
+    public static void mdcPut(String key, String value){
+        MDC.put(key, value);
+    }
+
+    public static String mdcGet(String key){
+        return MDC.get(key);
+    }
 
 }
