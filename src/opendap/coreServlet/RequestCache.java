@@ -169,7 +169,7 @@ public class RequestCache {
         if(id != null){
             return (String)id;
         }
-        return null;
+        return "THIS_GETS_FIXED_LATER";
     }
 
 }

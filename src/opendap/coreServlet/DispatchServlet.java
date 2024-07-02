@@ -40,6 +40,7 @@ import org.jdom.input.SAXBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -134,7 +135,7 @@ public class DispatchServlet extends HttpServlet {
 
             PersistentConfigurationHandler.installDefaultConfiguration(this, configFile);
 
-            loadConfig(configFile);
+            configDoc = ServletUtil.loadConfig(configFile, getServletContext());
 
             Element config = configDoc.getRootElement();
 
@@ -187,49 +188,6 @@ public class DispatchServlet extends HttpServlet {
     }
 
 
-    /**
-     * Loads the configuration file specified in the servlet parameter
-     * ConfigFileName.
-     *
-     * @throws ServletException When the file is missing, unreadable, or fails
-     *                          to parse (as an XML document).
-     */
-    private void loadConfig(String confFileName) throws ServletException {
-
-        String filename = Scrub.fileName(ServletUtil.getConfigPath(this) + confFileName);
-        String errorMsgBase = "OLFS configuration file \"";
-
-        log.debug("Loading Configuration File: {}", filename);
-        try {
-
-            File confFile = new File(filename);
-            FileInputStream fis = new FileInputStream(confFile);
-
-            try {
-                // Parse the XML doc into a Document object.
-                SAXBuilder sb = new SAXBuilder();
-                configDoc = sb.build(fis);
-            } finally {
-                fis.close();
-            }
-
-        } catch (FileNotFoundException e) {
-            String msg = errorMsgBase + filename + "\" cannot be found.";
-            log.error(msg);
-            throw new ServletException(msg, e);
-        } catch (IOException e) {
-            String msg = errorMsgBase + filename + "\" is not readable.";
-            log.error(msg);
-            throw new ServletException(msg, e);
-        } catch (JDOMException e) {
-            String msg = errorMsgBase + filename + "\" cannot be parsed.";
-            log.error(msg);
-            throw new ServletException(msg, e);
-        }
-
-        log.debug("Configuration loaded and parsed.");
-
-    }
 
 
     private void initBesManager() throws ServletException {
@@ -250,17 +208,6 @@ public class DispatchServlet extends HttpServlet {
     /**
      * <Handler className="opendap.bes.VersionDispatchHandler" />
      * <p>
-     * <!-- Bot Blocker
-     * - This handler can be used to block access from specific IP addresses
-     * - and by a range of IP addresses using a regular expression.
-     * -->
-     * <!-- <Handler className="opendap.coreServlet.BotBlocker"> -->
-     * <!-- <IpAddress>127.0.0.1</IpAddress> -->
-     * <!-- This matches all IPv4 addresses, work yours out from here.... -->
-     * <!-- <IpMatch>[012]?\d?\d\.[012]?\d?\d\.[012]?\d?\d\.[012]?\d?\d</IpMatch> -->
-     * <!-- Any IP starting with 65.55 (MSN bots the don't respect robots.txt  -->
-     * <!-- <IpMatch>65\.55\.[012]?\d?\d\.[012]?\d?\d</IpMatch>   -->
-     * <!-- </Handler>  -->
      * <Handler className="opendap.ncml.NcmlDatasetDispatcher" />
      * <Handler className="opendap.threddsHandler.StaticCatalogDispatch">
      * <prefix>thredds</prefix>
@@ -323,12 +270,9 @@ public class DispatchServlet extends HttpServlet {
         if (config == null)
             throw new ServletException("Bad configuration! The configuration element was NULL");
 
-        Element botBlocker = config.getChild("BotBlocker");
         Element noDynamicNavigation = config.getChild("NoDynamicNavigation");
 
         httpGetHandlers.add(new opendap.bes.VersionDispatchHandler());
-        if (botBlocker != null)
-            httpGetHandlers.add(new opendap.coreServlet.BotBlocker());
         httpGetHandlers.add(new opendap.ncml.NcmlDatasetDispatcher());
         httpGetHandlers.add(new opendap.threddsHandler.StaticCatalogDispatch());
         httpGetHandlers.add(new opendap.gateway.DispatchHandler());

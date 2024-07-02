@@ -600,8 +600,9 @@ public class OPeNDAPClient {
         }
         catch(Throwable t){
             log.error("OUCH! Caught "+t.getClass().getName()+" Message: "+t.getMessage());
-            log.error("STACK TRACE: \n"+org.apache.commons.lang.exception.ExceptionUtils.getStackTrace(t));
-
+            StringWriter writer = new StringWriter();
+            t.printStackTrace(new PrintWriter(writer));
+            log.error("STACK TRACE \n" + writer);
             try {
                 if(besOut!=null){
                     besOut.close();
@@ -662,7 +663,9 @@ public class OPeNDAPClient {
         catch(Throwable t){
             log.error("OUCH! Caught "+t.getClass().getName()+" Message: "+t.getMessage());
             try {
-                log.error("STACK TRACE: \n"+org.apache.commons.lang.exception.ExceptionUtils.getStackTrace(t));
+                StringWriter writer = new StringWriter();
+                t.printStackTrace(new PrintWriter(writer));
+                log.error("STACK TRACE \n" + writer);
             }
             catch (Throwable tt){
                 log.error("**** FAILED TO GENERATE STACK TRACE! ****");
