@@ -285,6 +285,9 @@ dependencies {
 
     ngapDep testImplementation("org.objenesis:objenesis:3.2")
 
+    // Cloudwatch logback appender
+    implementation group: 'cloudwatch logback appender', name: 'cloudwatch-logback-appender', version: '3.1'
+
 }
 
 // Substitute the version information before compilation
