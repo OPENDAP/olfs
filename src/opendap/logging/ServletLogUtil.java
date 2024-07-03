@@ -280,7 +280,7 @@ public class ServletLogUtil {
             configurator.setContext(loggerContext);
             // the context was probably already configured by default configuration
             // rules
-            loggerContext.reset();
+            // loggerContext.reset();
             configurator.doConfigure(logbackConfigFile);
             log.info("Configuration via {} successful.",configurator.getClass().getName());
         } catch (JoranException je) {
