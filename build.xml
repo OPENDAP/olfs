@@ -278,14 +278,16 @@
     <property name="owasp-encoder.lib" value="encoder-1.2.2.jar"/>
     <property name="owasp-encoder-jsp.lib" value="encoder-jsp-1.2.2.jar"/>
 
+    <!-- CloudWatchAppender (logback appender implementation)  -->
+    <property name="cloudwatch-logback-appender.lib" value="cloudwatch-logback-appender-3.11.jar"/>
+
+    <!-- CloudWatchAppender Dependencies -->
     <property name="aws-java-sdk-core.lib" value="aws-java-sdk-core-1.12.734.jar"/>
     <property name="aws-java-sdk-ec2.lib" value="aws-java-sdk-ec2-1.12.734.jar"/>
     <property name="aws-java-sdk-logs.lib" value="aws-java-sdk-logs-1.12.734.jar"/>
-
     <property name="jackson-core.lib" value="jackson-core-2.17.0.jar" />
     <property name="jackson-databind.lib" value="jackson-databind-2.17.0.jar" />
     <property name="jackson-annotations.lib" value="jackson-annotations-2.17.0.jar" />
-
     <property name="joda-time.lib" value="joda-time-2.12.7.jar"/>
 
     <!-- WCS Libs -->
@@ -304,8 +306,6 @@
 
     <property name="xlink.lib" value="xlink-v_1_0-1.4.0.jar"/>
 
-    <!-- Cloudwatch logback appender -->
-    <property name="cloudwathch-logback-appender.lib" value="cloudwatch-logback-appender-3.11.jar"/>
 
     <!--
         These are the library jars used by Hyrax.
@@ -338,15 +338,16 @@
         <include name="${logback-core.lib}"/>
         <include name="${logback-classic.lib}"/>
 
+        <!-- CloudWatchAppender and dependencies -->
+        <include name="${cloudwatch-logback-appender.lib}" />
         <include name="${aws-java-sdk-core.lib}"/>
         <include name="${aws-java-sdk-ec2.lib}"/>
         <include name="${aws-java-sdk-logs.lib}"/>
-
         <include name="${jackson-core.lib}"/>
         <include name="${jackson-databind.lib}"/>
         <include name="${jackson-annotations.lib}"/>
-
         <include name="${joda-time.lib}"/>
+        <!-- - - - - - - - - - - - - - - - - - - - - -->
 
         <include name="${urlRewrite.lib}"/>
 
@@ -500,7 +501,6 @@
         <copy todir="${build.src}" filtering="true">
             <fileset dir="${src.dir}">
                 <!-- include all the java files -->
-                <include name="com/**"/>
                 <include name="opendap/**"/>
                 <include name="org/opendap/**"/>
 
