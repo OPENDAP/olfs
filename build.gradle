@@ -210,6 +210,10 @@ dependencies {
     implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.5.6' // '1.1.11'
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.6'
 
+    // CloudWatchAppender (logback Appender implementation)
+    implementation files('lib/cloudwatch-logback-appender-3.1.jar')
+
+    // BEGIN - CloudWatchAppender dependencies
     implementation group: 'aws-java-sdk-core', name: 'aws-java-sdk-core', version: '1.12.734'
     implementation group: 'aws-java-sdk-ec2', name: 'aws-java-sdk-ec2', version: '1.12.734'
     implementation group: 'aws-java-sdk-logs', name: 'aws-java-sdk-logs', version: '1.12.734'
@@ -219,6 +223,7 @@ dependencies {
     implementation group: 'jackson', name: 'jackson-annotations', version: '2.17.0'
 
     implementation group: 'joda-time', name: 'joda-time', version: '2.12.7'
+    // END - CloudWatchAppender dependencies
 
     implementation group: 'commons-cli', name: 'commons-cli', version: '1.2'
     implementation group: 'commons-codec', name: 'commons-codec', version: '1.13'
