@@ -279,8 +279,8 @@
     <property name="owasp-encoder-jsp.lib" value="encoder-jsp-1.2.2.jar"/>
 
     <!-- CloudWatchAppender (logback appender implementation)  -->
-    <property name="cloudwatch-logback-appender.lib"
-              value="cloudwatch-logback-appender-3.11.jar"/>
+    <property name="cloudwatch-appender.lib"
+              value="cloudwatch-logback-appender-3.1.jar"/>
 
     <!-- CloudWatchAppender Dependencies -->
     <property name="aws-java-sdk-core.lib"
@@ -347,7 +347,7 @@
         <include name="${logback-classic.lib}"/>
 
         <!-- CloudWatchAppender and dependencies -->
-        <include name="${cloudwatch-logback-appender.lib}" />
+        <include name="${cloudwatch-appender.lib}" />
         <include name="${aws-java-sdk-core.lib}"/>
         <include name="${aws-java-sdk-ec2.lib}"/>
         <include name="${aws-java-sdk-logs.lib}"/>
