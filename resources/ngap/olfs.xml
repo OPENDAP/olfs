@@ -96,6 +96,7 @@ ENVIRONMENTS. THE DEPLOYED VERSION MAY DIFFER FROM THIS STAND-IN
     <ThreddsService  prefix="thredds" useMemoryCache="true" allowRemote="false" />
     <GatewayService  prefix="gateway" useMemoryCache="true" />
 
+    <UseDualCloudWatchLogs />
 
     <!--
     <DatasetUrlResponse type="..." />
