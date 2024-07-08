@@ -33,6 +33,8 @@ import opendap.coreServlet.*;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
 import opendap.http.mediaTypes.Dmrpp;
+import opendap.ppt.PPTException;
+import org.jdom.JDOMException;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
 import org.jdom.Document;
@@ -147,7 +149,7 @@ public class BuildDmrppDispatchHandler implements DispatchHandler {
             boolean itsJustThePrefixWithoutTheSlash = false;
             boolean itsJustThePrefix = false;
 
-            boolean itsJustTheSlash = resourceID.equals(THE_SLASH) && _prefix.equals(THE_SLASH);
+            boolean itsJustTheSlash = resourceID.equals(THE_SLASH);
             log.debug("itsJustTheSlash: {}", (itsJustTheSlash?"true":"false"));
             if (!itsJustTheSlash) {
                 itsJustThePrefix = _prefix.equals(resourceID);
@@ -258,17 +260,35 @@ public class BuildDmrppDispatchHandler implements DispatchHandler {
         sos.print("transform: translate(0px, 100px); ");
         sos.println("'>");
         sos.println("-------------------------------------<br/>");
-        sos.println("      Build dmr++ service endpoint<br/>");
+        sos.println("      build dmr++ service endpoint<br/>");
         sos.println(". . . . . . . . . . . . . . . . .<br/>");
-        sos.println("       All Requests: " + reqCounter.get() + "<br/>");
-        sos.println("Build dmr++ service: " + buildDmrppServiceCounter.get() + "<br/>");
-        sos.println("          This page: " + buildDmrppServiceEndpointCounter.incrementAndGet() + "<br/>");
+        sos.println("<br/>");
+        sos.println("all requests: " + reqCounter.get() + "<br/>");
+        sos.println("build dmr++ service: " + buildDmrppServiceCounter.get() + "<br/>");
+        sos.println("this page: " + buildDmrppServiceEndpointCounter.incrementAndGet() + "<br/>");
+        sos.println("<br/>");
+        sos.println("hyrax version: " + Version.getHyraxVersionString()+" <br/>");
+        Document besversion = null;
+        String failMsg = "BES version acquisition failed!";
+        try {
+            besversion = BESManager.getBES("/").getVersionDocument();
+        } catch (BESError | BadConfigurationException | JDOMException | PPTException | RuntimeException e){
+            log.info("Unable to acquire version document for BES. Caught {}, message: {}",e.getClass().getName(), e.getMessage());
+            sos.println("bes version: " + failMsg + " <br/>");
+        }
+        if(besversion != null){
+            Element lib = besversion.getRootElement().getChild("library",opendap.namespaces.BES.BES_NS);
+            String name = lib.getAttributeValue("name");
+            String version = lib.getAttributeValue("version");
+            sos.println("build_dmrpp (" + name + ") version: " + version+" <br/>");
+        }
+        sos.println("<br/>");
+        sos.println(". . . . . . . . . . . . . . . . .<br/>");
         sos.println("-------------------------------------<br/>");
         sos.println("</p>");
         sos.println("</body>");
         sos.println("</html>");
         sos.flush();
-
     }
 
 

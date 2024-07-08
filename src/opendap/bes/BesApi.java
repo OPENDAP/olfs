@@ -2869,6 +2869,4 @@ public class BesApi implements Cloneable {
         return spi;
     }
 
-
-
 }

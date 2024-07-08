@@ -40,6 +40,7 @@ import org.jdom.input.SAXBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -134,14 +135,15 @@ public class DispatchServlet extends HttpServlet {
 
             PersistentConfigurationHandler.installDefaultConfiguration(this, configFile);
 
-            loadConfig(configFile);
+            configDoc = ServletUtil.loadConfig(configFile, getServletContext());
 
             Element config = configDoc.getRootElement();
 
             Element enableCombinedLog = config.getChild("EnableCombinedLog");
-            if(enableCombinedLog!=null){
-                ServletLogUtil.useCombinedLog(true);
-            }
+            ServletLogUtil.useCombinedLog(enableCombinedLog!=null);
+
+            Element useDualCWLogs = config.getChild("UseDualCloudWatchLogs");
+            ServletLogUtil.useDualCloudWatchLogs(useDualCWLogs!=null);
 
             boolean enablePost = false;
             Element postConfig = config.getChild("HttpPost");
@@ -187,49 +189,6 @@ public class DispatchServlet extends HttpServlet {
     }
 
 
-    /**
-     * Loads the configuration file specified in the servlet parameter
-     * ConfigFileName.
-     *
-     * @throws ServletException When the file is missing, unreadable, or fails
-     *                          to parse (as an XML document).
-     */
-    private void loadConfig(String confFileName) throws ServletException {
-
-        String filename = Scrub.fileName(ServletUtil.getConfigPath(this) + confFileName);
-        String errorMsgBase = "OLFS configuration file \"";
-
-        log.debug("Loading Configuration File: {}", filename);
-        try {
-
-            File confFile = new File(filename);
-            FileInputStream fis = new FileInputStream(confFile);
-
-            try {
-                // Parse the XML doc into a Document object.
-                SAXBuilder sb = new SAXBuilder();
-                configDoc = sb.build(fis);
-            } finally {
-                fis.close();
-            }
-
-        } catch (FileNotFoundException e) {
-            String msg = errorMsgBase + filename + "\" cannot be found.";
-            log.error(msg);
-            throw new ServletException(msg, e);
-        } catch (IOException e) {
-            String msg = errorMsgBase + filename + "\" is not readable.";
-            log.error(msg);
-            throw new ServletException(msg, e);
-        } catch (JDOMException e) {
-            String msg = errorMsgBase + filename + "\" cannot be parsed.";
-            log.error(msg);
-            throw new ServletException(msg, e);
-        }
-
-        log.debug("Configuration loaded and parsed.");
-
-    }
 
 
     private void initBesManager() throws ServletException {
@@ -250,17 +209,6 @@ public class DispatchServlet extends HttpServlet {
     /**
      * <Handler className="opendap.bes.VersionDispatchHandler" />
      * <p>
-     * <!-- Bot Blocker
-     * - This handler can be used to block access from specific IP addresses
-     * - and by a range of IP addresses using a regular expression.
-     * -->
-     * <!-- <Handler className="opendap.coreServlet.BotBlocker"> -->
-     * <!-- <IpAddress>127.0.0.1</IpAddress> -->
-     * <!-- This matches all IPv4 addresses, work yours out from here.... -->
-     * <!-- <IpMatch>[012]?\d?\d\.[012]?\d?\d\.[012]?\d?\d\.[012]?\d?\d</IpMatch> -->
-     * <!-- Any IP starting with 65.55 (MSN bots the don't respect robots.txt  -->
-     * <!-- <IpMatch>65\.55\.[012]?\d?\d\.[012]?\d?\d</IpMatch>   -->
-     * <!-- </Handler>  -->
      * <Handler className="opendap.ncml.NcmlDatasetDispatcher" />
      * <Handler className="opendap.threddsHandler.StaticCatalogDispatch">
      * <prefix>thredds</prefix>
@@ -323,12 +271,9 @@ public class DispatchServlet extends HttpServlet {
         if (config == null)
             throw new ServletException("Bad configuration! The configuration element was NULL");
 
-        Element botBlocker = config.getChild("BotBlocker");
         Element noDynamicNavigation = config.getChild("NoDynamicNavigation");
 
         httpGetHandlers.add(new opendap.bes.VersionDispatchHandler());
-        if (botBlocker != null)
-            httpGetHandlers.add(new opendap.coreServlet.BotBlocker());
         httpGetHandlers.add(new opendap.ncml.NcmlDatasetDispatcher());
         httpGetHandlers.add(new opendap.threddsHandler.StaticCatalogDispatch());
         httpGetHandlers.add(new opendap.gateway.DispatchHandler());
@@ -459,7 +404,7 @@ public class DispatchServlet extends HttpServlet {
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
 
-        int request_status = HttpServletResponse.SC_OK;
+        int httpStatus = HttpServletResponse.SC_OK;
 
         try {
             Procedure timedProcedure = Timer.start();
@@ -499,14 +444,14 @@ public class DispatchServlet extends HttpServlet {
                     dh.handleRequest(request, response);
 
                 } else {
-                    request_status = OPeNDAPException.anyExceptionHandler(new NotFound("Failed to locate resource: " + relativeUrl), this, response);
+                    httpStatus = OPeNDAPException.anyExceptionHandler(new NotFound("Failed to locate resource: " + relativeUrl), this, response);
                 }
             } finally {
                 Timer.stop(timedProcedure);
             }
         } catch (Throwable t) {
             try {
-                request_status = OPeNDAPException.anyExceptionHandler(t, this, response);
+                httpStatus = OPeNDAPException.anyExceptionHandler(t, this, response);
             } catch (Throwable t2) {
                 try {
                     log.error("\n########################################################\n" +
@@ -515,11 +460,11 @@ public class DispatchServlet extends HttpServlet {
                             "This is the last error log attempt for this request.\n" +
                             "########################################################\n", t2);
                 } catch (Throwable t3) {
-                    // It's boned now.. Leave it be.
+                    // It's boned now... Leave it be.
                 }
             }
         } finally {
-            ServletLogUtil.logServerAccessEnd(request_status, ServletLogUtil.HYRAX_ACCESS_LOG_ID);
+            ServletLogUtil.logServerAccessEnd(httpStatus, ServletLogUtil.HYRAX_ACCESS_LOG_ID);
             RequestCache.close();
             log.info("Response completed.\n");
         }

@@ -46,7 +46,7 @@
     -->
 
 
-    <property name="FORMAT" value="%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z} [%X{host}] [%X{UserAgent}] [thread:%t] [%r][%X{ID}] [%X{SOURCE}] [%X{resourceID}] [%X{query}] [%X{size}] [%X{duration}]  %-5p - %c.%M\\(\\) - %m%n" />
+    <property name="FORMAT" value="%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z} [%X{host}] [%X{UserAgent}] [thread:%t] [%r][%X{ID}] [%X{SOURCE}] [%X{resourceID}] [%X{query}] [%X{size}] [%X{duration}]  %-5p - %c.%M - %m%n" />
 
 
     <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
@@ -147,7 +147,7 @@
     <!-- logger name="opendap.coreServlet.DispatchServlet"    level="all"/ -->
     <logger name="opendap.coreServlet.Scrub"              level="all"/>
     <logger name="opendap.coreServlet.RequestCache"       level="all"/>
-    <logger name="opendap.coreServlet.BotBlocker"         level="all"/>
+    <logger name="opendap.coreServlet.BotFilter"         level="all"/>
     <logger name="opendap.coreServlet.PersistentConfigurationHandler"  level="all"/>
 
     <logger name="opendap.bes" level="error" />
