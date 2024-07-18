@@ -43,7 +43,7 @@ public class Version  {
     private static final String olfsVersion  = "@OlfsVersion@";
     private static final String hyraxVersion = "@HyraxVersion@";
 
-    /*
+    /* Unused
      * Returns a String containing the OLFS version.
      * @return The version of OLFS.
     public static String getOLFSVersionString() {
@@ -78,7 +78,7 @@ public class Version  {
         return (hyrax);
     }
 
-    /*
+    /* Unused.
      *  Produce the ServerUUID value used by the top level of Hyrax.
      * @return The UUID.
     public static String getServerUUID(){

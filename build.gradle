@@ -41,8 +41,8 @@ sonarqube {
         property "sonar.organization", "opendap"
         property "sonar.inclusions", "src"
         property "sonar.exclusions", "src/opendap/Coverity_Model.java," +
-                                    "retired/**/*.java," +
-                                    "src/opendap/**/*Test.java"
+                "retired/**/*.java," +
+                "src/opendap/**/*Test.java"
         property "sonar.java.binaries", "build"
         property "sonar.java.libraries", "lib/*.jar"
     }
@@ -300,7 +300,7 @@ dependencies {
 // Substitute the version information before compilation
 compileJava {
     doFirst {
-    	println 'HYRAX_VERSION: ' + project.HYRAX_VERSION
+        println 'HYRAX_VERSION: ' + project.HYRAX_VERSION
     }
 
     dependsOn 'substituteVersionInfo'
@@ -345,7 +345,8 @@ tasks.register('init_dir') {
 // See: https://docs.gradle.org/current/userguide/war_plugin.html
 // We want to make multiple war files (opendap, ROOT, ngap) I think. This answer shows how:
 // given that https://stackoverflow.com/questions/13077694/create-multiple-war-files-with-different-dependencies-in-gradle
-war {
+war
+{
     archiveBaseName = 'opendap'
 
     // Copy/filter the various resource files
@@ -413,7 +414,7 @@ tasks.register('buildDists') {
 
 clean {
     // FIXME: Awful. instead, look for all (.+)\\.java.in files and delete $1.java jhrg 9/16/21
-    delete 'src/opendap/bes/Version.java'
+    // delete 'src/opendap/bes/Version.java' // I had to replace Version.java, we need it. ndp 07/18/24
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -453,9 +454,9 @@ tasks.withType(JavaCompile).configureEach {
 import org.apache.tools.ant.filters.ReplaceTokens
 import org.codehaus.groovy.runtime.GStringImpl
 
-def tokens = [SERVICE_CONTEXT: project.DEPLOYMENT_CONTEXT,
-              HyraxVersion: project.HYRAX_VERSION,
-              OlfsVersion: project.OLFS_VERSION,
+def tokens = [SERVICE_CONTEXT   : project.DEPLOYMENT_CONTEXT,
+              HyraxVersion      : project.HYRAX_VERSION,
+              OlfsVersion       : project.OLFS_VERSION,
               WcsSoftwareVersion: project.WCS_VERSION]
 
 // Not used. jhrg 9/17/21 WCS_SOFTWARE_VERSION: project.WCS_VERSION
