@@ -725,7 +725,7 @@ public class OPeNDAPClient {
             throw new PPTException("Received error content from BES showStatus " +
                     "command! error_mdg: " + error);
         }
-        return response.toString(HyraxStringEncoding.getCharset());
+        return response.toString(HyraxStringEncoding.getCharset().toString());
     }
 
     public boolean isOk(){
