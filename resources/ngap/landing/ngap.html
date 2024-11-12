@@ -103,21 +103,28 @@
                     <p>Python and <a href="https://pydap.github.io/pydap/intro.html">PyDAP</a>
                         can be used to access <a href="https://pace.oceansciences.org/">PACE</a> data within NASA's
                         Earthdata in the cloud, as well as data from other sources. Alternatively, the Python
-                        <a href="https://unidata.github.io/netcdf4-python/">netCDF</a>a>
+                        <a href="https://unidata.github.io/netcdf4-python/">netCDF</a>
                         package offers another robust option for accessing similar datasets.</p>
-                    <p>Using <a href="https://pydap.github.io/pydap/notebooks/PACE.html">Jupyter notebook</a>:</p>
+
+                    <p>Python packages such as <a href="https://pydap.github.io/pydap/intro.html">PyDAP</a> and
+                    <a href="https://unidata.github.io/netcdf4-python/">netCDF</a> can be used to access data
+                    within NASA's Earthdata in the cloud, such as <a href="https://pace.oceansciences.org/">PACE</a>
+                    datasets.</p>
+
+                    <p>Using <a href="https://pydap.github.io/pydap/notebooks/PACE.html">Jupyter notebook</a>, follow
+                    these steps:</p>
                     <ol>
-                        <li>First step: <strong>Authenticate</strong> to access the NASA systems</li>
-                        <li>Second: <strong>Access</strong> to get data</li>
-                        <li>Third: <strong>Plot</strong> to load the map visualization</li>
+                        <li><strong>Authenticate</strong> using EDL tokens;</li>
+                        <li><strong>Access</strong> data in a way that is parallelizable; and</li>
+                        <li><strong>Plot</strong> a graph derived from your analysis.</li>
                     </ol>
 
-                    <p>The PyDAP library is a powerful, Python-native tool designed specifically to access data
-                    through the OPeNDAP data model. With its ability to handle both array and table data types, PyDAP
-                    integrates smoothly with a wide range of Python packages, such as Matplotlib, enabling
-                    straightforward data visualization and analysis. Additionally, PyDAP can serve as an access layer
-                    for <em>xarray</em>, making it easier to work with multidimensional data structures and enhancing its
-                    utility for scientific applications where complex datasets are common.</p>
+                    <p>PyDAP is a powerful, parallelizable, python-native tool designed to access data through the
+                        OPeNDAP data model. With its ability to handle chunked arrays, complex tabular structures,
+                        and groups, PyDAP integrates smoothly with the broad Python-ecosystem. Additionally, PyDAP
+                        can serve as an access layer for <em>xarray</em>, making it easier to parallelize and scale a
+                        science-driven analysis when working with complex, multidimensional data structures without
+                        the need to download and reformat entire copies of datasets.</p>
 
                 </div>
                 <div class="col-md-5">
