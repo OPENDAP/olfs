@@ -1,0 +1,60 @@
+Added drop shadow, etc., using GIMP 2.1
+
+Clean the images using fuzzy select and then Edit -> Clear, Select -> None
+
+Added rounded corners:
+
+Here's how you can create rounded corners for your rectangular PNG image in GIMP 2.1:
+
+1. **Open the Image**: Start by opening your rectangular PNG image in GIMP.
+
+2. **Add an Alpha Channel**: To ensure the corners will be transparent, add an alpha channel (if your image doesn’t already have one):
+   - Go to **Layer** > **Transparency** > **Add Alpha Channel**.
+
+3. **Select Rounded Corners**:
+   - Go to **Select** > **Rounded Rectangle**.
+   - In the dialog that appears, set the **Radius** to control how rounded you want the corners to be. You can experiment with the radius until you achieve the look you want.
+
+4. **Invert Selection**:
+   - Once you’re happy with the rounded selection, go to **Select** > **Invert**. This will select the corners instead of the main image.
+
+5. **Clear the Corners**:
+   - Press **Delete** on your keyboard to clear the selected corners. You should now see transparent rounded corners.
+
+6. **Deselect**:
+   - Go to **Select** > **None** to remove the selection.
+
+7. **Save or Export**:
+   - Save the image in a format that supports transparency, like PNG, to keep the rounded corners.
+
+This should give you a PNG image with rounded corners!
+
+Added drop shadow using an expanded canvas size of +20 on top, +30 on each side and +40 on the bottom. This matches
+what was (apparently) used for the panoply screen shots.
+
+To add a drop shadow around your existing image in GIMP 2.1 and extend the canvas size to fit the shadow, follow these steps:
+
+1. **Open Your Image in GIMP**:
+   - Start GIMP and open your PNG file.
+
+2. **Add Alpha Channel** (if you haven’t already):
+   - Right-click on the image layer in the Layers panel and select *Add Alpha Channel*. This will allow for transparency in the shadowed areas.
+
+3. **Resize the Canvas to Fit the Shadow**:
+   - Go to *Image > Canvas Size*.
+   - Increase the width and height by a bit more than you want the shadow to extend (e.g., add 20-30 pixels to each dimension).
+   - Click on the *Center* button to keep your image centered in the new canvas size. Click **Resize** when done.
+
+4. **Apply the Drop Shadow**:
+   - Go to *Filters > Light and Shadow > Drop Shadow*.
+   - Adjust the **Offset X** and **Offset Y** to set the shadow’s position relative to the image.
+   - Increase the **Blur Radius** to soften the shadow’s edges.
+   - Adjust the **Opacity** to control the shadow’s darkness.
+   - Click **OK** to apply the shadow.
+
+5. **Export Your Image**:
+   - Once you’re happy with the shadow, go to *File > Export As*, choose **PNG** to keep transparency, and save your image.
+
+This process will add a shadow around your image, and resizing the canvas will ensure the shadow isn’t cut off.
+
+For the shadow, I used the default values of 20, 20 and 0.5.

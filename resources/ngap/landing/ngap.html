@@ -32,11 +32,12 @@
             </div>
             <div class="row pt-4 justify-content-center">
               <ul class="list-inline text-center">
-                <li class="list-inline-item h5 text-white-50">Panoply</li>
-                <li class="list-inline-item h5 text-white-50">Matlab</li>
-                <li class="list-inline-item h5 text-white-50">R</li>
-                <li class="list-inline-item h5 text-white-50">ArcGIS Pro</li>
-                <li class="list-inline-item h5 text-white-50">Jupyter Notebook</li>
+                  <li class="list-inline-item h5 text-white-50">Python</li>
+                  <li class="list-inline-item h5 text-white-50">Jupyter Notebook</li>
+                  <li class="list-inline-item h5 text-white-50">Matlab</li>
+                  <li class="list-inline-item h5 text-white-50">R</li>
+                  <li class="list-inline-item h5 text-white-50">Panoply</li>
+                  <li class="list-inline-item h5 text-white-50">ArcGIS Pro</li>
               </ul>
             </div>
             <div class="row pt-4 justify-content-center cta">
@@ -81,15 +82,13 @@
             <div class="row pt-5 pb-4 justify-content-center">
                 <div class="col-md-5">
                     <h3>
-                        <a href="https://opendap.github.io/documentation/tutorials/DataAccessTutorials.html">
-                            OPeNDAP Data Access Tutorials
+                        <a href="https://github.com/OPENDAP/ESIP2024">
+                            Interactive Data Access Tutorials
                         </a>
                     </h3>
                     You can find a number of tutorials which explain how to utilize different data access
                     clients to retrieve data from a DAP2 or DAP4 service on our
-                    <a href="https://opendap.github.io/documentation/tutorials/DataAccessTutorials.html">
-                        Data Access Tutorials
-                    </a> page.
+                    <a href="https://opendap.github.io/documentation/tutorials/DataAccessTutorials.html">Data Access Tutorials</a> page.
                 </div>
             </div>
         </div>
@@ -99,15 +98,51 @@
     <div class="hero-callout" style="background-color: #e3e3e3;">
         <div class="container-lg">
             <div class="row pt-5 pb-4 justify-content-center">
+                <div class="col-md-5">
+                    <h3>Hyrax and Python/PyDAP Example</h3>
+                    <p>Python and <a href="https://pydap.github.io/pydap/intro.html">PyDAP</a>
+                        can be used to access <a href="https://pace.oceansciences.org/">PACE</a> data within NASA's
+                        Earthdata in the cloud, as well as data from other sources. Alternatively, the Python
+                        <a href="https://unidata.github.io/netcdf4-python/">netCDF</a>a>
+                        package offers another robust option for accessing similar datasets.</p>
+                    <p>Using <a href="https://pydap.github.io/pydap/notebooks/PACE.html">Jupyter notebook</a>:</p>
+                    <ol>
+                        <li>First step: <strong>Authenticate</strong> to access the NASA systems</li>
+                        <li>Second: <strong>Access</strong> to get data</li>
+                        <li>Third: <strong>Plot</strong> to load the map visualization</li>
+                    </ol>
+
+                    <p>The PyDAP library is a powerful, Python-native tool designed specifically to access data
+                    through the OPeNDAP data model. With its ability to handle both array and table data types, PyDAP
+                    integrates smoothly with a wide range of Python packages, such as Matplotlib, enabling
+                    straightforward data visualization and analysis. Additionally, PyDAP can serve as an access layer
+                    for <em>xarray</em>, making it easier to work with multidimensional data structures and enhancing its
+                    utility for scientific applications where complex datasets are common.</p>
+
+                </div>
+                <div class="col-md-5">
+                    <img class="img-fluid" alt="Setup Earthdata Login" src="/docs/ngap/pydap-pace-1-shadow.png" />
+                    <img class="img-fluid" alt="Access one variable from the PACE dataset" src="/docs/ngap/pydap-pace-2-shadow.png" />
+                    <img class="img-fluid" alt="Plot the data using Python and matplotlib" src="/docs/ngap/pydap-pace-3-shadow.png" />
+                </div>
+            </div>
+            <div class="row pt-5 pb-4 justify-content-center">
               <div class="col-md-5">
                 <h3>Hyrax and Panoply Example</h3>
-                <p>Panoply plots geo-referenced and other arrays from netCDF, HDF, GRIB, and other datasets. With Panoply 4 (and later) you can Explore remote OpenDAP catalogs and open datasets served from them.</p>
+                <p>Panoply plots geo-referenced and other arrays from netCDF, HDF, GRIB, and other datasets.
+                    With Panoply 4 (and later) you can Explore remote OpenDAP catalogs and open datasets served from them.
+                    For this example we used Panoply version <strong>5.5.0</strong>. Older versions may not support
+                    URLs that use the <code>dap4://</code> protocol.</p>
                 <ol>
                   <li>Launch Panoply and click <strong>File > Open > Open Remote Dataset</strong></li>
-                  <li>Type <code>http://test.opendap.org/opendap/hyrax/data/nc/coads_climatology.nc</code> into the remote URL dialog</li>
+                  <li>Type <code>dap4://opendap.earthdata.nasa.gov/hyrax/data/nc/coads_climatology.nc</code> into
+                      the remote URL dialog</li>
                   <li>When the data loads, click <strong>SST</strong> to load the map visualization</li>
                 </ol>
-                <p>The Panoply application is a sophisticated GUI driven data client that is based around the CDM/NetCDF data model and utilizes that NetCDF-Java (and thus the Java DAP implementation) to access remote DAP datasets. Because it has a GUI it can retrieve (and cache for later) users credentials directly from the user.</p>
+                <p>The Panoply application is a sophisticated GUI driven data client that is based around the
+                    CDM/NetCDF data model and utilizes that NetCDF-Java (and thus the Java DAP implementation)
+                    to access remote DAP datasets. Because it has a GUI it can retrieve (and cache for later)
+                    users credentials directly from the user.</p>
               </div>
                 <div class="col-md-5">
                 <img class="img-fluid" alt="panoply-1" src="/docs/ngap/panoply-1.png" />
