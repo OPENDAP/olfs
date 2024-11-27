@@ -30,6 +30,7 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
+import com.google.gson.Gson;
 import opendap.PathBuilder;
 import opendap.auth.UserProfile;
 import opendap.coreServlet.Scrub;
@@ -49,8 +50,23 @@ import java.security.Principal;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
+<<<<<<< Updated upstream
 import static opendap.auth.IdFilter.USER_PROFILE;
 
+=======
+class json_log_entry{
+    String client_ip;
+    String user_id;
+    String user_agent;
+    String session_id;
+    long start_time;
+    String request_id;
+    String http_verb;
+    String resource_id;
+    String query_string;
+    String dap4_function;
+}
+>>>>>>> Stashed changes
 
 /**
  * User: ndp
@@ -440,7 +456,7 @@ public class ServletLogUtil {
      *
      * @return The BESlog formatted log line for this request
      */
-    public static String getLogEntryForBesLog(){
+    public static String getLogEntryForBesLogOLD(){
 
 
         StringBuilder alb = new StringBuilder();
@@ -465,6 +481,29 @@ public class ServletLogUtil {
         }
 
         return alb.toString();
+    }
+
+    public static String getLogEntryForBesLog(){
+
+        json_log_entry log_entry = new json_log_entry();
+        if(useCombinedLog.get()) {
+            log_entry.client_ip = MDC.get(CLIENT_HOST_KEY);
+            log_entry.user_agent = MDC.get(USER_AGENT_KEY);
+            log_entry.user_id = MDC.get(USER_ID_KEY);
+            log_entry.session_id = MDC.get(SESSION_ID_KEY);
+            log_entry.start_time = System.currentTimeMillis();
+            log_entry.request_id = MDC.get(REQUEST_ID_KEY);
+            log_entry.http_verb = MDC.get(HTTP_VERB_KEY);
+            log_entry.resource_id = MDC.get(RESOURCE_ID_KEY);
+
+            String ce = MDC.get(QUERY_STRING_KEY);
+            if(ce == null || ce.isEmpty()) {
+                ce = "-";
+            }
+            log_entry.query_string = ce;
+        }
+        Gson gson = new Gson();
+        return gson.toJson(log_entry);
     }
 
 
