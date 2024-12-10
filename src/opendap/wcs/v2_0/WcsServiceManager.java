@@ -54,7 +54,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * all of the WcsCatalog instances defined in the configuration and instantiated and intialized.
  *
  * RUNTIME: Provides WCS request processing a one stop should for the WcsCatalog instance needed to
- * fufill the requiest.
+ * fufill the request.
  *
  */
 public class WcsServiceManager {
