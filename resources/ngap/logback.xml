@@ -180,7 +180,7 @@
         <logGroup>hyrax_request_log</logGroup>
         <logStream>hyrax-%instanceId</logStream>
         <layout>
-            <pattern>{ "request_id": "%8X{ID}", "user_id": "%X{userid}", "rangeBeginDateTime": "N/A", "rangeEndDateTime":"N/A", "collectionId": "%X{resourceID}", "bbox": "N/A", "parameters": { "service_name": "hyrax", "service_provider": "OPeNDAP", "service_id": "hyrax_prod" } }%n</pattern>
+            <pattern>{ "request_id": "%X{ID}", "user_id": "%X{userid}", "rangeBeginDateTime": "N/A", "rangeEndDateTime": "N/A", "collectionId": "%X{resourceID}", "bbox": "N/A", "parameters": { "service_name": "hyrax", "service_provider": "OPeNDAP", "service_id": "hyrax_prod" } }%n</pattern>
         </layout>
     </appender>
 
@@ -200,7 +200,7 @@
         <logGroup>hyrax_response_log</logGroup>
         <logStream>hyrax-%instanceId</logStream>
         <layout>
-            <pattern>{ "request_id": "%8X{ID}", "job_ids": ["N/A"], "http_response_code": "%X{http_status}", "time_completed":"%d{yyyy-MM-dd'T'HH:mm:ssZ}", "total_time":"%8X{duration}", "output_size":"%X{size}" }%n</pattern>
+            <pattern>{ "request_id": "%X{ID}", "job_ids": ["N/A"], "http_response_code": %X{http_status}, "time_completed": "%d{yyyy-MM-dd'T'HH:mm:ssZ}", "total_time": %X{duration}, "output_size": "%X{size}" }%n</pattern>
         </layout>
     </appender>
 
