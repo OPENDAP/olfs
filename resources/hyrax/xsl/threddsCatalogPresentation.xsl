@@ -135,7 +135,6 @@
                 <!--                                                        -->
                 <!--                                                        -->
 
-                <!-- img alt="Logo" src='{$docsService}/images/logo.png'/-->
                 <img alt="Logo" src="{hyrax:path_concat(($docsService, 'images','logo.png'))}"/>
                 <h1>
                     <xsl:if test="@name"> <xsl:value-of select="@name"/> : </xsl:if><xsl:value-of select="thredds:dataset/@name"/>
