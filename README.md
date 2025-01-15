@@ -22,20 +22,6 @@
 _The files `install.html` and/or `docs/index.html` may have additional information._
 
 
-**_Hyrax Version 1.17.0 (23 Jan 2024)_**
-
-**_OLFS  Version 1.18.14  (23 Jan 2024)_** 
-
-
-### OLFS-1.18.14 requires
-* **[bes-3.20.13](https://github.com/OPENDAP/bes/releases/tag/3.20.13)** [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6884800.svg)](https://doi.org/10.5281/zenodo.6884800)
-
-* **[libdap-3.20.11](https://github.com/OPENDAP/libdap4/releases/tag/3.20.11)**
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6878992.svg)](https://doi.org/10.5281/zenodo.6878992)
-
-
-_The files `install.html` and/or `docs/index.html` may have additional information._
-
 ### First:
 
 Build and install the [`libdap4`](https://github.com/OPENDAP/libdap4) and 
