@@ -1,3 +1,128 @@
+## -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+## olfs-1.18.15
+## hyrax-1.17.1
+##
+	
+2024-12-16  Nathan Potter  <ndp@opendap.org>
+	
+	Logo update (#201)
+	* First draft with new logo. Using svg ftw.
+	* Retired old opendap logo image file.
+	* Switched logo.png to logo.svg as needed.
+	* Removed uneeded width attribute from svg declarations. Used 
+	svg group to set letter colors.
+	* Tweaks to blue logo.svg
+	
+
+2024-12-11  Nathan Potter  <ndp@opendap.org>
+	
+	Changed MDC key names to better reflect their meaning (#199)
+	
+	Fix NGAP CloudWatch metric  data types (numbers are numbers) 
+	(#195)
+	* Fixed ngap CloudWatch metric format so that the numbers are, 
+	infact, numbers. Dropped krufty formating.
+	* More fixing of the types
+
+	
+2024-11-12  James Gallagher  <jgallagher@opendap.org>
+	
+	New text from Miguel (#198)
+	
+	Addressed issue 1 and 2 from HYRAX-1561 (#197)
+	This edit improves the server's landing page in NGAP.
+	Addressed issue 1 and 2 from HYRAX-1561
+	Added bit about Pydap.
+	Updated/fixed Panoply description to use dap4: URL protocol.
+	Updated text and image for the PyDAP/PACE example.
+	
+	
+2024-07-08  ndp-opendap  <ndp@opendap.org>
+	
+	Fixing format issues in logback files
+	
+	Fixing format issues in logback files
+	
+2024-07-08  James Gallagher  <jgallagher@opendap.org>
+	    Samuel Lloyd  <sawerlloyd7@gmail.com>
+	    Kodi Neumiller  <kneumiller@mtech.edu>
+	    ndp-opendap  <ndp@opendap.org>
+	
+	Cw logs v 2 aws 1 (#194)
+	Added cloudwatch-appender and call to our appender in 
+	resources/hyrax/WEB-INF/conf/logback.xml
+	Added copy of the cloudwatchlogbackappender sources to 
+	build/src.
+	See the ant build.xml section about preprocessing the source 
+	files.
+	Added sources jar
+	Added copy of 'com/j256/cloudwatchappender' to build.xml
+	---------
+
+2024-07-02  ndp-opendap  <ndp@opendap.org>
+	
+	Filter workflow patch
+	
+2024-07-02  Nathan Potter  <ndp@opendap.org>
+	
+	BotFilter (#192)
+	* Retired BotBlocker
+	* Created BotFilter which utilizes the same
+	default configuration as BotBlocker but
+	implements the javax.servlet.Filter
+	interface instead of the
+	opendap.corServlet.DispatchHandler interface
+	* JSON output for blocked log
+	
+2024-06-27  Nathan Potter  <ndp@opendap.org>
+	
+	Added User-Agent header to the things that can be utilized by 
+	BotBlocker (#191)
+	
+	Fixing configuration bug and simplified evaluation of the block 
+	status (#190)
+	
+2024-06-26  Nathan Potter  <ndp@opendap.org>
+	
+	Fixing broken bot blocker (#189)
+	* Fixing broken bot blocker
+	
+2024-06-13  Nathan Potter  <ndp@opendap.org>
+	
+	Fix the missing build_dmrpp landing page. (#185)
+	* Fixed build_Dmrpp landing page
+	* Added new code to better manage RequestCache and RequestID
+
+	
+2024-05-21  Nathan Potter  <ndp@opendap.org>
+	
+	Refactored RequestCache for request id support. (#184)
+	* Refactored RequestCache for request id support.
+	* Normalized the use of RequestCache.close(), comments.
+	
+
+2024-03-26  Nathan Potter  <ndp@opendap.org>
+	
+	Updated http methods. (#183)
+	
+	
+2024-03-22  Nathan Potter  <ndp@opendap.org>
+	
+	Refactored BESError handling or the new HttpError returned by 
+	the BES. (#182)
+	* Refactored BESError handling for the new HttpError returned 
+	by the BES.
+	* Trapped a nullptr issue in Timer.
+	* Restored BESError state check methods.
+
+	
+2024-02-14  ndp-opendap  <ndp@opendap.org>
+	
+	Merge branch 'master' of https://github.com/opendap/olfs
+	
+	Fixed typo in NGAP landing page.
+	
+
 ## -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 ##  olfs-1.18.13-25
 ##  hyrax-1.16.8-25
