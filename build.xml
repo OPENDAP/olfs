@@ -939,7 +939,7 @@
                 $CATALINA_HOM/lib when the Docker containers are built.-->
                 <exclude name="elasticache-java-cluster-client-1.1.2.jar"/>
                 <exclude name="memcached-session-manager-2.3.2.jar"/>
-                <exclude name="memcached-session-manager-tc7-2.3.2.jar"/>
+                <exclude name="memcached-session-manager-tc9-2.3.2.jar"/>
 
             </fileset>
 
