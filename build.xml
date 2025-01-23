@@ -246,6 +246,7 @@
 
 
     <property name="slf4j.lib" value="slf4j-api-2.0.13.jar"/> <!-- updated version jhrg 6/3/24 -->
+    <property name="slf4j-simple.lib" value="slf4j-simple-2.0.13.jar"/> <!-- updated version jhrg 6/3/24 -->
     <property name="logback-core.lib" value="logback-core-1.5.6.jar"/> <!-- updated version jhrg 6/3/24 -->
     <property name="logback-classic.lib" value="logback-classic-1.5.6.jar"/> <!-- updated version jhrg 6/3/24 -->
 
@@ -335,6 +336,7 @@
         <include name="${saxon.lib}"/>
 
         <include name="${slf4j.lib}"/>
+        <include name="${slf4j-simple.lib}"/>
         <include name="${logback-core.lib}"/>
         <include name="${logback-classic.lib}"/>
 
@@ -387,6 +389,7 @@
         <include name="${saxon.lib}"/>
 
         <include name="${slf4j.lib}"/>
+        <include name="${slf4j-simple.lib}"/>
         <include name="${logback-core.lib}"/>
         <include name="${logback-classic.lib}"/>
 
