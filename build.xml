@@ -47,6 +47,8 @@
     <property name="DEPLOYMENT_CONTEXT" value="opendap"/>
     <property name="NGAP_DEPLOYMENT_CONTEXT" value="ngap"/>
 
+    <property name="ANT_OPTS" value=""/>
+
     <!-- ********************************************* -->
     <!-- Project-wide settings. All directories are    -->
     <!-- relative to the project "Basedir" directory,  -->
@@ -245,10 +247,9 @@
     <property name="urlRewrite.lib" value="urlrewrite-3.2.0.jar"/>
 
 
-    <property name="slf4j.lib" value="slf4j-api-2.0.13.jar"/> <!-- updated version jhrg 6/3/24 -->
-    <property name="slf4j-simple.lib" value="slf4j-simple-2.0.13.jar"/> <!-- Added 01/23/25 - ndp -->
-    <property name="logback-core.lib" value="logback-core-1.5.6.jar"/> <!-- updated version jhrg 6/3/24 -->
-    <property name="logback-classic.lib" value="logback-classic-1.5.6.jar"/> <!-- updated version jhrg 6/3/24 -->
+    <property name="slf4j.lib" value="slf4j-api-2.0.16.jar"/> <!-- updated version 01/23/25 - ndp -->
+    <property name="logback-core.lib" value="logback-core-1.5.16.jar"/> <!-- updated version 01/23/25 - ndp -->
+    <property name="logback-classic.lib" value="logback-classic-1.5.16.jar"/> <!-- updated version 01/23/25 - ndp -->
 
     <property name="commons-cli.lib" value="apache-commons-cli-1.2.jar"/>
     <property name="commons-codec.lib" value="apache-commons-codec-1.8.jar"/>
@@ -336,7 +337,7 @@
         <include name="${saxon.lib}"/>
 
         <include name="${slf4j.lib}"/>
-        <include name="${slf4j-simple.lib}"/>
+        <!-- include name="${slf4j-simple.lib}"/ -->
         <include name="${logback-core.lib}"/>
         <include name="${logback-classic.lib}"/>
 
@@ -389,7 +390,7 @@
         <include name="${saxon.lib}"/>
 
         <include name="${slf4j.lib}"/>
-        <include name="${slf4j-simple.lib}"/>
+        <!-- include name="${slf4j-simple.lib}"/ -->
         <include name="${logback-core.lib}"/>
         <include name="${logback-classic.lib}"/>
 
