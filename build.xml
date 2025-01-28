@@ -945,6 +945,7 @@
                 <exclude name="memcached-session-manager-2.3.2.jar"/>
                 <exclude name="memcached-session-manager-tc9-2.3.2.jar"/>
                 <!-- exclude name="redisson-3.11.6.jar"/ -->
+                <exclude name="redisson-3.22.0.jar"/>
                 <exclude name="redisson-all-3.22.0.jar"/>
                 <exclude name="redisson-tomcat-9-3.22.0.jar"/>
 
@@ -975,7 +976,7 @@
                 <exclude name="WEB-INF/urlrewrite.xml"/>
             </zipfileset>
 
-            <zipfileset dir="${build.ngap.resources}" prefix="WEB-INF">
+            <zipfileset dir="${build.nga`p.resources}" prefix="WEB-INF">
                 <include name="urlrewrite.xml"/>
             </zipfileset>
 
