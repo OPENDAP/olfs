@@ -944,6 +944,9 @@
                 <exclude name="elasticache-java-cluster-client-1.1.2.jar"/>
                 <exclude name="memcached-session-manager-2.3.2.jar"/>
                 <exclude name="memcached-session-manager-tc9-2.3.2.jar"/>
+                <!-- exclude name="reddison-3.11.6.jar"/ -->
+                <exclude name="reddison-all-3.22.0.jar"/>
+                <exclude name="reddison-tomcat-9-3.22.0.jar"/>
 
             </fileset>
 
