@@ -111,14 +111,14 @@ public class ServletLogUtil {
 
     private static Logger log;
     static{
-        System.out.print("+++LogUtil.static - Instantiating Logger ... \n");
-
+        System.out.println("+++LogUtil.static - Instantiating Logger ...");
         try {
             log = org.slf4j.LoggerFactory.getLogger(ServletLogUtil.class);
-            log.info("Logger instantiated. class: {}",log.getClass().getCanonicalName());
+            //log.info("Logger instantiated. class: " + log.getClass().getCanonicalName());
+            System.out.println("Logger instantiated. class: " + log.getClass().getCanonicalName());
         }
-        catch(NoClassDefFoundError e) {
-            System.err.println("\n\n[ERROR]  +++LogUtil.initLogging() -  Unable to instantiate Logger. java.lang.NoClassDefFoundError: "+e.getMessage()+"  [ERROR]\n");
+        catch(Exception e) {
+            System.err.println("\n\n[ERROR]  +++LogUtil.static -  Unable to instantiate Logger. message: "+e.getMessage()+"  [ERROR]\n");
             throw e;
         }
     }
