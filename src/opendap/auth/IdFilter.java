@@ -84,8 +84,10 @@ public class IdFilter implements Filter {
         try {
             if (isInitialized)
                 return;
+
             this.filterConfig = filterConfig;
             try {
+                System.out.println("IdFilter.init() - config file: " + filterConfig.getInitParameter(CONFIG_PARAMETER_NAME));
                 init();
             } catch (IOException | JDOMException se) {
                 log.warn("init() - INITIALIZATION HAS BEEN POSTPONED! FAILED TO INITIALIZE IdFilter! " +
