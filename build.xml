@@ -976,7 +976,7 @@
                 <exclude name="WEB-INF/urlrewrite.xml"/>
             </zipfileset>
 
-            <zipfileset dir="${build.nga`p.resources}" prefix="WEB-INF">
+            <zipfileset dir="${build.ngap.resources}" prefix="WEB-INF">
                 <include name="urlrewrite.xml"/>
             </zipfileset>
 
