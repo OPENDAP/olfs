@@ -180,7 +180,7 @@
         <logGroup>hyrax_request_log</logGroup>
         <logStream>hyrax-%instanceId</logStream>
         <layout>
-            <pattern>{ "request_id": "%X{ID}", "user_id": "%X{userid}", "rangeBeginDateTime": "N/A", "rangeEndDateTime": "N/A", "collectionId": "%X{resourceID}", "bbox": "N/A", "parameters": { "service_name": "hyrax", "service_provider": "OPeNDAP", "service_id": "hyrax_prod" } }%n</pattern>
+            <pattern>{ "request_id": "%X{ID}", "user_id": "%X{userid}", "user_ip": "%X{host}", "rangeBeginDateTime": "", "rangeEndDateTime": "", "collectionId": "%X{resourceID}", "parameters": { "service_name": "hyrax", "service_provider": "OPeNDAP", "service_id": "hyrax_prod" } }%n</pattern>
         </layout>
     </appender>
 
