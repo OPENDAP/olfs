@@ -4,18 +4,23 @@
 
 # Hyrax/OLFS 
 
-**_Hyrax Version 1.17.0 (23 Jan 2024)_**
+**_Hyrax Version 1.17.1 (15 Jan 2025)_**
 
-**_OLFS  Version 1.18.14  (23 Jan 2024)_** 
+**_OLFS  Version 1.18.15  (15 Jan 2025)_** 
+
+### OLFS-1.18.15 requires
 
 
-### OLFS-1.18.14 requires
-* **[bes-3.20.13](https://github.com/OPENDAP/bes/releases/tag/3.20.13)** [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6884800.svg)](https://doi.org/10.5281/zenodo.6884800)
+* **[bes-3.21.1](https://github.com/OPENDAP/bes/releases/tag/3.21.1)**
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14655683.svg)](https://doi.org/10.5281/zenodo.14655683)
 
-* **[libdap-3.20.11](https://github.com/OPENDAP/libdap4/releases/tag/3.20.11)**
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6878992.svg)](https://doi.org/10.5281/zenodo.6878992)
+
+* **[libdap-3.21.1](https://github.com/OPENDAP/libdap4/releases/tag/3.21.1)**
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14646648.svg)](https://doi.org/10.5281/zenodo.14646648)
+
 
 _The files `install.html` and/or `docs/index.html` may have additional information._
+
 
 ### First:
 
@@ -90,6 +95,5 @@ initially, with NASA's EDSC (Earth Data Search Client). In that directory you
 will find a README along with some help in testing the servlet using
 curl. NB: I think this is no longer used but it is really pretty
 interesting, all the same.
-
 
 

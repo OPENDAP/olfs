@@ -66,7 +66,7 @@
                 }
             </style>
             <body>
-                <img alt="Insitution Logo" src='{$docsService}/images/logo.png'/>
+                <img alt="Insitution Logo" src='{$docsService}/images/logo.svg'/>
 
 
 

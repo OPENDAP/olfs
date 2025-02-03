@@ -124,7 +124,7 @@
                 <table width="100%" border="0">
                     <tr>
                         <td>
-                            <img alt="OPeNDAP Logo" src="{$docsService}/images/logo.png"/>
+                            <img alt="OPeNDAP Logo" src="{$docsService}/images/logo.svg"/>
                         </td>
                         <td>
                             <div class="small_italic" style="padding-bottom: 5px;">Welcome to the</div>

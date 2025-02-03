@@ -255,8 +255,14 @@
     <!--    <IpAddress>127.0.0.1</IpAddress> -->
     <!-- The following matches all IPv4 addresses, work yours out from here.... -->
     <!-- <IpMatch>[012]?\d?\d\.[012]?\d?\d\.[012]?\d?\d\.[012]?\d?\d</IpMatch> -->
+    <!-- -->
     <!-- Any IP starting with 65.55 -->
     <!-- <IpMatch>65\.55\.[012]?\d?\d\.[012]?\d?\d</IpMatch>   -->
+    <!-- -->
+    <!-- You can use UserAgentMatch to block based on User-Agent matching. -->
+    <!-- The following will block all clients whose User-Agent begins with "foo". -->
+    <!-- <UserAgentMatch>foo.*</UserAgentMatch-->
+    <!-- -->
     <!-- The following AllowedResponseRegex expression is the default -->
     <!-- <AllowedResponseRegex>^\/opendap\/docs\/(images|css)\/.*$</AllowedResponseRegex>   -->
     <!-- <BlockedResponseRegex>^.*.(dap|dods)(.nc4?)?$</BlockedResponseRegex>   -->

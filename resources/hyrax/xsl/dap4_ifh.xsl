@@ -164,13 +164,13 @@
                 <!--                      PAGE BANNER                       -->
                 <!--                                                        -->
                 <!--                                                        -->
-                <table width="100%" border="0">
+                <table class="banner_table">
                     <tr>
-                        <td>
-                            <img alt="OPeNDAP Logo" src="{$docsService}/images/logo.png"/>
+                        <td class="banner_logo">
+                            <img alt="OPeNDAP Logo"  src="{$docsService}/images/logo.svg"/>
                         </td>
-                        <td>
-                            <div class="large">OPeNDAP DAP4 Data Request Form</div>
+                        <td class="banner_title">
+                            <div class="large" >DAP4 Data Request Form</div>
                         </td>
                     </tr>
                 </table>

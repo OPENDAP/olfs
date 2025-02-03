@@ -63,7 +63,7 @@
                 <!--                                                        -->
                 <!--                                                        -->
 
-                <img alt="Logo" src='{$docsService}/images/logo.png'/>
+                <img alt="Logo" src='{$docsService}/images/logo.svg'/>
                 <h1>
                     <xsl:if test="@name">
                         <xsl:value-of select="@name"/> :

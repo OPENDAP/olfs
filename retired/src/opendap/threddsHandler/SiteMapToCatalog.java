@@ -255,7 +255,7 @@ public class SiteMapToCatalog {
         cat.append("<title>OPeNDAP Hyrax: Contents of ").append(smNode.getFullNodeName()).append("</title>\n");
         cat.append("</head>\n");
         cat.append("<body>\n");
-        cat.append("<img alt=\"OPeNDAP Logo\" src=\"/opendap/docs/images/logo.png\"/>\n");
+        cat.append("<img alt=\"OPeNDAP Logo\" src=\"/opendap/docs/images/logo.svg\"/>\n");
         cat.append("<h1>\n");
         cat.append("Contents of ").append(smNode.getFullNodeName()).append("<br/>\n");
         cat.append("</h1>\n");

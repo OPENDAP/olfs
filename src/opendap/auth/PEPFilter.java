@@ -69,6 +69,7 @@ public class PEPFilter implements Filter {
     public void init(FilterConfig filterConfig) throws ServletException {
         this.filterConfig = filterConfig;
         try {
+            System.out.println("PEPFilter.init() - config file: " + filterConfig.getInitParameter(configParameterName));
             init();
         }
         catch (IOException | JDOMException se){

@@ -31,7 +31,6 @@ import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
 import opendap.PathBuilder;
-import opendap.auth.UserProfile;
 import opendap.coreServlet.Scrub;
 import opendap.coreServlet.ServletUtil;
 import org.slf4j.Logger;
@@ -45,11 +44,8 @@ import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.security.Principal;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
-
-import static opendap.auth.IdFilter.USER_PROFILE;
 
 
 /**
@@ -92,9 +88,9 @@ public class ServletLogUtil {
 
 
 
-    private static final String ID_KEY = "ID";
-    private static final String SOURCE_KEY = "SOURCE";
-    private static final String HOST_KEY = "host";
+    private static final String REQUEST_ID_KEY = "ID";
+    private static final String HTTP_VERB_KEY = "SOURCE";
+    private static final String CLIENT_HOST_KEY = "host";
     private static final String SESSION_ID_KEY = "ident";
     private static final String USER_ID_KEY = "userid";
     private static final String USER_AGENT_KEY = "UserAgent";
@@ -115,14 +111,14 @@ public class ServletLogUtil {
 
     private static Logger log;
     static{
-        System.out.print("+++LogUtil.static - Instantiating Logger ... \n");
-
+        System.out.println("+++LogUtil.static - Instantiating Logger ...");
         try {
             log = org.slf4j.LoggerFactory.getLogger(ServletLogUtil.class);
-            log.info("Logger instantiated. class: {}",log.getClass().getCanonicalName());
+            //log.info("Logger instantiated. class: " + log.getClass().getCanonicalName());
+            System.out.println("Logger instantiated. class: " + log.getClass().getCanonicalName());
         }
-        catch(NoClassDefFoundError e) {
-            System.err.println("\n\n[ERROR]  +++LogUtil.initLogging() -  Unable to instantiate Logger. java.lang.NoClassDefFoundError: "+e.getMessage()+"  [ERROR]\n");
+        catch(Exception e) {
+            System.err.println("\n\n[ERROR]  +++LogUtil.static -  Unable to instantiate Logger. message: "+e.getMessage()+"  [ERROR]\n");
             throw e;
         }
     }
@@ -382,9 +378,9 @@ public class ServletLogUtil {
 
         HttpSession session = req.getSession(false);
 
-        MDC.put(ID_KEY, reqID);
-        MDC.put(SOURCE_KEY, httpVerb);
-        MDC.put(HOST_KEY, req.getRemoteHost());
+        MDC.put(REQUEST_ID_KEY, reqID);
+        MDC.put(HTTP_VERB_KEY, httpVerb);
+        MDC.put(CLIENT_HOST_KEY, req.getRemoteHost());
         MDC.put(SESSION_ID_KEY, (session == null) ? "-" : session.getId());
 
         String uid = opendap.auth.Util.getUID(req);
@@ -447,14 +443,15 @@ public class ServletLogUtil {
         if(useCombinedLog.get()) {
             String sep = "|&|";
 
-            alb.append(MDC.get(HOST_KEY)).append(sep);
+            alb.append(MDC.get(CLIENT_HOST_KEY)).append(sep);
             alb.append(MDC.get(USER_AGENT_KEY)).append(sep);
             alb.append(MDC.get(SESSION_ID_KEY)).append(sep);
             alb.append(MDC.get(USER_ID_KEY)).append(sep);
             alb.append(MDC.get(START_TIME_KEY)).append(sep);
-            alb.append(MDC.get(ID_KEY)).append(sep);
-            alb.append(MDC.get(SOURCE_KEY)).append(sep);
+            alb.append(MDC.get(REQUEST_ID_KEY)).append(sep);
+            alb.append(MDC.get(HTTP_VERB_KEY)).append(sep);
             alb.append(MDC.get(RESOURCE_ID_KEY)).append(sep);
+
 
             String ce = MDC.get(QUERY_STRING_KEY);
             if(ce == null || ce.isEmpty()) {
@@ -541,9 +538,9 @@ public class ServletLogUtil {
         //
         // These were set in logServerAccessStart()
         //
-        MDC.remove(ID_KEY);
-        MDC.remove(SOURCE_KEY);
-        MDC.remove(HOST_KEY);
+        MDC.remove(REQUEST_ID_KEY);
+        MDC.remove(HTTP_VERB_KEY);
+        MDC.remove(CLIENT_HOST_KEY);
         MDC.remove(SESSION_ID_KEY);
         MDC.remove(USER_ID_KEY);
         MDC.remove(START_TIME_KEY);
