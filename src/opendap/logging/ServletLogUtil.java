@@ -472,7 +472,7 @@ public class ServletLogUtil {
     public static void setResponseSize(long size){
         // Only set the size if it's not equal to the missing value (-1)
         if(size>=0) {
-            MDC.put(RESPONSE_SIZE_KEY, Long.toString(size) + " bytes");
+            MDC.put(RESPONSE_SIZE_KEY, Long.toString(size));
         }
     }
 
