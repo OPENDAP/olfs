@@ -48,7 +48,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -224,26 +223,26 @@ public class DispatchServlet extends HttpServlet {
      *     to requests for a dataset resource URL, meaning that the response
      *     will be either source data file or an HTTP 403 Forbidden error, as
      *     defined by the state of the AllowDirectDataSourceAccess feature.
-     *
+     * <br/>
      *     If UseDAP2ResourceUrlResponse is not enabled (not present in the
      *     configuration, or commented out) the server will default to returning
      *     the DAP4 Dataset Services Response (DSR) when a dataset resource URL
      *     is requested.
-     *
+     * <br/>
      *     See Dap4 specification for more:
      *     https://docs.opendap.org/index.php?title=OPULS_Development#DAP4_Specification
      * -->
      * <UseDAP2ResourceUrlResponse />
-     *
+     * <br/>
      * <!--
      *     DataRequestForm
-     *
+     * <br/>
      *     Defines the DAP data model version for the DAta Request Form linked to
      *     from the "blue-bar" catalog.html pages generated from  either the
      *     DDX (for DAP2) or the DMR (for DAP4).
-     * -->
+     * <br/>
      * <DataRequestForm type="dap4" />
-     *
+     * <br/>
      *
      * </Handler>
      * <Handler className="opendap.bes.DirectoryDispatchHandler" />
