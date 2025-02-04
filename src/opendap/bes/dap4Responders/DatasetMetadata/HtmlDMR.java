@@ -50,6 +50,8 @@ import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.filter.ElementFilter;
 import org.jdom.filter.Filter;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMSource;
 import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
@@ -57,6 +59,7 @@ import org.slf4j.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.DataOutputStream;
+import java.io.FileOutputStream;
 import java.util.List;
 import java.util.Vector;
 
@@ -133,6 +136,11 @@ public class HtmlDMR extends Dap4Responder {
                 qp,
                 xmlBase,
                 dmr);
+
+        FileOutputStream fos = new FileOutputStream("/Users/ndp/OPeNDAP/hyrax/build/share/hyrax/GESDISC/olfs_html_dmr.dmr");
+        XMLOutputter xmlo = new XMLOutputter(Format.getCompactFormat());
+        xmlo.output(dmr,fos);
+        fos.close();
 
         dmr.getRootElement().setAttribute("dataset_id",resourceID);
         // dmr.getRootElement().setAttribute("base", xmlBase, Namespace.XML_NAMESPACE);   // not needed - DMR has it

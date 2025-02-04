@@ -47,12 +47,13 @@
     <xsl:variable name="debug" select="false()"/>
 
     <xsl:variable name="datasetUrl">
-        <xsl:choose>
+        <!-- xsl:choose>
             <xsl:when test="$forceDataRequestFormLinkToHttps='true'">
                 <xsl:value-of select='replace(/dap:Dataset/@xml:base,"^http:","https:")'/>
             </xsl:when>
             <xsl:otherwise><xsl:value-of select="/dap:Dataset/@xml:base"/></xsl:otherwise>
-        </xsl:choose>
+        </xsl:choose -->
+        <xsl:value-of select="/dap:Dataset/@xml:base" />
     </xsl:variable>
 
     <xsl:variable name="hasDap4Types">
@@ -515,6 +516,7 @@
             <xsl:variable name="dimSize">
                 <xsl:call-template name="DimSize"/>
             </xsl:variable>
+           <xsl:comment>dimSize: <xsl:value-of select="$dimSize"/></xsl:comment>
 
             <span class="medium">[
                 <xsl:if test="@name">
@@ -535,6 +537,8 @@
             <xsl:variable name="dimSize">
                 <xsl:call-template name="DimSize" />
             </xsl:variable>
+            <xsl:comment>dimSize: <xsl:value-of select="$dimSize"/></xsl:comment>
+
             <xsl:variable name="dimTag" select="concat($myJSVarName,'_dim_',position())"/>
 
             <input type="text" id="{$dimTag}" size="8" oninput="autoResize(event)" onfocus="describe_index()"
@@ -552,7 +556,8 @@
         <xsl:choose>
             <xsl:when test="./@name">
                 <xsl:variable name="fqn"> <xsl:value-of select="translate(./@name,' .','__')"/></xsl:variable>
-                <xsl:value-of select="fn:DimSize($fqn)"/>
+<!--                <xsl:comment>DimSize fqn: <xsl:value-of select="$fqn"/></xsl:comment>-->
+                <xsl:value-of select="fn:DimSize($fqn)" />
             </xsl:when>
             <xsl:otherwise><xsl:value-of select="./@size"/> </xsl:otherwise>
         </xsl:choose>
