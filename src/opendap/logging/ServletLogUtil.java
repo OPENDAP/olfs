@@ -469,11 +469,13 @@ public class ServletLogUtil {
 
     /**
      * Used in various places in the server to add the response size to the log.
-     * @param size The size, in bytes, of the response. Values less than 0 will be ignored.
+     * Will set the response if it has not already been set or if it's value is empty.
+     * @param size The size, in bytes, of the response. A value of -1 indicates that the size is unknown
      */
     public static void setResponseSize(long size){
-        // Only set the size if it's not equal to the missing value (-1)
+
         String mdc_size = MDC.get(RESPONSE_SIZE_KEY);
+        // Was it set? Is it empty??
         if(mdc_size==null || mdc_size.isEmpty())
             MDC.put(RESPONSE_SIZE_KEY, Long.toString(size));
     }

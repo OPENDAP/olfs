@@ -35,19 +35,13 @@ import opendap.logging.Procedure;
 import opendap.logging.Timer;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -86,7 +80,6 @@ public class DispatchServlet extends HttpServlet {
      *
      * @serial
      */
-    private static final AtomicInteger reqNumber = new AtomicInteger(0);
     private static final AtomicBoolean IS_INITIALIZED = new AtomicBoolean(false);
     private static final ReentrantLock INIT_LOCK = new ReentrantLock();
 
@@ -104,7 +97,7 @@ public class DispatchServlet extends HttpServlet {
      * servlet InitParameters. The Debug object can be referenced (with
      * impunity) from any of the dods code...
      *
-     * @throws javax.servlet.ServletException
+     * @throws javax.servlet.ServletException When the bad things happen.
      */
     public void init() throws ServletException {
         INIT_LOCK.lock();
@@ -261,7 +254,7 @@ public class DispatchServlet extends HttpServlet {
      * @param httpPostHandlers The list of POST handlers for the OLFS to use.
      * @param enablePost If the value is TRU then the POST handling will be enabled.
      * @param config The configuration Element to use when configuring the service.
-     * @throws Exception
+     * @throws Exception When the bad things happen
      */
     private void loadHyraxServiceHandlers(
             List<DispatchHandler> httpGetHandlers,
