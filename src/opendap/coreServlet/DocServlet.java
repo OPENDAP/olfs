@@ -120,7 +120,6 @@ public class DocServlet extends HttpServlet {
             String servletName = "/" + this.getServletName();
 
             String reqId = RequestCache.getRequestId();
-
             ServletLogUtil.logServerAccessStart(request, ServletLogUtil.DOCS_ACCESS_LOG_ID, "HTTP-GET", reqId);
 
             if (!redirect(request, response)) {
