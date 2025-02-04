@@ -586,7 +586,7 @@ public class DispatchServlet extends HttpServlet {
     protected long getLastModified(HttpServletRequest req) {
 
         RequestCache.open(req);
-        ServletLogUtil.logServerAccessStart(req, ServletLogUtil.HYRAX_LAST_MODIFIED_ACCESS_LOG_ID, "LastModified", RequestCache.getRequestId());
+        //ServletLogUtil.logServerAccessStart(req, ServletLogUtil.HYRAX_LAST_MODIFIED_ACCESS_LOG_ID, "LastModified", RequestCache.getRequestId());
 
         long lmt = new Date().getTime();
 
@@ -607,7 +607,7 @@ public class DispatchServlet extends HttpServlet {
             log.error("Caught: {}  Message: {} ", e.getClass().getName(), e.getMessage());
             lmt = new Date().getTime();
         } finally {
-            ServletLogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, ServletLogUtil.HYRAX_LAST_MODIFIED_ACCESS_LOG_ID);
+            //ServletLogUtil.logServerAccessEnd(HttpServletResponse.SC_OK, ServletLogUtil.HYRAX_LAST_MODIFIED_ACCESS_LOG_ID);
             Timer.stop(timedProcedure);
             // We don't RequestCache.close() here so that the cache is
             // available for the doGet() method which comes next.

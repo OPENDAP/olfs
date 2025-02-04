@@ -108,6 +108,8 @@ public class ServletLogUtil {
     private static final AtomicBoolean useCombinedLog = new AtomicBoolean(false);
     public static final AtomicBoolean useDualCloudWatchLogs = new AtomicBoolean(false);
 
+    public static final int MISSING_SIZE_VALUE = -1;
+
 
     private static Logger log;
     static{
@@ -471,9 +473,9 @@ public class ServletLogUtil {
      */
     public static void setResponseSize(long size){
         // Only set the size if it's not equal to the missing value (-1)
-        if(size>=0) {
+        String mdc_size = MDC.get(RESPONSE_SIZE_KEY);
+        if(mdc_size==null || mdc_size.isEmpty())
             MDC.put(RESPONSE_SIZE_KEY, Long.toString(size));
-        }
     }
 
 
@@ -484,9 +486,8 @@ public class ServletLogUtil {
      * @param logName the name of the Logger to which to write stuff.
      */
     public static void logServerAccessEnd(int httpStatus, String logName) {
-        logServerAccessEnd(httpStatus, -1, logName);
+        logServerAccessEnd(httpStatus, MISSING_SIZE_VALUE, logName);
     }
-
 
     /**
      * Write log entry to named log.
