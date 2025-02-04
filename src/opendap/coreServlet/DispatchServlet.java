@@ -324,20 +324,18 @@ public class DispatchServlet extends HttpServlet {
     /**
      * Temporary implementation HEAD denial response. Because in most cases
      * the server has to do a lot of work to get a Content-Length value.
-     *
+     * <br />
      * The default implementation of doHead() appears to replace the
      * ServletOutputStream in the response with a a stream that counts bytes
      * but does not transmot them. Maybe this makes sense for an file service,
      * but not here. We could refine this by adding DispatchHandler.doHead()
      * and having each handler do something that makes sense.
      *
-     * @param request
-     * @param response
-     * @throws ServletException
-     * @throws IOException
+     * @param request The request to be handled
+     * @param response The response to which the outcome will be transmitted
      */
     @Override
-    public void doHead(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    public void doHead(HttpServletRequest request, HttpServletResponse response) {
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
 

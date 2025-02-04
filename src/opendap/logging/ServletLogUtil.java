@@ -75,9 +75,6 @@ public class ServletLogUtil {
     public static final String ADMIN_ACCESS_LOG_ID = "HyraxAdminAccess";
     public static final String ADMIN_ACCESS_LAST_MODIFIED_LOG_ID = "HyraxAdminLastModifiedAccess";
 
-    public static final String S3_SERVICE_ACCESS_LOG_ID = "S3ServiceAccess";
-    public static final String S3_SERVICE_LAST_MODIFIED_LOG_ID = "S3ServiceLastModifiedAccess";
-
     public static final String WCS_ACCESS_LOG_ID = "WCSAccess";
     public static final String WCS_LAST_MODIFIED_ACCESS_LOG_ID = "WCSLastModifiedAccess";
 
@@ -111,7 +108,7 @@ public class ServletLogUtil {
     public static final int MISSING_SIZE_VALUE = -1;
 
 
-    private static Logger log;
+    private static final Logger log;
     static{
         System.out.println("+++LogUtil.static - Instantiating Logger ...");
         try {
@@ -285,7 +282,7 @@ public class ServletLogUtil {
             log.error("Caught {} Message: {}",je.getClass().getName(),je.getMessage());
             StringWriter sw = new StringWriter();
             je.printStackTrace(new PrintWriter(sw));
-            log.error("Stack trace: \n{}",sw.toString());
+            log.error("Stack trace: \n{}",sw);
         }
     }
 
@@ -401,13 +398,12 @@ public class ServletLogUtil {
         MDC.put(QUERY_STRING_KEY, query);
 
         if(log.isInfoEnabled()) {
-            StringBuilder startMsg = new StringBuilder();
-            startMsg.append("REQUEST START - ");
-            startMsg.append("RemoteHost: '").append(LogUtil.scrubEntry(req.getRemoteHost())).append("' ");
-            startMsg.append("RequestedResource: '").append(resourceID).append("' ");
-            startMsg.append("QueryString: '").append(query).append("' ");
-            startMsg.append("AccessLog: ").append(logName);
-            log.info(startMsg.toString());
+            String startMsg = "REQUEST START - " +
+                    "RemoteHost: '" + LogUtil.scrubEntry(req.getRemoteHost()) + "' " +
+                    "RequestedResource: '" + resourceID + "' " +
+                    "QueryString: '" + query + "' " +
+                    "AccessLog: " + logName;
+            log.info(startMsg);
         }
         if(logName.equals(HYRAX_ACCESS_LOG_ID) && useDualCloudWatchLogs.get()){
             Logger cwRequestLog = org.slf4j.LoggerFactory.getLogger(CLOUDWATCH_REQUEST_LOG);
@@ -504,7 +500,7 @@ public class ServletLogUtil {
         long  duration = -1;
         String sTime = MDC.get("startTime");
         if(sTime!=null) {
-            long startTime = Long.valueOf(sTime);
+            long startTime = Long.parseLong(sTime);
             duration = endTime - startTime;
         }
         MDC.put(DURATION_KEY, (duration>=0)?Long.toString(duration):"unknown" +" ms");
@@ -572,14 +568,6 @@ public class ServletLogUtil {
     public static void useDualCloudWatchLogs(boolean value) {
         useDualCloudWatchLogs.set(value);
         log.info("CloudWatch Logs Are {}", value ? "ENABLED." : "DISABLED");
-    }
-
-    public static void mdcPut(String key, String value){
-        MDC.put(key, value);
-    }
-
-    public static String mdcGet(String key){
-        return MDC.get(key);
     }
 
 }
