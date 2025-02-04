@@ -564,10 +564,12 @@ public class ServletLogUtil {
 
     public static void useCombinedLog(boolean value) {
         useCombinedLog.set(value);
+        log.info("Combined OLFS/BES Log Is {}", value ? "ENABLED." : "DISABLED");
     }
 
     public static void useDualCloudWatchLogs(boolean value) {
         useDualCloudWatchLogs.set(value);
+        log.info("CloudWatch Logs Are {}", value ? "ENABLED." : "DISABLED");
     }
 
     public static void mdcPut(String key, String value){
