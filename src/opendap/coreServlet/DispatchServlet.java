@@ -278,11 +278,8 @@ public class DispatchServlet extends HttpServlet {
             // The NgapDispatchHandler does POST, and needs to come before BesDapDispatcher
             httpPostHandlers.add(new opendap.ngap.NgapDispatchHandler());
 
-            // The DAP dispatch handler does POST
+            // The BesDapDispatcher does POST
             httpPostHandlers.add( new opendap.bes.BesDapDispatcher());
-
-            // And the BuildDmrpp dispatch handler does POST
-            //httpPostHandlers.add(new opendap.build_dmrpp.BuildDmrppDispatchHandler());
         }
 
         if(noDynamicNavigation!=null) {
