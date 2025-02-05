@@ -112,13 +112,15 @@ public class DocServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
 
         int status = HttpServletResponse.SC_OK;
+        RequestCache.open(request);
 
-        int response_size = 0;
+        int response_size = ServletLogUtil.MISSING_SIZE_VALUE;
         try {
             String contextPath = ServletUtil.getContextPath(this);
             String servletName = "/" + this.getServletName();
 
-            ServletLogUtil.logServerAccessStart(request, ServletLogUtil.DOCS_ACCESS_LOG_ID, "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
+            String reqId = RequestCache.getRequestId();
+            ServletLogUtil.logServerAccessStart(request, ServletLogUtil.DOCS_ACCESS_LOG_ID, "HTTP-GET", reqId);
 
             if (!redirect(request, response)) {
 
@@ -214,6 +216,8 @@ public class DocServlet extends HttpServlet {
             }
         } finally {
             ServletLogUtil.logServerAccessEnd(status, response_size, ServletLogUtil.DOCS_ACCESS_LOG_ID);
+            RequestCache.close();
+            log.info("Response completed.\n");
         }
     }
 

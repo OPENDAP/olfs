@@ -35,26 +35,19 @@ import opendap.logging.Procedure;
 import opendap.logging.Timer;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -86,7 +79,6 @@ public class DispatchServlet extends HttpServlet {
      *
      * @serial
      */
-    private static final AtomicInteger reqNumber = new AtomicInteger(0);
     private static final AtomicBoolean IS_INITIALIZED = new AtomicBoolean(false);
     private static final ReentrantLock INIT_LOCK = new ReentrantLock();
 
@@ -104,7 +96,7 @@ public class DispatchServlet extends HttpServlet {
      * servlet InitParameters. The Debug object can be referenced (with
      * impunity) from any of the dods code...
      *
-     * @throws javax.servlet.ServletException
+     * @throws javax.servlet.ServletException When the bad things happen.
      */
     public void init() throws ServletException {
         INIT_LOCK.lock();
@@ -231,26 +223,26 @@ public class DispatchServlet extends HttpServlet {
      *     to requests for a dataset resource URL, meaning that the response
      *     will be either source data file or an HTTP 403 Forbidden error, as
      *     defined by the state of the AllowDirectDataSourceAccess feature.
-     *
+     * <br/>
      *     If UseDAP2ResourceUrlResponse is not enabled (not present in the
      *     configuration, or commented out) the server will default to returning
      *     the DAP4 Dataset Services Response (DSR) when a dataset resource URL
      *     is requested.
-     *
+     * <br/>
      *     See Dap4 specification for more:
      *     https://docs.opendap.org/index.php?title=OPULS_Development#DAP4_Specification
      * -->
      * <UseDAP2ResourceUrlResponse />
-     *
+     * <br/>
      * <!--
      *     DataRequestForm
-     *
+     * <br/>
      *     Defines the DAP data model version for the DAta Request Form linked to
      *     from the "blue-bar" catalog.html pages generated from  either the
      *     DDX (for DAP2) or the DMR (for DAP4).
-     * -->
+     * <br/>
      * <DataRequestForm type="dap4" />
-     *
+     * <br/>
      *
      * </Handler>
      * <Handler className="opendap.bes.DirectoryDispatchHandler" />
@@ -261,7 +253,7 @@ public class DispatchServlet extends HttpServlet {
      * @param httpPostHandlers The list of POST handlers for the OLFS to use.
      * @param enablePost If the value is TRU then the POST handling will be enabled.
      * @param config The configuration Element to use when configuring the service.
-     * @throws Exception
+     * @throws Exception When the bad things happen
      */
     private void loadHyraxServiceHandlers(
             List<DispatchHandler> httpGetHandlers,
@@ -332,20 +324,18 @@ public class DispatchServlet extends HttpServlet {
     /**
      * Temporary implementation HEAD denial response. Because in most cases
      * the server has to do a lot of work to get a Content-Length value.
-     *
+     * <br />
      * The default implementation of doHead() appears to replace the
      * ServletOutputStream in the response with a a stream that counts bytes
      * but does not transmot them. Maybe this makes sense for an file service,
      * but not here. We could refine this by adding DispatchHandler.doHead()
      * and having each handler do something that makes sense.
      *
-     * @param request
-     * @param response
-     * @throws ServletException
-     * @throws IOException
+     * @param request The request to be handled
+     * @param response The response to which the outcome will be transmitted
      */
     @Override
-    public void doHead(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    public void doHead(HttpServletRequest request, HttpServletResponse response) {
 
         String relativeUrl = ReqInfo.getLocalUrl(request);
 
