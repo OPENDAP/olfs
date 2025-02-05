@@ -160,7 +160,7 @@ public class BESSiteMapService extends HttpServlet {
 
 
         int request_status = HttpServletResponse.SC_OK;
-        int response_size = -1;
+        int response_size = ServletLogUtil.MISSING_SIZE_VALUE;
         try {
             Procedure timedProcedure = Timer.start();
             RequestCache.open(request);
