@@ -27,6 +27,7 @@
 <xsl:stylesheet version="2.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:dap="http://xml.opendap.org/ns/DAP/4.0#"
+                xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                 xmlns:fn="http://xml.opendap.org/ns/xsl/functions/1.0#"
 >
     <xsl:output method="xml" version="1.1" encoding="UTF-8" indent="yes"/>
@@ -88,9 +89,15 @@
 
 <!--###########################################################################-->
 
-    <xsl:function name="fn:DimSize">
+    <xsl:function name="fn:oldDimSize">
         <xsl:param name="fqn"/>
         <xsl:value-of select="$DimsMap/entry[@key=$fqn]/dap:Dimension/@size"/>
+    </xsl:function>
+
+    <xsl:function name="fn:DimSize">
+        <xsl:param name="fqn" as="xsd:string"/>
+        <xsl:variable name="dimension" select="$DimsMap/entry[@key=$fqn]/dap:Dimension" />
+        <xsl:value-of select="$dimension/@size"/>
     </xsl:function>
 
     <xsl:function name="fn:GetDimension">
@@ -515,11 +522,10 @@
 
         <xsl:for-each select="dap:Dim">
 
-            <xsl:call-template name="DimNameTest"/>
+<!--             <xsl:call-template name="DimNameTest"/> -->
             <xsl:variable name="dimSize">
                 <xsl:call-template name="DimSize"/>
             </xsl:variable>
-           <xsl:comment> DimHeader dimSize: <xsl:value-of select="$dimSize" /> </xsl:comment>
 
             <span class="medium">[
                 <xsl:if test="@name">
@@ -537,12 +543,11 @@
         <xsl:param name="myJSVarName"/>
 
         <xsl:for-each select="dap:Dim">
-            <xsl:call-template name="DimNameTest"/>
+<!--            <xsl:call-template name="DimNameTest"/> -->
             <xsl:variable name="dimSize">
                 <xsl:call-template name="DimSize" />
             </xsl:variable>
-            <xsl:comment> dap:Dim dimSize: <xsl:value-of select="$dimSize" /> </xsl:comment>
-
+<!--            <xsl:comment> dap:Dim dimSize: <xsl:value-of select="$dimSize" /> </xsl:comment> -->
             <xsl:variable name="dimTag" select="concat($myJSVarName,'_dim_',position())"/>
 
             <input type="text" id="{$dimTag}" size="8" oninput="autoResize(event)" onfocus="describe_index()"
@@ -559,23 +564,23 @@
     <xsl:template name="DimSize">
         <xsl:choose>
             <xsl:when test="./@name">
-                <xsl:variable name="fqn_base" select="translate(./@name,' .','__')" />
-                <xsl:variable name="fqn">"<xsl:value-of select="$fqn_base" />"</xsl:variable>
-                <xsl:value-of select="fn:DimSize($fqn)" />
+                <!-- <xsl:variable name="fqn" select="translate(./@name,' .','__')"/> -->
+                <xsl:variable name="fqn" select="@name"/>
+                <xsl:value-of select="fn:DimSize($fqn)"/>
             </xsl:when>
-            <xsl:otherwise><xsl:value-of select="./@size"/></xsl:otherwise>
+            <xsl:otherwise><xsl:value-of select="./@size"/> </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
 
 
-    <xsl:template name="DimNameTest">
-        <xsl:variable name="fqn" select="@name" />
+    <!-- xsl:template name="DimNameTest">
+        <xsl:variable name="fqn" select="./@name" />
         <xsl:comment>
   ##############################################################################
     DimNameTest fqn: <xsl:value-of select="$fqn"/>
   ###########################################################################
         </xsl:comment>
-    </xsl:template>
+    </xsl:template -->
 
 
     <!-- ###################################################################
