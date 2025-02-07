@@ -114,20 +114,8 @@ public class XmlDMR extends Dap4Responder {
         TransmitCoordinator tc = new ServletResponseTransmitCoordinator(response);
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
         User user = new User(request);
-
-        // besApi.writeDMR(user,resourceID,qp,xmlBase,os, tc);
-
-        Document dmr_doc = new Document();
-        besApi.getDMRDocument(user,resourceID,qp,xmlBase, dmr_doc);
-        XMLOutputter xmlo = new XMLOutputter(Format.getCompactFormat());
-        xmlo.output(dmr_doc,os);
+        besApi.writeDMR(user,resourceID,qp,xmlBase,os, tc);
         os.flush();
-
-        FileOutputStream fos = new FileOutputStream("/Users/ndp/OPeNDAP/hyrax/build/share/hyrax/GESDISC/olfs_xml_dmr.dmr");
-        xmlo.output(dmr_doc,fos);
-        fos.flush();
-        fos.close();
-
         ServletLogUtil.setResponseSize(os.size());
         log.debug("Sent {} size:{}",getServiceTitle(),os.size());
     }
