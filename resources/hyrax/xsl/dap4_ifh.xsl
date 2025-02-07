@@ -48,15 +48,12 @@
     <xsl:variable name="debug" select="false()"/>
 
     <xsl:variable name="datasetUrl">
-        <!--
         <xsl:choose>
             <xsl:when test="$forceDataRequestFormLinkToHttps='true'">
                 <xsl:value-of select='replace(/dap:Dataset/@xml:base,"^http:","https:")'/>
             </xsl:when>
             <xsl:otherwise><xsl:value-of select="/dap:Dataset/@xml:base"/></xsl:otherwise>
         </xsl:choose>
-        -->
-        <xsl:value-of select="/dap:Dataset/@xml:base"/>
     </xsl:variable>
 
     <xsl:variable name="hasDap4Types">
@@ -88,11 +85,6 @@
     </xsl:template>
 
 <!--###########################################################################-->
-
-    <xsl:function name="fn:oldDimSize">
-        <xsl:param name="fqn"/>
-        <xsl:value-of select="$DimsMap/entry[@key=$fqn]/dap:Dimension/@size"/>
-    </xsl:function>
 
     <xsl:function name="fn:DimSize">
         <xsl:param name="fqn" as="xsd:string"/>
@@ -522,7 +514,6 @@
 
         <xsl:for-each select="dap:Dim">
 
-<!--             <xsl:call-template name="DimNameTest"/> -->
             <xsl:variable name="dimSize">
                 <xsl:call-template name="DimSize"/>
             </xsl:variable>
@@ -543,11 +534,9 @@
         <xsl:param name="myJSVarName"/>
 
         <xsl:for-each select="dap:Dim">
-<!--            <xsl:call-template name="DimNameTest"/> -->
             <xsl:variable name="dimSize">
                 <xsl:call-template name="DimSize" />
             </xsl:variable>
-<!--            <xsl:comment> dap:Dim dimSize: <xsl:value-of select="$dimSize" /> </xsl:comment> -->
             <xsl:variable name="dimTag" select="concat($myJSVarName,'_dim_',position())"/>
 
             <input type="text" id="{$dimTag}" size="8" oninput="autoResize(event)" onfocus="describe_index()"
@@ -571,16 +560,6 @@
             <xsl:otherwise><xsl:value-of select="./@size"/> </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
-
-
-    <!-- xsl:template name="DimNameTest">
-        <xsl:variable name="fqn" select="./@name" />
-        <xsl:comment>
-  ##############################################################################
-    DimNameTest fqn: <xsl:value-of select="$fqn"/>
-  ###########################################################################
-        </xsl:comment>
-    </xsl:template -->
 
 
     <!-- ###################################################################
