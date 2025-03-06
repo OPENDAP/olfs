@@ -776,7 +776,12 @@ public class BES {
         if(reqElement==null){
             throw new IOException("The BES Request document must have a root element!");
         }
-        reqElement.setAttribute("bes_client",oc.getID());
+        String reqID = reqElement.getAttributeValue(BesApi.REQUEST_ID);
+        if(reqID==null)
+            reqID="";
+
+        reqID += "[bes_client:"+oc.getID()+"]";
+        reqElement.setAttribute(BesApi.REQUEST_ID,reqID);
     }
 
 
