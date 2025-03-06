@@ -199,8 +199,7 @@ public class BuildDmrppServlet extends HttpServlet {
         int request_status = HttpServletResponse.SC_OK;
         try {
             RequestCache.open(request);
-
-            ServletLogUtil.logServerAccessStart(request, ServletLogUtil.BUILD_DMRPP_ACCESS_LOG_ID, "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
+            ServletLogUtil.logServerAccessStart(request, ServletLogUtil.BUILD_DMRPP_ACCESS_LOG_ID, "HTTP-GET", RequestCache.getRequestId());
             if (!redirect(request, response)) {
 
                 if(!buildDmrppDispatchHandler.requestDispatch(request,response,true)){

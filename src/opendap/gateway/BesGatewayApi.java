@@ -130,7 +130,7 @@ public class BesGatewayApi extends BesApi implements Cloneable {
         log.debug("Building request for BES gateway_module request. remoteDataSourceUrl: "+ remoteDataSourceUrl);
         Element e, request = new Element("request", BES.BES_NS);
 
-        request.setAttribute(REQUEST_ID, RequestCache.getRequestId());
+        request.setAttribute(REQUEST_ID_KEY, RequestCache.getRequestId());
 
 
         request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
@@ -195,7 +195,7 @@ public class BesGatewayApi extends BesApi implements Cloneable {
 
         //String besDataSource = getBES(dataSource).trimPrefix(dataSource);
 
-        request.setAttribute(REQUEST_ID, RequestCache.getRequestId());
+        request.setAttribute(REQUEST_ID_KEY, RequestCache.getRequestId());
 
         /**----------------------------------------------------------------------
          * Added this bit for the cloudy dap experiment - ndp 1/19/17

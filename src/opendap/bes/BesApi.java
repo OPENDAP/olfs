@@ -107,8 +107,9 @@ public class BesApi implements Cloneable {
     public static final String BES_SERVER_ADMINISTRATOR_KEY = "BES.ServerAdministrator";
     public static final String DEFAULT_SUPPORT_EMAIL_ADDRESS   = "support@opendap.org";
 
-    public static final String REQUEST_ID      = "reqID";
-
+    public static final String REQUEST_ID_KEY = "reqID";
+    public static final String BES_CLIENT_ID_KEY = "clientId";
+    public static final String BES_CLIENT_CMD_COUNT_KEY = "clientCmdCount";
 
     private static final Namespace BES_NS = opendap.namespaces.BES.BES_NS;
 
@@ -2329,7 +2330,7 @@ public class BesApi implements Cloneable {
 
 
         Element e, request = new Element("request", BES_NS);
-        request.setAttribute(REQUEST_ID, RequestCache.getRequestId());
+        request.setAttribute(REQUEST_ID_KEY, RequestCache.getRequestId());
 
         request.addContent(setContextElement(XDAP_ACCEPT_CONTEXT, DEFAULT_XDAP_ACCEPT));
 
@@ -2421,7 +2422,7 @@ public class BesApi implements Cloneable {
 
         Element e, request = new Element("request", BES_NS);
 
-        request.setAttribute(REQUEST_ID, RequestCache.getRequestId());
+        request.setAttribute(REQUEST_ID_KEY, RequestCache.getRequestId());
 
         //----------------------------------------------------------------------
         // Added this bit for the cloudy dap experiment - ndp 1/19/17
@@ -2488,7 +2489,7 @@ public class BesApi implements Cloneable {
     public  Document getSiteMapRequestDocument(String sitePrefix) {
 
         Element request = new Element("request", BES_NS);
-        request.setAttribute(REQUEST_ID, RequestCache.getRequestId());
+        request.setAttribute(REQUEST_ID_KEY, RequestCache.getRequestId());
 
         request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
         request.addContent(setContextElement(ERRORS_CONTEXT,XML_ERRORS));
@@ -2537,7 +2538,7 @@ public class BesApi implements Cloneable {
 
 
         Element request = new Element("request", BES_NS);
-        request.setAttribute(REQUEST_ID, RequestCache.getRequestId());
+        request.setAttribute(REQUEST_ID_KEY, RequestCache.getRequestId());
 
         request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
         request.addContent(setContextElement(ERRORS_CONTEXT,XML_ERRORS));
@@ -2588,7 +2589,7 @@ public class BesApi implements Cloneable {
 
 
         Element e, request = new Element("request", BES_NS);
-        request.setAttribute(REQUEST_ID, RequestCache.getRequestId());
+        request.setAttribute(REQUEST_ID_KEY, RequestCache.getRequestId());
         request.addContent(setContextElement(ERRORS_CONTEXT,XML_ERRORS));
 
         e = new Element(type,BES_NS);
@@ -2852,7 +2853,7 @@ public class BesApi implements Cloneable {
     public static Document getShowBesKeyRequestDocument(String besKey) {
 
         Element request = new Element("request", BES_NS);
-        request.setAttribute(REQUEST_ID, RequestCache.getRequestId());
+        request.setAttribute(REQUEST_ID_KEY, RequestCache.getRequestId());
         request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
         request.addContent(setContextElement(ERRORS_CONTEXT,XML_ERRORS));
         request.addContent(showBesKeyRequestElement(besKey));

@@ -203,7 +203,8 @@ public class Servlet extends HttpServlet {
 
         int request_status = HttpServletResponse.SC_OK;
         try {
-            ServletLogUtil.logServerAccessStart(req, ServletLogUtil.WCS_ACCESS_LOG_ID, "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
+            RequestCache.open(req);
+            ServletLogUtil.logServerAccessStart(req, ServletLogUtil.WCS_ACCESS_LOG_ID, "HTTP-GET", RequestCache.getRequestId());
             httpGetService.handleRequest(req, resp);
         }
         catch (Throwable t) {
@@ -269,7 +270,8 @@ public class Servlet extends HttpServlet {
     public void doPost(HttpServletRequest req, HttpServletResponse resp){
         int request_status = HttpServletResponse.SC_OK;
         try {
-            ServletLogUtil.logServerAccessStart(req, ServletLogUtil.WCS_ACCESS_LOG_ID, "HTTP-POST", Integer.toString(reqNumber.incrementAndGet()));
+            RequestCache.open(req);
+            ServletLogUtil.logServerAccessStart(req, ServletLogUtil.WCS_ACCESS_LOG_ID, "HTTP-POST", RequestCache.getRequestId());
 
             if(wcsPostService.requestCanBeHandled(req)){
                 wcsPostService.handleRequest(req,resp);
@@ -316,7 +318,6 @@ public class Servlet extends HttpServlet {
 
         RequestCache.open(req);
         ServletLogUtil.logServerAccessStart(req, ServletLogUtil.WCS_LAST_MODIFIED_ACCESS_LOG_ID, "LastModified", RequestCache.getRequestId());
-
         try {
             return new Date().getTime();
         } finally {
