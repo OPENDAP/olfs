@@ -771,7 +771,7 @@ public class BES {
      * @param oc
      * @throws IOException
      */
-    private void addClientInfo(Document request, OPeNDAPClient oc) throws IOException {
+    private void addBesClientInfo(Document request, OPeNDAPClient oc) throws IOException {
         Element reqElement = request.getRootElement();
         if(reqElement==null){
             throw new IOException("The BES Request document must have a root element!");
@@ -874,7 +874,7 @@ public class BES {
                     throw new PPTException(msg);
                 }
 
-                addClientInfo(request, oc);
+                addBesClientInfo(request, oc);
                 if (log.isDebugEnabled()) {
                     log.debug("besTransaction() request document: \n-----------\n{}-----------\n", showRequest(request));
                 }

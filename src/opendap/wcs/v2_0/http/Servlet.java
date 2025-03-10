@@ -287,7 +287,6 @@ public class Servlet extends HttpServlet {
                 log.error("{}",msg);
                 request_status = OPeNDAPException.anyExceptionHandler(new BadRequest(msg), this,  resp);
             }
-
         }
         catch (Throwable t) {
             try {
@@ -329,7 +328,6 @@ public class Servlet extends HttpServlet {
 
     }
 
-
     @Override
     public void destroy() {
         ServletLogUtil.logServerShutdown("destroy()");
@@ -342,6 +340,4 @@ public class Servlet extends HttpServlet {
         super.destroy();
     }
 
-
-
-}
+} // class BES
