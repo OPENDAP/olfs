@@ -188,7 +188,8 @@ public class DispatchServlet extends HttpServlet {
 
         int request_status = HttpServletResponse.SC_OK;
         try {
-            ServletLogUtil.logServerAccessStart(request, ServletLogUtil.GATEWAY_ACCESS_LOG_ID, "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
+            RequestCache.open(request);
+            ServletLogUtil.logServerAccessStart(request, ServletLogUtil.GATEWAY_ACCESS_LOG_ID, "HTTP-GET", RequestCache.getRequestId());
             if (!redirect(request, response)) {
 
                 if(!gatewayDispatchHandler.requestDispatch(request,response,true)){

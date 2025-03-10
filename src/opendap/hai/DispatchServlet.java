@@ -205,8 +205,8 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
         int request_status = HttpServletResponse.SC_OK;
 
         try {
-
-            ServletLogUtil.logServerAccessStart(request, ServletLogUtil.ADMIN_ACCESS_LOG_ID, "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
+            RequestCache.open(request);
+            ServletLogUtil.logServerAccessStart(request, ServletLogUtil.ADMIN_ACCESS_LOG_ID, "HTTP-GET", RequestCache.getRequestId());
 
             if (!redirect(request, response)) {
 
@@ -257,8 +257,8 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
         int request_status = HttpServletResponse.SC_OK;
 
         try {
-
-            ServletLogUtil.logServerAccessStart(request, ServletLogUtil.ADMIN_ACCESS_LOG_ID, "HTTP-POST", Integer.toString(reqNumber.incrementAndGet()));
+            RequestCache.open(request);
+            ServletLogUtil.logServerAccessStart(request, ServletLogUtil.ADMIN_ACCESS_LOG_ID, "HTTP-POST", RequestCache.getRequestId());
 
             if (!redirect(request, response)) {
 

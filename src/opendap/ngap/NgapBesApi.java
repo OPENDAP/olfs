@@ -134,7 +134,7 @@ public class NgapBesApi extends BesApi implements Cloneable {
         log.debug("Building request for BES ngap_module request. remoteDataSourceUrl: "+ remoteDataSourceUrl);
         Element e, request = new Element("request", BES.BES_NS);
 
-        request.setAttribute(REQUEST_ID, RequestCache.getRequestId());
+        request.setAttribute(REQUEST_ID_KEY, RequestCache.getRequestId());
 
         request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
 
@@ -249,7 +249,7 @@ public class NgapBesApi extends BesApi implements Cloneable {
 
         //String besDataSource = getBES(dataSource).trimPrefix(dataSource);
 
-        request.setAttribute(REQUEST_ID, RequestCache.getRequestId());
+        request.setAttribute(REQUEST_ID_KEY, RequestCache.getRequestId());
 
         request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
 
