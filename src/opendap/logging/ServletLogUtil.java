@@ -394,7 +394,7 @@ public class ServletLogUtil {
         MDC.put(RESOURCE_ID_KEY,resourceID);
 
         String query = Scrub.simpleQueryString(req.getQueryString());
-        query = (query == null) ? "" : query;
+        query = (query == null || query.isEmpty()) ? "-" : query;
         MDC.put(QUERY_STRING_KEY, query);
 
         if(log.isInfoEnabled()) {
