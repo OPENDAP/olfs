@@ -28,6 +28,8 @@
 package opendap.ppt;
 
 import opendap.bes.BESError;
+import opendap.bes.BesApi;
+import opendap.coreServlet.RequestCache;
 import opendap.io.HyraxStringEncoding;
 import opendap.xml.Util;
 import org.apache.commons.cli.*;
@@ -703,7 +705,9 @@ public class OPeNDAPClient {
 
     public Document getShowStatusRequestDocument(){
         Element request = new Element("request", BES_NS);
-        request.setAttribute("reqID", "client: " + getID() + ":"+ commandCount );
+        request.setAttribute(BesApi.REQUEST_ID_KEY, RequestCache.getRequestId() );
+        request.setAttribute(BesApi.BES_CLIENT_ID_KEY, getID() );
+        request.setAttribute(BesApi.BES_CLIENT_CMD_COUNT_KEY, Integer.toString(commandCount) );
         request.addContent(new Element("showStatus"));
         return new Document(request);
     }
