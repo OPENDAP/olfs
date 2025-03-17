@@ -385,7 +385,7 @@ public class ViewersServlet extends HttpServlet {
     public void doGet(HttpServletRequest req, HttpServletResponse resp) {
 
         RequestCache.open(req);
-        String reqId = RequestCache.getRequestId();
+        RequestId reqId = RequestCache.getRequestId();
 
         ServletLogUtil.logServerAccessStart(req, ServletLogUtil.HYRAX_ACCESS_LOG_ID, "HTTP-GET", reqId);
         LOG.debug(ServletUtil.showRequest(req, reqId));

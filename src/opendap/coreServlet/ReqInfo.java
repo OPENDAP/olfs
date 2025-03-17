@@ -51,38 +51,8 @@ import java.util.regex.Pattern;
 import static opendap.http.Util.PROTOCOL_TERMINATION;
 
 
-/**
- * Provides utility methods that perform "analysis" of the user request and return important componet strings
- * for the OPeNDAP servlet.
- *
- * The dataSourceName is the local URL path of the request, minus any requestSuffixRegex detected. So, if the request is
- * for a dataset (an atom) then the dataSourceName is the local path and the name of the dataset minus the
- * requestSuffixRegex. If the request is for a collection, then the dataSourceName is the complete local path.
- * <p><b>Examples:</b>
- * <ul><li>If the complete URL were: http://opendap.org:8080/opendap/nc/fnoc1.nc.dds?lat,lon,time&lat>72.0<br/>
- * Then the:</li>
- * <ul>
- * <li> RequestURL = http://opendap.org:8080/opendap/nc/fnoc1.nc </li>
- * <li> CollectionName = /opendap/nc/ </li>
- * <li> DataSetName = fnoc1.nc </li>
- * <li> DataSourceName = /opendap/nc/fnoc1.nc </li>
- * <li> RequestSuffix = dds </li>
- * <li> ConstraintExpression = lat,lon,time&lat>72.0 </li>
- * </ul>
- *
- * <li>If the complete URL were: http://opendap.org:8080/opendap/nc/<br/>
- * Then the:</li>
- * <ul>
- * <li> RequestURL = http://opendap.org:8080/opendap/nc/ </li>
- * <li> CollectionName = /opendap/nc/ </li>
- * <li> DataSetName = null </li>
- * <li> DataSourceName = /opendap/nc/ </li>
- * <li> RequestSuffix = "" </li>
- * <li> ConstraintExpression = "" </li>
- * </ul>
- * </ul>
- * @author Nathan Potter
- */
+;
+
 
 public class ReqInfo {
 
@@ -927,38 +897,37 @@ public class ReqInfo {
     /**
      * A request header key/name to check for a request id.
      */
-    public static final String REQUEST_UUID_KEY="a-api-request-uuid";
+    public static final String REQUEST_ID_HEADER_KEY ="a-api-request-uuid";
 
-    /**
-     * Returns the unique id of this request. If upstream service chain
-     * components have provided one in the request headers it will be sanitized
-     * and returned. Otherwise, a new request ID will be minted and returned.
-     * @param req
-     * @return
-     */
-    public static String getRequestId(HttpServletRequest req){
-        String reqID;
+    // public static String getRequestId(HttpServletRequest req){ return "";}
 
-        reqID = req.getHeader(REQUEST_UUID_KEY);
-        if(reqID != null) {
+        /**
+         * Returns the unique id of this request. If upstream service chain
+         * components have provided one in the request headers it will be sanitized
+         * and returned. Otherwise, a new request ID will be minted and returned.
+         * @param req
+         * @return
+         */
+    public static RequestId getRequestId(HttpServletRequest req){
+        // Contains a fresh uuid
+        RequestId reqId = new RequestId();
+
+        // Add additional req.getHeader() calls for different keys as needed.
+        String request_id_header = req.getHeader(REQUEST_ID_HEADER_KEY);
+        if(request_id_header != null) {
             // TODO Determine the allowed characters and associated format
             //  for the REQUEST_UUID_KEY and use that to implement a closely
             //  tailored Scrub method to use for sanitizing this input
-            reqID = Scrub.simpleString(reqID);
-            return reqID;
+            reqId.id(Scrub.simpleString(request_id_header));
         }
-        // Add additional req.getHeader() calls for different keys as needed.
-
-
-        // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-        // DEFAULT
-        // No service chain request ID appears in the expected request headers
-        // so make a homegrown request_id and send it on.
-        UUID uuid = UUID.randomUUID();
-        reqID = Thread.currentThread().getName() +
-                "_" + Thread.currentThread().getId() +
-                "_" + uuid;
-        return reqID;
+        else {
+            // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+            // DEFAULT
+            // No service chain request ID appears in the expected request headers
+            // so make a homegrown request_id and send it on.
+            reqId.id(Thread.currentThread().getName() + "_" + Thread.currentThread().getId());
+        }
+        return reqId;
     }
 
 }

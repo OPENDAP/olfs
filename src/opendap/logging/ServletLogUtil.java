@@ -31,6 +31,7 @@ import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
 import opendap.PathBuilder;
+import opendap.coreServlet.RequestId;
 import opendap.coreServlet.Scrub;
 import opendap.coreServlet.ServletUtil;
 import org.slf4j.Logger;
@@ -373,11 +374,11 @@ public class ServletLogUtil {
      * @param reqID The request ID, implemented as the request number.
      *
      */
-    public static void logServerAccessStart(HttpServletRequest req, String logName,  String httpVerb, String reqID) {
+    public static void logServerAccessStart(HttpServletRequest req, String logName,  String httpVerb, RequestId reqID) {
 
         HttpSession session = req.getSession(false);
 
-        MDC.put(REQUEST_ID_KEY, reqID);
+        MDC.put(REQUEST_ID_KEY, reqID.getCombined());
         MDC.put(HTTP_VERB_KEY, httpVerb);
         MDC.put(CLIENT_HOST_KEY, req.getRemoteHost());
         MDC.put(SESSION_ID_KEY, (session == null) ? "-" : session.getId());

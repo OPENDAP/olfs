@@ -400,7 +400,7 @@ public class DispatchServlet extends HttpServlet {
             Procedure timedProcedure = Timer.start();
 
             RequestCache.open(request);
-            String reqId = RequestCache.getRequestId();
+            RequestId reqId = RequestCache.getRequestId();
 
             try {
 
@@ -497,7 +497,7 @@ public class DispatchServlet extends HttpServlet {
             try {
 
                 RequestCache.open(request);
-                String reqId = RequestCache.getRequestId();
+                RequestId reqId = RequestCache.getRequestId();
 
                 ServletLogUtil.logServerAccessStart(request, ServletLogUtil.HYRAX_ACCESS_LOG_ID, "HTTP-POST", reqId);
 

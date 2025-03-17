@@ -404,6 +404,9 @@ public class ServletUtil {
      * @param reqno The request number.
      * @return A string containing infformation about the passed HttpServletRequest req
      */
+    public static String showRequest(HttpServletRequest req, RequestId reqId) {
+        return showRequest(req, reqId.getCombined());
+    }
     public static String showRequest(HttpServletRequest req, String reqId) {
 
         StringBuilder sb = new StringBuilder();

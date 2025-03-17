@@ -30,10 +30,7 @@ import opendap.bes.BESError;
 import opendap.bes.BESResource;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.BesApi;
-import opendap.coreServlet.OPeNDAPException;
-import opendap.coreServlet.ReqInfo;
-import opendap.coreServlet.RequestCache;
-import opendap.coreServlet.Util;
+import opendap.coreServlet.*;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
 import opendap.logging.ServletLogUtil;
@@ -130,7 +127,9 @@ public class BesGatewayApi extends BesApi implements Cloneable {
         log.debug("Building request for BES gateway_module request. remoteDataSourceUrl: "+ remoteDataSourceUrl);
         Element e, request = new Element("request", BES.BES_NS);
 
-        request.setAttribute(REQUEST_ID_KEY, RequestCache.getRequestId());
+        RequestId rid = RequestCache.getRequestId();
+        request.setAttribute(BesApi.REQUEST_ID_KEY, rid.id() );
+        request.setAttribute(BesApi.REQUEST_UUID_KEY, rid.uuid().toString() );
 
 
         request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
@@ -195,7 +194,9 @@ public class BesGatewayApi extends BesApi implements Cloneable {
 
         //String besDataSource = getBES(dataSource).trimPrefix(dataSource);
 
-        request.setAttribute(REQUEST_ID_KEY, RequestCache.getRequestId());
+        RequestId rid = RequestCache.getRequestId();
+        request.setAttribute(BesApi.REQUEST_ID_KEY, rid.id() );
+        request.setAttribute(BesApi.REQUEST_UUID_KEY, rid.uuid().toString() );
 
         /**----------------------------------------------------------------------
          * Added this bit for the cloudy dap experiment - ndp 1/19/17
