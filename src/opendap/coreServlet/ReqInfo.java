@@ -639,21 +639,22 @@ public class ReqInfo {
     public static String toString(HttpServletRequest request){
         String s = "";
 
-        s += "getLocalUrl(): "+ getLocalUrl(request) + "\n";
-        s += "getBesDataSourceID(): "+ getBesDataSourceID(getLocalUrl(request)) + "\n";
-        s += "getServiceUrl(): "+ getServiceUrl(request) + "\n";
-        s += "getCollectionName(): "+ ReqInfo.getCollectionName(request) + "\n";
+        s += "ReqInfo:\n";
+        s += "               getLocalUrl(): "+ getLocalUrl(request) + "\n";
+        s += "        getBesDataSourceID(): "+ getBesDataSourceID(getLocalUrl(request)) + "\n";
+        s += "             getServiceUrl(): "+ getServiceUrl(request) + "\n";
+        s += "         getCollectionName(): "+ ReqInfo.getCollectionName(request) + "\n";
 
-        s += "getConstraintExpression(): ";
+        s += "   getConstraintExpression(): ";
         try {
             s += ReqInfo.getConstraintExpression(request) + "\n";
         } catch (IOException e) {
             s += "Encountered IOException when attempting get the constraint expression! Msg: " + e.getMessage() + "\n";
         }
-        s += "getDataSetName(): "+ ReqInfo.getDataSetName(request) + "\n";
-        s += "getRequestSuffix(): "+ ReqInfo.getRequestSuffix(request) + "\n";
-        s += "requestForOpendapContents(): "+ ReqInfo.requestForOpendapContents(request) + "\n";
-        s += "requestForTHREDDSCatalog(): "+ ReqInfo.requestForTHREDDSCatalog(request) + "\n";
+        s += "             getDataSetName(): "+ ReqInfo.getDataSetName(request) + "\n";
+        s += "           getRequestSuffix(): "+ ReqInfo.getRequestSuffix(request) + "\n";
+        s += "  requestForOpendapContents(): "+ ReqInfo.requestForOpendapContents(request) + "\n";
+        s += "   requestForTHREDDSCatalog(): "+ ReqInfo.requestForTHREDDSCatalog(request) + "\n";
 
         return s;
 
@@ -925,40 +926,40 @@ public class ReqInfo {
     }
 
     /**
-     * A request header key/name to check for a request id.
+     * A request header key/name used by a client to transmit  a request id.
      */
-    public static final String REQUEST_UUID_KEY="a-api-request-uuid";
+    public static final String REQUEST_ID_HEADER_KEY ="a-api-request-uuid";
 
-    /**
-     * Returns the unique id of this request. If upstream service chain
-     * components have provided one in the request headers it will be sanitized
-     * and returned. Otherwise, a new request ID will be minted and returned.
-     * @param req
-     * @return
-     */
-    public static String getRequestId(HttpServletRequest req){
-        String reqID;
+    // public static String getRequestId(HttpServletRequest req){ return "";}
 
-        reqID = req.getHeader(REQUEST_UUID_KEY);
-        if(reqID != null) {
+        /**
+         * Produces the unique id of this request. If upstream service chain
+         * components have provided a request id string in the request headers it will
+         * be sanitized and used to construct a new RequestId. Otherwise,
+         * a new RequestId will be minted and returned.
+         * @param req
+         * @return
+         */
+    public static RequestId getRequestId(HttpServletRequest req){
+        RequestId reqId;
+
+        // Add additional req.getHeader() calls for different keys as needed.
+        String request_id_header = req.getHeader(REQUEST_ID_HEADER_KEY);
+        if(request_id_header != null) {
             // TODO Determine the allowed characters and associated format
             //  for the REQUEST_UUID_KEY and use that to implement a closely
             //  tailored Scrub method to use for sanitizing this input
-            reqID = Scrub.simpleString(reqID);
-            return reqID;
+            reqId = new RequestId(Scrub.simpleString(request_id_header));
         }
-        // Add additional req.getHeader() calls for different keys as needed.
-
-
-        // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-        // DEFAULT
-        // No service chain request ID appears in the expected request headers
-        // so make a homegrown request_id and send it on.
-        UUID uuid = UUID.randomUUID();
-        reqID = Thread.currentThread().getName() +
-                "_" + Thread.currentThread().getId() +
-                "_" + uuid;
-        return reqID;
+        else {
+            // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+            // DEFAULT
+            // No service chain request ID appears in the expected request headers
+            // so make a homegrown request_id and send it on.
+            // The no paramater cobstrutor Contains a fresh uuid
+            reqId = new RequestId();
+        }
+        return reqId;
     }
 
 }

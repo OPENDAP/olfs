@@ -164,7 +164,7 @@ public class BESSiteMapService extends HttpServlet {
         try {
             Procedure timedProcedure = Timer.start();
             RequestCache.open(request);
-            String reqId = RequestCache.getRequestId();
+            RequestId reqId = RequestCache.getRequestId();
             try {
 
                 ServletLogUtil.logServerAccessStart(request, ServletLogUtil.SITEMAP_ACCESS_LOG_ID, "HTTP-GET", reqId);

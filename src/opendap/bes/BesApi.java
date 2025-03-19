@@ -34,6 +34,7 @@ import opendap.coreServlet.ByteArrayOutputStreamTransmitCoordinator;
 import opendap.coreServlet.RequestCache;
 import opendap.coreServlet.ResourceInfo;
 import opendap.coreServlet.TransmitCoordinator;
+import opendap.coreServlet.RequestId;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
 import opendap.logging.ServletLogUtil;
@@ -108,6 +109,7 @@ public class BesApi implements Cloneable {
     public static final String DEFAULT_SUPPORT_EMAIL_ADDRESS   = "support@opendap.org";
 
     public static final String REQUEST_ID_KEY = "reqID";
+    public static final String REQUEST_UUID_KEY = "reqUUID";
     public static final String BES_CLIENT_ID_KEY = "clientId";
     public static final String BES_CLIENT_CMD_COUNT_KEY = "clientCmdCount";
 
@@ -2330,7 +2332,9 @@ public class BesApi implements Cloneable {
 
 
         Element e, request = new Element("request", BES_NS);
-        request.setAttribute(REQUEST_ID_KEY, RequestCache.getRequestId());
+        RequestId rid = RequestCache.getRequestId();
+        request.setAttribute(REQUEST_ID_KEY, rid.id());
+        request.setAttribute(REQUEST_UUID_KEY, rid.uuid().toString());
 
         request.addContent(setContextElement(XDAP_ACCEPT_CONTEXT, DEFAULT_XDAP_ACCEPT));
 
@@ -2422,7 +2426,9 @@ public class BesApi implements Cloneable {
 
         Element e, request = new Element("request", BES_NS);
 
-        request.setAttribute(REQUEST_ID_KEY, RequestCache.getRequestId());
+        RequestId rid = RequestCache.getRequestId();
+        request.setAttribute(REQUEST_ID_KEY, rid.id());
+        request.setAttribute(REQUEST_UUID_KEY, rid.uuid().toString());
 
         //----------------------------------------------------------------------
         // Added this bit for the cloudy dap experiment - ndp 1/19/17
@@ -2489,7 +2495,9 @@ public class BesApi implements Cloneable {
     public  Document getSiteMapRequestDocument(String sitePrefix) {
 
         Element request = new Element("request", BES_NS);
-        request.setAttribute(REQUEST_ID_KEY, RequestCache.getRequestId());
+        RequestId rid = RequestCache.getRequestId();
+        request.setAttribute(REQUEST_ID_KEY, rid.id());
+        request.setAttribute(REQUEST_UUID_KEY, rid.uuid().toString());
 
         request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
         request.addContent(setContextElement(ERRORS_CONTEXT,XML_ERRORS));
@@ -2538,7 +2546,9 @@ public class BesApi implements Cloneable {
 
 
         Element request = new Element("request", BES_NS);
-        request.setAttribute(REQUEST_ID_KEY, RequestCache.getRequestId());
+        RequestId rid = RequestCache.getRequestId();
+        request.setAttribute(REQUEST_ID_KEY, rid.id());
+        request.setAttribute(REQUEST_UUID_KEY, rid.uuid().toString());
 
         request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
         request.addContent(setContextElement(ERRORS_CONTEXT,XML_ERRORS));
@@ -2589,7 +2599,10 @@ public class BesApi implements Cloneable {
 
 
         Element e, request = new Element("request", BES_NS);
-        request.setAttribute(REQUEST_ID_KEY, RequestCache.getRequestId());
+        RequestId rid = RequestCache.getRequestId();
+        request.setAttribute(REQUEST_ID_KEY, rid.id());
+        request.setAttribute(REQUEST_UUID_KEY, rid.uuid().toString());
+
         request.addContent(setContextElement(ERRORS_CONTEXT,XML_ERRORS));
 
         e = new Element(type,BES_NS);
@@ -2853,7 +2866,10 @@ public class BesApi implements Cloneable {
     public static Document getShowBesKeyRequestDocument(String besKey) {
 
         Element request = new Element("request", BES_NS);
-        request.setAttribute(REQUEST_ID_KEY, RequestCache.getRequestId());
+        RequestId rid = RequestCache.getRequestId();
+        request.setAttribute(REQUEST_ID_KEY, rid.id());
+        request.setAttribute(REQUEST_UUID_KEY, rid.uuid().toString());
+
         request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
         request.addContent(setContextElement(ERRORS_CONTEXT,XML_ERRORS));
         request.addContent(showBesKeyRequestElement(besKey));
