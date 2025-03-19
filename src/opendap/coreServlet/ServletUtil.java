@@ -401,43 +401,43 @@ public class ServletUtil {
      * Writes information about the incomming request to a String.
      *
      * @param req   The current request
-     * @param reqno The request number.
+     * @param reqId The RequestId for the current request.
      * @return A string containing infformation about the passed HttpServletRequest req
      */
     public static String showRequest(HttpServletRequest req, RequestId reqId) {
-        return showRequest(req, reqId.getCombined());
-    }
-    public static String showRequest(HttpServletRequest req, String reqId) {
 
         StringBuilder sb = new StringBuilder();
 
         sb.append("\n-------------------------------------------\n");
         sb.append("showRequest()\n");
-        sb.append("  RequestId: ").append(reqId).append("\n");
+        sb.append("  RequestId:\n");
+        sb.append("       id():    ").append(reqId.id()).append("\n");
+        sb.append("     uuid():  ").append(reqId.uuid()).append("\n");
+        sb.append("    logId(): ").append(reqId.logId()).append("\n");
         sb.append("  HttpServletRequest Object:\n");
-        sb.append("    getServerName():          ").append(req.getServerName()).append("\n");
-        sb.append("    getServerPort():          ").append(req.getServerPort()).append("\n");
-        sb.append("    getProtocol():            ").append(req.getProtocol()).append("\n");
-        sb.append("    getScheme():              ").append(req.getScheme()).append("\n");
+        sb.append("          getServerName(): ").append(req.getServerName()).append("\n");
+        sb.append("          getServerPort(): ").append(req.getServerPort()).append("\n");
+        sb.append("            getProtocol(): ").append(req.getProtocol()).append("\n");
+        sb.append("              getScheme(): ").append(req.getScheme()).append("\n");
 
-        sb.append("    getRemoteHost():          ").append(req.getRemoteHost()).append("\n");
-        sb.append("    getRemoteUser():          ").append(req.getRemoteUser()).append("\n");
-        sb.append("    getRequestURL():          ").append(req.getRequestURL()).append("\n");
-        sb.append("    getRequestURI():          ").append(req.getRequestURI()).append("\n");
-        sb.append("    getContextPath():         ").append(req.getContextPath()).append("\n");
-        sb.append("    getQueryString():         ").append(req.getQueryString()).append("\n");
-        sb.append("    getAuthType():            ").append(req.getAuthType()).append("\n");
-        sb.append("    getMethod():              ").append(req.getMethod()).append("\n");
-        sb.append("    getPathInfo():            ").append(req.getPathInfo()).append("\n");
-        sb.append("    getPathTranslated():      ").append(req.getPathTranslated()).append("\n");
+        sb.append("          getRemoteHost(): ").append(req.getRemoteHost()).append("\n");
+        sb.append("          getRemoteUser(): ").append(req.getRemoteUser()).append("\n");
+        sb.append("          getRequestURL(): ").append(req.getRequestURL()).append("\n");
+        sb.append("          getRequestURI(): ").append(req.getRequestURI()).append("\n");
+        sb.append("         getContextPath(): ").append(req.getContextPath()).append("\n");
+        sb.append("         getQueryString(): ").append(req.getQueryString()).append("\n");
+        sb.append("            getAuthType(): ").append(req.getAuthType()).append("\n");
+        sb.append("              getMethod(): ").append(req.getMethod()).append("\n");
+        sb.append("            getPathInfo(): ").append(req.getPathInfo()).append("\n");
+        sb.append("      getPathTranslated(): ").append(req.getPathTranslated()).append("\n");
         // We used to ask the request to return the value of getRequestedSessionId() but not so much now, thanks sonar...
 
-        sb.append("    getServletPath():         ").append(req.getServletPath()).append("\n");
+        sb.append("          getServletPath(): ").append(req.getServletPath()).append("\n");
 
-        sb.append("    getCharacterEncoding():   ").append(req.getCharacterEncoding()).append("\n");
-        sb.append("    getContentType():         ").append(req.getContentType()).append("\n");
-        sb.append("    getLocalAddr():           ").append(req.getLocalAddr()).append("\n");
-        sb.append("    getLocalName():           ").append(req.getLocalName()).append("\n");
+        sb.append("    getCharacterEncoding(): ").append(req.getCharacterEncoding()).append("\n");
+        sb.append("          getContentType(): ").append(req.getContentType()).append("\n");
+        sb.append("            getLocalAddr(): ").append(req.getLocalAddr()).append("\n");
+        sb.append("            getLocalName(): ").append(req.getLocalName()).append("\n");
 
         sb.append("  HttpServletRequest Attributes: \n");
 
@@ -452,17 +452,16 @@ public class ServletUtil {
         sb.append(showSession(req.getSession(true)));
 
         sb.append("  Request Info:\n");
-        sb.append("    localUrl:                  '").append(ReqInfo.getLocalUrl(req)).append("'\n");
-        sb.append("    dataSetName:               '").append(ReqInfo.getDataSetName(req)).append("'\n");
-        sb.append("    requestSuffixRegex:             '").append(ReqInfo.getRequestSuffix(req)).append("'\n");
-        sb.append("    CE:                        '");
+        sb.append("              localUrl: '").append(ReqInfo.getLocalUrl(req)).append("'\n");
+        sb.append("           dataSetName:  '").append(ReqInfo.getDataSetName(req)).append("'\n");
+        sb.append("    requestSuffixRegex: '").append(ReqInfo.getRequestSuffix(req)).append("'\n");
+        sb.append("                    CE: '");
         try {
             sb.append(ReqInfo.getConstraintExpression(req)).append("'\n");
         } catch (IOException e) {
             sb.append("Encountered IOException when attempting get the constraint expression! Msg: ").append(e.getMessage()).append("\n");
         }
         sb.append("\n");
-        sb.append("ReqInfo:\n");
         sb.append(ReqInfo.toString(req));
         sb.append("-------------------------------------------");
 
@@ -476,10 +475,10 @@ public class ServletUtil {
         StringBuilder sb = new StringBuilder();
         sb.append("  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .\n");
         sb.append("  Session: \n");
-        sb.append("    getId():                   ").append(session.getId()).append("\n");
-        sb.append("    getCreationTime():         ").append(session.getCreationTime()).append("\n");
-        sb.append("    getLastAccessedTime():     ").append(session.getLastAccessedTime()).append("\n");
-        sb.append("    getMaxInactiveInterval():  ").append(session.getMaxInactiveInterval()).append("\n");
+        sb.append("                     getId(): ").append(session.getId()).append("\n");
+        sb.append("           getCreationTime(): ").append(session.getCreationTime()).append("\n");
+        sb.append("       getLastAccessedTime(): ").append(session.getLastAccessedTime()).append("\n");
+        sb.append("    getMaxInactiveInterval(): ").append(session.getMaxInactiveInterval()).append("\n");
 
         sb.append("    Attributes: \n");
         Enumeration attrNames = session.getAttributeNames();

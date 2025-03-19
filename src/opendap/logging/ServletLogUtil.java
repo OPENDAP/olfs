@@ -378,7 +378,7 @@ public class ServletLogUtil {
 
         HttpSession session = req.getSession(false);
 
-        MDC.put(REQUEST_ID_KEY, reqID.getCombined());
+        MDC.put(REQUEST_ID_KEY, reqID.logId());
         MDC.put(HTTP_VERB_KEY, httpVerb);
         MDC.put(CLIENT_HOST_KEY, req.getRemoteHost());
         MDC.put(SESSION_ID_KEY, (session == null) ? "-" : session.getId());

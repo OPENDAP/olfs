@@ -51,8 +51,38 @@ import java.util.regex.Pattern;
 import static opendap.http.Util.PROTOCOL_TERMINATION;
 
 
-;
-
+/**
+ * Provides utility methods that perform "analysis" of the user request and return important componet strings
+ * for the OPeNDAP servlet.
+ *
+ * The dataSourceName is the local URL path of the request, minus any requestSuffixRegex detected. So, if the request is
+ * for a dataset (an atom) then the dataSourceName is the local path and the name of the dataset minus the
+ * requestSuffixRegex. If the request is for a collection, then the dataSourceName is the complete local path.
+ * <p><b>Examples:</b>
+ * <ul><li>If the complete URL were: http://opendap.org:8080/opendap/nc/fnoc1.nc.dds?lat,lon,time&lat>72.0<br/>
+ * Then the:</li>
+ * <ul>
+ * <li> RequestURL = http://opendap.org:8080/opendap/nc/fnoc1.nc </li>
+ * <li> CollectionName = /opendap/nc/ </li>
+ * <li> DataSetName = fnoc1.nc </li>
+ * <li> DataSourceName = /opendap/nc/fnoc1.nc </li>
+ * <li> RequestSuffix = dds </li>
+ * <li> ConstraintExpression = lat,lon,time&lat>72.0 </li>
+ * </ul>
+ *
+ * <li>If the complete URL were: http://opendap.org:8080/opendap/nc/<br/>
+ * Then the:</li>
+ * <ul>
+ * <li> RequestURL = http://opendap.org:8080/opendap/nc/ </li>
+ * <li> CollectionName = /opendap/nc/ </li>
+ * <li> DataSetName = null </li>
+ * <li> DataSourceName = /opendap/nc/ </li>
+ * <li> RequestSuffix = "" </li>
+ * <li> ConstraintExpression = "" </li>
+ * </ul>
+ * </ul>
+ * @author Nathan Potter
+ */
 
 public class ReqInfo {
 
@@ -609,21 +639,22 @@ public class ReqInfo {
     public static String toString(HttpServletRequest request){
         String s = "";
 
-        s += "getLocalUrl(): "+ getLocalUrl(request) + "\n";
-        s += "getBesDataSourceID(): "+ getBesDataSourceID(getLocalUrl(request)) + "\n";
-        s += "getServiceUrl(): "+ getServiceUrl(request) + "\n";
-        s += "getCollectionName(): "+ ReqInfo.getCollectionName(request) + "\n";
+        s += "ReqInfo:\n";
+        s += "               getLocalUrl(): "+ getLocalUrl(request) + "\n";
+        s += "        getBesDataSourceID(): "+ getBesDataSourceID(getLocalUrl(request)) + "\n";
+        s += "             getServiceUrl(): "+ getServiceUrl(request) + "\n";
+        s += "         getCollectionName(): "+ ReqInfo.getCollectionName(request) + "\n";
 
-        s += "getConstraintExpression(): ";
+        s += "   getConstraintExpression(): ";
         try {
             s += ReqInfo.getConstraintExpression(request) + "\n";
         } catch (IOException e) {
             s += "Encountered IOException when attempting get the constraint expression! Msg: " + e.getMessage() + "\n";
         }
-        s += "getDataSetName(): "+ ReqInfo.getDataSetName(request) + "\n";
-        s += "getRequestSuffix(): "+ ReqInfo.getRequestSuffix(request) + "\n";
-        s += "requestForOpendapContents(): "+ ReqInfo.requestForOpendapContents(request) + "\n";
-        s += "requestForTHREDDSCatalog(): "+ ReqInfo.requestForTHREDDSCatalog(request) + "\n";
+        s += "             getDataSetName(): "+ ReqInfo.getDataSetName(request) + "\n";
+        s += "           getRequestSuffix(): "+ ReqInfo.getRequestSuffix(request) + "\n";
+        s += "  requestForOpendapContents(): "+ ReqInfo.requestForOpendapContents(request) + "\n";
+        s += "   requestForTHREDDSCatalog(): "+ ReqInfo.requestForTHREDDSCatalog(request) + "\n";
 
         return s;
 
@@ -895,22 +926,22 @@ public class ReqInfo {
     }
 
     /**
-     * A request header key/name to check for a request id.
+     * A request header key/name used by a client to transmit  a request id.
      */
     public static final String REQUEST_ID_HEADER_KEY ="a-api-request-uuid";
 
     // public static String getRequestId(HttpServletRequest req){ return "";}
 
         /**
-         * Returns the unique id of this request. If upstream service chain
-         * components have provided one in the request headers it will be sanitized
-         * and returned. Otherwise, a new request ID will be minted and returned.
+         * Produces the unique id of this request. If upstream service chain
+         * components have provided a request id string in the request headers it will
+         * be sanitized and used to construct a new RequestId. Otherwise,
+         * a new RequestId will be minted and returned.
          * @param req
          * @return
          */
     public static RequestId getRequestId(HttpServletRequest req){
-        // Contains a fresh uuid
-        RequestId reqId = new RequestId();
+        RequestId reqId;
 
         // Add additional req.getHeader() calls for different keys as needed.
         String request_id_header = req.getHeader(REQUEST_ID_HEADER_KEY);
@@ -918,14 +949,15 @@ public class ReqInfo {
             // TODO Determine the allowed characters and associated format
             //  for the REQUEST_UUID_KEY and use that to implement a closely
             //  tailored Scrub method to use for sanitizing this input
-            reqId.id(Scrub.simpleString(request_id_header));
+            reqId = new RequestId(Scrub.simpleString(request_id_header));
         }
         else {
             // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
             // DEFAULT
             // No service chain request ID appears in the expected request headers
             // so make a homegrown request_id and send it on.
-            reqId.id(Thread.currentThread().getName() + "_" + Thread.currentThread().getId());
+            // The no paramater cobstrutor Contains a fresh uuid
+            reqId = new RequestId();
         }
         return reqId;
     }
