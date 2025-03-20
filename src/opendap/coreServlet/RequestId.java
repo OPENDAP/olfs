@@ -26,7 +26,6 @@
 
 package opendap.coreServlet;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.UUID;
 
 
@@ -37,8 +36,8 @@ import java.util.UUID;
  * @author Nathan Potter
  */
 public class RequestId {
-    private String id;
-    private UUID uuid;
+    private final String id;
+    private final UUID uuid;
 
     /**
      * Make a new RequestId object using the thread name and thread id strings to construct the request id string.
