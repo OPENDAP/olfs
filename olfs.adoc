@@ -10,13 +10,14 @@ OPeNDAP, Inc.
 = OPeNDAP Lightweight Frontend Service (OLFS)
 
 == Overview
-The OPeNDAP Lightweight Frontend Service (OLFS) is the public/outward facing component of the Hyrax server. It provides a number of of service API's and UI's.
+The OPeNDAP Lightweight Frontend Service (OLFS) is the public/outward facing component of the Hyrax server.
 
 == What does it Do?
-The OLFS provides a number of interfaces through users and programatic clients can request and subset data.
+The OLFS provides a number of interfaces through which users and programmatic clients can request and subset data.
 
 === Supported APIs:
 
+* https://docs.opendap.org/index.php/Aggregation_enhancements[Aggregation Service API] (_Does this even work? When was the last time we tried it?_)
 * https://www.earthdata.nasa.gov/s3fs-public/imported/ESE-RFC-004v1.1.pdf[DAP2 data access API]
 * https://opendap.github.io/dap4-specification/DAP4.html[DAP4 data access API]
 * https://www.ogc.org/publications/standard/wcs/[WCS 2.0 API]
@@ -32,5 +33,160 @@ The OLFS provides a number of interfaces through users and programatic clients c
 * Both the DAP2 and DAP4 services have a web UI that allows a user to build and execute data access requests. These "Data Request Form" pages are built using the DDX (an XML encoding of DAP2 metadata) or DMR (an XML encoded metadata document for DAP4) processed using and XSL transform that is conditioned by the OLFS prior to the transformation step.
 
 == How? How does it work?
-=== Servlets
+The OLFS uses two primary patterns for implementing services, _HttpServlet_ implementations and _DispatchHandler_ implementations. In many cases a _servlet_ utilizes one or more _DispatchHandler_ classes.
+
+=== Configuration
+The olfs utilizes several configuration files. The primary one, olfs.xml, controls OLFS behavior and defines thelocations of one or more BES services that are needed for the Hyrax to function
+
+==== olfs.xml
+==== user-access.xml
+==== logback.xml and logback-test.xml
+==== catalog.xml
+==== viewers.xml
+==== webstart.xml
+
+
+=== OLFS Servlets
+
+The servlet implementations subclass HttpServlet. The servlets implement the various services that the OLFS supports. Some of these rely on one or more DAP4Responder implementations to perform the heavy lifting of answering the requests.
+
+* Package: *opendap.aggregation*
+- `AggregationServlet.java` - Implements the https://docs.opendap.org/index.php/Aggregation_enhancements[Hyrax Aggregation Service API]
+
+* Package: *opendap.auth*
+- `PDPService.java` - This standalone service is an implementation of a Policy Decision Point which can be used as part of an authentication and access permissions activity. I can be run on a remote system and asked if a particular user/group/role is allowed access to a particular resource.
+
+* Package: *opendap.bes*
+- `BESSiteMapService.java` - This service uses the BES to construct and cache a Site Map of the data holdings in a particular deployment of Hyrax.
+
+* Package: *opendap.build_dmrpp*
+- `BuildDmrppServlet.java` - This service can be used to have Hyrax create and reqturn a dmr++ document for a particular dataset. _It seems to be the case that this service has been "overwhelmed by events" (OBE) and might be retired_.
+
+* Package: *opendap.coreServlet*
+- `DispatchServlet.java` - This service is the core Hyrax service that uses a number of DispatchHanlder implementations to define it's core functionality.
+- `DocServlet.java` - This service provides client access to the static documents held by the OLFS such as image, css, and javascript files.
+
+* Package: *opendap.gateway*
+- `DispatchServlet.java` - Implements the Hyrax Gateway Service. _We should prbably review this with an eye towards its retirement_.
+
+* *Package: opendap.viewers*
+- `ViewersServlet.java` - This servlet is used create JavaWebStart documents that can can be utilized by a client to launch/access external applications such as _IdvViewer_, _NetCdfTools_, and _AutoPlot_. It can also direct users to externally running web services such as _NcWms_ and/or _Godiva_. 
+
+* Package: *opendap.w10n*
+- `W10nServlet.java` - Implements the https://pds-imaging.jpl.nasa.gov/tools/w10n/[w10n data access api] for the Hyrax data holdings.
+
+* Package: *opendap.wcs.v2_0.http* - _There are problems with WCS in general, and it would be worth evaluating the retirement potential for this package._
+- `Servlet.java` - Provides a WCS 2.0 implementation. This works, but requires the operator to perform configuration work for each "collection" in order to identify the domain and range variables for the collections datasets. 
+
+
 === Dispatch Handlers
+These classes implement the `opendap.coreSevlet.DispatchHandle` interface and are used by the `CoreServlet` to direct the client requests to the appropriate software for response.
+
+* Package: *opendap.bes*
+- `BesDapDispatcher.java` - This _DispatchHandler_ implementation provides the core DAP2 and DAP4 services for Hyrax, which includes data access services and the production of the HTML Data Request Forms. It does this by utilizing a collection of _Dap4Responder_ implementations. Each of which handles a very specific task, typically commanding the BES to produce a particular response.
+- `BESThreddsDispatchHandler.java` - This DispatchHandler uses a combination of the BES `showNode`  interface, and a XSL transform file along with state information  to generate THREDDS client catalog responses and return them to the user.
+- `DirectoryDispatchHandler.java` - This DispatchHandler uses the BES `showNode`  interface, and a XSL transform file to produce the browser navigable "blue-bar" pages that express the data holdings of the service as a directed graph.
+- `FileDispatchHandler.java` - Used to transmit files from the BES to the user. If the source file is seen as a data file byt the BES this will be blocked unless specifically enabled in the _olfs.xml_ configuration file by uncommenting the `<AllowDirectDataSourceAccess />` element.
+- `VersionDispatchHandler.java` - This combines the BES version information and OLFS version information to make and return a combined XML version document to the requestor.
+
+* Package: *opendap.build_dmrpp*
+- `BuildDmrppDispatchHandler.java` -
+
+* Package: *opendap.coreServlet*
+- `NoPostHandler.java` - This is used when POST request submissions are disabled, which is determined by the presence of the `<HttpPost .../>` element in `olfs.xml` file.
+
+* Package: *opendap.gateway*
+- `DispatchHandler.java`
+
+* Package: *opendap.nciso*
+- `IsoDispatchHandler.java`
+- `RubricDispatchHandler.java`
+
+* Package: *opendap.ncml*
+- `NcmlDatasetDispatcher.java`
+
+* Package: *opendap.ngap*
+- `NgapDispatchHandler.java`
+
+* Package: *opendap.threddsHandler*
+- `StaticCatalogDispatch.java`
+
+* Package: *opendap.wcs.v2_0.http*
+- `FormHandler.java`
+- `HttpGetHandler.java`
+- `SoapHandler.java`
+- `XmlRequestHandler.java`
+
+== Issues
+* Virtually no unit tests exist for the OLFS.
+* There are regression tests. The tests exist in their own GitHub repo, the https://github.com/OPENDAP/hyrax_regression_tests[hyrax_regression_tests] project. They require a fully operational Hyrax in order to be run.
+
+
+
+
+
+== Dap4Responders
+Both the DAP2 and DAP4 utilizes specialized implementations of Dap4Responder. _Probably the name could be better at this point_ :)
+
+
+=== DAP2 Responders
+Responders that handle all the DAP2 things.
+
+* Package: *opendap.bes.dap2Responders*
+- `Ascii.java` - Uses the BES to produce and transmit the DAP2 ASCII encoded data response.
+- `CovJson.java` - Uses the BES to produce and transmit the DAP2 Coverage JSON encoded data response.
+- `CsvData.java` - Uses the BES to produce and transmit the DAP2 CSV encoded data response (which is fundamentally the same as the DAP2 ASCII response).
+- `Dap2Data.java` - Uses the BES to produce and transmit the DAP2 data response.
+- `Dap2IFH.java` - Uses the BES to retrieve the DAP3.2 DDX XML document. This is fed, along with injected state information, into an XSL transform to produce the DAP2 Data Request Form (aka the Interface From Hell, aka the IFH) and transmit form page to the requesting client.
+- `DAS.java` - Uses the BES to produce and transmit the DAP2 DAS response.
+- `DatasetInfoHtmlPage.java` - Uses the BES to produce and transmit the DAP2 Dataset Info Page response.
+- `DDS.java` - Uses the BES to produce and transmit the DAP2 DDS response.
+- `DDX.java` - Uses the BES to produce and transmit the DAP3.2 DDX response (unique to Hyrax, not part of the DAP2 specification, a stepping stone to DAP4).
+- `GeoTiff.java` - Uses the BES to produce a DAP2 data response and encode it as a GeoTiff file.
+- `GmlJpeg2000.java` - Uses the BES to produce a DAP2 data response and encode it as a GMLJpeg2000 file.
+- `Ijson.java` - Uses the BES to produce a DAP2 data response and encode it as an "instance" json (.ijsn) response.
+- `Iso19115.java` - Uses the BES to produce a DAP3.2 DDX response and then applies an XSL transform to produce ISO-19115 metadata document.
+- `Iso19115Rubric.java` - Uses the BES to produce a DAP3.2 DDX response and then applies an XSL transform to produce an HTML page the shows how the metadata does and does not conform to the ISO-19115 expectations.
+- `Json.java` - Uses the BES to produce a DAP2 data response and encode it as an json (.json) response.
+- `Netcdf3.java` - Uses the BES to produce a DAP2 data response and encode it as a netcdf-3 file.
+- `Netcdf4.java` - Uses the BES to produce a DAP2 data response and encode it as a netcdf-4 file.
+- `RDF.java` - Uses the BES to produce a DAP3.2 DDX response and then applies an XSL transform to an HTML page to represent the document as RDF.
+- `XmlData.java` - Uses the BES to produce a DAP2 data response and encode it as an XML document.
+
+=== Generic Responders
+
+* Package: *opendap.bes.dap4Responders*
+- `FileAccess.java` - Used to transmit files from the BES to the requesting client.
+- `Version.java` - Builds and returns the Hyrax combined version response document (XML).
+
+=== DAP4 Responders
+Responders that handle all the DAP4 things.
+
+* Package: *opendap.bes.dap4Responders.DataResponse* This package contains responders that return data in various encodings.
+- `CovJsonDR.java` - Uses the BES to produce and transmit the DAP4 data response encoded as Coverage JSON (may not have a companion implementation in the BES)
+- `CsvDR.java` - Uses the BES to produce and transmit the DAP4 data response encoded as CSV.
+- `GeoTiffDR.java` - Uses the BES to produce and transmit the DAP4 data response encoded as a GeoTiff file.
+- `GmlJpeg2000DR.java` - Uses the BES to produce and transmit the DAP4 data response encoded as a GML JPEG 2000 file.
+- `IjsonDR.java` - Uses the BES to produce and transmit the DAP4 data response encoded as instance JSON (.ijsn)".
+- `JsonDR.java` - Uses the BES to produce and transmit the DAP4 data response encoded as JSON.
+- `Netcdf3DR.java` - Uses the BES to produce and transmit the DAP4 data response encoded as a netcdf-3 file. Note that the netcdf-3 data model is a subset of the DAP4 data model and not all DAP4 data content m,ay encoded as netcdf-3.
+- `Netcdf4DR.java` - Uses the BES to produce and transmit the DAP4 data response encoded as a netcdf-4 file.
+- `NormativeDR.java` - Uses the BES to produce and transmit the normative  DAP4 data response.
+- `XmlDR.java` - Uses the BES to produce and transmit the DAP4 data response encoded as an XML data response.
+
+* Package: *opendap.bes.dap4Responders.DatasetMetadata* This package contains responders that return metadata in various encodings.
+- `HtmlDMR.java` - Uses the BES to produce and return the DMR response which is used, along with an XSL transform and several state variable to produce the DAP4 Data Request Form.
+- `IjsonDMR.java` - Uses the BES to produce and transmit the DAP4 metadata response encoded as a instance JSON (.ijsn).
+- `JsonDMR.java` - Uses the BES to produce and transmit the DAP4 metadata response encoded as JSON.
+- `NormativeDMR.java` - Uses the BES to produce and transmit the normative DAP4 metadata response (XML).
+- `RdfDMR.java`  - Uses the BES to produce and transmit the DAP4 metadata response encoded as RDF.
+- `XmlDMR.java`  - Uses the BES to produce and transmit the DAP4 metadata response encoded as XML.
+
+* Package: *opendap.bes.dap4Responders.DatasetServices* This package contains responders that return the DAP4 Dataset Service Response (DSR) in various encodings. _I think at this opoint this package is obviated as the DSR while defined in the DAP4 specification does not enjoy any know useful implementation._
+- `HtmlDSR.java`  - Uses the BES to retrieve the DSR response and return it encoded as HTML by using a XSL transform..
+- `NormativeDSR.java` - Uses the BES to produce and transmit the DSR response (XML).
+- `XmlDSR.java` - Uses the BES to produce and transmit the DSR response (XML).
+
+* Package: *opendap.bes.dap4Responders.Iso19115*
+- `IsoDMR.java`- Uses the BES to produce a DAP4 DMR response and then applies an XSL transform to produce ISO-19115 metadata document.
+- `IsoRubricDMR.java` - Uses the BES to produce a DAP4 DMR response and then applies an XSL transform to produce an HTML page the shows how the metadata does and does not conform to the ISO-19115 expectations.
