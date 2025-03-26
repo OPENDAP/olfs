@@ -1,0 +1,36 @@
+= image:logo.svg[width=300]
+OPeNDAP, Inc.
+{docdatetime}
+:doctype: book
+:source-highlighter: coderay
+:coderay-linenums-mode: inline
+:prewrap!:
+:imagesdir: ./doc/images
+
+= OPeNDAP Lightweight Frontend Service (OLFS)
+
+== Overview
+The OPeNDAP Lightweight Frontend Service (OLFS) is the public/outward facing component of the Hyrax server. It provides a number of of service API's and UI's.
+
+== What does it Do?
+The OLFS provides a number of interfaces through users and programatic clients can request and subset data.
+
+=== Supported APIs:
+
+* https://www.earthdata.nasa.gov/s3fs-public/imported/ESE-RFC-004v1.1.pdf[DAP2 data access API]
+* https://opendap.github.io/dap4-specification/DAP4.html[DAP4 data access API]
+* https://www.ogc.org/publications/standard/wcs/[WCS 2.0 API]
+* https://pds-imaging.jpl.nasa.gov/tools/w10n/[w10n data access api]
+* https://docs.unidata.ucar.edu/tds/current/userguide/client_side_catalog_specification.html[THREDDS Client-Side Catalog API] for machine traversable catalog/inventories.
+* *File Download Service* - This is a configuration option which, when enabled, allows the user to download the underlying data files directly from the Hyrax service.
+* *Gateway service* - This service allows the user to ask Hyrax to retrive a remote dataset file and then provide DAP services for that file.
+* *https://opendap.earthdata.nasa.gov[NGAP DAP service]* - The NGAP service is a NASA specific service that works with a number of NASA services to located and access data. This service utilizes the NASA Common Metadata Repository (CMR), Thin Egress Client (TEA), and AWS S3 to provide access to data using precomputed dmr++ files and HTTP Range GET commands to extract data values form files/objects held in S3.
+
+
+=== Supported UIs
+
+* Both the DAP2 and DAP4 services have a web UI that allows a user to build and execute data access requests. These "Data Request Form" pages are built using the DDX (an XML encoding of DAP2 metadata) or DMR (an XML encoded metadata document for DAP4) processed using and XSL transform that is conditioned by the OLFS prior to the transformation step.
+
+== How? How does it work?
+=== Servlets
+=== Dispatch Handlers
