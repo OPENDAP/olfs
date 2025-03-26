@@ -787,7 +787,7 @@ public class ReqInfo {
      * determined because of CDN, Firewall, or internal server redirect URL rewriting.
      *
      * The method checks for the presence of the request headers: CLOUD_FRONT_FORWARDED_PROTOCOL
-     * and X_FORWARDED_PROTOCOL to determine f the protocol of the request was rewritten by
+     * and X_FORWARDED_PROTOCOL to determine if the protocol of the request was rewritten by
      * some forwarding agent (such as the AWS CloudFront Content Delivery Network).
      *
      * It can often be the case that the forwarding entity is supporting TLS on an outward facing
@@ -863,7 +863,7 @@ public class ReqInfo {
         }
         // We know that the values of the request headers CLOUD_FRONT_FORWARDED_PROTOCOL
         // and X_FORWARDED_PROTOCOL don't end with the PROTOCOL_TERMINATION (aka "://")
-        // zso we check for the absence of a trailing PROTOCOL_TERMINATION and add it
+        // so we check for the absence of a trailing PROTOCOL_TERMINATION and add it
         // as needed.
         if(!client_request_protcol.endsWith(PROTOCOL_TERMINATION)){
             client_request_protcol += PROTOCOL_TERMINATION;
