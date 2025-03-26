@@ -35,18 +35,41 @@ The OLFS provides a number of interfaces through which users and programmatic cl
 == How? How does it work?
 The OLFS uses two primary patterns for implementing services, _HttpServlet_ implementations and _DispatchHandler_ implementations. In many cases a _servlet_ utilizes one or more _DispatchHandler_ classes.
 
-=== Configuration
-The olfs utilizes several configuration files. The primary one, olfs.xml, controls OLFS behavior and defines thelocations of one or more BES services that are needed for the Hyrax to function
+== Configuration
+The olfs utilizes several configuration files. The primary one, olfs.xml, controls OLFS behavior and defines thelocations of one or more BES services that are needed for the Hyrax to function.
 
-==== olfs.xml
-==== user-access.xml
-==== logback.xml and logback-test.xml
-==== catalog.xml
-==== viewers.xml
-==== webstart.xml
+=== Startup Behavior
+When the server starts the code in `opendap.coreServlet.DispathServlet.init()` utilizes the ServletUtil class methids to locate the configuration. The following location are checked:
 
+1. /etc/olfs
+1. /usr/share/olfs
+1. $CATALINA_HOME/webapps/opendap/WEB-INF/conf
 
-=== OLFS Servlets
+If the configuration is not found in either of the first two locations then default the configuration bundled in the war file will be used. If however one of the first locations is found, but the configuration is missing, and the running service has write permission to the identified location, then the service will copy its default configuration to the identified location. This creates a configuration that can be easily modified by the operator and that will persist across updates and/or redeployments of the OLFS.
+
+=== olfs.xml
+This file contains the core configuration for the OLFS. It defines a number of service behaviors and also the location of the BES(s) to be used when handling requests.
+
+=== user-access.xml
+This file is an authentication and permissions file that allows the operator to delpoy a service that can make use of OAUth2 Single Sign On (SSO) to authenticate users. The file also defines the various operational permissions the authenticated users will have (via groups and roles)
+
+=== logback.xml and logback-test.xml
+These files provide the loggin frame work behaviors: Log file names, log file content, and what things will be logged at each logging level.
+
+=== catalog.xml
+The top level static THREDDS client catalog for the machine traversable THREDDS service. This file nominally contains a catalog ref to the dynamically generated Hyrax THREDDS catalogs:
+
+  <catalogRef xlink:href="/opendap/hyrax/catalog.xml" xlink:title="Hyrax Catalog" name="Hyrax Catalog" />
+
+It can be expanded to create a much more extensive static catalog.
+
+=== viewers.xml
+This provides the configuration for the various Java Web Start applications (IDV Viewer, NetcdfToolsUI, etc.) and WebServiceHandlers (NcWMS, Godiva)
+
+=== webstart.xml
+*_I think that this can be retired, but that assertion needs to be tested._*
+
+== OLFS Servlets
 
 The servlet implementations subclass HttpServlet. The servlets implement the various services that the OLFS supports. Some of these rely on one or more DAP4Responder implementations to perform the heavy lifting of answering the requests.
 
@@ -79,7 +102,7 @@ The servlet implementations subclass HttpServlet. The servlets implement the var
 - `Servlet.java` - Provides a WCS 2.0 implementation. This works, but requires the operator to perform configuration work for each "collection" in order to identify the domain and range variables for the collections datasets. 
 
 
-=== Dispatch Handlers
+== Dispatch Handlers
 These classes implement the `opendap.coreSevlet.DispatchHandle` interface and are used by the `CoreServlet` to direct the client requests to the appropriate software for response.
 
 * Package: *opendap.bes*
