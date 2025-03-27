@@ -58,7 +58,7 @@ env:
 #  - java -version
 #  - echo "#######################################################"
 before_install:
-  - gem install bundler -v
+  - gem install bundler
 
 install:
   - nvm install 12.13.0
