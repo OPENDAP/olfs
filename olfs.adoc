@@ -45,6 +45,17 @@ So how does all this "claiming" work? _Through the magic of regular expressions_
 
 Finally, the chosen responder will set the HTTP response headers appropriately (media types etc) and then use the BesApi to build and issue a request to the target BES. This is done using a OPeNDAPClient object. The request is passed with the target output stream, and the OPeNDAPClient handles the transmission of the request and then the reception and retransmission of the BES response back to the client.
 
+All this checking and "claiming" seems so involved. Yup. It is. And it's partially a byproduct of the conflation of services. If I were to design it again I would follow the lead os the THREDDS Data Server (TDS) and separate the services using a URL path prefix something like:
+
+* opendap/catalog/path - Would produce a browser navigable HTML catalog of the servers holdings.
+* opendap/thredds/path - Would produce a machine readable/traversable THREDDS client catalog (XML) of the servers holdings.
+* opendap/dap4/path - The DAP4 service and only the DAP4 service.
+* opendap/dap2/path - The DAP2 service and only the DAP2 service.
+* opendap/file/path - The file download service.
+* etc.
+
+I think each of these services might be it's own servlet. Regardless this would decrease some of the burden of trying to figure out what the client is after. All these services exist on the same URL path and a lot of the process described above is about the disambiguation of requests. I think this organization would reduce some of the code size and processing time.
+
 == Configuration
 The olfs utilizes several configuration files. The primary one, olfs.xml, controls OLFS behavior and defines thelocations of one or more BES services that are needed for the Hyrax to function.
 
