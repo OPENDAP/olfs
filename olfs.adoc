@@ -32,8 +32,22 @@ The OLFS provides a number of interfaces through which users and programmatic cl
 
 * Both the DAP2 and DAP4 services have a web UI that allows a user to build and execute data access requests. These "Data Request Form" pages are built using the DDX (an XML encoding of DAP2 metadata) or DMR (an XML encoded metadata document for DAP4) processed using and XSL transform that is conditioned by the OLFS prior to the transformation step.
 
+== How is the runtime code assembled?
+The primary pattern used by the OLFS  for implementing services, _HttpServlet_ implementations that utilize _DispatchHandler_ implementations to claim requests and respond to them. In some cases a _servlet_ might utilize a single instance of DispatchHandler to run the show. For example, _opendap.build_dmrpp.BuildDmrppServlet_ relies solely on _opendap.build_dmrpp.BuildDmrppDispatchHandler_ and _opendap.wcs.v2.0.Servlet_ relies solely on _opendap.wcs.v2.0.HttpGetHandler_. In other examples there are many _DispatchHandler_ in the Servlet. For example _opendap.coreServlet.DispatchServlet_ has about a dozen different _DispatchHandler_ instances.
+
+
 == How? How does it work?
-The OLFS uses two primary patterns for implementing services, _HttpServlet_ implementations and _DispatchHandler_ implementations. In many cases a _servlet_ utilizes one or more _DispatchHandler_ classes.
+
+Let's look at the primary servlet, _opendap.coreServlet.DispatchServlet_, handles an incoming request:
+* In the doGet() method the code first handles some bookkeeping (such as producing a request id and starting the access log for the request) before iterating over its internal vector of DispatchHandlers, asking each if it can service the request. The first DispatchHandlers to claim the request is then asked to service it and send the response. The order of the DispatchHandler objects in the vector is critical, as there are greedy DispatchHandlers (FileDispatchHandler for example) that will claim things that should/would have been claimed by a different DispatchHandler. The order is established in the init() method.
+
+If the request is for some type of DAP response then the BesDapDispatcher will claim it.
+
+Inside BesDapDispatcher there is a vector of Dap4Responder objects, each one associated with a particular DAP response type (such as: use DAP2 and return a netcdf-3 encoded response, use DAP4 and return the DMR response, etc.) The BesDapDispatcher iterates over its vector of Dap4Responders and hands the response duties to the first one that claims the request.
+
+So how does all this claiming work? Through the magic of regular expressions. Each of the Dap4Responders contains a primary regular expression which  should match a URL path in the request. For example the NormativeDMR responder has something like this `^.*\.dmr$`. But it's more complex because in DAP4 there are several different alternate encodings for the DMR (and the other response types) that a client might wish to receive. This is handled by having each normative responder hold a collection of alternative responders, each of which has it's own suffix and regex. The NormativeDMR will combine all of these so that when it is asked if a request can be handled it simply evaluates the request URL path to see if it matches the combined regex of its own regex and all of it alternative responder regexs. When the request is submitted for processing NormativeDMR locates the appropriate responder and sends the request to it.
+
+Finally, the chosen responder will set the HTTP response headers appropriately (media types etc) and then use the BesApi to build and issue a request to the target BES. This is done using a OPeNDAPClient object. The request is passed with the target output stream, and the OPeNDAPClient handles the transmission of the request and then the reception and retransmission of the BES response back to the client.
 
 == Configuration
 The olfs utilizes several configuration files. The primary one, olfs.xml, controls OLFS behavior and defines thelocations of one or more BES services that are needed for the Hyrax to function.
@@ -46,6 +60,8 @@ When the server starts the code in `opendap.coreServlet.DispathServlet.init()` u
 1. $CATALINA_HOME/webapps/opendap/WEB-INF/conf
 
 If the configuration is not found in either of the first two locations then default the configuration bundled in the war file will be used. If however one of the first locations is found, but the configuration is missing, and the running service has write permission to the identified location, then the service will copy its default configuration to the identified location. This creates a configuration that can be easily modified by the operator and that will persist across updates and/or redeployments of the OLFS.
+
+The DispatchServlet.init() method also loads a vector with new instances of its DispatchHandler objects that it will utilize to service requests. More on this below.
 
 === olfs.xml
 This file contains the core configuration for the OLFS. It defines a number of service behaviors and also the location of the BES(s) to be used when handling requests.
@@ -140,16 +156,17 @@ These classes implement the `opendap.coreSevlet.DispatchHandle` interface and ar
 - `SoapHandler.java`
 - `XmlRequestHandler.java`
 
-== Issues
-* Virtually no unit tests exist for the OLFS.
-* There are regression tests. The tests exist in their own GitHub repo, the https://github.com/OPENDAP/hyrax_regression_tests[hyrax_regression_tests] project. They require a fully operational Hyrax in order to be run.
-
 
 
 
 
 == Dap4Responders
-Both the DAP2 and DAP4 utilizes specialized implementations of Dap4Responder. _Probably the name could be better at this point_ :)
+This abstract class embodies a number of general operations needed for:
+
+* Identifying requests that should be handled by an instance of the class.
+* HTTP client/server content negotiation for DAP4 (DAP2 doesn't support this)
+
+_This could use a refactor to condense the hierarchy of inheritance from 4 classes to 2._ :)
 
 
 === DAP2 Responders
@@ -213,3 +230,9 @@ Responders that handle all the DAP4 things.
 * Package: *opendap.bes.dap4Responders.Iso19115*
 - `IsoDMR.java`- Uses the BES to produce a DAP4 DMR response and then applies an XSL transform to produce ISO-19115 metadata document.
 - `IsoRubricDMR.java` - Uses the BES to produce a DAP4 DMR response and then applies an XSL transform to produce an HTML page the shows how the metadata does and does not conform to the ISO-19115 expectations.
+
+
+== Testing
+* Virtually no unit tests exist for the OLFS.
+* There are regression tests. The tests exist in their own GitHub repo, the https://github.com/OPENDAP/hyrax_regression_tests[hyrax_regression_tests] project. They require a fully operational Hyrax in order to be run.
+
