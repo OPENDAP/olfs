@@ -16,7 +16,6 @@ The OPeNDAP Lightweight Frontend Service (OLFS) is the public/outward facing com
 The OLFS provides a number of interfaces through which users and programmatic clients can request and subset data.
 
 === Supported APIs:
-
 * https://docs.opendap.org/index.php/Aggregation_enhancements[Aggregation Service API] (_Does this even work? When was the last time we tried it?_)
 * https://www.earthdata.nasa.gov/s3fs-public/imported/ESE-RFC-004v1.1.pdf[DAP2 data access API]
 * https://opendap.github.io/dap4-specification/DAP4.html[DAP4 data access API]
@@ -27,25 +26,20 @@ The OLFS provides a number of interfaces through which users and programmatic cl
 * *Gateway service* - This service allows the user to ask Hyrax to retrive a remote dataset file and then provide DAP services for that file.
 * *https://opendap.earthdata.nasa.gov[NGAP DAP service]* - The NGAP service is a NASA specific service that works with a number of NASA services to located and access data. This service utilizes the NASA Common Metadata Repository (CMR), Thin Egress Client (TEA), and AWS S3 to provide access to data using precomputed dmr++ files and HTTP Range GET commands to extract data values form files/objects held in S3.
 
-
-=== Supported UIs
-
+=== Supported User Interfaces
 * Both the DAP2 and DAP4 services have a web UI that allows a user to build and execute data access requests. These "Data Request Form" pages are built using the DDX (an XML encoding of DAP2 metadata) or DMR (an XML encoded metadata document for DAP4) processed using and XSL transform that is conditioned by the OLFS prior to the transformation step.
 
 == How is the runtime code assembled?
-The primary pattern used by the OLFS  for implementing services, _HttpServlet_ implementations that utilize _DispatchHandler_ implementations to claim requests and respond to them. In some cases a servlet might utilize a single instance of _DispatchHandler_ to run the show. For example, the servlet _opendap.build_dmrpp.BuildDmrppServlet_ relies solely on _opendap.build_dmrpp.BuildDmrppDispatchHandler_ and the servlet _opendap.wcs.v2.0.Servlet_ relies solely on _opendap.wcs.v2.0.HttpGetHandler_. In other examples there are many _DispatchHandler_ objects used by the servlet implementation. For example _opendap.coreServlet.DispatchServlet_ uses about a dozen different _DispatchHandler_ instances.
-
+The primary code pattern used by the OLFS for implementing services is to subclass _HttpServlet_ and create specialized implementations that utilize one or more _DispatchHandler_ implementations to claim requests and respond to them. In some cases a servlet might utilize a single instance of _DispatchHandler_ to run the show. For example, the servlet _opendap.build_dmrpp.BuildDmrppServlet_ relies solely on _opendap.build_dmrpp.BuildDmrppDispatchHandler_ and the servlet _opendap.wcs.v2.0.Servlet_ relies solely on _opendap.wcs.v2.0.HttpGetHandler_. In other examples there are many _DispatchHandler_ objects used by the servlet implementation. For example _opendap.coreServlet.DispatchServlet_ uses about a dozen different _DispatchHandler_ instances.
 
 == How? How does it work?
+Let's look at how the primary servlet, _opendap.coreServlet.DispatchServlet_, handles an incoming request: In the _doGet()_ method the code first handles some bookkeeping (such as producing a request id and starting the access log for the request) before iterating over its internal vector of _DispatchHandlers_, asking each if it can service the request. The first _DispatchHandler_ to claim the request is then asked to service it and transmit the response. The order of the _DispatchHandler_ objects in the vector is critical, as there are greedy _DispatchHandlers_ (_FileDispatchHandler_ for example) that will claim things that should/would have been claimed by a different _DispatchHandler_. The order is established in the _DispatchServlet.init()_ method.
 
-Let's look at the primary servlet, _opendap.coreServlet.DispatchServlet_, handles an incoming request:
-* In the doGet() method the code first handles some bookkeeping (such as producing a request id and starting the access log for the request) before iterating over its internal vector of DispatchHandlers, asking each if it can service the request. The first DispatchHandlers to claim the request is then asked to service it and send the response. The order of the DispatchHandler objects in the vector is critical, as there are greedy DispatchHandlers (FileDispatchHandler for example) that will claim things that should/would have been claimed by a different DispatchHandler. The order is established in the init() method.
+If the request is for some type of DAP response then the _BesDapDispatcher_ will claim it.
 
-If the request is for some type of DAP response then the BesDapDispatcher will claim it.
+Inside _BesDapDispatcher_ there is a vector of _Dap4Responder_ objects, each one associated with a particular DAP response type (such as: use DAP2 and return a netcdf-3 encoded response, use DAP4 and return the DMR response, etc.) The _BesDapDispatcher_ iterates over its vector of _Dap4Responder_ objects and hands the response duties to the first one that claims the request.
 
-Inside BesDapDispatcher there is a vector of Dap4Responder objects, each one associated with a particular DAP response type (such as: use DAP2 and return a netcdf-3 encoded response, use DAP4 and return the DMR response, etc.) The BesDapDispatcher iterates over its vector of Dap4Responders and hands the response duties to the first one that claims the request.
-
-So how does all this claiming work? Through the magic of regular expressions. Each of the Dap4Responders contains a primary regular expression which  should match a URL path in the request. For example the NormativeDMR responder has something like this `^.*\.dmr$`. But it's more complex because in DAP4 there are several different alternate encodings for the DMR (and the other response types) that a client might wish to receive. This is handled by having each normative responder hold a collection of alternative responders, each of which has it's own suffix and regex. The NormativeDMR will combine all of these so that when it is asked if a request can be handled it simply evaluates the request URL path to see if it matches the combined regex of its own regex and all of it alternative responder regexs. When the request is submitted for processing NormativeDMR locates the appropriate responder and sends the request to it.
+So how does all this claiming work? Through the magic of regular expressions! Each of the _Dap4Responder_ objects contains a primary regular expression which is used to match a URL path in the request. For example the _NormativeDMR_ responder has something like this `^.*\.dmr$`. But it's more complex because in DAP4 there are several different alternate encodings for the DMR (and the other response types as well) that a client might wish to receive. This is handled by having each normative responder hold a collection of alternative responders, each of which has its own suffix and regex. When _NormativeDMR_ is built, it combines all of it alternative responder regex expression into a single combined regex. When _NormativeDMR_ is asked if a request can be handled it simply evaluates the request URL path to see if it matches the combined regex. When the request is submitted for processing NormativeDMR locates the appropriate responder (using the individual regukar expressions) and sends the request to it.
 
 Finally, the chosen responder will set the HTTP response headers appropriately (media types etc) and then use the BesApi to build and issue a request to the target BES. This is done using a OPeNDAPClient object. The request is passed with the target output stream, and the OPeNDAPClient handles the transmission of the request and then the reception and retransmission of the BES response back to the client.
 
