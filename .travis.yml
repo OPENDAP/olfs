@@ -57,6 +57,8 @@ env:
 #  - ./install-jdk.sh -F 11 --target $JAVA_HOME
 #  - java -version
 #  - echo "#######################################################"
+before_install:
+  - gem install bundler -v
 
 install:
   - nvm install 12.13.0
