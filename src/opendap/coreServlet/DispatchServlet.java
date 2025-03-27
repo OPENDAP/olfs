@@ -269,7 +269,7 @@ public class DispatchServlet extends HttpServlet {
         httpGetHandlers.add(new opendap.ncml.NcmlDatasetDispatcher());
         httpGetHandlers.add(new opendap.threddsHandler.StaticCatalogDispatch());
         httpGetHandlers.add(new opendap.gateway.DispatchHandler());
-        //httpGetHandlers.add(new opendap.build_dmrpp.BuildDmrppDispatchHandler());
+
         // The NgapDispatchHandler needs to come before BesDapDispatcher
         httpGetHandlers.add(new opendap.ngap.NgapDispatchHandler());
         httpGetHandlers.add(new opendap.bes.BesDapDispatcher());
