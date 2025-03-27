@@ -33,7 +33,7 @@ The OLFS provides a number of interfaces through which users and programmatic cl
 * Both the DAP2 and DAP4 services have a web UI that allows a user to build and execute data access requests. These "Data Request Form" pages are built using the DDX (an XML encoding of DAP2 metadata) or DMR (an XML encoded metadata document for DAP4) processed using and XSL transform that is conditioned by the OLFS prior to the transformation step.
 
 == How is the runtime code assembled?
-The primary pattern used by the OLFS  for implementing services, _HttpServlet_ implementations that utilize _DispatchHandler_ implementations to claim requests and respond to them. In some cases a _servlet_ might utilize a single instance of DispatchHandler to run the show. For example, _opendap.build_dmrpp.BuildDmrppServlet_ relies solely on _opendap.build_dmrpp.BuildDmrppDispatchHandler_ and _opendap.wcs.v2.0.Servlet_ relies solely on _opendap.wcs.v2.0.HttpGetHandler_. In other examples there are many _DispatchHandler_ in the Servlet. For example _opendap.coreServlet.DispatchServlet_ has about a dozen different _DispatchHandler_ instances.
+The primary pattern used by the OLFS  for implementing services, _HttpServlet_ implementations that utilize _DispatchHandler_ implementations to claim requests and respond to them. In some cases a servlet might utilize a single instance of _DispatchHandler_ to run the show. For example, the servlet _opendap.build_dmrpp.BuildDmrppServlet_ relies solely on _opendap.build_dmrpp.BuildDmrppDispatchHandler_ and the servlet _opendap.wcs.v2.0.Servlet_ relies solely on _opendap.wcs.v2.0.HttpGetHandler_. In other examples there are many _DispatchHandler_ objects used by the servlet implementation. For example _opendap.coreServlet.DispatchServlet_ uses about a dozen different _DispatchHandler_ instances.
 
 
 == How? How does it work?
@@ -135,22 +135,22 @@ These classes implement the `opendap.coreSevlet.DispatchHandle` interface and ar
 - `NoPostHandler.java` - This is used when POST request submissions are disabled, which is determined by the presence of the `<HttpPost .../>` element in `olfs.xml` file.
 
 * Package: *opendap.gateway*
-- `DispatchHandler.java`
+- `DispatchHandler.java` - This handler implements the https://docs.opendap.org/index.php/Gateway_Service[Gateway Service]. It is one of the DispatchHandlers loaded by the opendap.coreServlet.DispatchServlet
 
 * Package: *opendap.nciso*
-- `IsoDispatchHandler.java`
-- `RubricDispatchHandler.java`
+- `IsoDispatchHandler.java`- Deprecated (should be moved to _retired_)
+- `RubricDispatchHandler.java` - Deprecated (should be moved to _retired_)
 
-* Package: *opendap.ncml*
+* Package: *opendap.ncml* - _I think this whole package might be retired._
 - `NcmlDatasetDispatcher.java`
 
 * Package: *opendap.ngap*
-- `NgapDispatchHandler.java`
+- `NgapDispatchHandler.java` - This is the NGAP handler, a child od BEsDapDispatcher. It claims any request that begins with its prefix string (default: _ngap/_) and then uses it's parent class and a specialization of the BesApi, NgapBesApi, to build BES commands to service the request.
 
 * Package: *opendap.threddsHandler*
-- `StaticCatalogDispatch.java`
+- `StaticCatalogDispatch.java` - The OLFS server static THREDDS client catalogs, and this is the class that does this. Static catalogs exist on the host filesystem and are integrated with the dynamic catalogs built by interacting with the BES.
 
-* Package: *opendap.wcs.v2_0.http*
+* Package: *opendap.wcs.v2_0.http* - _I think we should retire this package._
 - `FormHandler.java`
 - `HttpGetHandler.java`
 - `SoapHandler.java`
