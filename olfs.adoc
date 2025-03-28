@@ -44,7 +44,7 @@ The *_olfs_* provides a number of interfaces through which users and programmati
 The primary code pattern used by the *_olfs_* for implementing services is to subclass _HttpServlet_ and create specialized implementations that utilize one or more _DispatchHandler_ implementations to claim requests and respond to them. In some cases a servlet might utilize a single instance of _DispatchHandler_ to run the show. For example, the servlet _opendap.build_dmrpp.BuildDmrppServlet_ relies solely on _opendap.build_dmrpp.BuildDmrppDispatchHandler_ and the servlet _opendap.wcs.v2.0.Servlet_ relies solely on _opendap.wcs.v2.0.HttpGetHandler_. In other examples there are many _DispatchHandler_ objects used by the servlet implementation. For example _opendap.coreServlet.DispatchServlet_ uses about a dozen different _DispatchHandler_ instances.
 
 == How? How does it work?
-It's complicated, so first I'll walk through a simplified narrative of the request/response operation and then add a couple of section after regarding other parts of the operation.
+It's complicated, so first I'll walk through a simplified narrative of the request/response operation and then add a couple of sections after regarding other parts of the operation.
 
 === DAP Request/Response
 
@@ -56,11 +56,11 @@ If the request is for some type of DAP response then the _BesDapDispatcher_ will
 
 Inside _BesDapDispatcher_ there is a vector of _Dap4Responder_ objects, each one associated with a particular DAP response type (such as: use DAP2 and return a netcdf-3 encoded response, use DAP4 and return the DMR response, etc.) The _BesDapDispatcher_ iterates over its vector of _Dap4Responder_ objects and hands the response duties to the first one that claims the request.
 
-So how does all this "claiming" work? _Through the magic of regular expressions_! Each of the _Dap4Responder_ objects contains a primary regular expression which is used to match a URL path in the request. For example the _NormativeDMR_ responder has something like this `^.*\.dmr$`. But it's more complex because in DAP4 there are several different alternate encodings for the DMR (and the other response types as well) that a client might wish to receive. This is handled by having each normative responder hold a collection of alternative responders, each of which has its own suffix and regex. When _NormativeDMR_ is built, it combines all of it alternative responder regex expression into a single combined regex. When _NormativeDMR_ is asked if a request can be handled it simply evaluates the request URL path to see if it matches the combined regex. When the request is submitted for processing NormativeDMR locates the appropriate responder (using the individual regukar expressions) and sends the request to it.
+One might ask: How does all this "claiming" work? _Through the magic of regular expressions!_ Each of the _Dap4Responder_ objects contains a primary regular expression which is used to match a URL path in the request. For example the _NormativeDMR_ responder has something like this `^.*\.dmr$`. But it's more complex because in DAP4 there are several different alternate encodings for the DMR (and the other response types as well) that a client might wish to receive. This is handled by having each normative responder hold a collection of alternative responders, each of which has its own suffix and regex. When _NormativeDMR_ is built, it combines all of its alternative responder regex expression into a single combined regex. When _NormativeDMR_ is asked if a request can be handled it simply evaluates the request URL path to see if it matches the combined regex. When the request is submitted for processing NormativeDMR locates the appropriate responder (using the individual regular expressions) and delegates the request to it.
 
-Finally, the chosen responder will set the HTTP response headers appropriately (media types etc) and then use the BesApi to build and issue a request to the target BES. This is done using a OPeNDAPClient object. The request is passed with the target output stream, and the OPeNDAPClient handles the transmission of the request and then the reception and retransmission of the BES response back to the client.
+Finally, the chosen responder will set the HTTP response headers appropriately (media types etc) and then use the BesApi to build and issue a request to the target BES. This is done using a OPeNDAPClient object. The request is passed with the response output stream, and the OPeNDAPClient handles the transmission of the request and then the reception and retransmission of the BES response back to the client.
 
-All this checking and "claiming" seems so involved. Yup. It is. And it's partially a byproduct of the conflation of services. If I were to design it again I would follow the lead os the THREDDS Data Server (TDS) and separate the services using a URL path prefix something like:
+_All this checking and "claiming" seems so involved._ Yes. Yes it is. And it's partially a byproduct of the conflation of services. If I were to design it again I would follow the lead os the THREDDS Data Server (TDS) and separate the services using a URL path prefix something like:
 
 * _opendap/catalog/path_ - Would produce a browser navigable HTML catalog of the servers holdings.
 * _opendap/thredds/path_ - Would produce a machine readable/traversable THREDDS client catalog (XML) of the servers holdings.
@@ -69,7 +69,7 @@ All this checking and "claiming" seems so involved. Yup. It is. And it's partial
 * _opendap/file/path_ - The file download service.
 * etc.
 
-I think each of these services might be it's own servlet. Regardless this would decrease some of the burden of trying to figure out what the client is after. All these services exist on the same URL path and a lot of the process described above is about the disambiguation of requests. I think this organization would reduce some of the code size and processing time.
+I think each of these services might be its own servlet. Regardless this would decrease some of the burden of trying to figure out what the client is after. All these services exist on the same URL path and a lot of the process described above is about the disambiguation of requests. I think this organization would reduce some of the code size and processing time.
 
 === Caching
 The *_olfs_* utilizes a number of caches.
