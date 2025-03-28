@@ -213,7 +213,7 @@ public class BesSiteMap {
 
 
     /**
-     * Loads the SiteMap. If the stiemap cache file is missing/empty/expired
+     * Loads the SiteMap. If the sitemap cache file is missing/empty/expired
      * then it will be rebuilt.
      * @return The number of bytes in the site map.
      * @throws BESError

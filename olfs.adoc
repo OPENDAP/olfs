@@ -1,19 +1,30 @@
 = image:logo.svg[width=300]
 OPeNDAP, Inc.
 {docdatetime}
+:toc: left
+:toclevels: 3
+:numbered:
+:docinfo: shared
+:icons: font
+:tabsize: 4
+:indent: 4
 :doctype: book
 :source-highlighter: coderay
 :coderay-linenums-mode: inline
 :prewrap!:
 :imagesdir: ./doc/images
+:homepage: www.opendap.org
 
-= OPeNDAP Lightweight Frontend Service (OLFS)
+
+
+
+= OPeNDAP Lightweight Frontend Service (olfs)
 
 == Overview
-The OPeNDAP Lightweight Frontend Service (OLFS) is the public/outward facing component of the Hyrax server.
+The OPeNDAP Lightweight Frontend Service (*_olfs_*) is the public/outward facing component of the Hyrax server.
 
 == What does it Do?
-The OLFS provides a number of interfaces through which users and programmatic clients can request and subset data.
+The *_olfs_* provides a number of interfaces through which users and programmatic clients can request and subset data.
 
 === Supported APIs:
 * https://docs.opendap.org/index.php/Aggregation_enhancements[Aggregation Service API] (_Does this even work? When was the last time we tried it?_)
@@ -27,13 +38,17 @@ The OLFS provides a number of interfaces through which users and programmatic cl
 * *https://opendap.earthdata.nasa.gov[NGAP DAP service]* - The NGAP service is a NASA specific service that works with a number of NASA services to located and access data. This service utilizes the NASA Common Metadata Repository (CMR), Thin Egress Client (TEA), and AWS S3 to provide access to data using precomputed dmr++ files and HTTP Range GET commands to extract data values form files/objects held in S3.
 
 === Supported User Interfaces
-* Both the DAP2 and DAP4 services have a web UI that allows a user to build and execute data access requests. These "Data Request Form" pages are built using the DDX (an XML encoding of DAP2 metadata) or DMR (an XML encoded metadata document for DAP4) processed using and XSL transform that is conditioned by the OLFS prior to the transformation step.
+* Both the DAP2 and DAP4 services have a web UI that allows a user to build and execute data access requests. These "Data Request Form" pages are built using the DDX (an XML encoding of DAP2 metadata) or DMR (an XML encoded metadata document for DAP4) processed using and XSL transform that is conditioned by the *_olfs_* prior to the transformation step.
 
 == How is the runtime code assembled?
-The primary code pattern used by the OLFS for implementing services is to subclass _HttpServlet_ and create specialized implementations that utilize one or more _DispatchHandler_ implementations to claim requests and respond to them. In some cases a servlet might utilize a single instance of _DispatchHandler_ to run the show. For example, the servlet _opendap.build_dmrpp.BuildDmrppServlet_ relies solely on _opendap.build_dmrpp.BuildDmrppDispatchHandler_ and the servlet _opendap.wcs.v2.0.Servlet_ relies solely on _opendap.wcs.v2.0.HttpGetHandler_. In other examples there are many _DispatchHandler_ objects used by the servlet implementation. For example _opendap.coreServlet.DispatchServlet_ uses about a dozen different _DispatchHandler_ instances.
+The primary code pattern used by the *_olfs_* for implementing services is to subclass _HttpServlet_ and create specialized implementations that utilize one or more _DispatchHandler_ implementations to claim requests and respond to them. In some cases a servlet might utilize a single instance of _DispatchHandler_ to run the show. For example, the servlet _opendap.build_dmrpp.BuildDmrppServlet_ relies solely on _opendap.build_dmrpp.BuildDmrppDispatchHandler_ and the servlet _opendap.wcs.v2.0.Servlet_ relies solely on _opendap.wcs.v2.0.HttpGetHandler_. In other examples there are many _DispatchHandler_ objects used by the servlet implementation. For example _opendap.coreServlet.DispatchServlet_ uses about a dozen different _DispatchHandler_ instances.
 
 == How? How does it work?
-Let's look at how the primary servlet, _opendap.coreServlet.DispatchServlet_, handles an incoming request:
+It's complicated, so first I'll walk through a simplified narrative of the request/response operation and then add a couple of section after regarding other parts of the operation.
+
+=== DAP Request/Response
+
+Let's look at how the primary servlet, _opendap.coreServlet.DispatchServlet_, handles an incoming DAP service request:
 
 In the _opendap.coreServlet.DispatchServlet.doGet()_ method the code first handles some bookkeeping (such as producing a request id and starting the access log for the request) before iterating over its internal vector of _DispatchHandler_ objects, asking each if it can service the request. The first _DispatchHandler_ to claim the request is then asked to service it and transmit the response. The order of the _DispatchHandler_ objects in the vector is critical, as there are greedy _DispatchHandler_ implementations (_FileDispatchHandler_ for example) that will claim things that should/would have been claimed by a different _DispatchHandler_. The order is established in the _DispatchServlet.init()_ method.
 
@@ -47,31 +62,52 @@ Finally, the chosen responder will set the HTTP response headers appropriately (
 
 All this checking and "claiming" seems so involved. Yup. It is. And it's partially a byproduct of the conflation of services. If I were to design it again I would follow the lead os the THREDDS Data Server (TDS) and separate the services using a URL path prefix something like:
 
-* opendap/catalog/path - Would produce a browser navigable HTML catalog of the servers holdings.
-* opendap/thredds/path - Would produce a machine readable/traversable THREDDS client catalog (XML) of the servers holdings.
-* opendap/dap4/path - The DAP4 service and only the DAP4 service.
-* opendap/dap2/path - The DAP2 service and only the DAP2 service.
-* opendap/file/path - The file download service.
+* _opendap/catalog/path_ - Would produce a browser navigable HTML catalog of the servers holdings.
+* _opendap/thredds/path_ - Would produce a machine readable/traversable THREDDS client catalog (XML) of the servers holdings.
+* _opendap/dap4/path_ - The DAP4 service and only the DAP4 service.
+* _opendap/dap2/path_ - The DAP2 service and only the DAP2 service.
+* _opendap/file/path_ - The file download service.
 * etc.
 
 I think each of these services might be it's own servlet. Regardless this would decrease some of the burden of trying to figure out what the client is after. All these services exist on the same URL path and a lot of the process described above is about the disambiguation of requests. I think this organization would reduce some of the code size and processing time.
 
+=== Caching
+The *_olfs_* utilizes a number of caches.
+
+==== RequestCache
+The RequestCache is used by every thread servicing a request. It's an object cached so it essentially allows objects to be passed from on part the execution stack to another with it being carried as a parameter. I thread servicing a request can safely put things it may need into the RequestCache. When the request/response is completed the RequestCache for the thread is cleared. (You can see this in the `opendap.coreServlet.DispatchServlet.get()` method)
+
+The vast majority of the usages of RequestCache are responders caching a MediaType object as a set up for request execution If an error occurs the error handling apparatus can make good choices about how to encode the error for the client.
+
+==== BesNodeCache
+In order to improve navigation performance the *_olfs_* utilizes an in memory LRU cache called BESNodeCache. This is used by the *_olfs_* to cache the BES responses to showNode commands (which is how the BES exposes it's dynamic navigable catalogs). These entries are held for a configurable period of time before a new request for the cached entry will cause the entry to be refreshed. This is a thread safe cache available to all processing threads.
+
+==== BesSiteMap Cache
+The BesSiteMap class is used to get and maintain a site map file for use with robots.txt The file is refreshed based on a configurable time period.
+
+==== Thredds CatalogManager
+Hard to know if this even gets used in the real world, so I'm going to skip longer explanation in favor of: For performance reasons the *_olfs_* can cache THREDDS catalogs in memory, and it is complicated when the catalogs need to be updated.
+
 == Configuration
-The olfs utilizes several configuration files. The primary one, olfs.xml, controls OLFS behavior and defines thelocations of one or more BES services that are needed for the Hyrax to function.
+The *_olfs_* utilizes several configuration files. The primary one, _olfs.xml_, controls *_olfs_* behavior and defines thelocations of one or more BES services that are needed for the Hyrax to function.
 
-=== Startup Behavior
-When the server starts the code in `opendap.coreServlet.DispathServlet.init()` utilizes the ServletUtil class methids to locate the configuration. The following location are checked:
+=== Locating the configuration at startup.
+When the server starts the code in `opendap.coreServlet.DispathServlet.init()` utilizes the ServletUtil class methods to locate the configuration. The `ServletUtil.getConfigPath()` method checks the following locations:
 
-1. /etc/olfs
-1. /usr/share/olfs
-1. $CATALINA_HOME/webapps/opendap/WEB-INF/conf
 
-If the configuration is not found in either of the first two locations then default the configuration bundled in the war file will be used. If however one of the first locations is found, but the configuration is missing, and the running service has write permission to the identified location, then the service will copy its default configuration to the identified location. This creates a configuration that can be easily modified by the operator and that will persist across updates and/or redeployments of the OLFS.
+1. _/etc/olfs_
+1. _/usr/share/olfs_
+1. _$CATALINA_HOME/webapps/_ deployment_context _/WEB-INF/conf_
+
+If neither of the first two locations are located then default the configuration bundled in the war file will be used.
+
+If either of the first two locations is found, and if the configuration is not in that location, and the running service has write permission to the identified location, then the service will copy its default configuration to the identified location.This creates a configuration that can be easily modified by the operator and that will persist across updates and/or redeployments of the *_olfs_*.
+
 
 The DispatchServlet.init() method also loads a vector with new instances of its DispatchHandler objects that it will utilize to service requests. More on this below.
 
 === olfs.xml
-This file contains the core configuration for the OLFS. It defines a number of service behaviors and also the location of the BES(s) to be used when handling requests.
+This file contains the core configuration for the *_olfs_*. It defines a number of service behaviors and also the location of the BES(s) to be used when handling requests.
 
 === user-access.xml
 This file is an authentication and permissions file that allows the operator to delpoy a service that can make use of OAUth2 Single Sign On (SSO) to authenticate users. The file also defines the various operational permissions the authenticated users will have (via groups and roles)
@@ -84,7 +120,7 @@ The top level static THREDDS client catalog for the machine traversable THREDDS 
 
   <catalogRef xlink:href="/opendap/hyrax/catalog.xml" xlink:title="Hyrax Catalog" name="Hyrax Catalog" />
 
-It can be expanded to create a much more extensive static catalog.
+It can be expanded to create a much more extensive static catalog by creating a filesystem tree of catalog files linked by the appropriate catalogRef elements.
 
 === viewers.xml
 This provides the configuration for the various Java Web Start applications (IDV Viewer, NetcdfToolsUI, etc.) and WebServiceHandlers (NcWMS, Godiva)
@@ -92,9 +128,8 @@ This provides the configuration for the various Java Web Start applications (IDV
 === webstart.xml
 *_I think that this can be retired, but that assertion needs to be tested._*
 
-== OLFS Servlets
-
-The servlet implementations subclass HttpServlet. The servlets implement the various services that the OLFS supports. Some of these rely on one or more DAP4Responder implementations to perform the heavy lifting of answering the requests.
+== Servlets
+The servlet implementations subclass HttpServlet. The servlets implement the various services that the *_olfs_* supports. Some of these rely on one or more DAP4Responder implementations to perform the heavy lifting of answering the requests. There is not a one to one and onto relationship with things I think of as a service and the servlets. They all implement a service, but some implement several services.
 
 * Package: *opendap.aggregation*
 - `AggregationServlet.java` - Implements the https://docs.opendap.org/index.php/Aggregation_enhancements[Hyrax Aggregation Service API]
@@ -110,7 +145,7 @@ The servlet implementations subclass HttpServlet. The servlets implement the var
 
 * Package: *opendap.coreServlet*
 - `DispatchServlet.java` - This service is the core Hyrax service that uses a number of DispatchHanlder implementations to define it's core functionality.
-- `DocServlet.java` - This service provides client access to the static documents held by the OLFS such as image, css, and javascript files.
+- `DocServlet.java` - This service provides client access to the static documents held by the *_olfs_* such as image, css, and javascript files.
 
 * Package: *opendap.gateway*
 - `DispatchServlet.java` - Implements the Hyrax Gateway Service. _We should prbably review this with an eye towards its retirement_.
@@ -133,13 +168,13 @@ These classes implement the `opendap.coreSevlet.DispatchHandle` interface and ar
 - `BESThreddsDispatchHandler.java` - This DispatchHandler uses a combination of the BES `showNode`  interface, and a XSL transform file along with state information  to generate THREDDS client catalog responses and return them to the user.
 - `DirectoryDispatchHandler.java` - This DispatchHandler uses the BES `showNode`  interface, and a XSL transform file to produce the browser navigable "blue-bar" pages that express the data holdings of the service as a directed graph.
 - `FileDispatchHandler.java` - Used to transmit files from the BES to the user. If the source file is seen as a data file byt the BES this will be blocked unless specifically enabled in the _olfs.xml_ configuration file by uncommenting the `<AllowDirectDataSourceAccess />` element.
-- `VersionDispatchHandler.java` - This combines the BES version information and OLFS version information to make and return a combined XML version document to the requestor.
+- `VersionDispatchHandler.java` - This combines the BES version information and *_olfs_* version information to make and return a combined XML version document to the requestor.
 
 * Package: *opendap.build_dmrpp*
 - `BuildDmrppDispatchHandler.java` -
 
 * Package: *opendap.coreServlet*
-- `NoPostHandler.java` - This is used when POST request submissions are disabled, which is determined by the presence of the `<HttpPost .../>` element in `olfs.xml` file.
+- `NoPostHandler.java` - This is used when POST request submissions are disabled, which is determined by the presence of the `<HttpPost .../>` element in _olfs.xml_ file.
 
 * Package: *opendap.gateway*
 - `DispatchHandler.java` - This handler implements the https://docs.opendap.org/index.php/Gateway_Service[Gateway Service]. It is one of the DispatchHandlers loaded by the opendap.coreServlet.DispatchServlet
@@ -155,7 +190,7 @@ These classes implement the `opendap.coreSevlet.DispatchHandle` interface and ar
 - `NgapDispatchHandler.java` - This is the NGAP handler, a child od BEsDapDispatcher. It claims any request that begins with its prefix string (default: _ngap/_) and then uses it's parent class and a specialization of the BesApi, NgapBesApi, to build BES commands to service the request.
 
 * Package: *opendap.threddsHandler*
-- `StaticCatalogDispatch.java` - The OLFS server static THREDDS client catalogs, and this is the class that does this. Static catalogs exist on the host filesystem and are integrated with the dynamic catalogs built by interacting with the BES.
+- `StaticCatalogDispatch.java` - The *_olfs_* server static THREDDS client catalogs, and this is the class that does this. Static catalogs exist on the host filesystem and are integrated with the dynamic catalogs built by interacting with the BES.
 
 * Package: *opendap.wcs.v2_0.http* - _I think we should retire this package._
 - `FormHandler.java`
@@ -240,6 +275,6 @@ Responders that handle all the DAP4 things.
 
 
 == Testing
-* Virtually no unit tests exist for the OLFS.
+* Virtually no unit tests exist for the *_olfs_*.
 * There are regression tests. The tests exist in their own GitHub repo, the https://github.com/OPENDAP/hyrax_regression_tests[hyrax_regression_tests] project. They require a fully operational Hyrax in order to be run.
 

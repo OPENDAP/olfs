@@ -115,7 +115,7 @@
 
 
     <ThreddsService  prefix="thredds" useMemoryCache="true" allowRemote="false" />
-    <GatewayService  prefix="gateway" useMemoryCache="true" />
+    <GatewayService  prefix="gateway" />
 
     <!-- <UseDAP2ResourceUrlResponse />
     @DEPRECATED - Use the <DatasetUrlResponse /> and <DataRequestForm /> elements to

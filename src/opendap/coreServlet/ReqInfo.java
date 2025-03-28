@@ -101,6 +101,12 @@ public class ReqInfo {
     private static final String JAVAX_SERVLET_FORWARD_QUERY_STRING = "javax.servlet.forward.query_string";
     private static final String MISSING = "MISSING";
 
+    /**
+     * A request header key/name used by a client to transmit  a request id.
+     */
+    public static final String REQUEST_ID_HEADER_KEY ="a-api-request-uuid";
+
+
     private static Logger log;
     static {
         log = org.slf4j.LoggerFactory.getLogger(ReqInfo.class);
@@ -925,21 +931,15 @@ public class ReqInfo {
         return requestUrlStr;
     }
 
+
     /**
-     * A request header key/name used by a client to transmit  a request id.
+     * Produces the unique id of this request. If upstream service chain
+     * components have provided a request id string in the request headers it will
+     * be sanitized and used to construct a new RequestId. Otherwise,
+     * a new RequestId will be minted and returned.
+     * @param req
+     * @return
      */
-    public static final String REQUEST_ID_HEADER_KEY ="a-api-request-uuid";
-
-    // public static String getRequestId(HttpServletRequest req){ return "";}
-
-        /**
-         * Produces the unique id of this request. If upstream service chain
-         * components have provided a request id string in the request headers it will
-         * be sanitized and used to construct a new RequestId. Otherwise,
-         * a new RequestId will be minted and returned.
-         * @param req
-         * @return
-         */
     public static RequestId getRequestId(HttpServletRequest req){
         RequestId reqId;
 
