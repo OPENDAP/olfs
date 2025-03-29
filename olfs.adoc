@@ -14,18 +14,19 @@ OPeNDAP, Inc.
 :prewrap!:
 :imagesdir: ./doc/images
 :homepage: www.opendap.org
-
-
-
+[[top]]
 
 = OPeNDAP Lightweight Frontend Service (olfs)
 
+[[overview]]
 == Overview
 The OPeNDAP Lightweight Frontend Service (*_olfs_*) is the public/outward facing component of the Hyrax server.
 
+[[whutdo]]
 == What does it Do?
 The *_olfs_* provides a number of interfaces through which users and programmatic clients can request and subset data.
 
+[[apis]]
 === Supported APIs:
 * https://docs.opendap.org/index.php/Aggregation_enhancements[Aggregation Service API] (_Does this even work? When was the last time we tried it?_)
 * https://www.earthdata.nasa.gov/s3fs-public/imported/ESE-RFC-004v1.1.pdf[DAP2 data access API]
@@ -33,18 +34,28 @@ The *_olfs_* provides a number of interfaces through which users and programmati
 * https://www.ogc.org/publications/standard/wcs/[WCS 2.0 API]
 * https://pds-imaging.jpl.nasa.gov/tools/w10n/[w10n data access api]
 * https://docs.unidata.ucar.edu/tds/current/userguide/client_side_catalog_specification.html[THREDDS Client-Side Catalog API] for machine traversable catalog/inventories.
-* *File Download Service* - This is a configuration option which, when enabled, allows the user to download the underlying data files directly from the Hyrax service.
+* *File Download Service* - When this option is enabled the clients are allowed to download the underlying data files directly from the Hyrax service. Not super efficient use of Hyrax t.b.h. some (all?) of the on-prem NASA DAACs operate a separate download service for the data files.
 * *Gateway service* - This service allows the user to ask Hyrax to retrive a remote dataset file and then provide DAP services for that file.
-* *https://opendap.earthdata.nasa.gov[NGAP DAP service]* - The NGAP service is a NASA specific service that works with a number of NASA services to located and access data. This service utilizes the NASA Common Metadata Repository (CMR), Thin Egress Client (TEA), and AWS S3 to provide access to data using precomputed dmr++ files and HTTP Range GET commands to extract data values form files/objects held in S3.
+* *https://opendap.earthdata.nasa.gov[NGAP DAP service]* - The NGAP DAP service is a NASA specific service that integrates into NASA's NGAP service chain, providing a publicly accessible DAP service endpoint for their cloud deployed data holds. The NGAP DAP service utilizes the NASA Common Metadata Repository (CMR), Thin Egress Client (TEA), and AWS S3 to provide access to data using precomputed dmr++ files and HTTP Range GET commands to extract data values from files/objects held in S3. Note: The NGAP DAP service does not provide a traversable catalog/inventory of the data holdings.
 
+[[uiisnice]]
 === Supported User Interfaces
-* Both the DAP2 and DAP4 services have a web UI that allows a user to build and execute data access requests. These "Data Request Form" pages are built using the DDX (an XML encoding of DAP2 metadata) or DMR (an XML encoded metadata document for DAP4) processed using and XSL transform that is conditioned by the *_olfs_* prior to the transformation step.
+* *Data Request Form (aka the _Interface From Hell_, aka the _IFH_)*:  Both the DAP2 and DAP4 services provide a web UI that allows a user to build and execute data access requests. IFH pages are built by retrieving the metadata for the dataset from the BES as an XML document and then using an XSL transform to produce the IFH response from the metadata document.
+** For the DAP2 IFH a DDX (an XML encoding of DAP2 metadata) is used to build the form.
+** For the DAP4 IFH the DMR document is used.
+** Each case has its own XSLT which is conditioned by the *_olfs_* prior to the transformation step.
 
+* *Browser Navigable Catalogs*: The OLFS uses BES showNode commands to discover what the BES "catalog" (usually a filesystem but maybe not) contains. The BES responses are XML documents that the OLFS operates on with an XSL transform to produce http://test.opendap.org:8080/opendap/"[the "blue bar" browser navigation pages that Hyrax produces]. Some parts of this representaion are controlled by the *_olfs.xml_* file used with the deployment. (See <<configuration>>)
+
+* *Machine Readable Catalogs* _No Scraping Required!_
+
+[[assembly]]
 == How is the runtime code assembled?
 The primary code pattern used by the *_olfs_* for implementing services is to subclass _HttpServlet_ and create specialized implementations that utilize one or more _DispatchHandler_ implementations to claim requests and respond to them. In some cases a servlet might utilize a single instance of _DispatchHandler_ to run the show. For example, the servlet _opendap.build_dmrpp.BuildDmrppServlet_ relies solely on _opendap.build_dmrpp.BuildDmrppDispatchHandler_ and the servlet _opendap.wcs.v2.0.Servlet_ relies solely on _opendap.wcs.v2.0.HttpGetHandler_. In other examples there are many _DispatchHandler_ objects used by the servlet implementation. For example _opendap.coreServlet.DispatchServlet_ uses about a dozen different _DispatchHandler_ instances.
 
+[[howwork]]
 == How? How does it work?
-It's complicated, so first I'll walk through a simplified narrative of the request/response operation and then add a couple of sections after regarding other parts of the operation.
+It's complicated, so first I'll provide a simplified narrative of the request/response operation and then I'll add a couple of sections regarding other parts of the operation.
 
 === DAP Request/Response
 
@@ -88,9 +99,11 @@ The BesSiteMap class is used to get and maintain a site map file for use with ro
 ==== Thredds CatalogManager
 Hard to know if this even gets used in the real world, so I'm going to skip longer explanation in favor of: For performance reasons the *_olfs_* can cache THREDDS catalogs in memory, and it is complicated when the catalogs need to be updated.
 
+[[configuration]]
 == Configuration
-The *_olfs_* utilizes several configuration files. The primary one, _olfs.xml_, controls *_olfs_* behavior and defines thelocations of one or more BES services that are needed for the Hyrax to function.
+The *_olfs_* utilizes several configuration files. The primary one, _olfs.xml_, controls *_olfs_* behavior and defines theblocations of one or more BES services that are needed for the Hyrax to function.
 
+[[find-config]]
 === Locating the configuration at startup.
 When the server starts the code in `opendap.coreServlet.DispathServlet.init()` utilizes the ServletUtil class methods to locate the configuration. The `ServletUtil.getConfigPath()` method checks the following locations:
 
@@ -99,22 +112,26 @@ When the server starts the code in `opendap.coreServlet.DispathServlet.init()` u
 1. _/usr/share/olfs_
 1. _$CATALINA_HOME/webapps/_ deployment_context _/WEB-INF/conf_
 
-If neither of the first two locations are located then default the configuration bundled in the war file will be used.
+If neither of the first two locations are located then the default configuration bundled in the war file will be used.
 
 If either of the first two locations is found, and if the configuration is not in that location, and the running service has write permission to the identified location, then the service will copy its default configuration to the identified location.This creates a configuration that can be easily modified by the operator and that will persist across updates and/or redeployments of the *_olfs_*.
 
 
 The DispatchServlet.init() method also loads a vector with new instances of its DispatchHandler objects that it will utilize to service requests. More on this below.
 
+[[olfs.xml]]
 === olfs.xml
 This file contains the core configuration for the *_olfs_*. It defines a number of service behaviors and also the location of the BES(s) to be used when handling requests.
 
+[[user-access.xml]]
 === user-access.xml
-This file is an authentication and permissions file that allows the operator to delpoy a service that can make use of OAUth2 Single Sign On (SSO) to authenticate users. The file also defines the various operational permissions the authenticated users will have (via groups and roles)
+This file is an authentication and permissions control file that allows the operator to delpoy a service that can make use of OAUth2 Single Sign On (SSO) to authenticate users. The file also defines the various operational permissions the authenticated users will have (via groups and roles)
 
+[[logback]]
 === logback.xml and logback-test.xml
 These files provide the loggin frame work behaviors: Log file names, log file content, and what things will be logged at each logging level.
 
+[[catalog.xml]]
 === catalog.xml
 The top level static THREDDS client catalog for the machine traversable THREDDS service. This file nominally contains a catalog ref to the dynamically generated Hyrax THREDDS catalogs:
 
@@ -122,14 +139,17 @@ The top level static THREDDS client catalog for the machine traversable THREDDS 
 
 It can be expanded to create a much more extensive static catalog by creating a filesystem tree of catalog files linked by the appropriate catalogRef elements.
 
+[[viewers.xml]]
 === viewers.xml
 This provides the configuration for the various Java Web Start applications (IDV Viewer, NetcdfToolsUI, etc.) and WebServiceHandlers (NcWMS, Godiva)
 
+[[webstart.xml]]
 === webstart.xml
 *_I think that this can be retired, but that assertion needs to be tested._*
 
+[[servlets]]
 == Servlets
-The servlet implementations subclass HttpServlet. The servlets implement the various services that the *_olfs_* supports. Some of these rely on one or more DAP4Responder implementations to perform the heavy lifting of answering the requests. There is not a one to one and onto relationship with things I think of as a service and the servlets. They all implement a service, but some implement several services.
+The servlet implementations subclass HttpServlet. The servlets implement the various services that the *_olfs_* supports. Some of these rely on one or more _DispatchHandler_ implementations to perform the heavy lifting of answering the requests. There is not a one to one and onto relationship with things I think of as a service and the servlets. They all implement a service, but some implement several services.
 
 * Package: *opendap.aggregation*
 - `AggregationServlet.java` - Implements the https://docs.opendap.org/index.php/Aggregation_enhancements[Hyrax Aggregation Service API]
@@ -159,7 +179,7 @@ The servlet implementations subclass HttpServlet. The servlets implement the var
 * Package: *opendap.wcs.v2_0.http* - _There are problems with WCS in general, and it would be worth evaluating the retirement potential for this package._
 - `Servlet.java` - Provides a WCS 2.0 implementation. This works, but requires the operator to perform configuration work for each "collection" in order to identify the domain and range variables for the collections datasets. 
 
-
+[[dispatch-handlers]]
 == Dispatch Handlers
 These classes implement the `opendap.coreSevlet.DispatchHandle` interface and are used by the `CoreServlet` to direct the client requests to the appropriate software for response.
 
@@ -201,18 +221,18 @@ These classes implement the `opendap.coreSevlet.DispatchHandle` interface and ar
 
 
 
-
-== Dap4Responders
-This abstract class embodies a number of general operations needed for:
+[[dapresponders]]
+== DapResponders
+The abstract class Dap4Responder class embodies a number of general operations needed for:
 
 * Identifying requests that should be handled by an instance of the class.
 * HTTP client/server content negotiation for DAP4 (DAP2 doesn't support this)
 
 _This could use a refactor to condense the hierarchy of inheritance from 4 classes to 2._ :)
 
-
+[[dap2responders]]
 === DAP2 Responders
-Responders that handle all the DAP2 things.
+Responders that handle all the DAP2 things. All are children of Dap4Responder. Yeah. I know. Go figure.
 
 * Package: *opendap.bes.dap2Responders*
 - `Ascii.java` - Uses the BES to produce and transmit the DAP2 ASCII encoded data response.
@@ -229,18 +249,20 @@ Responders that handle all the DAP2 things.
 - `Ijson.java` - Uses the BES to produce a DAP2 data response and encode it as an "instance" json (.ijsn) response.
 - `Iso19115.java` - Uses the BES to produce a DAP3.2 DDX response and then applies an XSL transform to produce ISO-19115 metadata document.
 - `Iso19115Rubric.java` - Uses the BES to produce a DAP3.2 DDX response and then applies an XSL transform to produce an HTML page the shows how the metadata does and does not conform to the ISO-19115 expectations.
-- `Json.java` - Uses the BES to produce a DAP2 data response and encode it as an json (.json) response.
+- `Json.java` - Uses the BES to produce a DAP2 data response and encode it as a json (.json) response.
 - `Netcdf3.java` - Uses the BES to produce a DAP2 data response and encode it as a netcdf-3 file.
 - `Netcdf4.java` - Uses the BES to produce a DAP2 data response and encode it as a netcdf-4 file.
 - `RDF.java` - Uses the BES to produce a DAP3.2 DDX response and then applies an XSL transform to an HTML page to represent the document as RDF.
 - `XmlData.java` - Uses the BES to produce a DAP2 data response and encode it as an XML document.
 
+[[genericresponders]]
 === Generic Responders
 
 * Package: *opendap.bes.dap4Responders*
 - `FileAccess.java` - Used to transmit files from the BES to the requesting client.
 - `Version.java` - Builds and returns the Hyrax combined version response document (XML).
 
+[[dap2responders]]
 === DAP4 Responders
 Responders that handle all the DAP4 things.
 
@@ -273,7 +295,7 @@ Responders that handle all the DAP4 things.
 - `IsoDMR.java`- Uses the BES to produce a DAP4 DMR response and then applies an XSL transform to produce ISO-19115 metadata document.
 - `IsoRubricDMR.java` - Uses the BES to produce a DAP4 DMR response and then applies an XSL transform to produce an HTML page the shows how the metadata does and does not conform to the ISO-19115 expectations.
 
-
+[[testing]]
 == Testing
 * Virtually no unit tests exist for the *_olfs_*.
 * There are regression tests. The tests exist in their own GitHub repo, the https://github.com/OPENDAP/hyrax_regression_tests[hyrax_regression_tests] project. They require a fully operational Hyrax in order to be run.
