@@ -106,7 +106,7 @@ Hard to know if this even gets used in the real world, so I'm going to skip long
 == Resources
 In the project directory you can find the resources included with the *_olfs_* when it's packaged for deployment. The default resources are located in _olfs/resources/hyrax_ these include js, jsp, xml, jnlp, and a directory (_olfs/resources/hyrax/xsl_) of XSL transform files. I think now that all the files are hooked up to code in the server, but I suspect some of the things that use the xslt are not actually used themselves..
 
-Some of the other directories within resources that may or may not be in use.
+Some of the directories within resource may or may not be in use, ymmv.
 
 === olfs/resources/hyrax/`xsl`
 There are quite few files in here but there's only a few that matter
