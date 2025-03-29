@@ -41,13 +41,15 @@ The *_olfs_* provides a number of interfaces through which users and programmati
 [[uiisnice]]
 === Supported User Interfaces
 * *Data Request Form (aka the _Interface From Hell_, aka the _IFH_)*:  Both the DAP2 and DAP4 services provide a web UI that allows a user to build and execute data access requests. IFH pages are built by retrieving the metadata for the dataset from the BES as an XML document and then using an XSL transform to produce the IFH response from the metadata document.
-** For the DAP2 IFH a DDX (an XML encoding of DAP2 metadata) is used to build the form.
-** For the DAP4 IFH the DMR document is used.
+** http://test.opendap.org:8080/opendap/ghrsst/20020602090000-JPL-L4_GHRSST-SSTfnd-MUR-GLOB-v02.0-fv04.1.h5.html[For the DAP2 IFH] a DDX (an XML encoding of DAP2 metadata) is used to build the form.
+** http://test.opendap.org:8080/opendap/ghrsst/20020602090000-JPL-L4_GHRSST-SSTfnd-MUR-GLOB-v02.0-fv04.1.h5.dmr.html[For the DAP4 IFH] the DMR document is used.
 ** Each case has its own XSLT which is conditioned by the *_olfs_* prior to the transformation step.
 
-* *Browser Navigable Catalogs*: The OLFS uses BES showNode commands to discover what the BES "catalog" (usually a filesystem but maybe not) contains. The BES responses are XML documents that the OLFS operates on with an XSL transform to produce http://test.opendap.org:8080/opendap/"[the "blue bar" browser navigation pages that Hyrax produces]. Some parts of this representaion are controlled by the *_olfs.xml_* file used with the deployment. (See <<configuration>>)
+[[browser_catalog]]
+* *Browser Navigable Catalog*: The OLFS uses BES showNode commands to discover what the BES "catalog" (usually a filesystem but maybe not) contains. The BES responses are XML documents that the OLFS operates on with an XSL transform to produce http://test.opendap.org:8080/opendap/"[the "blue bar" browser navigation pages that Hyrax produces]. The server will try to return this page for any url path ending in `/` or in `/contents.html` Some parts of the calaig ui representation are controlled by the *_olfs.xml_* file used with the deployment. (See <<configuration>>)
 
-* *Machine Readable Catalogs* _No Scraping Required!_
+[[thredds_catalog]]
+* *THREDDS Catalogs, a machine-readable catalog* _No Scraping Required!_ The OLFS automatically provides a machine readable THREDDS catalog for the inventory in its catalog. In fact it uses the same inputs and only differs in the XSL from the browser navigable catalog described above to produce http://test.opendap.org:8080/opendap/catalog.xml"[a THREDDS catalog response]. (See <<browser_catalog>>)
 
 [[assembly]]
 == How is the runtime code assembled?
@@ -61,7 +63,7 @@ It's complicated, so first I'll provide a simplified narrative of the request/re
 
 Let's look at how the primary servlet, _opendap.coreServlet.DispatchServlet_, handles an incoming DAP service request:
 
-In the _opendap.coreServlet.DispatchServlet.doGet()_ method the code first handles some bookkeeping (such as producing a request id and starting the access log for the request) before iterating over its internal vector of _DispatchHandler_ objects, asking each if it can service the request. The first _DispatchHandler_ to claim the request is then asked to service it and transmit the response. The order of the _DispatchHandler_ objects in the vector is critical, as there are greedy _DispatchHandler_ implementations (_FileDispatchHandler_ for example) that will claim things that should/would have been claimed by a different _DispatchHandler_. The order is established in the _DispatchServlet.init()_ method.
+In the _opendap.coreServlet.DispatchServlet.doGet()_ method the code first handles some bookkeeping (such as producing a request id and starting the access log for the request) before iterating over an internal vector of _DispatchHandler_ objects, asking each in turn if it can service the request. The first _DispatchHandler_ to claim the request is then asked to service it and transmit the response. The order of the _DispatchHandler_ objects in the vector is critical, as there are greedy _DispatchHandler_ implementations (_FileDispatchHandler_ for example) that will claim things that should/would have been claimed by the intended _DispatchHandler_ if asked prior. The order is established in the _DispatchServlet.init()_ method.
 
 If the request is for some type of DAP response then the _BesDapDispatcher_ will claim it.
 
@@ -71,6 +73,7 @@ One might ask: How does all this "claiming" work? _Through the magic of regular 
 
 Finally, the chosen responder will set the HTTP response headers appropriately (media types etc) and then use the BesApi to build and issue a request to the target BES. This is done using a OPeNDAPClient object. The request is passed with the response output stream, and the OPeNDAPClient handles the transmission of the request and then the reception and retransmission of the BES response back to the client.
 
+==== Service Conflation Issue
 _All this checking and "claiming" seems so involved._ Yes. Yes it is. And it's partially a byproduct of the conflation of services. If I were to design it again I would follow the lead os the THREDDS Data Server (TDS) and separate the services using a URL path prefix something like:
 
 * _opendap/catalog/path_ - Would produce a browser navigable HTML catalog of the servers holdings.
@@ -80,24 +83,70 @@ _All this checking and "claiming" seems so involved._ Yes. Yes it is. And it's p
 * _opendap/file/path_ - The file download service.
 * etc.
 
-I think each of these services might be its own servlet. Regardless this would decrease some of the burden of trying to figure out what the client is after. All these services exist on the same URL path and a lot of the process described above is about the disambiguation of requests. I think this organization would reduce some of the code size and processing time.
+I think each of these services might be implemented as a servlet. In Hyrax, all these services currently exist on the same URL path and a lot of the process described above is about the disambiguation of requests. I think this reorganization would reduce some of the code size and processing time, and potentially an ala-carte deployment where we can choose the services to include.
 
-=== Caching
+== Caching
 The *_olfs_* utilizes a number of caches.
 
-==== RequestCache
+=== RequestCache
 The RequestCache is used by every thread servicing a request. It's an object cached so it essentially allows objects to be passed from on part the execution stack to another with it being carried as a parameter. I thread servicing a request can safely put things it may need into the RequestCache. When the request/response is completed the RequestCache for the thread is cleared. (You can see this in the `opendap.coreServlet.DispatchServlet.get()` method)
 
 The vast majority of the usages of RequestCache are responders caching a MediaType object as a set up for request execution If an error occurs the error handling apparatus can make good choices about how to encode the error for the client.
 
-==== BesNodeCache
+=== BesNodeCache
 In order to improve navigation performance the *_olfs_* utilizes an in memory LRU cache called BESNodeCache. This is used by the *_olfs_* to cache the BES responses to showNode commands (which is how the BES exposes it's dynamic navigable catalogs). These entries are held for a configurable period of time before a new request for the cached entry will cause the entry to be refreshed. This is a thread safe cache available to all processing threads.
 
-==== BesSiteMap Cache
+=== BesSiteMap Cache
 The BesSiteMap class is used to get and maintain a site map file for use with robots.txt The file is refreshed based on a configurable time period.
 
-==== Thredds CatalogManager
+=== Thredds CatalogManager
 Hard to know if this even gets used in the real world, so I'm going to skip longer explanation in favor of: For performance reasons the *_olfs_* can cache THREDDS catalogs in memory, and it is complicated when the catalogs need to be updated.
+
+[[resources]]
+== Resources
+In the project directory you can find the resources included with the *_olfs_* when it's packaged for deployment. The default resources are located in _olfs/resources/hyrax_ these include js, jsp, xml, jnlp, and a directory (_olfs/resources/hyrax/xsl_) of XSL transform files that almost certainly contains some historical material that is not currently being utilized.
+
+There are other directories with resources that may or may not be in use. The _olfs/resources/hyrax/ngap_ directory contains the resources that we use amend/replace things from the regular build to produce our NGAP builds. Things like a custom landing page and the libraries to let us use memcached to manage session state in our multi-host deployments.
+
+=== olfs/resources/hyrax/`xsl`
+There are quite few files in here but there's only a few that matter
+
+==== Version
+* *_version.xsl_* - This is imported by nearly all the XSL transform docs, and is used inject Hyrax version. When the builds are run, the key string `@HyraxVersion@` is replaced with the Version string value.
+
+
+==== IFH Production
+* *_dap2ifh.xsl_* - Builds the DAP2 Data Request Form response from a DMR and passed parameters from the OLFS
+* *_dap4ifh.xsl_* - Builds the DAP4 Data Request Form response from a DMR and passed parameters from the OLFS
+
+==== Browsable Catalog UI
+* *_dap4Contents.xsl_* - Builds a DAP4 *_contents.html_* page.
+* *_node_contents.xsl_* - Builds a DAP2 *_contents.html_* page from a BES showNode response. (DirectoryDispatchHandler)
+
+==== THREDDS Catalog production
+* *_node_catalog.xsl_* - Builds THREDDS *_catalog.xml_* response from a BES showNode response. (ThreddsDispatchHandler)
+* *_besNodeToDatasetScanCatalog.xsl_* - The THREDDS Things, *_3T_*.
+* *_threddsCatalogIngest.xsl_* - *_3T_*
+* *_threddsCatalogPresentation.xsl_* - *_3T_*
+* *_threddsDatasetDetail.xsl_* - *_3T_*
+* *_threddsMetadataDetail.xsl_* - *_3T_*
+
+==== RDF Responses
+* *_anyXml2Rdf.xsl_* - Used to produce both the DAP2 and DAP4 RDF responses for the server. Oddly this seems to be a pointless empty wrapper for *_xml2rdf.xsl_*
+* *_xml2rdf.xsl_* - Simply included in *_anyXml2Rdf.xml_*  `<xsl:include href="xml2rdf.xsl"/>`
+
+==== w10n
+* *_showNodeToW10nCatalog.xsl_* - Makes w10n collection pages from a BES showNode response.
+* *_w10nDataset.xsl_* - makes w10n dataset pages from a DAP3.2 DDX from the BES.
+
+==== Viewers
+* *_webStartDataset.xsl_* - Used by the viewers servlet produce an available viewers page for a dataset.
+
+==== Obscure DAP4 Things
+* *_asyncResponse.xsl_* - Used by a prototype DAP4 asynchronous response implemented in dap4Responders.DataResponse.NormativeDR.handleStoreResultResponse(). _I bet this feature is never used._
+* *_datasetServices.xsl_* - Used to create the DAP4 Dataset Services Response page. _Probably not used_.
+
+
 
 [[configuration]]
 == Configuration
