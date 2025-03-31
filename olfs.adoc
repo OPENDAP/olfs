@@ -102,14 +102,21 @@ The BesSiteMap class is used to get and maintain a site map file for use with ro
 === Thredds CatalogManager
 Hard to know if this even gets used in the real world, so I'm going to skip longer explanation in favor of: For performance reasons the *_olfs_* can cache THREDDS catalogs in memory, and it is complicated when the catalogs need to be updated.
 
+[[filters]]
+== Filters
+* *_ClickJackFilter_* - Filter to stop the click jack hackery.
+* *_BotFilter_* - Can be used to block access from single ip addresses, domains, or whatever your desires and regex acumen allow you to express. See *_olfs.xml_* for configuration details.
+* *_IdFilter_* - Used for user authentication see <<authentication>>
+* *_PEPFilter_* - Used for user authentication see <<authentication>>
+
 [[resources]]
 == Resources
-In the project directory you can find the resources included with the *_olfs_* when it's packaged for deployment. The default resources are located in _olfs/resources/hyrax_ these include js, jsp, xml, jnlp, and a directory (_olfs/resources/hyrax/xsl_) of XSL transform files. I think now that all the files are hooked up to code in the server, but I suspect some of the things that use the xslt are not actually used themselves..
+In the project directory you can find the resources included with the *_olfs_* when it's packaged for deployment. The default resources are located in _olfs/resources/hyrax_ these include *_js_*, *_jsp_*, *_xml_*, *_jnlp_*, and *_xslt_* files.
 
 Some of the directories within resource may or may not be in use, ymmv.
 
 === olfs/resources/hyrax/`xsl`
-A lot of the HTML produced by the server is built using the transforms found in this directory.
+A lot of the HTML produced by the server is built using the transforms found in this directory. I think that as of now that all the files are hooked up to code in the server, but I suspect some of the things that use the *_xslt_* files may not be used themselves.
 
 ==== Version
 * *_version.xsl_* - This is imported by nearly all the XSL transform docs, and is used inject Hyrax version. When the builds are run, the key string `@HyraxVersion@` is replaced with the Version string value.
@@ -344,6 +351,63 @@ Responders that handle all the DAP4 things.
 * Package: *opendap.bes.dap4Responders.Iso19115*
 - `IsoDMR.java`- Uses the BES to produce a DAP4 DMR response and then applies an XSL transform to produce ISO-19115 metadata document.
 - `IsoRubricDMR.java` - Uses the BES to produce a DAP4 DMR response and then applies an XSL transform to produce an HTML page the shows how the metadata does and does not conform to the ISO-19115 expectations.
+
+[[authentication]]
+== Authentication
+For NASA deployments OLFS can be configured to provide authentication services using an (almost) OAuth2 implementation in the *_opendap.auth_* package. The implementation follows the Identity Provider (IdP) plus Policy Decision Point (PDP) pattern.
+
+=== Enable Authentication
+To enable authentication: Edit the file *_resources/hyrax/WEB-INF/web.xml_* to enable to two authentication filters *_IdFilter_* and *_PEPFilter_*. Then the service must be rebuilt and a new WAR file generated with this change in place.
+
+=== Configure Authentication
+All the configuration happens in the *_user-access.xml_* file located in the configuration directory.
+
+=== Identity Provider (IdP)
+The IdP is composed of:
+
+* *_IdProvider_* - Theis abstract classes contains common machinery/API is used to parent specific implementations of a provider.
+* *_UrsIdp_* - Implements an IdProvider that utilizes Earth Data Login (EDL, aka URS) to authenticate a user. All the URS action is in here!
+* *_TomcatRealmIdp_* - In theory this IdProvider implemtation works with Tomcat Realms (like the MemoryRealm) but It's been a long time since it was tested.
+* *_IdManager_* - This *singleton* class holds a collection of IdProvders, but in practice only ever has one. If NASA follows through with allowing user to choose between EDL  Google authentication then we'll be right in here making this work!
+* *_IdFilter_* - This class does the heavy lifting of authentication
+
+=== Policy Decision Point (PDP)
+In this software we define users, groups, and roles in order to define role based access policies.
+In *_user-access.xml_* we define a group based on one or more "user" definitions.
+
+    <!-- Define the group urs_users as all users in the authContext urs -->
+    <group id="urs_users" >
+        <user idPattern="^(?!\s*$).+" authContext="urs" />
+    </group>
+
+A role is defined as one more groups and each policy can be applied to one or more roles.
+
+    <!-- The only group in the role "users" is the "urs_users" group. -->
+    <role id="users">
+        <group id="urs_users" />
+    </role>
+
+Here's a policy that allows anyone to access the image and navigable catalog files in Hyrax.
+
+    <Policy class="opendap.auth.RegexPolicy">
+        <role>.*</role>
+        <resource>^.*((\/docs\/.*)|(\/)|(\.(css|png|jpg|ico|gif|xsl|jsp|svg))|(\/contents\.html)|(\/catalog\.html)|(\/catalog\.xml)|(logout)|(login)|(\/version))$</resource>
+        <queryString>.*$</queryString>
+        <allowedAction>HEAD</allowedAction>
+        <allowedAction>GET</allowedAction>
+    </Policy>
+
+This allows non-authenticated users to looka round , and when something bad happens they get a web page rendered with css and images.
+
+==== Classes
+* *_Policy_* - This interface defines the policy API
+* *_RegexPolicy_* - A policy the uses Regx matching on the URL path and the query string to evaluate access. If the request matches the regex patterns users/groups/roles held by the Policy are allowed access.
+* *_PolicyDecisionPoint_* - This abstract class is the parent of *_RemotePDP_* and *_SimplePDP_*.
+* *_PEPFilter_* - This Filter is an embodiment of a policy enforcement point. It holds an instance of PolicyDecisionPoint which is used to evalute incoming requests to determine if access will be allowed. If the request is not permitted, and they aren't logged in, then they are redirected to the login endpoint (aka IdFilter) to get that sorted.
+* *_PDPService_* - This child of HttpServlet can be runs as a standalone PDP service, accepting evaluation requests and responding with simple permitted or not permitted.
+* *_RemotePDP_* - Defines a policy decision point somewhere on the internet. With a remote PDP the server sends the uid,
+authContext, url path, query , and http verb (GET, POST, etc) and the remote PDP responds with permitted or not permitted.
+* *_SimplePDP_* - _"Simple is often better"_ - Ned Greene 1984 This is the policy decision point that we use. It is locally hostsed and configured.
 
 [[testing]]
 == Testing
