@@ -117,6 +117,7 @@ asciidoctor olfs.adoc
 ```
 open olfs.html
 ```
-4. Once you are ready to push your changes / suggestions to the documentation, make a commit and push to the repo.
+4. Once you are ready to push your changes / suggestions to the documentation, make commits following standard git practices.
+5. Push to the remote repository.
 NOTE: This `olfs.html` will be ignored by git, and only the source file `olfs.adoc` will be pushed to the repository.
 
