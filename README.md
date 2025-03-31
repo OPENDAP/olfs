@@ -97,3 +97,26 @@ curl. NB: I think this is no longer used but it is really pretty
 interesting, all the same.
 
 
+## OLFS documentation
+This repository provides a user-oriented documentation.
+
+### How to Contribute
+To contribute to this documentation you will need to:
+a) Have cloned this repository
+b) Fetch all recent changes (git pull)
+c) Create a new branch (do not push to master branch)
+d) Have `asciidoctor` installed. 
+
+**Steps**
+1. Navigate to local (cloned) directory, and switch to a new branch (do not commit to master branch).
+2. Make changes to the source file (`olfs.adoc`). You can build the html file locally, by running:
+```
+asciidoctor olfs.adoc
+```
+3. Inspect the changes, by opening the `html` file using a browser. For example:
+```
+open olfs.html
+```
+4. Once you are ready to push your changes / suggestions to the documentation, make a commit and push to the repo.
+NOTE: This `olfs.html` will be ignored by git, and only the source file `olfs.adoc` will be pushed to the repository.
+
