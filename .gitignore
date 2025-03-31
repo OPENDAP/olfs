@@ -12,6 +12,9 @@
 build
 release
 
+# ignore olfs documentation 
+olfs.html
+
 ## Scratch dir
 scratch
 
