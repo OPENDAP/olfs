@@ -46,7 +46,7 @@ The *_olfs_* provides a number of interfaces through which users and programmati
 ** Each case has its own XSLT which is conditioned by the *_olfs_* prior to the transformation step.
 
 [[browser_catalog]]
-* *Browser Navigable Catalog*: The OLFS uses BES showNode commands to discover what the BES "catalog" (usually a filesystem but maybe not) contains. The BES responses are XML documents that the OLFS operates on with an XSL transform to produce http://test.opendap.org:8080/opendap/"[the "blue bar" browser navigation pages that Hyrax produces]. The server will try to return this page for any url path ending in `/` or in `/contents.html` Some parts of the calaig ui representation are controlled by the *_olfs.xml_* file used with the deployment. (See <<configuration>>)
+* *Browser Navigable Catalog*: The OLFS uses BES showNode commands to discover what the BES "catalog" (usually a filesystem but maybe not) contains. The BES responses are XML documents that the OLFS operates on with an XSL transform to produce http://test.opendap.org:8080/opendap/"[the Hyrax "blue bar" browser navigation pages]. The server will try to return this page for any url path ending in `/` or in `/contents.html` Some parts of the catalog ui representation are controlled by the *_olfs.xml_* file used with the deployment. (See <<configuration>>)
 
 [[thredds_catalog]]
 * *THREDDS Catalogs, a machine-readable catalog* _No Scraping Required!_ The OLFS automatically provides a machine readable THREDDS catalog for the inventory in its catalog. In fact it uses the same inputs and only differs in the XSL from the browser navigable catalog described above to produce http://test.opendap.org:8080/opendap/catalog.xml"[a THREDDS catalog response]. (See <<browser_catalog>>)
