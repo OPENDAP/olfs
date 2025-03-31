@@ -165,9 +165,9 @@ The *_olfs_* utilizes several configuration files. The primary one, _olfs.xml_, 
 When the server starts the code in `opendap.coreServlet.DispathServlet.init()` utilizes the ServletUtil class methods to locate the configuration. The `ServletUtil.getConfigPath()` method checks the following locations:
 
 
-1. _/etc/olfs_
-1. _/usr/share/olfs_
-1. _$CATALINA_HOME/webapps/_ deployment_context _/WEB-INF/conf_
+. _/etc/olfs_
+. _/usr/share/olfs_
+. _$CATALINA_HOME/webapps/_ deployment_context _/WEB-INF/conf_
 
 If neither of the first two locations are located then the default configuration bundled in the war file will be used.
 
