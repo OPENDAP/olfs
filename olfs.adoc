@@ -353,25 +353,45 @@ Responders that handle all the DAP4 things.
 - `IsoRubricDMR.java` - Uses the BES to produce a DAP4 DMR response and then applies an XSL transform to produce an HTML page the shows how the metadata does and does not conform to the ISO-19115 expectations.
 
 [[authentication]]
-== Authentication
+== Authentication/Authorization
 For NASA deployments OLFS can be configured to provide authentication services using an (almost) OAuth2 implementation in the *_opendap.auth_* package. The implementation follows the Identity Provider (IdP) plus Policy Decision Point (PDP) pattern.
 
-=== Enable Authentication
+=== Controls
+You must first build an authentication/authorization renablrd web archive file, and then you will need to configure the deployment.
+
+==== Enable Authentication/Authorization
 To enable authentication: Edit the file *_resources/hyrax/WEB-INF/web.xml_* to enable to two authentication filters *_IdFilter_* and *_PEPFilter_*. Then the service must be rebuilt and a new WAR file generated with this change in place.
 
-=== Configure Authentication
+==== Configure Authentication/Authorization
 All the configuration happens in the *_user-access.xml_* file located in the configuration directory.
 
-=== Identity Provider (IdP)
+=== Authentication - aka the Identity Provider (IdP)
+Authentication is the operation wherein a users software client establishes that it is working on behalf of a particular user. Use the abstract class *_IdProvider_* to capture the common API for an identity provider and provide two implementations, *_UrsIdP_* and *_TomcatRealmIdP_*. In theory the *_TomcatRealmIdP_* should work the Tomcat Memory Authentication Realm, but this has not been verified in years. The *_UrsIdP_* knows how to authenticate user with NASA's Earth Data Login (EDL) service. In NASA speak, *_UrsIdP_* is an _EDL client_. The IdFilter provides the core of the authentication functionality and handles saving request information (Like target URL and query string) in a user session so that it can be used to redirect the client to thir original request target when the client returns from a *_Single Sign On_* authentication journey.
+
+==== EDL Tokens
+The IdFilter will also accept an HTTP *_Authorization_* headers with a token.
+
+Typically, *_Authorization_* headers look like:
+
+    Authorization: Bearer A_LONG_STRING_OF_TOKEN_THINGS
+
+These can be submitted to the OLFS with the request and no trip need be made to EDL by the client. When using authorization tokens, sessions do not need to be maintained by the client, although doing so makes the transaction faster still.
+
+
+
+
+
+
+==== Classes
 The IdP is composed of:
 
 * *_IdProvider_* - Theis abstract classes contains common machinery/API is used to parent specific implementations of a provider.
 * *_UrsIdp_* - Implements an IdProvider that utilizes Earth Data Login (EDL, aka URS) to authenticate a user. All the URS action is in here!
 * *_TomcatRealmIdp_* - In theory this IdProvider implemtation works with Tomcat Realms (like the MemoryRealm) but It's been a long time since it was tested.
-* *_IdManager_* - This *singleton* class holds a collection of IdProvders, but in practice only ever has one. If NASA follows through with allowing user to choose between EDL  Google authentication then we'll be right in here making this work!
+* *_IdManager_* - This *singleton* class holds a collection of IdProviders, but in practice only ever has one. If NASA follows through with allowing user to choose between EDL  Google authentication then we'll be right in here making this work!
 * *_IdFilter_* - This class does the heavy lifting of authentication
 
-=== Policy Decision Point (PDP)
+=== Authorization - aka the Policy Decision Point (PDP)
 In this software we define users, groups, and roles in order to define role based access policies.
 In *_user-access.xml_* we define a group based on one or more "user" definitions.
 
