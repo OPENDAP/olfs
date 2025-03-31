@@ -319,7 +319,7 @@ Responders that handle all the DAP2 things. All are children of Dap4Responder. Y
 - `FileAccess.java` - Used to transmit files from the BES to the requesting client.
 - `Version.java` - Builds and returns the Hyrax combined version response document (XML).
 
-[[dap2responders]]
+[[dap4responders]]
 === DAP4 Responders
 Responders that handle all the DAP4 things.
 
