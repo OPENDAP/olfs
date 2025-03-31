@@ -89,9 +89,9 @@ I think each of these services might be implemented as a servlet. In Hyrax, all 
 The *_olfs_* utilizes a number of caches.
 
 === RequestCache
-The RequestCache is used by every thread servicing a request. It's an object cached so it essentially allows objects to be passed from on part the execution stack to another with it being carried as a parameter. I thread servicing a request can safely put things it may need into the RequestCache. When the request/response is completed the RequestCache for the thread is cleared. (You can see this in the `opendap.coreServlet.DispatchServlet.get()` method)
+The RequestCache is used by every thread servicing a request. It's an object cache. It allows objects to be passed from on part the execution stack to another with it being carried as a parameter. Each thread that's servicing a request can safely put things it may need into the RequestCache. When the request/response is completed the RequestCache for the thread is cleared. (You can see this in the `opendap.coreServlet.DispatchServlet.doGet()` method)
 
-The vast majority of the usages of RequestCache are responders caching a MediaType object as a set up for request execution If an error occurs the error handling apparatus can make good choices about how to encode the error for the client.
+The vast majority of the usages of RequestCache are responders caching a MediaType object as a set-up for request execution. This way if an error occurs the error handling apparatus can make good choices about how to encode the error response for the client.
 
 === BesNodeCache
 In order to improve navigation performance the *_olfs_* utilizes an in memory LRU cache called BESNodeCache. This is used by the *_olfs_* to cache the BES responses to showNode commands (which is how the BES exposes it's dynamic navigable catalogs). These entries are held for a configurable period of time before a new request for the cached entry will cause the entry to be refreshed. This is a thread safe cache available to all processing threads.
