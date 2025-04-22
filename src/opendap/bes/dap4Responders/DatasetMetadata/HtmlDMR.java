@@ -65,6 +65,7 @@ public class HtmlDMR extends Dap4Responder {
     private Logger log;
     private static String defaultRequestSuffix = ".html";
     private boolean _enforceRequiredUserSelection;
+    private boolean _showDmrppLink;
 
 
     public HtmlDMR(String sysPath, String pathPrefix, BesApi besApi, boolean enforceRequiredUserSelection) {
@@ -75,6 +76,7 @@ public class HtmlDMR extends Dap4Responder {
         super(sysPath, pathPrefix, requestSuffix, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
         _enforceRequiredUserSelection = enforceRequiredUserSelection;
+        _showDmrppLink = false;
 
         setServiceRoleId("http://services.opendap.org/dap4/dataset-metadata");
         setServiceTitle("HTML representation of the DMR.");
@@ -93,6 +95,14 @@ public class HtmlDMR extends Dap4Responder {
 
     public boolean enforceRequiredUserSelection() {
         return _enforceRequiredUserSelection;
+    }
+
+    public boolean showDmrppLink() {
+        return _showDmrppLink;
+    }
+
+    public void showDmrppLink(boolean value) {
+        _showDmrppLink = value;
     }
 
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -163,9 +173,9 @@ public class HtmlDMR extends Dap4Responder {
             if(BesDapDispatcher.allowDirectDataSourceAccess()){
                 transformer.setParameter("allowDirectDataSourceAccess","true");
             }
-
-            // transformer.setParameter("showDmrppLink", "true");
-
+            if(showDmrppLink()) {
+                transformer.setParameter("showDmrppLink", "true");
+            }
 
             AuthenticationControls.setLoginParameters(transformer,request);
 
