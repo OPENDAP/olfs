@@ -62,11 +62,13 @@ import java.util.Vector;
 
 public class HtmlDMR extends Dap4Responder {
 
-    private Logger log;
-    private static String defaultRequestSuffix = ".html";
-    private boolean _enforceRequiredUserSelection;
+    private final Logger log;
+    private static final String defaultRequestSuffix = ".html";
+    private final boolean _enforceRequiredUserSelection;
     private boolean _showDmrppLink;
 
+    private final Filter dap4AttributeFilter = new ElementFilter("Attribute", DAP.DAPv40_NS);
+    private final String indent_inc = "  ";
 
     public HtmlDMR(String sysPath, String pathPrefix, BesApi besApi, boolean enforceRequiredUserSelection) {
         this(sysPath, pathPrefix, defaultRequestSuffix, besApi, enforceRequiredUserSelection);
@@ -263,9 +265,6 @@ public class HtmlDMR extends Dap4Responder {
 
 
 
-    private Filter dap4AttributeFilter = new ElementFilter("Attribute", DAP.DAPv40_NS);
-    private String indent_inc = "  ";
-
     public String dap4AttributesToProperties(Element variable, String name, String indent, boolean first){
 
         String myIndent = indent + indent_inc;
@@ -356,14 +355,13 @@ public class HtmlDMR extends Dap4Responder {
 
     /**
      *
-     * @param val
-     * @return
+     * @param val The string to encode.
+     * @return Returns the string val encoded for json in html
      */
     public static  String encodeStringForJsInHtml(String val){
         com.google.gson.Gson gson = new com.google.gson.Gson();
         String jsVal = gson.toJson(val);
-        String htmlJsVal = Encode.forHtml(jsVal);
-        return htmlJsVal;
+        return Encode.forHtml(jsVal);
     }
 
     public String dap4AttributeToPropertyValue(Element attribute, String indent){
