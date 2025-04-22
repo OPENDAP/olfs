@@ -498,7 +498,7 @@ public class BesCatalog implements Catalog {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             xmlo.output(node, baos);
             _rawCatalogBuffer = baos.toByteArray();
-            _log.debug("loadNodeCatalog() - Loaded BES catalog response: \n{}", baos.toString(HyraxStringEncoding.getCharset().name()));
+            _log.debug("loadNodeCatalog() - Loaded BES catalog response: \n{}", baos.toString(HyraxStringEncoding.getCharsetName()));
             return node;
 
         } finally {
