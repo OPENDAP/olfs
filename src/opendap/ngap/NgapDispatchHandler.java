@@ -29,6 +29,7 @@ package opendap.ngap;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.BesDapDispatcher;
 import opendap.bes.BesApi;
+import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Util;
 import org.jdom.Element;
@@ -39,6 +40,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Vector;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
 
@@ -100,7 +102,16 @@ public class NgapDispatchHandler extends BesDapDispatcher {
 
         _besApi = new NgapBesApi(_prefix);
         super.init(servlet, config, _besApi);
-        //_ngapForm  =  new NGAPForm(getSystemPath(), _prefix);
+
+        // By default, addResponder() will make it the last responder in the vector, and the last to be checked.
+        // If there is some conflict with an upstream "greedy" responder this responder may not be called.
+        //
+        // addResponder(new NgapDmrppResponder(getSystemPath(),_besApi, true));
+        //
+        // So instead we can put it anywhere in the vector like this:
+        Vector<Dap4Responder> responders = getResponders();
+        responders.add(0, new NgapDmrppResponder(getSystemPath(),_besApi, true));
+
         _initialized=true;
     }
 
