@@ -164,6 +164,9 @@ public class HtmlDMR extends Dap4Responder {
                 transformer.setParameter("allowDirectDataSourceAccess","true");
             }
 
+            // transformer.setParameter("showDmrppLink", "true");
+
+
             AuthenticationControls.setLoginParameters(transformer,request);
 
             DataOutputStream os = new DataOutputStream(response.getOutputStream());

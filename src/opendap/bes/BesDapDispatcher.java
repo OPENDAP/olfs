@@ -90,6 +90,9 @@ public class BesDapDispatcher implements DispatchHandler {
         d_datasetUrlResponse = requestForm;
     }
 
+    public boolean addFileoutTypeSuffixToDownloadFilename(){
+        return _addFileoutTypeSuffixToDownloadFilename;
+    }
 
     public String getSystemPath(){ return _systemPath; }
 
