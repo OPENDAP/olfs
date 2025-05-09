@@ -294,7 +294,7 @@ public class Dap2Error extends Exception {
     public final void print(OutputStream os) {
         PrintStream pw = null;
         try {
-            pw = new PrintStream(os, true, HyraxStringEncoding.getCharset().name());
+            pw = new PrintStream(os, true, HyraxStringEncoding.getCharsetName());
             print(pw);
             pw.flush();
         } catch (UnsupportedEncodingException e) {
