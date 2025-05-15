@@ -116,7 +116,7 @@ public abstract class HttpResponder {
 
     public static String readFileAsString(String fileName) throws IOException {
         StringBuilder stringBuilder = new StringBuilder();
-        Scanner scanner = new Scanner(new File(fileName), HyraxStringEncoding.getCharset().name());
+        Scanner scanner = new Scanner(new File(fileName), HyraxStringEncoding.getCharsetName());
 
         try {
             while (scanner.hasNextLine()) {

@@ -163,7 +163,7 @@ public class Dap2Data extends Dap4Responder {
             Dap4Error d4e = new Dap4Error();
             d4e.setHttpStatusCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             d4e.setMessage(msg);
-            d4e.setOtherInformation(besResponse.toString( HyraxStringEncoding.getCharset().name()));
+            d4e.setOtherInformation(besResponse.toString( HyraxStringEncoding.getCharsetName()));
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             sos.print(d4e.toString());
             sos.flush();

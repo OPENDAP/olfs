@@ -889,7 +889,7 @@ public class BES {
                 if (!result) {
                     // We got back an error object from the BES in the baos.
                     // We feed that to the BESError class to build the error object.
-                    log.debug("BESError: \n{}", errorOutputStream.toString(HyraxStringEncoding.getCharset()));
+                    log.debug("BESError: \n{}", errorOutputStream.toString(HyraxStringEncoding.getCharsetName()));
                     ByteArrayInputStream bais = new ByteArrayInputStream(errorOutputStream.toByteArray());
                     BESError besError = new BESError(bais);
 
