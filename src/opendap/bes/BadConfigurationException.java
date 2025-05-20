@@ -29,7 +29,7 @@ package opendap.bes;
 
 import opendap.coreServlet.OPeNDAPException;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  *

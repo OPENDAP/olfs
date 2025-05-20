@@ -53,10 +53,10 @@ import org.jdom.transform.JDOMSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.net.URL;
@@ -216,7 +216,7 @@ public class ViewersServlet extends HttpServlet {
      * calling their init() methods and passing into them the XML Element
      * that defined them from the config document.
      *
-     * @throws javax.servlet.ServletException When things go poorly
+     * @throws jakarta.servlet.ServletException When things go poorly
      */
     private void  buildJwsHandlers(String resourcesDir, Element webStartConfig)
             throws ServletException {
@@ -285,7 +285,7 @@ public class ViewersServlet extends HttpServlet {
      * that defined them from the config document.
      *
      * @return A VEector of JwsHandlers that have been intialized and are ready to use.
-     * @throws javax.servlet.ServletException When things go poorly
+     * @throws jakarta.servlet.ServletException When things go poorly
      */
     private void buildWebServiceHandlers(String resourcesDir, Element webStartConfig) throws ServletException {
 

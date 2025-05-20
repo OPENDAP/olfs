@@ -37,7 +37,7 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 
-import javax.servlet.ServletOutputStream;
+import jakarta.servlet.ServletOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;

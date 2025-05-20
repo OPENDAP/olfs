@@ -32,8 +32,8 @@ import opendap.io.HyraxStringEncoding;
 import opendap.ppt.PPTException;
 import org.slf4j.Logger;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.rmi.server.UID;

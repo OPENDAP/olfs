@@ -11,10 +11,10 @@ import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.DataOutputStream;
 import java.io.PrintStream;
 import java.util.Date;
@@ -50,7 +50,7 @@ public class BESSiteMapService extends HttpServlet {
      * servlet InitParameters. The Debug object can be referenced (with
      * impunity) from any of the dods code...
      *
-     * @throws javax.servlet.ServletException When the bad things happen.
+     * @throws jakarta.servlet.ServletException When the bad things happen.
      */
     @Override
     public void init() throws ServletException {

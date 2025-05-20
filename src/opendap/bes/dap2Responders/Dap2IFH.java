@@ -54,8 +54,8 @@ import org.jdom.transform.JDOMSource;
 import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.DataOutputStream;
 import java.util.Iterator;
 import java.util.List;

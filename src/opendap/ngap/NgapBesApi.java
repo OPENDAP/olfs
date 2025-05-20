@@ -47,7 +47,7 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.slf4j.Logger;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

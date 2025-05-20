@@ -33,10 +33,10 @@ import opendap.services.ServicesRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -60,7 +60,7 @@ public class W10nServlet extends HttpServlet   {
     /**
      * ************************************************************************
      *
-     * @throws javax.servlet.ServletException
+     * @throws jakarta.servlet.ServletException
      */
     @Override
     public void init() throws ServletException {

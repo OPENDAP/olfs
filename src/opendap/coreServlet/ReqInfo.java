@@ -36,7 +36,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONArray;
 import org.slf4j.Logger;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URLDecoder;
@@ -94,11 +94,11 @@ public class ReqInfo {
     private static final String X_FORWARDED_PROTOCOL = "X-Forwarded-Proto";
     private static final String X_FORWARDED_PORT = "X-Forwarded-Port";
 
-    private static final String JAVAX_SERVLET_FORWARD_REQUEST_URI  = "javax.servlet.forward.request_uri";
-    private static final String JAVAX_SERVLET_FORWARD_CONTEXT_PATH = "javax.servlet.forward.context_path";
-    private static final String JAVAX_SERVLET_FORWARD_SERVLET_PATH = "javax.servlet.forward.servlet_path";
-    private static final String JAVAX_SERVLET_FORWARD_PATH_INFO    = "javax.servlet.forward.path_info";
-    private static final String JAVAX_SERVLET_FORWARD_QUERY_STRING = "javax.servlet.forward.query_string";
+    private static final String JAVAX_SERVLET_FORWARD_REQUEST_URI  = "jakarta.servlet.forward.request_uri";
+    private static final String JAVAX_SERVLET_FORWARD_CONTEXT_PATH = "jakarta.servlet.forward.context_path";
+    private static final String JAVAX_SERVLET_FORWARD_SERVLET_PATH = "jakarta.servlet.forward.servlet_path";
+    private static final String JAVAX_SERVLET_FORWARD_PATH_INFO    = "jakarta.servlet.forward.path_info";
+    private static final String JAVAX_SERVLET_FORWARD_QUERY_STRING = "jakarta.servlet.forward.query_string";
     private static final String MISSING = "MISSING";
 
     /**
@@ -772,7 +772,7 @@ public class ReqInfo {
      * but it does not include query string parameters.
      *
      * If this request has been forwarded using:
-     *    RequestDispatcher.forward(javax.servlet.ServletRequest, javax.servlet.ServletResponse)
+     *    RequestDispatcher.forward(jakarta.servlet.ServletRequest, jakarta.servlet.ServletResponse)
      * the server path in the reconstructed URL must reflect the path used to
      * obtain the RequestDispatcher, and not the server path specified by the client.
      *
@@ -909,7 +909,7 @@ public class ReqInfo {
             // Read the javadoc entry for HttpServletRequest.getRequestUrl() in the header
             // comment for this method.
             //
-            // Because javax.servlet.forward.request_uri does not contain the request
+            // Because jakarta.servlet.forward.request_uri does not contain the request
             // protocol or the port number of the service we have to determine this
             // by examining the HttpServletRequest objects state.
             String serverName = req.getServerName();

@@ -267,8 +267,8 @@
     <property name="saxon-s9api.lib" value="saxon-9.1.0.5-s9api.jar"/>
     <property name="saxon.lib" value="saxon-9.1.0.5.jar"/>
 
-    <property name="catalina.lib" value="catalina-6.0.53.jar"/>
-    <property name="servlet-api.lib" value="servlet-api-3.0.jar"/>
+    <property name="catalina.lib" value="catalina-11.0.7.jar"/>
+    <property name="servlet-api.lib" value="jakarta-servlet-api-6.1.jar"/>
 
     <property name="sjson.lib" value="json-simple-1.1.1.jar"/>
 

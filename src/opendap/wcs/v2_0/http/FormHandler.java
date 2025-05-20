@@ -29,8 +29,8 @@ import opendap.wcs.v2_0.WCS;
 import opendap.wcs.v2_0.WcsException;
 import org.jdom.Element;
 
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.net.URLDecoder;
 
