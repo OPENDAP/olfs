@@ -36,10 +36,10 @@ import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLDecoder;
 import java.util.concurrent.ConcurrentHashMap;
@@ -578,7 +578,7 @@ public class OPeNDAPException extends Exception {
         sb.append("# server: ").append(request.getServerName()).append("%0A");
         sb.append("# port: ").append(request.getServerPort()).append("%0A");
 
-        String cleanUri = (String) request.getAttribute("javax.servlet.forward.request_uri");
+        String cleanUri = (String) request.getAttribute("jakarta.servlet.forward.request_uri");
         if(cleanUri!=null){
             cleanUri = URLDecoder.decode(cleanUri, HyraxStringEncoding.getCharset().name());
             cleanUri = Scrub.urlContent(cleanUri);
@@ -587,7 +587,7 @@ public class OPeNDAPException extends Exception {
             cleanUri = "null";
         }
 
-        sb.append("# javax.servlet.forward.request_uri: ");
+        sb.append("# jakarta.servlet.forward.request_uri: ");
         sb.append(cleanUri);
 
         sb.append("%0A");
