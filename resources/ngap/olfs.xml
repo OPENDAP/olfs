@@ -164,6 +164,12 @@ ENVIRONMENTS. THE DEPLOYED VERSION MAY DIFFER FROM THIS STAND-IN
     -->
     <!-- ForceLinksToHttps /  -->
 
+    <!--
+        'ShowDmrppLink' - When present will cause the Data Request Form pages to display a link the dmr++ file.
+         This only works for NGAP deployments at this time.
+    -->
+    <ShowDmrppLink />
+
 
 
 

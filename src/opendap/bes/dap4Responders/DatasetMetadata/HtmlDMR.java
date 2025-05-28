@@ -70,15 +70,15 @@ public class HtmlDMR extends Dap4Responder {
     private final Filter dap4AttributeFilter = new ElementFilter("Attribute", DAP.DAPv40_NS);
     private final String indent_inc = "  ";
 
-    public HtmlDMR(String sysPath, String pathPrefix, BesApi besApi, boolean enforceRequiredUserSelection) {
-        this(sysPath, pathPrefix, defaultRequestSuffix, besApi, enforceRequiredUserSelection);
+    public HtmlDMR(String sysPath, String pathPrefix, BesApi besApi, boolean enforceRequiredUserSelection, boolean showDmrppLink) {
+        this(sysPath, pathPrefix, defaultRequestSuffix, besApi, enforceRequiredUserSelection, showDmrppLink);
     }
 
-    public HtmlDMR(String sysPath, String pathPrefix, String requestSuffix, BesApi besApi, boolean enforceRequiredUserSelection) {
+    public HtmlDMR(String sysPath, String pathPrefix, String requestSuffix, BesApi besApi, boolean enforceRequiredUserSelection, boolean showDmrppLink) {
         super(sysPath, pathPrefix, requestSuffix, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
         _enforceRequiredUserSelection = enforceRequiredUserSelection;
-        _showDmrppLink = false;
+        _showDmrppLink = showDmrppLink;
 
         setServiceRoleId("http://services.opendap.org/dap4/dataset-metadata");
         setServiceTitle("HTML representation of the DMR.");

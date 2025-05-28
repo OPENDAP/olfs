@@ -47,8 +47,8 @@ public class NormativeDMR extends Dap4Responder {
     private static String defaultRequestSuffix = ".dmr";
 
 
-    public NormativeDMR(String sysPath, BesApi besApi, boolean addTypeSuffixToDownloadFilename, boolean enforceRequiredUserSelection) {
-        this(sysPath, null, defaultRequestSuffix, besApi, addTypeSuffixToDownloadFilename,enforceRequiredUserSelection);
+    public NormativeDMR(String sysPath, BesApi besApi, boolean addTypeSuffixToDownloadFilename, boolean enforceRequiredUserSelection, boolean showDmrppLink) {
+        this(sysPath, null, defaultRequestSuffix, besApi, addTypeSuffixToDownloadFilename,enforceRequiredUserSelection, showDmrppLink);
     }
 
     public NormativeDMR(
@@ -57,7 +57,8 @@ public class NormativeDMR extends Dap4Responder {
             String requestSuffix,
             BesApi besApi,
             boolean addFileoutTypeSuffixToDownloadFilename,
-            boolean enforceRequiredUserSelection) {
+            boolean enforceRequiredUserSelection,
+            boolean showDmrppLink) {
         super(sysPath, pathPrefix, requestSuffix, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
@@ -70,7 +71,7 @@ public class NormativeDMR extends Dap4Responder {
         setNormativeMediaType(new DMR(getRequestSuffix()));
 
         addAltRepResponder(new XmlDMR   (sysPath, pathPrefix, besApi, addFileoutTypeSuffixToDownloadFilename));
-        addAltRepResponder(new HtmlDMR  (sysPath, pathPrefix, besApi, enforceRequiredUserSelection));
+        addAltRepResponder(new HtmlDMR  (sysPath, pathPrefix, besApi, enforceRequiredUserSelection, showDmrppLink));
         addAltRepResponder(new RdfDMR   (sysPath, pathPrefix, besApi, addFileoutTypeSuffixToDownloadFilename));
         addAltRepResponder(new JsonDMR  (sysPath, pathPrefix, besApi, addFileoutTypeSuffixToDownloadFilename));
         addAltRepResponder(new IjsonDMR (sysPath, pathPrefix, besApi, addFileoutTypeSuffixToDownloadFilename));
