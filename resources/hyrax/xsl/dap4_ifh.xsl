@@ -43,6 +43,7 @@
     <xsl:param name="enforceSelection" />
     <xsl:param name="forceDataRequestFormLinkToHttps" />
     <xsl:param name="allowDirectDataSourceAccess" />
+    <xsl:param name="showDmrppLink" />
 
 
     <xsl:variable name="debug" select="false()"/>
@@ -191,6 +192,9 @@
                         class="small"
                         style="background-color: #527CC1; float: right; font-weight: normal; font-style: italic; padding: 7px 7px 0px 0px">
                         <a style="color: white;" title="XML encoded DMR document" href="{@name}.dmr.xml">dmr</a>
+                        <xsl:if test="$showDmrppLink">
+                            <a style="color: white;" title="The DMR++ document for this dataset" href="{@name}.dap.dmrpp">dmr++</a>
+                        </xsl:if>
                     </div>
                 </h1>
 

@@ -73,6 +73,7 @@ public class BesDapDispatcher implements DispatchHandler {
     private Vector<Dap4Responder> _responders;
     private static boolean _addFileoutTypeSuffixToDownloadFilename = false;
     private static boolean _enforceRequiredUserSelection = false;
+    private static boolean _showDmrppLink = false;
 
     private static boolean d_allowDirectDataSourceAccess = false;
     private static DataRequestFormType d_dataRequestFormType = dap4;
@@ -90,6 +91,9 @@ public class BesDapDispatcher implements DispatchHandler {
         d_datasetUrlResponse = requestForm;
     }
 
+    public boolean addFileoutTypeSuffixToDownloadFilename(){
+        return _addFileoutTypeSuffixToDownloadFilename;
+    }
 
     public String getSystemPath(){ return _systemPath; }
 
@@ -142,6 +146,13 @@ public class BesDapDispatcher implements DispatchHandler {
                 _enforceRequiredUserSelection = true;
             }
             _log.info("RequireUserSelection: {}",_enforceRequiredUserSelection);
+
+            _showDmrppLink = false;
+            dv = _config.getChild("ShowDmrppLink");
+            if (dv != null) {
+                _showDmrppLink = true;
+            }
+            _log.info("ShowDmrppLink: {}",_showDmrppLink);
 
             d_dataRequestFormType = dap4;
             dv = _config.getChild("DataRequestForm");
@@ -243,7 +254,7 @@ public class BesDapDispatcher implements DispatchHandler {
         _responders.add(ndsr);
 
         _responders.add(new NormativeDR(_systemPath, besApi, _addFileoutTypeSuffixToDownloadFilename));
-        _responders.add(new NormativeDMR(_systemPath, besApi, _addFileoutTypeSuffixToDownloadFilename, _enforceRequiredUserSelection));
+        _responders.add(new NormativeDMR(_systemPath, besApi, _addFileoutTypeSuffixToDownloadFilename, _enforceRequiredUserSelection, _showDmrppLink));
         _responders.add(new IsoDMR(_systemPath, besApi));
         _responders.add(new Version(_systemPath, besApi));
 

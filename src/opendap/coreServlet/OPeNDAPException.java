@@ -208,9 +208,9 @@ public class OPeNDAPException extends Exception {
 
 
             ByteArrayOutputStream baos =new ByteArrayOutputStream();
-            PrintStream ps = new PrintStream( baos,  true, HyraxStringEncoding.getCharset().name());
+            PrintStream ps = new PrintStream( baos,  true, HyraxStringEncoding.getCharsetName());
             t.printStackTrace(ps);
-            log.debug(baos.toString(HyraxStringEncoding.getCharset().name()));
+            log.debug(baos.toString(HyraxStringEncoding.getCharsetName()));
 
             OPeNDAPException oe;
 
@@ -580,7 +580,7 @@ public class OPeNDAPException extends Exception {
 
         String cleanUri = (String) request.getAttribute("javax.servlet.forward.request_uri");
         if(cleanUri!=null){
-            cleanUri = URLDecoder.decode(cleanUri, HyraxStringEncoding.getCharset().name());
+            cleanUri = URLDecoder.decode(cleanUri, HyraxStringEncoding.getCharsetName());
             cleanUri = Scrub.urlContent(cleanUri);
         }
         else {
