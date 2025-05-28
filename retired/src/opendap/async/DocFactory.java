@@ -320,7 +320,7 @@ public class DocFactory {
 
     public static String  getXmlBase(HttpServletRequest req){
 
-        String forwardRequestUri = (String)req.getAttribute("javax.servlet.forward.request_uri");
+        String forwardRequestUri = (String)req.getAttribute("jakarta.servlet.forward.request_uri");
         String requestUrl = req.getRequestURL().toString();
 
 

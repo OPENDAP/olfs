@@ -27,7 +27,7 @@ package opendap.wcs.v2_0;
 
 import org.jdom.Element;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * WCS exceptions 
