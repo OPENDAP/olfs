@@ -31,7 +31,3 @@ then
 else
     echo "ERROR: Failed to located the bes snapshot file: ${BES_SNAPSHOT_FILE}" >&2
 fi
-
-export BUILD_DMRPP_VERSION=${BUILD_DMRPP_VERSION:-$(cat "${BES_SNAPSHOT_FILE}" | grep "build_dmrpp-" | sed "s/build_dmrpp-//g" | awk '{print $1;}')}
-echo "#       BUILD_DMRPP_VERSION: ${BUILD_DMRPP_VERSION}" >&2
-echo "#" >&2
