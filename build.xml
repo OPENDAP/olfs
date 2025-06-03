@@ -283,6 +283,8 @@
     <property name="jackson-databind.lib" value="jackson-databind-2.17.0.jar" />
     <property name="jackson-annotations.lib" value="jackson-annotations-2.17.0.jar" />
 
+    <property name="java-jwt.lib" value="java-jwt-4.5.0.jar"/>
+
     <property name="joda-time.lib" value="joda-time-2.12.7.jar"/>
 
     <!-- WCS Libs -->
@@ -344,6 +346,8 @@
         <include name="${jackson-core.lib}"/>
         <include name="${jackson-databind.lib}"/>
         <include name="${jackson-annotations.lib}"/>
+
+        <include name="${java-jwt.lib}"/>
 
         <include name="${joda-time.lib}"/>
 
