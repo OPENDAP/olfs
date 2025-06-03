@@ -43,6 +43,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -207,7 +208,47 @@ public class UrsIdP extends IdProvider{
 
 // curl -X POST -d 'token=<token>&client_id=<‘your application client_id’> https://urs.earthdata.nasa.gov/oauth/tokens/user
 
+    /**
+     * TODO: add docstring? etc
+     * TODO: reconsider exception
+     * @param accessToken
+     * @return
+     */
+    boolean isEdlTokenValid(String accessToken) throws IOException { 
+        log.error("TODO: IMPLEMENT `isEdlTokenValid`!");
+        // TODO:
+        // Get the JWKS from "disk"
+        // Use JWT library to decode
+        return true;
+    }
 
+    /**
+     * Return the decoded "uid" parameter from the `accessToken` JWT's payload.
+     * May throw if EDL `accessToken` is invalid; valid EDL token can be confirmed
+     * via `isEdlTokenValid`.
+     *
+     * @param accessToken A pre-verified EDL JWT token
+     * @return The `accessToken`'s user id (`uid`)
+     * @throws Exception For invalid `accessToken`
+     */
+    String getEdlUserIdFromToken(String accessToken) throws Exception {
+        // Safety
+        // probably safe to assume it has the correct length, structure, and encoding 
+        // and that the "uid" field is present in the payload.
+
+        // The JWT structure is `header.payload.signature`; we need to pull the id 
+        // out of the Base64-encoded `payload` substring
+        String[] jwt_components = accessToken.split("\\.");
+        String payload = new String(Base64.getDecoder().decode(jwt_components[1]));
+        
+        // Get user id from payload!
+        JsonParser jparse = new JsonParser();
+        JsonObject payload_json = jparse.parse(payload).getAsJsonObject();
+        String uid = payload_json.get("uid").getAsString();
+
+        log.debug("uid: {}",uid);
+        return uid;
+    }
 
 
     /**
@@ -304,21 +345,27 @@ public class UrsIdP extends IdProvider{
                 userProfile.setEDLAccessToken(edlat);
                 userProfile.setAuthContext(getAuthContext());
 
+                // Confirm that the access token is valid, then extract the user id.
+                // By testing validity first, we know if we can trust the token's
+                // payload, as the payload may contain a user id even if the token
+                // *isn't* valid.
+                String token = edlat.getAccessToken();
+                foundValidAuthToken = isEdlTokenValid(token);
+                if (foundValidAuthToken) {
+                    String uid = getEdlUserIdFromToken(token);
+                    userProfile.setUID(uid);
+                }
 
-                String uid = getEdlUserId(edlat.getAccessToken());
-                userProfile.setUID(uid);
+                // If we didn't find a valid auth token locally, request a UserId from the 
+                // EDL endpoint; successful retrieval indicates that the token is valid
+                if (false) { // !foundValidAuthToken TODO-revert: During dev, skip fallback
+                    log.error("Unable to validate EDL access token locally; falling back to remote validation"); // TODO-should this be debug instead of error?
+                    String uid = getEdlUserId(token);
+                    userProfile.setUID(uid);
+                    foundValidAuthToken = userProfile.getUID() != null;
+                }
 
-                // I am hesitant to remove thiscall to getEDLUserProfile().
-                // Everything seems to work
-                // without it, and retrieving the user profile adds the time
-                // cost of another round-trip to EDL. We always have to
-                // grab the UID regardless, we need it  as part of the mvp state
-                // of the UserProfile, and we want the EDL user profile we have
-                // know the UId to ask for it. Which means two trips...
-                //
-                // getEDLUserProfile(userProfile);
-
-                foundValidAuthToken = userProfile.getUID() != null;
+                log.error("\nTOKEN AUTHENTICATION INTERMEDIATES: \n\tTOKEN VALID? {} \n\tUSER ID: {}", foundValidAuthToken, userProfile.getUID()); // TODO-remove debug log
             }
             else if (rejectUnsupportedAuthzSchemes) {
                     String msg = "Received an unsolicited/unsupported/unanticipated/unappreciated ";
