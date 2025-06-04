@@ -70,7 +70,7 @@
         <p align="left">Please re-authenticate and try again. </p>
         <% if (message != null) { %>
             <p align="left">The specific error message associated with your request was:</p>
-            <blockquote> <p><strong><%= Encode.forHtml(message) %> </strong></p> </blockquote>
+            <strong><pre><%= Encode.forHtml(message) %> </pre></strong>
         <% } %>
         <% if(supportEmail!=null){ %>
             <p align="left"> If you think that the server is broken (that the URL you submitted should have worked),
