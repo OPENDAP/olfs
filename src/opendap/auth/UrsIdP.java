@@ -28,9 +28,11 @@ package opendap.auth;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import opendap.PathBuilder;
 import opendap.coreServlet.ReqInfo;
 import opendap.http.error.Forbidden;
+import opendap.io.HyraxStringEncoding;
 import opendap.logging.LogUtil;
 import opendap.logging.Procedure;
 import opendap.logging.Timer;
@@ -214,7 +216,7 @@ public class UrsIdP extends IdProvider{
      * @param accessToken
      * @return
      */
-    boolean isEdlTokenValid(String accessToken) throws IOException { 
+    boolean isEdlTokenValid(String accessToken) {
         log.error("TODO: IMPLEMENT `isEdlTokenValid`!");
         // TODO:
         // Get the JWKS from "disk"
@@ -229,23 +231,20 @@ public class UrsIdP extends IdProvider{
      *
      * @param accessToken A pre-verified EDL JWT token
      * @return The `accessToken`'s user id (`uid`)
-     * @throws Exception For invalid `accessToken`
-     */
-    String getEdlUserIdFromToken(String accessToken) throws Exception {
-        // Safety
-        // probably safe to assume it has the correct length, structure, and encoding 
-        // and that the "uid" field is present in the payload.
-
+     * @throws IndexOutOfBoundsException For invalid `accessToken` that is not a properly constructed JWT
+     * @throws JsonSyntaxException For invalid `accessToken` that does not contain valid JSON
+     */ 
+    String getEdlUserIdFromToken(String accessToken) throws IndexOutOfBoundsException, JsonSyntaxException {
         // The JWT structure is `header.payload.signature`; we need to pull the id 
         // out of the Base64-encoded `payload` substring
         String[] jwt_components = accessToken.split("\\.");
-        String payload = new String(Base64.getDecoder().decode(jwt_components[1]));
+        String payload = new String(Base64.getDecoder().decode(jwt_components[1]), HyraxStringEncoding.getCharset());
         
-        // Get user id from payload!
+        // Get user id from payload
         JsonParser jparse = new JsonParser();
-        JsonObject payload_json = jparse.parse(payload).getAsJsonObject();
-        String uid = payload_json.get("uid").getAsString();
-
+        JsonObject payload_json = jparse.parseString(payload).getAsJsonObject();
+        String uid = payload_json.has("uid") ? payload_json.get("uid").getAsString() : null;
+    
         log.debug("uid: {}",uid);
         return uid;
     }
@@ -354,14 +353,21 @@ public class UrsIdP extends IdProvider{
                 if (foundValidAuthToken) {
                     String uid = getEdlUserIdFromToken(token);
                     userProfile.setUID(uid);
+
+                    // While unlikely, it is possible that the uid of a "valid" local token is null;
+                    // We require a uid downstream, so for all intents and purposes the token 
+                    // was not actually a valid EDL token
+                    foundValidAuthToken = userProfile.getUID() != null;
                 }
 
                 // If we didn't find a valid auth token locally, request a UserId from the 
-                // EDL endpoint; successful retrieval indicates that the token is valid
+                // EDL endpoint; this will implicitly validate the auth token
                 if (false) { // !foundValidAuthToken TODO-revert: During dev, skip fallback
                     log.error("Unable to validate EDL access token locally; falling back to remote validation"); // TODO-should this be debug instead of error?
                     String uid = getEdlUserId(token);
                     userProfile.setUID(uid);
+
+                    // Successful retrieval indicates that the token is valid
                     foundValidAuthToken = userProfile.getUID() != null;
                 }
 
