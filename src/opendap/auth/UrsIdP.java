@@ -241,11 +241,54 @@ public class UrsIdP extends IdProvider{
      * @return
      */
     boolean isEdlTokenValid(String accessToken) {
-        log.error("TODO: IMPLEMENT `isEdlTokenValid`!");
+        log.error("\n\tVALIDATING TOKEN!");
+
+        // 1. pull in JWKS (the public key set) from config
+        String jwks_str = getUrsClientPublicKeys();
+        String invalidTokenPrefix = "\n\n" + this.getClass().getSimpleName() + " token validation failed: "; // TODO-remove extra new line prefix
+        if (jwks_str.isEmpty()) {
+            log.error("{}", invalidTokenPrefix + "Client public key string is empty");
+            return false;
+        }
+        // log.error("\n\tTOKENNNN: {}", jwks_str);
+
+        JsonObject jwks_json;
+        try {
+            jwks_json = JsonParser.parseString(jwks_str).getAsJsonObject();
+        } 
+        catch (JsonSyntaxException e)
+        {
+            log.error("{}", invalidTokenPrefix + "Client public key string fails JSON parsing. Details: " + e.getMessage());
+            return false;
+        }
+        log.error("\n\tJSON: {}", jwks_json.toString());
         
-        // Step one: pull in JWKS from variable 
-        String auth_jwks = getUrsClientPublicKeys();
-        // Step two: use it to verify token
+        // 2. Figure out which key id the access token will want us to pull out...
+        String token_header;
+        try {
+            JsonObject token_header = jparse.parseString(accessToken).getAsJsonObject();
+        }
+        catch (JsonSyntaxException e)
+        {
+            log.error("{}", invalidTokenPrefix + "Access token fails JSON parsing. Details: " + e.getMessage());
+            return false;
+        }
+        log.error("\n\tJSON: {}", token_header.toString());
+        
+        String token_sig = token_header.has("sig") ? token_header.get("sig").getAsString() : null;
+        if (token_sig == null) {
+            log.error("{}", invalidTokenPrefix + "Access token has no `sig` key.");
+            return false;
+        }
+        log.error("\n\tTOKEN SIG: {}", token_sig);
+
+        // 3. ...and then pull out that matching key!
+        /*
+         * loop through jwks_json tokens and find the one that has a "kid" field that matches token_sig
+         * that's the key we want!
+         */
+
+        // Step two: use the key to verify the access token
         return false;
     }
 
@@ -266,8 +309,7 @@ public class UrsIdP extends IdProvider{
         String payload = new String(Base64.getDecoder().decode(jwt_components[1]), HyraxStringEncoding.getCharset());
         
         // Get user id from payload
-        JsonParser jparse = new JsonParser();
-        JsonObject payload_json = jparse.parseString(payload).getAsJsonObject();
+        JsonObject payload_json = JsonParser.parseString(payload).getAsJsonObject();
         String uid = payload_json.has("uid") ? payload_json.get("uid").getAsString() : null;
     
         log.debug("uid: {}",uid);
