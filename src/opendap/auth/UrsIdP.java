@@ -62,6 +62,7 @@ public class UrsIdP extends IdProvider{
     public static final String URS_URL_KEY = "UrsUrl";
     public static final String URS_CLIENT_ID_KEY = "UrsClientId";
     public static final String URS_CLIENT_AUTH_CODE_KEY = "UrsClientAuthCode";
+    public static final String URS_CLIENT_PUBLIC_KEYS_KEY = "UrsClientPublicKeys";
 
     public static final String REJECT_UNSUPPORTED_AUTHZ_SCHEMES_KEY = "RejectUnsupportedAuthzSchemes";
 
@@ -70,6 +71,7 @@ public class UrsIdP extends IdProvider{
     private String ursUrl;
     private String clientAppId;
     private String clientAppAuthCode;
+    private String clientPublicKeys;
     private boolean rejectUnsupportedAuthzSchemes;
 
     private static final String ERR_PREFIX = "ERROR! msg: ";
@@ -99,6 +101,9 @@ public class UrsIdP extends IdProvider{
         e = getConfigElement(config,URS_CLIENT_AUTH_CODE_KEY);
         clientAppAuthCode = e.getTextTrim();
 
+        e = getOptionalConfigElement(config,URS_CLIENT_PUBLIC_KEYS_KEY);
+        clientPublicKeys = e != null ? e.getTextTrim() : "";
+
         e = config.getChild(REJECT_UNSUPPORTED_AUTHZ_SCHEMES_KEY);
         if(e != null)
             rejectUnsupportedAuthzSchemes = true;
@@ -123,7 +128,20 @@ public class UrsIdP extends IdProvider{
         return e;
     }
 
-
+    /**
+     * Another little worker method.
+     * @param config
+     * @param childName
+     * @return element found in `config`; will be `null` if `childName` not present
+     */
+    private Element getOptionalConfigElement(Element config, String childName) {
+        Element e = config.getChild(childName);
+        if(e == null){
+            String msg = this.getClass().getSimpleName() + " configuration does not contain optional <" + childName + "> element.";
+            log.error("{}",msg);
+        }
+        return e;
+    }
 
     public String getUrsUrl() {
         return ursUrl;
@@ -172,7 +190,13 @@ public class UrsIdP extends IdProvider{
         this.clientAppAuthCode = ursClientAppAuthCode;
     }
 
+    public String getUrsClientPublicKeys() {
+        return clientPublicKeys;
+    }
 
+    public void setUrsClientPublicKeys(String ursClientPublicKeys) {
+        this.clientPublicKeys = ursClientPublicKeys;
+    }
 
     void getEDLUserProfile(UserProfile userProfile) throws IOException {
 
@@ -218,10 +242,11 @@ public class UrsIdP extends IdProvider{
      */
     boolean isEdlTokenValid(String accessToken) {
         log.error("TODO: IMPLEMENT `isEdlTokenValid`!");
-        // TODO:
-        // Get the JWKS from "disk"
-        // Use JWT library to decode
-        return true;
+        
+        // Step one: pull in JWKS from variable 
+        String auth_jwks = getUrsClientPublicKeys();
+        // Step two: use it to verify token
+        return false;
     }
 
     /**
