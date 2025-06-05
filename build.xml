@@ -284,6 +284,7 @@
     <property name="jackson-annotations.lib" value="jackson-annotations-2.17.0.jar" />
 
     <property name="java-jwt.lib" value="java-jwt-4.5.0.jar"/>
+    <property name="jwks-rsa.lib" value="jwks-rsa-0.22.1.jar"/>
 
     <property name="joda-time.lib" value="joda-time-2.12.7.jar"/>
 
@@ -348,6 +349,7 @@
         <include name="${jackson-annotations.lib}"/>
 
         <include name="${java-jwt.lib}"/>
+        <include name="${jwks-rsa.lib}"/>
 
         <include name="${joda-time.lib}"/>
 
