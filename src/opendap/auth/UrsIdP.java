@@ -26,6 +26,7 @@
 
 package opendap.auth;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
@@ -240,57 +241,92 @@ public class UrsIdP extends IdProvider{
      * @param accessToken
      * @return
      */
-    boolean isEdlTokenValid(String accessToken) {
-        log.error("\n\tVALIDATING TOKEN!");
-
-        // 1. pull in JWKS (the public key set) from config
+    JsonObject getPublicKeyForAccessToken(String accessToken) {
+        // 1. Pull in JWKS (the public key set) from config
         String jwks_str = getUrsClientPublicKeys();
         String invalidTokenPrefix = "\n\n" + this.getClass().getSimpleName() + " token validation failed: "; // TODO-remove extra new line prefix
         if (jwks_str.isEmpty()) {
             log.error("{}", invalidTokenPrefix + "Client public key string is empty");
-            return false;
+            return null;
         }
         // log.error("\n\tTOKENNNN: {}", jwks_str);
 
-        JsonObject jwks_json;
+        JsonObject jwk_set;
         try {
-            jwks_json = JsonParser.parseString(jwks_str).getAsJsonObject();
+            jwk_set = JsonParser.parseString(jwks_str).getAsJsonObject();
         } 
         catch (JsonSyntaxException e)
         {
             log.error("{}", invalidTokenPrefix + "Client public key string fails JSON parsing. Details: " + e.getMessage());
-            return false;
+            return null;
         }
-        log.error("\n\tJSON: {}", jwks_json.toString());
+        // log.error("\n\tJSON: {}", jwk_set.toString());
+        
+        if (!jwk_set.has("keys")) {
+            log.error("{}", invalidTokenPrefix + "Client public key string contains no keys.");
+            return null;
+        }
+        JsonArray jwk_keys = jwk_set.getAsJsonArray("keys");
+        // log.error("\n\t KEY LENGTH: {}", jwk_keys.size());
         
         // 2. Figure out which key id the access token will want us to pull out...
-        String token_header;
+        JsonObject token_header;
         try {
-            JsonObject token_header = jparse.parseString(accessToken).getAsJsonObject();
+            // TODO - add specific safety catches here??
+            String[] jwt_components = accessToken.split("\\.");
+            String header_str = new String(Base64.getDecoder().decode(jwt_components[0]), HyraxStringEncoding.getCharset());
+            token_header = JsonParser.parseString(header_str).getAsJsonObject();
         }
         catch (JsonSyntaxException e)
         {
             log.error("{}", invalidTokenPrefix + "Access token fails JSON parsing. Details: " + e.getMessage());
-            return false;
+            return null;
         }
-        log.error("\n\tJSON: {}", token_header.toString());
+        // log.error("\n\tJSON: {}", token_header.toString());
         
         String token_sig = token_header.has("sig") ? token_header.get("sig").getAsString() : null;
         if (token_sig == null) {
             log.error("{}", invalidTokenPrefix + "Access token has no `sig` key.");
+            return null;
+        }
+        // log.error("\n\tWE WANT TOKEN SIG: {}", token_sig);
+
+        // // 3. ...and then pull out that matching key!
+        JsonObject public_key = null;
+        for(int i = 0; i < jwk_keys.size(); i++) {  
+            JsonObject jwk = jwk_keys.get(i).getAsJsonObject();
+            if (jwk.has("kid")) {
+                if (jwk.get("kid").getAsString().equals(token_sig)) {
+                    public_key = jwk;
+                    break;
+                }
+            }
+        }
+        // log.error("\n\tGot 'em? {}", public_key);
+        return public_key;
+    }
+
+    /**
+     * TODO: add docstring? etc
+     * TODO: reconsider exception
+     * @param accessToken
+     * @return
+     */
+    boolean isEdlTokenValid(String accessToken) {
+        // 1. From the set of public access keys provided, get the one specifically
+        // required by our accessToken
+        JsonObject public_key = getPublicKeyForAccessToken(accessToken);
+        if (public_key == null) {
             return false;
         }
-        log.error("\n\tTOKEN SIG: {}", token_sig);
+        log.error("\n\tKEYYYYY: {}", public_key);
 
-        // 3. ...and then pull out that matching key!
-        /*
-         * loop through jwks_json tokens and find the one that has a "kid" field that matches token_sig
-         * that's the key we want!
-         */
+        // 2. Use the key to verify the access token
 
-        // Step two: use the key to verify the access token
         return false;
     }
+
+
 
     /**
      * Return the decoded "uid" parameter from the `accessToken` JWT's payload.
