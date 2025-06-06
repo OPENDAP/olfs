@@ -30,8 +30,11 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
+import com.auth0.jwt.JWT;
 import com.auth0.jwk.Jwk;
+import com.auth0.jwk.InvalidPublicKeyException;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
@@ -51,9 +54,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.security.interfaces.RSAPublicKey;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import static opendap.auth.IdFilter.USER_PROFILE;
 
@@ -246,7 +251,7 @@ public class UrsIdP extends IdProvider{
      * @param accessToken
      * @return
      */
-    JsonObject getPublicKeyForAccessToken(String accessToken) {
+    RSAPublicKey getPublicKeyForAccessToken(String accessToken) throws InvalidPublicKeyException {
         // 1. Pull in JWKS (the public key set) from config
         String jwks_str = getUrsClientPublicKeys();
         String invalidTokenPrefix = "\n\n" + this.getClass().getSimpleName() + " token validation failed: "; // TODO-remove extra new line prefix
@@ -297,17 +302,40 @@ public class UrsIdP extends IdProvider{
         // log.error("\n\tWE WANT TOKEN SIG: {}", token_sig);
 
         // // 3. ...and then pull out that matching key!
-        JsonObject public_key = null;
+        JsonObject jwk_json = null;
         for(int i = 0; i < jwk_keys.size(); i++) {  
             JsonObject jwk = jwk_keys.get(i).getAsJsonObject();
             if (jwk.has("kid")) {
                 if (jwk.get("kid").getAsString().equals(token_sig)) {
-                    public_key = jwk;
+                    jwk_json = jwk;
                     break;
                 }
             }
         }
-        // log.error("\n\tGot 'em? {}", public_key);
+        // log.error("\n\tGot 'em? {}", jwk_json);
+
+        // Map<String,JsonElement> m = jwk_json.asMap();
+
+        // https://github.com/auth0/jwks-rsa-java/blob/master/src/main/java/com/auth0/jwk/Jwk.java#L90
+        Map<String, Object> values = new HashMap<>(); //TODO: make this directly from json
+        values.put("alg", null);
+        values.put("kty", jwk_json.get("kty").getAsString());
+        values.put("use", null);
+        values.put("key_ops", null);
+        values.put("x5c", null);
+        values.put("x5t", null);
+        values.put("kid", jwk_json.get("kid").getAsString());
+        values.put("n", jwk_json.get("n").getAsString());
+        values.put("e", jwk_json.get("e").getAsString());
+
+        log.error("\n\tJWKKKKKK: {}", values);
+
+        Jwk jwk = Jwk.fromValues(values);
+        log.error("\n\tJWKKKKKK: {}", jwk);        
+
+        RSAPublicKey public_key = (RSAPublicKey) jwk.getPublicKey();
+
+
         return public_key;
     }
 
@@ -320,14 +348,39 @@ public class UrsIdP extends IdProvider{
     boolean isEdlTokenValid(String accessToken) {
         // 1. From the set of public access keys provided, get the one specifically
         // required by our accessToken
-        JsonObject public_key = getPublicKeyForAccessToken(accessToken);
-        if (public_key == null) {
+        RSAPublicKey public_key;
+        try  {
+            public_key = getPublicKeyForAccessToken(accessToken);
+        } catch (InvalidPublicKeyException e)
+        {
+            log.error("\n\tInvalid public key: {}", e);
             return false;
         }
-        log.error("\n\tKEYYYYY: {}", public_key);
+       if (public_key == null) {
+            return false;
+        }
+        // log.error("\n\tKEYYYYY: {}", public_key);
 
         // 2. Use the key to verify the access token
+        try {
+            Algorithm algorithm = Algorithm.RSA256(public_key);
+            // log.error("\n\tALG {}", algorithm);
 
+            JWTVerifier verifier = JWT.require(algorithm).build();
+            //     .withIssuer("auth0") //TODO - what is this??
+            //     .build();
+
+            // Will throw an exception if the access token is bad or 
+            // fails a verification step
+            DecodedJWT jwt = verifier.verify(accessToken);
+            log.error("\n\tDECODED JWT {}", jwt);
+
+            // If we've made it here, the token is valid
+            return true;
+        } catch (JWTVerificationException e) { // TODO add all other errors here
+            // invalid signature or claims
+            log.error("\n\tOH NO {}", e);
+        }
         return false;
     }
 
