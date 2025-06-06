@@ -251,97 +251,113 @@ public class UrsIdP extends IdProvider{
      * @param accessToken
      * @return
      */
-    RSAPublicKey getPublicKeyForAccessToken(String accessToken) throws InvalidPublicKeyException, JsonSyntaxException {
-        // 1. Pull in the public key set as JSON objects
+    RSAPublicKey getPublicKeyForId(String public_key_id) throws InvalidPublicKeyException, JsonSyntaxException {
+        // 1. Get the key set (JSON web key set, i.e. JWKS)
         String jwks_str = getUrsClientPublicKeys();
-        JsonObject jwk_set = JsonParser.parseString(jwks_str).getAsJsonObject();
-        JsonArray jwk_keys = jwk_set.getAsJsonArray("keys");
-        
-        // 2. Figure out which key id the access token will want us to pull out...
-        // TODO - add specific safety catches here??
-        // TODO: replace by passing in key values
-        String[] jwt_components = accessToken.split("\\.");
-        String header_str = new String(Base64.getDecoder().decode(jwt_components[0]), HyraxStringEncoding.getCharset());
-        JsonObject token_header = JsonParser.parseString(header_str).getAsJsonObject();
-        String token_sig = token_header.get("sig").getAsString();
+        JsonObject jwks = JsonParser.parseString(jwks_str).getAsJsonObject();
+        JsonArray jwks_keys = jwks.getAsJsonArray("keys");
 
-        // 3. Pull out the matching key
+        // 2. Pull out the requested key
         JsonObject jwk_json = null;
-        for(int i = 0; i < jwk_keys.size(); i++) {  
-            JsonObject jwk = jwk_keys.get(i).getAsJsonObject();
+        for (int i = 0; i < jwks_keys.size(); i++) {
+            JsonObject jwk = jwks_keys.get(i).getAsJsonObject();
             if (jwk.has("kid")) {
-                if (jwk.get("kid").getAsString().equals(token_sig)) {
+                if (jwk.get("kid").getAsString().equals(public_key_id)) {
                     jwk_json = jwk;
                     break;
                 }
             }
         }
         if (jwk_json == null) {
-            return null; 
+            return null;
         }
 
-        // 4. Convert key's json entry to a public key
+        // 3. Convert key's json entry to a public key
         Map<String, Object> jwk_values = new HashMap<>();
         for (Map.Entry<String, JsonElement> entry : jwk_json.entrySet()) {
             jwk_values.put(entry.getKey(), entry.getValue().getAsString());
         }
-        Jwk jwk = Jwk.fromValues(jwk_values);
 
         try {
+            Jwk jwk = Jwk.fromValues(jwk_values);
             return (RSAPublicKey) jwk.getPublicKey();
-        } catch (Exception e) {
-            log.error("\n\tSOMETHING BAD HAPPENED {}", e);
-            // return null;
+        } catch (InvalidPublicKeyException e) {
+            log.error("Unable to get public key. Details: {}", e);
         }
         return null;
     }
 
     /**
-     * Return the decoded "uid" parameter from the `accessToken` JWT's payload;
-     * return value will be `null` if `accessToken` is invalid.
+     * Return the value for `key` from the encoded JSON string `input_str`;
+     * return value will be `null` if encoded string is not JSON or if
+     * `key` is not found in object.
      *
-     * @param accessToken A pre-verified EDL JWT token
-     * @return The `accessToken`'s user id (`uid`)
-     * @throws TODO- consider if this can throw
-     */ 
-    String getEdlUserIdFromToken(String publicKeys, String accessToken) {
-        // 1. From the set of public access keys provided, get the one specifically
-        // required by our accessToken
-        RSAPublicKey public_key;
-        try  {
-            public_key = getPublicKeyForAccessToken(accessToken);
-        } catch (InvalidPublicKeyException | JsonSyntaxException  e)
-        {
-            log.error("\n\tNo valid matching public key found in `{}`. Details: {}", publicKeys, e);
+     * @param input_str
+     * @param key
+     * @return The value of `key`, null if not found
+     */
+    private String getStringValueFromEncodedString(String input_str, String key) {
+        String decoded_str = new String(Base64.getDecoder().decode(input_str),
+                HyraxStringEncoding.getCharset());
+        JsonObject decoded_json;
+        try {
+            decoded_json = JsonParser.parseString(decoded_str).getAsJsonObject();
+        } catch (JsonSyntaxException e) {
+            log.error("{}", e);
             return null;
         }
-       if (public_key == null) {
+        return decoded_json.has(key) ? decoded_json.get(key).getAsString() : null;
+    }
+
+    /**
+     * Return the value of "uid" from the `accessToken` JWT's payload;
+     * `null` if `accessToken` is invalid.
+     *
+     * @param publicKeys  A stringified JWK Set
+     * @param accessToken An pre-verified EDL JWT token
+     * @return The `accessToken`'s user id (`uid`)
+     */
+    String getEdlUserIdFromToken(String publicKeys, String accessToken) {
+        // 1. Figure out which public key the access token requires
+        DecodedJWT unverified_jwt = null;
+        try {
+            unverified_jwt = JWT.decode(accessToken);
+        } catch (JsonSyntaxException e) {
+            log.error("Unable to load access token as JWT. Details: {}", e);
+            return null;
+        }
+        String pub_key_id = getStringValueFromEncodedString(unverified_jwt.getHeader(), "sig");
+        if (pub_key_id == null) {
+            log.error("Access token missing required field `sig`.");
             return null;
         }
 
-        // 2. Use the key to verify the access token
+        // 2. From the set of public access keys provided, get the one specifically
+        // required by our access token
+        RSAPublicKey public_key;
+        try {
+            public_key = getPublicKeyForId(pub_key_id);
+        } catch (InvalidPublicKeyException | JsonSyntaxException e) {
+            log.error("No valid matching public key found in `{}`. Details: {}", publicKeys, e);
+            return null;
+        }
+        if (public_key == null) {
+            return null;
+        }
+
+        // 3. Use that key to verify the access token
         try {
             Algorithm algorithm = Algorithm.RSA256(public_key);
             JWTVerifier verifier = JWT.require(algorithm).build();
-            DecodedJWT jwt = verifier.verify(accessToken);
-            // If we've made it here, the token is valid!
-            log.error("\n\tDECODED JWT {}", jwt);
-        } catch (JWTVerificationException e) { // TODO add all other errors here
-            // invalid signature or claims
-            log.error("\n\tOH NO {}", e);
+            DecodedJWT valid_jwt = verifier.verify(unverified_jwt);
+        } catch (JWTVerificationException e) {
+            log.error("Access token failed verification. Details: {}", e);
             return null;
         }
 
-        // The JWT structure is `header.payload.signature`; we need to pull the id out of the 
-        // Base64-encoded `payload` substring. We do this manually instead of doing `jwt.getPayload()` 
-        // so that we can specify our string encoding charset
-        String[] jwt_components = accessToken.split("\\.");
-        String payload = new String(Base64.getDecoder().decode(jwt_components[1]), HyraxStringEncoding.getCharset());
-        
-        // ...finally, pull user id from payload!
-        JsonObject payload_json = JsonParser.parseString(payload).getAsJsonObject();
-        String uid = payload_json.has("uid") ? payload_json.get("uid").getAsString() : null;
-        log.debug("uid: {}",uid);
+        // ...finally, pull user id from the payload!
+        String uid = getStringValueFromEncodedString(unverified_jwt.getPayload(), "uid");
+        log.debug("uid: {}", uid);
         return uid;
     }
 
@@ -451,11 +467,12 @@ public class UrsIdP extends IdProvider{
                         userProfile.setUID(uid);
                         foundValidAuthToken = true;
                     }
-                } 
+                }
 
-                // ...and fall back to the EDL endpoint on local failure or lack of local public keys
+                // ...and fall back to the EDL endpoint on local failure or lack of local public
+                // keys
                 if (false) { // TODO: update to !foundValidAuthToken
-                    
+
                     String uid = getEdlUserId(token);
                     userProfile.setUID(uid);
 
