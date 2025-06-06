@@ -243,43 +243,45 @@ public class UrsIdP extends IdProvider{
         userProfile.ingestJsonProfileString(contents);
     }
 
-// curl -X POST -d 'token=<token>&client_id=<‘your application client_id’> https://urs.earthdata.nasa.gov/oauth/tokens/user
+    // curl -X POST -d 'token=<token>&client_id=<‘your application client_id’>
+    // https://urs.earthdata.nasa.gov/oauth/tokens/user
 
     /**
      * TODO: add docstring? etc
      * TODO: reconsider exception
+     * 
      * @param accessToken
      * @return
      */
-    RSAPublicKey getPublicKeyForId(String public_key_id) throws InvalidPublicKeyException, JsonSyntaxException {
+    RSAPublicKey getPublicKeyForId(String publicKeyId) throws InvalidPublicKeyException, JsonSyntaxException {
         // 1. Get the key set (JSON web key set, i.e. JWKS)
-        String jwks_str = getUrsClientPublicKeys();
-        JsonObject jwks = JsonParser.parseString(jwks_str).getAsJsonObject();
-        JsonArray jwks_keys = jwks.getAsJsonArray("keys");
+        String jwksStr = getUrsClientPublicKeys();
+        JsonObject jwks = JsonParser.parseString(jwksStr).getAsJsonObject();
+        JsonArray jwksKeys = jwks.getAsJsonArray("keys");
 
         // 2. Pull out the requested key
-        JsonObject jwk_json = null;
-        for (int i = 0; i < jwks_keys.size(); i++) {
-            JsonObject jwk = jwks_keys.get(i).getAsJsonObject();
+        JsonObject jwkJson = null;
+        for (int i = 0; i < jwksKeys.size(); i++) {
+            JsonObject jwk = jwksKeys.get(i).getAsJsonObject();
             if (jwk.has("kid")) {
-                if (jwk.get("kid").getAsString().equals(public_key_id)) {
-                    jwk_json = jwk;
+                if (jwk.get("kid").getAsString().equals(publicKeyId)) {
+                    jwkJson = jwk;
                     break;
                 }
             }
         }
-        if (jwk_json == null) {
+        if (jwkJson == null) {
             return null;
         }
 
         // 3. Convert key's json entry to a public key
-        Map<String, Object> jwk_values = new HashMap<>();
-        for (Map.Entry<String, JsonElement> entry : jwk_json.entrySet()) {
-            jwk_values.put(entry.getKey(), entry.getValue().getAsString());
+        Map<String, Object> jwkValues = new HashMap<>();
+        for (Map.Entry<String, JsonElement> entry : jwkJson.entrySet()) {
+            jwkValues.put(entry.getKey(), entry.getValue().getAsString());
         }
 
         try {
-            Jwk jwk = Jwk.fromValues(jwk_values);
+            Jwk jwk = Jwk.fromValues(jwkValues);
             return (RSAPublicKey) jwk.getPublicKey();
         } catch (InvalidPublicKeyException e) {
             log.error("Unable to get public key. Details: {}", e);
@@ -288,25 +290,25 @@ public class UrsIdP extends IdProvider{
     }
 
     /**
-     * Return the value for `key` from the encoded JSON string `input_str`;
+     * Return the value for `key` from the encoded JSON string `inputStr`;
      * return value will be `null` if encoded string is not JSON or if
      * `key` is not found in object.
      *
-     * @param input_str
+     * @param inputStr
      * @param key
      * @return The value of `key`, null if not found
      */
-    private String getStringValueFromEncodedString(String input_str, String key) {
-        String decoded_str = new String(Base64.getDecoder().decode(input_str),
+    private String getStringValueFromEncodedString(String inputStr, String key) {
+        String decodedStr = new String(Base64.getDecoder().decode(inputStr),
                 HyraxStringEncoding.getCharset());
-        JsonObject decoded_json;
+        JsonObject decodedJson;
         try {
-            decoded_json = JsonParser.parseString(decoded_str).getAsJsonObject();
+            decodedJson = JsonParser.parseString(decodedStr).getAsJsonObject();
         } catch (JsonSyntaxException e) {
             log.error("{}", e);
             return null;
         }
-        return decoded_json.has(key) ? decoded_json.get(key).getAsString() : null;
+        return decodedJson.has(key) ? decodedJson.get(key).getAsString() : null;
     }
 
     /**
@@ -319,54 +321,56 @@ public class UrsIdP extends IdProvider{
      */
     String getEdlUserIdFromToken(String publicKeys, String accessToken) {
         // 1. Figure out which public key the access token requires
-        DecodedJWT unverified_jwt = null;
+        DecodedJWT unverifiedJwt = null;
         try {
-            unverified_jwt = JWT.decode(accessToken);
+            unverifiedJwt = JWT.decode(accessToken);
         } catch (JsonSyntaxException e) {
             log.error("Unable to load access token as JWT. Details: {}", e);
             return null;
         }
-        String pub_key_id = getStringValueFromEncodedString(unverified_jwt.getHeader(), "sig");
-        if (pub_key_id == null) {
+        String publicKeyId = getStringValueFromEncodedString(unverifiedJwt.getHeader(), "sig");
+        if (publicKeyId == null) {
             log.error("Access token missing required field `sig`.");
             return null;
         }
 
         // 2. From the set of public access keys provided, get the one specifically
         // required by our access token
-        RSAPublicKey public_key;
+        RSAPublicKey publicKey;
         try {
-            public_key = getPublicKeyForId(pub_key_id);
+            publicKey = getPublicKeyForId(publicKeyId);
         } catch (InvalidPublicKeyException | JsonSyntaxException e) {
             log.error("No valid matching public key found in `{}`. Details: {}", publicKeys, e);
             return null;
         }
-        if (public_key == null) {
+        if (publicKey == null) {
             return null;
         }
 
         // 3. Use that key to verify the access token
         try {
-            Algorithm algorithm = Algorithm.RSA256(public_key);
+            Algorithm algorithm = Algorithm.RSA256(publicKey);
             JWTVerifier verifier = JWT.require(algorithm).build();
-            DecodedJWT valid_jwt = verifier.verify(unverified_jwt);
+            DecodedJWT verifiedJwt = verifier.verify(unverifiedJwt);
         } catch (JWTVerificationException e) {
             log.error("Access token failed verification. Details: {}", e);
             return null;
         }
 
         // ...finally, pull user id from the payload!
-        String uid = getStringValueFromEncodedString(unverified_jwt.getPayload(), "uid");
+        String uid = getStringValueFromEncodedString(unverifiedJwt.getPayload(), "uid");
         log.debug("uid: {}", uid);
         return uid;
     }
 
     /**
      * Old Way:
-     * curl -X POST -d 'token=<token>&client_id=<‘your application client_id’> https://urs.earthdata.nasa.gov/oauth/tokens/user
+     * curl -X POST -d 'token=<token>&client_id=<‘your application client_id’>
+     * https://urs.earthdata.nasa.gov/oauth/tokens/user
      *
      * New Way:
-     * curl -X POST -d 'token=<token>’ -H ‘Authorization: ‘Basic <base64appcreds>’ https://urs.earthdata.nasa.gov/oauth/tokens/user
+     * curl -X POST -d 'token=<token>’ -H ‘Authorization: ‘Basic <base64appcreds>’
+     * https://urs.earthdata.nasa.gov/oauth/tokens/user
      *
      *
      * @param accessToken
