@@ -1,0 +1,436 @@
+= image:logo.svg[width=300]
+OPeNDAP, Inc.
+{docdatetime}
+:toc: left
+:toclevels: 3
+:numbered:
+:docinfo: shared
+:icons: font
+:tabsize: 4
+:indent: 4
+:doctype: book
+:source-highlighter: coderay
+:coderay-linenums-mode: inline
+:prewrap!:
+:imagesdir: ./doc/images
+:homepage: www.opendap.org
+[[top]]
+
+= OPeNDAP Lightweight Frontend Service (olfs)
+
+[[overview]]
+== Overview
+The OPeNDAP Lightweight Frontend Service (*_olfs_*) is the public/outward facing component of the Hyrax server.
+
+[[whutdo]]
+== What does it Do?
+The *_olfs_* provides a number of interfaces through which users and programmatic clients can request and subset data.
+
+[[apis]]
+=== Supported APIs:
+* https://docs.opendap.org/index.php/Aggregation_enhancements[Aggregation Service API] (_Does this even work? When was the last time we tried it?_)
+* https://www.earthdata.nasa.gov/s3fs-public/imported/ESE-RFC-004v1.1.pdf[DAP2 data access API]
+* https://opendap.github.io/dap4-specification/DAP4.html[DAP4 data access API]
+* https://www.ogc.org/publications/standard/wcs/[WCS 2.0 API]
+* https://pds-imaging.jpl.nasa.gov/tools/w10n/[w10n data access api]
+* https://docs.unidata.ucar.edu/tds/current/userguide/client_side_catalog_specification.html[THREDDS Client-Side Catalog API] for machine traversable catalog/inventories.
+* *File Download Service* - When this option is enabled the clients are allowed to download the underlying data files directly from the Hyrax service. Not super efficient use of Hyrax t.b.h. some (all?) of the on-prem NASA DAACs operate a separate download service for the data files.
+* *Gateway service* - This service allows the user to ask Hyrax to retrive a remote dataset file and then provide DAP services for that file.
+* *https://opendap.earthdata.nasa.gov[NGAP DAP service]* - The NGAP DAP service is a NASA specific service that integrates into NASA's NGAP service chain, providing a publicly accessible DAP service endpoint for their cloud deployed data holds. The NGAP DAP service utilizes the NASA Common Metadata Repository (CMR), Thin Egress Client (TEA), and AWS S3 to provide access to data using precomputed dmr++ files and HTTP Range GET commands to extract data values from files/objects held in S3. Note: The NGAP DAP service does not provide a traversable catalog/inventory of the data holdings.
+
+[[uiisnice]]
+=== Supported User Interfaces
+* *Data Request Form (aka the _Interface From Hell_, aka the _IFH_)*:  Both the DAP2 and DAP4 services provide a web UI that allows a user to build and execute data access requests. IFH pages are built by retrieving the metadata for the dataset from the BES as an XML document and then using an XSL transform to produce the IFH response from the metadata document.
+** http://test.opendap.org:8080/opendap/ghrsst/20020602090000-JPL-L4_GHRSST-SSTfnd-MUR-GLOB-v02.0-fv04.1.h5.html[For the DAP2 IFH] a DDX (an XML encoding of DAP2 metadata) is used to build the form.
+** http://test.opendap.org:8080/opendap/ghrsst/20020602090000-JPL-L4_GHRSST-SSTfnd-MUR-GLOB-v02.0-fv04.1.h5.dmr.html[For the DAP4 IFH] the DMR document is used.
+** Each case has its own XSLT which is conditioned by the *_olfs_* prior to the transformation step.
+
+[[browser_catalog]]
+* *Browser Navigable Catalog*: The OLFS uses BES showNode commands to discover what the BES "catalog" (usually a filesystem but maybe not) contains. The BES responses are XML documents that the OLFS operates on with an XSL transform to produce http://test.opendap.org:8080/opendap/"[the Hyrax "blue bar" browser navigation pages]. The server will try to return this page for any url path ending in `/` or in `/contents.html` Some parts of the catalog ui representation are controlled by the *_olfs.xml_* file used with the deployment. (See <<configuration>>)
+
+[[thredds_catalog]]
+* *THREDDS Catalogs, a machine-readable catalog* _No Scraping Required!_ The OLFS automatically provides a machine readable THREDDS catalog for the inventory in its catalog. In fact it uses the same inputs and only differs in the XSL from the browser navigable catalog described above to produce http://test.opendap.org:8080/opendap/catalog.xml"[a THREDDS catalog response]. (See <<browser_catalog>>)
+
+[[assembly]]
+== How is the runtime code assembled?
+The primary code pattern used by the *_olfs_* for implementing services is to subclass _HttpServlet_ and create specialized implementations that utilize one or more _DispatchHandler_ implementations to claim requests and respond to them. In some cases a servlet might utilize a single instance of _DispatchHandler_ to run the show. For example, the servlet _opendap.build_dmrpp.BuildDmrppServlet_ relies solely on _opendap.build_dmrpp.BuildDmrppDispatchHandler_ and the servlet _opendap.wcs.v2.0.Servlet_ relies solely on _opendap.wcs.v2.0.HttpGetHandler_. In other examples there are many _DispatchHandler_ objects used by the servlet implementation. For example _opendap.coreServlet.DispatchServlet_ uses about a dozen different _DispatchHandler_ instances.
+
+[[howwork]]
+== How? How does it work?
+It's complicated, so first I'll provide a simplified narrative of the request/response operation and then I'll add a couple of sections regarding other parts of the operation.
+
+=== DAP Request/Response
+
+Let's look at how the primary servlet, _opendap.coreServlet.DispatchServlet_, handles an incoming DAP service request:
+
+In the _opendap.coreServlet.DispatchServlet.doGet()_ method the code first handles some bookkeeping (such as producing a request id and starting the access log for the request) before iterating over an internal vector of _DispatchHandler_ objects, asking each in turn if it can service the request. The first _DispatchHandler_ to claim the request is then asked to service it and transmit the response. The order of the _DispatchHandler_ objects in the vector is critical, as there are greedy _DispatchHandler_ implementations (_FileDispatchHandler_ for example) that will claim things that should/would have been claimed by the intended _DispatchHandler_ if asked prior. The order is established in the _DispatchServlet.init()_ method.
+
+If the request is for some type of DAP response then the _BesDapDispatcher_ will claim it.
+
+Inside _BesDapDispatcher_ there is a vector of _Dap4Responder_ objects, each one associated with a particular DAP response type (such as: use DAP2 and return a netcdf-3 encoded response, use DAP4 and return the DMR response, etc.) The _BesDapDispatcher_ iterates over its vector of _Dap4Responder_ objects and hands the response duties to the first one that claims the request.
+
+One might ask: How does all this "claiming" work? _Through the magic of regular expressions!_ Each of the _Dap4Responder_ objects contains a primary regular expression which is used to match a URL path in the request. For example the _NormativeDMR_ responder has something like this `^.*\.dmr$`. But it's more complex because in DAP4 there are several different alternate encodings for the DMR (and the other response types as well) that a client might wish to receive. This is handled by having each normative responder hold a collection of alternative responders, each of which has its own suffix and regex. When _NormativeDMR_ is built, it combines all of its alternative responder regex expression into a single combined regex. When _NormativeDMR_ is asked if a request can be handled it simply evaluates the request URL path to see if it matches the combined regex. When the request is submitted for processing NormativeDMR locates the appropriate responder (using the individual regular expressions) and delegates the request to it.
+
+Finally, the chosen responder will set the HTTP response headers appropriately (media types etc) and then use the BesApi to build and issue a request to the target BES. This is done using a OPeNDAPClient object. The request is passed with the response output stream, and the OPeNDAPClient handles the transmission of the request and then the reception and retransmission of the BES response back to the client.
+
+==== Service Conflation Issue
+_All this checking and "claiming" seems so involved._ Yes. Yes it is. And it's partially a byproduct of the conflation of services. If I were to design it again I would follow the lead os the THREDDS Data Server (TDS) and separate the services using a URL path prefix something like:
+
+* _opendap/catalog/path_ - Would produce a browser navigable HTML catalog of the servers holdings.
+* _opendap/thredds/path_ - Would produce a machine readable/traversable THREDDS client catalog (XML) of the servers holdings.
+* _opendap/dap4/path_ - The DAP4 service and only the DAP4 service.
+* _opendap/dap2/path_ - The DAP2 service and only the DAP2 service.
+* _opendap/file/path_ - The file download service.
+* etc.
+
+I think each of these services might be implemented as a servlet. In Hyrax, all these services currently exist on the same URL path and a lot of the process described above is about the disambiguation of requests. I think this reorganization would reduce some of the code size and processing time, and potentially an ala-carte deployment where we can choose the services to include.
+
+== Caching
+The *_olfs_* utilizes a number of caches.
+
+=== RequestCache
+The RequestCache is used by every thread servicing a request. It's an object cache. It allows objects to be passed from on part the execution stack to another with it being carried as a parameter. Each thread that's servicing a request can safely put things it may need into the RequestCache. When the request/response is completed the RequestCache for the thread is cleared. (You can see this in the `opendap.coreServlet.DispatchServlet.doGet()` method)
+
+The vast majority of the usages of RequestCache are responders caching a MediaType object as a set-up for request execution. This way if an error occurs the error handling apparatus can make good choices about how to encode the error response for the client.
+
+=== BesNodeCache
+In order to improve navigation performance the *_olfs_* utilizes an in memory LRU cache called BESNodeCache. This is used by the *_olfs_* to cache the BES responses to showNode commands (which is how the BES exposes it's dynamic navigable catalogs). These entries are held for a configurable period of time before a new request for the cached entry will cause the entry to be refreshed. This is a thread safe cache available to all processing threads.
+
+=== BesSiteMap Cache
+The BesSiteMap class is used to get and maintain a site map file for use with robots.txt The file is refreshed based on a configurable time period.
+
+=== Thredds CatalogManager
+Hard to know if this even gets used in the real world, so I'm going to skip longer explanation in favor of: For performance reasons the *_olfs_* can cache THREDDS catalogs in memory, and it is complicated when the catalogs need to be updated.
+
+[[filters]]
+== Filters
+* *_ClickJackFilter_* - Filter to stop the click jack hackery.
+* *_BotFilter_* - Can be used to block access from single ip addresses, domains, or whatever your desires and regex acumen allow you to express. See *_olfs.xml_* for configuration details.
+* *_IdFilter_* - Used for user authentication see <<authentication>>
+* *_PEPFilter_* - Used for user authentication see <<authentication>>
+
+[[resources]]
+== Resources
+In the project directory you can find the resources included with the *_olfs_* when it's packaged for deployment. The default resources are located in _olfs/resources/hyrax_ these include *_js_*, *_jsp_*, *_xml_*, *_jnlp_*, and *_xslt_* files.
+
+Some of the directories within resource may or may not be in use, ymmv.
+
+=== olfs/resources/hyrax/`xsl`
+A lot of the HTML produced by the server is built using the transforms found in this directory. I think that as of now that all the files are hooked up to code in the server, but I suspect some of the things that use the *_xslt_* files may not be used themselves.
+
+==== Version
+* *_version.xsl_* - This is imported by nearly all the XSL transform docs, and is used inject Hyrax version. When the builds are run, the key string `@HyraxVersion@` is replaced with the Version string value.
+
+
+==== IFH Production
+* *_dap2ifh.xsl_* - Builds the DAP2 Data Request Form response from a DMR and passed parameters from the OLFS
+* *_dap4ifh.xsl_* - Builds the DAP4 Data Request Form response from a DMR and passed parameters from the OLFS
+
+==== Browsable Catalog UI
+* *_dap4Contents.xsl_* - Builds a DAP4 *_contents.html_* page.
+* *_node_contents.xsl_* - Builds a DAP2 *_contents.html_* page from a BES showNode response. (DirectoryDispatchHandler)
+
+==== THREDDS Catalog production
+* *_node_catalog.xsl_* - Builds THREDDS *_catalog.xml_* response from a BES showNode response. (ThreddsDispatchHandler)
+* *_besNodeToDatasetScanCatalog.xsl_* - The THREDDS Things, *_3T_*.
+* *_threddsCatalogIngest.xsl_* - *_3T_*
+* *_threddsCatalogPresentation.xsl_* - *_3T_*
+* *_threddsDatasetDetail.xsl_* - *_3T_*
+* *_threddsMetadataDetail.xsl_* - *_3T_*
+
+==== RDF Responses
+* *_anyXml2Rdf.xsl_* - Used to produce both the DAP2 and DAP4 RDF responses for the server. Oddly this seems to be a pointless empty wrapper for *_xml2rdf.xsl_*
+* *_xml2rdf.xsl_* - Simply included in *_anyXml2Rdf.xml_*  `<xsl:include href="xml2rdf.xsl"/>`
+
+==== w10n
+* *_showNodeToW10nCatalog.xsl_* - Makes w10n collection pages from a BES showNode response.
+* *_w10nDataset.xsl_* - makes w10n dataset pages from a DAP3.2 DDX from the BES.
+
+==== Viewers
+* *_webStartDataset.xsl_* - Used by the viewers servlet produce an available viewers page for a dataset.
+
+==== Obscure DAP4 Things
+* *_asyncResponse.xsl_* - Used by a prototype DAP4 asynchronous response implemented in dap4Responders.DataResponse.NormativeDR.handleStoreResultResponse(). _I bet this feature is never used._
+* *_datasetServices.xsl_* - Used to create the DAP4 Dataset Services Response page. _Probably not used_.
+
+=== olfs/resources/hyrax/`ngap`
+The _olfs/resources/hyrax/ngap_ directory contains the resources that we use amend/replace things from the regular build to produce our NGAP builds. Things like a custom landing page and the libraries to let us use *_memcached_* to manage session state in our multi-host deployments.
+
+[[configuration]]
+== Configuration
+The *_olfs_* utilizes several configuration files. The primary one, _olfs.xml_, controls *_olfs_* behavior and defines theblocations of one or more BES services that are needed for the Hyrax to function.
+
+[[find-config]]
+=== Locating the configuration at startup.
+When the server starts the code in `opendap.coreServlet.DispathServlet.init()` utilizes the ServletUtil class methods to locate the configuration. The `ServletUtil.getConfigPath()` method checks the following locations:
+
+
+. _/etc/olfs_
+. _/usr/share/olfs_
+. _$CATALINA_HOME/webapps/_ deployment_context _/WEB-INF/conf_
+
+If neither of the first two locations are located then the default configuration bundled in the war file will be used.
+
+If either of the first two locations is found, and if the configuration is not in that location, and the running service has write permission to the identified location, then the service will copy its default configuration to the identified location.This creates a configuration that can be easily modified by the operator and that will persist across updates and/or redeployments of the *_olfs_*.
+
+
+The DispatchServlet.init() method also loads a vector with new instances of its DispatchHandler objects that it will utilize to service requests. More on this below.
+
+[[olfs.xml]]
+=== olfs.xml
+This file contains the core configuration for the *_olfs_*. It defines a number of service behaviors and also the location of the BES(s) to be used when handling requests.
+
+[[user-access.xml]]
+=== user-access.xml
+This file is an authentication and permissions control file that allows the operator to delpoy a service that can make use of OAUth2 Single Sign On (SSO) to authenticate users. The file also defines the various operational permissions the authenticated users will have (via groups and roles)
+
+[[logback]]
+=== logback.xml and logback-test.xml
+These files provide the loggin frame work behaviors: Log file names, log file content, and what things will be logged at each logging level.
+
+[[catalog.xml]]
+=== catalog.xml
+The top level static THREDDS client catalog for the machine traversable THREDDS service. This file nominally contains a catalog ref to the dynamically generated Hyrax THREDDS catalogs:
+
+  <catalogRef xlink:href="/opendap/hyrax/catalog.xml" xlink:title="Hyrax Catalog" name="Hyrax Catalog" />
+
+It can be expanded to create a much more extensive static catalog by creating a filesystem tree of catalog files linked by the appropriate catalogRef elements.
+
+[[viewers.xml]]
+=== viewers.xml
+This provides the configuration for the various Java Web Start applications (IDV Viewer, NetcdfToolsUI, etc.) and WebServiceHandlers (NcWMS, Godiva)
+
+[[webstart.xml]]
+=== webstart.xml
+*_I think that this can be retired, but that assertion needs to be tested._*
+
+[[servlets]]
+== Servlets
+The servlet implementations subclass HttpServlet. The servlets implement the various services that the *_olfs_* supports. Some of these rely on one or more _DispatchHandler_ implementations to perform the heavy lifting of answering the requests. There is not a one to one and onto relationship with things I think of as a service and the servlets. They all implement a service, but some implement several services.
+
+* Package: *opendap.aggregation*
+- `AggregationServlet.java` - Implements the https://docs.opendap.org/index.php/Aggregation_enhancements[Hyrax Aggregation Service API]
+
+* Package: *opendap.auth*
+- `PDPService.java` - This standalone service is an implementation of a Policy Decision Point which can be used as part of an authentication and access permissions activity. I can be run on a remote system and asked if a particular user/group/role is allowed access to a particular resource.
+
+* Package: *opendap.bes*
+- `BESSiteMapService.java` - This service uses the BES to construct and cache a Site Map of the data holdings in a particular deployment of Hyrax.
+
+* Package: *opendap.build_dmrpp*
+- `BuildDmrppServlet.java` - This service can be used to have Hyrax create and reqturn a dmr++ document for a particular dataset. _It seems to be the case that this service has been "overwhelmed by events" (OBE) and might be retired_.
+
+* Package: *opendap.coreServlet*
+- `DispatchServlet.java` - This service is the core Hyrax service that uses a number of DispatchHanlder implementations to define it's core functionality.
+- `DocServlet.java` - This service provides client access to the static documents held by the *_olfs_* such as image, css, and javascript files.
+
+* Package: *opendap.gateway*
+- `DispatchServlet.java` - Implements the Hyrax Gateway Service. _We should prbably review this with an eye towards its retirement_.
+
+* *Package: opendap.viewers*
+- `ViewersServlet.java` - This servlet is used create JavaWebStart documents that can can be utilized by a client to launch/access external applications such as _IdvViewer_, _NetCdfTools_, and _AutoPlot_. It can also direct users to externally running web services such as _NcWms_ and/or _Godiva_. 
+
+* Package: *opendap.w10n*
+- `W10nServlet.java` - Implements the https://pds-imaging.jpl.nasa.gov/tools/w10n/[w10n data access api] for the Hyrax data holdings.
+
+* Package: *opendap.wcs.v2_0.http* - _There are problems with WCS in general, and it would be worth evaluating the retirement potential for this package._
+- `Servlet.java` - Provides a WCS 2.0 implementation. This works, but requires the operator to perform configuration work for each "collection" in order to identify the domain and range variables for the collections datasets. 
+
+[[dispatch-handlers]]
+== Dispatch Handlers
+These classes implement the `opendap.coreSevlet.DispatchHandle` interface and are used by the `CoreServlet` to direct the client requests to the appropriate software for response.
+
+* Package: *opendap.bes*
+- `BesDapDispatcher.java` - This _DispatchHandler_ implementation provides the core DAP2 and DAP4 services for Hyrax, which includes data access services and the production of the HTML Data Request Forms. It does this by utilizing a collection of _Dap4Responder_ implementations. Each of which handles a very specific task, typically commanding the BES to produce a particular response.
+- `BESThreddsDispatchHandler.java` - This DispatchHandler uses a combination of the BES `showNode`  interface, and a XSL transform file along with state information  to generate THREDDS client catalog responses and return them to the user.
+- `DirectoryDispatchHandler.java` - This DispatchHandler uses the BES `showNode`  interface, and a XSL transform file to produce the browser navigable "blue-bar" pages that express the data holdings of the service as a directed graph.
+- `FileDispatchHandler.java` - Used to transmit files from the BES to the user. If the source file is seen as a data file byt the BES this will be blocked unless specifically enabled in the _olfs.xml_ configuration file by uncommenting the `<AllowDirectDataSourceAccess />` element.
+- `VersionDispatchHandler.java` - This combines the BES version information and *_olfs_* version information to make and return a combined XML version document to the requestor.
+
+* Package: *opendap.build_dmrpp*
+- `BuildDmrppDispatchHandler.java` -
+
+* Package: *opendap.coreServlet*
+- `NoPostHandler.java` - This is used when POST request submissions are disabled, which is determined by the presence of the `<HttpPost .../>` element in _olfs.xml_ file.
+
+* Package: *opendap.gateway*
+- `DispatchHandler.java` - This handler implements the https://docs.opendap.org/index.php/Gateway_Service[Gateway Service]. It is one of the DispatchHandlers loaded by the opendap.coreServlet.DispatchServlet
+
+* Package: *opendap.nciso*
+- `IsoDispatchHandler.java`- Deprecated (should be moved to _retired_)
+- `RubricDispatchHandler.java` - Deprecated (should be moved to _retired_)
+
+* Package: *opendap.ncml* - _I think this whole package might be retired._
+- `NcmlDatasetDispatcher.java`
+
+* Package: *opendap.ngap*
+- `NgapDispatchHandler.java` - This is the NGAP handler, a child od BEsDapDispatcher. It claims any request that begins with its prefix string (default: _ngap/_) and then uses it's parent class and a specialization of the BesApi, NgapBesApi, to build BES commands to service the request.
+
+* Package: *opendap.threddsHandler*
+- `StaticCatalogDispatch.java` - The *_olfs_* server static THREDDS client catalogs, and this is the class that does this. Static catalogs exist on the host filesystem and are integrated with the dynamic catalogs built by interacting with the BES.
+
+* Package: *opendap.wcs.v2_0.http* - _I think we should retire this package._
+- `FormHandler.java`
+- `HttpGetHandler.java`
+- `SoapHandler.java`
+- `XmlRequestHandler.java`
+
+
+
+
+[[dapresponders]]
+== DapResponders
+The abstract class Dap4Responder class embodies a number of general operations needed for:
+
+* Identifying requests that should be handled by an instance of the class.
+* HTTP client/server content negotiation for DAP4 (DAP2 doesn't support this)
+
+_This could use a refactor to condense the hierarchy of inheritance from 4 classes to 2._ :)
+
+[[dap2responders]]
+=== DAP2 Responders
+Responders that handle all the DAP2 things. All are children of Dap4Responder. Yeah. I know. Go figure.
+
+* Package: *opendap.bes.dap2Responders*
+- `Ascii.java` - Uses the BES to produce and transmit the DAP2 ASCII encoded data response.
+- `CovJson.java` - Uses the BES to produce and transmit the DAP2 Coverage JSON encoded data response.
+- `CsvData.java` - Uses the BES to produce and transmit the DAP2 CSV encoded data response (which is fundamentally the same as the DAP2 ASCII response).
+- `Dap2Data.java` - Uses the BES to produce and transmit the DAP2 data response.
+- `Dap2IFH.java` - Uses the BES to retrieve the DAP3.2 DDX XML document. This is fed, along with injected state information, into an XSL transform to produce the DAP2 Data Request Form (aka the Interface From Hell, aka the IFH) and transmit form page to the requesting client.
+- `DAS.java` - Uses the BES to produce and transmit the DAP2 DAS response.
+- `DatasetInfoHtmlPage.java` - Uses the BES to produce and transmit the DAP2 Dataset Info Page response.
+- `DDS.java` - Uses the BES to produce and transmit the DAP2 DDS response.
+- `DDX.java` - Uses the BES to produce and transmit the DAP3.2 DDX response (unique to Hyrax, not part of the DAP2 specification, a stepping stone to DAP4).
+- `GeoTiff.java` - Uses the BES to produce a DAP2 data response and encode it as a GeoTiff file.
+- `GmlJpeg2000.java` - Uses the BES to produce a DAP2 data response and encode it as a GMLJpeg2000 file.
+- `Ijson.java` - Uses the BES to produce a DAP2 data response and encode it as an "instance" json (.ijsn) response.
+- `Iso19115.java` - Uses the BES to produce a DAP3.2 DDX response and then applies an XSL transform to produce ISO-19115 metadata document.
+- `Iso19115Rubric.java` - Uses the BES to produce a DAP3.2 DDX response and then applies an XSL transform to produce an HTML page the shows how the metadata does and does not conform to the ISO-19115 expectations.
+- `Json.java` - Uses the BES to produce a DAP2 data response and encode it as a json (.json) response.
+- `Netcdf3.java` - Uses the BES to produce a DAP2 data response and encode it as a netcdf-3 file.
+- `Netcdf4.java` - Uses the BES to produce a DAP2 data response and encode it as a netcdf-4 file.
+- `RDF.java` - Uses the BES to produce a DAP3.2 DDX response and then applies an XSL transform to an HTML page to represent the document as RDF.
+- `XmlData.java` - Uses the BES to produce a DAP2 data response and encode it as an XML document.
+
+[[genericresponders]]
+=== Generic Responders
+
+* Package: *opendap.bes.dap4Responders*
+- `FileAccess.java` - Used to transmit files from the BES to the requesting client.
+- `Version.java` - Builds and returns the Hyrax combined version response document (XML).
+
+[[dap4responders]]
+=== DAP4 Responders
+Responders that handle all the DAP4 things.
+
+* Package: *opendap.bes.dap4Responders.DataResponse* This package contains responders that return data in various encodings.
+- `CovJsonDR.java` - Uses the BES to produce and transmit the DAP4 data response encoded as Coverage JSON (may not have a companion implementation in the BES)
+- `CsvDR.java` - Uses the BES to produce and transmit the DAP4 data response encoded as CSV.
+- `GeoTiffDR.java` - Uses the BES to produce and transmit the DAP4 data response encoded as a GeoTiff file.
+- `GmlJpeg2000DR.java` - Uses the BES to produce and transmit the DAP4 data response encoded as a GML JPEG 2000 file.
+- `IjsonDR.java` - Uses the BES to produce and transmit the DAP4 data response encoded as instance JSON (.ijsn)".
+- `JsonDR.java` - Uses the BES to produce and transmit the DAP4 data response encoded as JSON.
+- `Netcdf3DR.java` - Uses the BES to produce and transmit the DAP4 data response encoded as a netcdf-3 file. Note that the netcdf-3 data model is a subset of the DAP4 data model and not all DAP4 data content m,ay encoded as netcdf-3.
+- `Netcdf4DR.java` - Uses the BES to produce and transmit the DAP4 data response encoded as a netcdf-4 file.
+- `NormativeDR.java` - Uses the BES to produce and transmit the normative  DAP4 data response.
+- `XmlDR.java` - Uses the BES to produce and transmit the DAP4 data response encoded as an XML data response.
+
+* Package: *opendap.bes.dap4Responders.DatasetMetadata* This package contains responders that return metadata in various encodings.
+- `HtmlDMR.java` - Uses the BES to produce and return the DMR response which is used, along with an XSL transform and several state variable to produce the DAP4 Data Request Form.
+- `IjsonDMR.java` - Uses the BES to produce and transmit the DAP4 metadata response encoded as a instance JSON (.ijsn).
+- `JsonDMR.java` - Uses the BES to produce and transmit the DAP4 metadata response encoded as JSON.
+- `NormativeDMR.java` - Uses the BES to produce and transmit the normative DAP4 metadata response (XML).
+- `RdfDMR.java`  - Uses the BES to produce and transmit the DAP4 metadata response encoded as RDF.
+- `XmlDMR.java`  - Uses the BES to produce and transmit the DAP4 metadata response encoded as XML.
+
+* Package: *opendap.bes.dap4Responders.DatasetServices* This package contains responders that return the DAP4 Dataset Service Response (DSR) in various encodings. _I think at this opoint this package is obviated as the DSR while defined in the DAP4 specification does not enjoy any know useful implementation._
+- `HtmlDSR.java`  - Uses the BES to retrieve the DSR response and return it encoded as HTML by using a XSL transform..
+- `NormativeDSR.java` - Uses the BES to produce and transmit the DSR response (XML).
+- `XmlDSR.java` - Uses the BES to produce and transmit the DSR response (XML).
+
+* Package: *opendap.bes.dap4Responders.Iso19115*
+- `IsoDMR.java`- Uses the BES to produce a DAP4 DMR response and then applies an XSL transform to produce ISO-19115 metadata document.
+- `IsoRubricDMR.java` - Uses the BES to produce a DAP4 DMR response and then applies an XSL transform to produce an HTML page the shows how the metadata does and does not conform to the ISO-19115 expectations.
+
+[[authentication]]
+== Authentication/Authorization
+For NASA deployments OLFS can be configured to provide authentication services using an (almost) OAuth2 implementation in the *_opendap.auth_* package. The implementation follows the Identity Provider (IdP) plus Policy Decision Point (PDP) pattern.
+
+=== Controls
+You must first build an authentication/authorization renablrd web archive file, and then you will need to configure the deployment.
+
+==== Enable Authentication/Authorization
+To enable authentication: Edit the file *_resources/hyrax/WEB-INF/web.xml_* to enable to two authentication filters *_IdFilter_* and *_PEPFilter_*. Then the service must be rebuilt and a new WAR file generated with this change in place.
+
+==== Configure Authentication/Authorization
+All the configuration happens in the *_user-access.xml_* file located in the configuration directory.
+
+=== Authentication - aka the Identity Provider (IdP)
+Authentication is the operation wherein a users software client establishes that it is working on behalf of a particular user. Use the abstract class *_IdProvider_* to capture the common API for an identity provider and provide two implementations, *_UrsIdP_* and *_TomcatRealmIdP_*. In theory the *_TomcatRealmIdP_* should work the Tomcat Memory Authentication Realm, but this has not been verified in years. The *_UrsIdP_* knows how to authenticate user with NASA's Earth Data Login (EDL) service. In NASA speak, *_UrsIdP_* is an _EDL client_. The IdFilter provides the core of the authentication functionality and handles saving request information (Like target URL and query string) in a user session so that it can be used to redirect the client to thir original request target when the client returns from a *_Single Sign On_* authentication journey.
+
+==== EDL Tokens
+The IdFilter will also accept an HTTP *_Authorization_* headers with a token.
+
+Typically, *_Authorization_* headers look like:
+
+    Authorization: Bearer A_LONG_STRING_OF_TOKEN_THINGS
+
+These can be submitted to the OLFS with the request and no trip need be made to EDL by the client. When using authorization tokens, sessions do not need to be maintained by the client, although doing so makes the transaction faster still.
+
+
+
+
+
+
+==== Classes
+The IdP is composed of:
+
+* *_IdProvider_* - Theis abstract classes contains common machinery/API is used to parent specific implementations of a provider.
+* *_UrsIdp_* - Implements an IdProvider that utilizes Earth Data Login (EDL, aka URS) to authenticate a user. All the URS action is in here!
+* *_TomcatRealmIdp_* - In theory this IdProvider implemtation works with Tomcat Realms (like the MemoryRealm) but It's been a long time since it was tested.
+* *_IdManager_* - This *singleton* class holds a collection of IdProviders, but in practice only ever has one. If NASA follows through with allowing user to choose between EDL  Google authentication then we'll be right in here making this work!
+* *_IdFilter_* - This class does the heavy lifting of authentication
+
+=== Authorization - aka the Policy Decision Point (PDP)
+In this software we define users, groups, and roles in order to define role based access policies.
+In *_user-access.xml_* we define a group based on one or more "user" definitions.
+
+    <!-- Define the group urs_users as all users in the authContext urs -->
+    <group id="urs_users" >
+        <user idPattern="^(?!\s*$).+" authContext="urs" />
+    </group>
+
+A role is defined as one more groups and each policy can be applied to one or more roles.
+
+    <!-- The only group in the role "users" is the "urs_users" group. -->
+    <role id="users">
+        <group id="urs_users" />
+    </role>
+
+Here's a policy that allows anyone to access the image and navigable catalog files in Hyrax.
+
+    <Policy class="opendap.auth.RegexPolicy">
+        <role>.*</role>
+        <resource>^.*((\/docs\/.*)|(\/)|(\.(css|png|jpg|ico|gif|xsl|jsp|svg))|(\/contents\.html)|(\/catalog\.html)|(\/catalog\.xml)|(logout)|(login)|(\/version))$</resource>
+        <queryString>.*$</queryString>
+        <allowedAction>HEAD</allowedAction>
+        <allowedAction>GET</allowedAction>
+    </Policy>
+
+This allows non-authenticated users to looka round , and when something bad happens they get a web page rendered with css and images.
+
+==== Classes
+* *_Policy_* - This interface defines the policy API
+* *_RegexPolicy_* - A policy the uses Regx matching on the URL path and the query string to evaluate access. If the request matches the regex patterns users/groups/roles held by the Policy are allowed access.
+* *_PolicyDecisionPoint_* - This abstract class is the parent of *_RemotePDP_* and *_SimplePDP_*.
+* *_PEPFilter_* - This Filter is an embodiment of a policy enforcement point. It holds an instance of PolicyDecisionPoint which is used to evalute incoming requests to determine if access will be allowed. If the request is not permitted, and they aren't logged in, then they are redirected to the login endpoint (aka IdFilter) to get that sorted.
+* *_PDPService_* - This child of HttpServlet can be runs as a standalone PDP service, accepting evaluation requests and responding with simple permitted or not permitted.
+* *_RemotePDP_* - Defines a policy decision point somewhere on the internet. With a remote PDP the server sends the uid,
+authContext, url path, query , and http verb (GET, POST, etc) and the remote PDP responds with permitted or not permitted.
+* *_SimplePDP_* - _"Simple is often better"_ - Ned Greene 1984 This is the policy decision point that we use. It is locally hostsed and configured.
+
+[[testing]]
+== Testing
+* Virtually no unit tests exist for the *_olfs_*.
+* There are regression tests. The tests exist in their own GitHub repo, the https://github.com/OPENDAP/hyrax_regression_tests[hyrax_regression_tests] project. They require a fully operational Hyrax in order to be run.
+

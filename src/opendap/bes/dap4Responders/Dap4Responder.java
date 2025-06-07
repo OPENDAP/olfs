@@ -46,12 +46,18 @@ import java.util.regex.Pattern;
 
 
 /**
- * Created by IntelliJ IDEA.
- * User: ndp
- * Date: 9/4/12
- * Time: 9:16 AM
- * To change this template use File | Settings | File Templates.
- */
+ * This abstract class embodies a number of general operations needed for:
+ *   * Identifying requests that should be handled by an instance of the class.
+ *   * HTTP client/server content negotiation for DAP4 (DAP2 doesn't support this)
+ * This is the terminal abstract class in a chain of inheritance:
+ *     HttpResponder -> DapResponder -> BesDapResponder -> Dap4Responder
+ *  which probably could be condensed to:
+ *     HttpResponder -> DapResponder
+ *  Since the only places that DapResponder is explicitly utilized is as the parent class of BesDapResponder, and
+ *  the only place that BesDapResponder is explicitly used is as the parent classes of Dap4Responder which
+ *  is currently the parent class of every responder that is used in the OLFS and is used explicitly to refer to
+ *  members of collections of the various responders.
+ **/
 public abstract class Dap4Responder extends BesDapResponder  {
 
     Logger _log;
@@ -70,17 +76,30 @@ public abstract class Dap4Responder extends BesDapResponder  {
         addTypeSuffixToDownloadFilename(false);
     }
 
+    /**
+     * This controls if a responder should add a relevant suffix to the Download file name transmitted in
+     * HTTP the response headers.
+     * @param value True to have a suffix added. False to not add a suffix
+     */
     public void addTypeSuffixToDownloadFilename(boolean value){
         _addTypeSuffixToDownloadFilename = value;
     }
 
 
+    /**
+     *
+     * @return True is a a relevant suffix thould be added to the Download Filename.
+     */
     public boolean addTypeSuffixToDownloadFilename(){
         return _addTypeSuffixToDownloadFilename;
     }
 
 
-    public void setNormativeMediaType(MediaType mt){
+    /**
+     * Sets the default/standard/original media type for the responder
+     * @param mt The default MediaType
+     */
+    protected void setNormativeMediaType(MediaType mt){
         _normativeMediaType = mt;
         _combinedRequestSuffixRegex = buildRequestMatchingRegex();
         _log.debug("combinedRequestSuffixRegex: {}", _combinedRequestSuffixRegex);
@@ -136,63 +155,47 @@ public abstract class Dap4Responder extends BesDapResponder  {
     private String buildRequestMatchingRegexWorker(Dap4Responder responder) {
 
         StringBuilder s = new StringBuilder();
-
         if (responder.getNormativeMediaType().getMediaSuffix().startsWith("."))
             s.append("\\");
         s.append(responder.getNormativeMediaType().getMediaSuffix());
 
-
         Dap4Responder[] altResponders = responder.getAltRepResponders();
-
-
         boolean hasAltRepResponders = altResponders.length > 0;
-        if (hasAltRepResponders)
+        if (hasAltRepResponders) {
             s.append("(");
-
-
+        }
         boolean notFirstPass = false;
         for (Dap4Responder altResponder : altResponders) {
-
-            if (notFirstPass)
+            if (notFirstPass) {
                 s.append("|");
-
+            }
             s.append("(").append("(");
-
             s.append(buildRequestMatchingRegexWorker(altResponder));
-
             s.append(")?").append(")");
-
             notFirstPass = true;
         }
-
-        if (hasAltRepResponders)
+        if (hasAltRepResponders) {
             s.append(")?");
-
+        }
         return s.toString();
-
     }
 
 
     /**
-     * THis is where we do the Server-driven HTTP Content Negotiation.
+     * This is where we do the Server-driven HTTP Content Negotiation.
      * @param request
      * @return
      * @throws NoSuchElementException
      */
     public Dap4Responder getBestResponderForHttpRequest(HttpServletRequest request) throws NoSuchElementException {
 
-
-        HashMap<MediaType,Dap4Responder> responderMap = new HashMap<MediaType, Dap4Responder>();
-
+        HashMap<MediaType,Dap4Responder> responderMap = new HashMap<>();
         String acceptsHeaderValue = request.getHeader("Accept");
-
         _log.debug("Accept: {}", acceptsHeaderValue);
 
-        Vector<MediaType> clientMediaTypes = new Vector<MediaType>();
-
+        Vector<MediaType> clientMediaTypes = new Vector<>();
         if(acceptsHeaderValue!=null){
             String[] mimeTypes = acceptsHeaderValue.split(",");
-
             for(String mimeType: mimeTypes){
                 clientMediaTypes.add(new MediaType(mimeType.trim()));
             }
@@ -205,7 +208,7 @@ public abstract class Dap4Responder extends BesDapResponder  {
             _log.debug("Clients accepts media type: {}", mt.toString());
         }
 
-        TreeSet<MediaType> matchingTypes = new TreeSet<MediaType>();
+        TreeSet<MediaType> matchingTypes = new TreeSet<>();
 
         for(MediaType mt: clientMediaTypes){
             if(mt.getMimeType().equalsIgnoreCase(_normativeMediaType.getMimeType())){
@@ -224,7 +227,6 @@ public abstract class Dap4Responder extends BesDapResponder  {
             }
 
             for(Dap4Responder altRepResponder : getAltRepResponders()){
-
                 MediaType altType = altRepResponder.getNormativeMediaType();
                 if(mt.getMimeType().equalsIgnoreCase(altType.getMimeType())){
                     matchingTypes.add(mt);
@@ -250,7 +252,6 @@ public abstract class Dap4Responder extends BesDapResponder  {
         _log.debug("Best Responder:      {}", bestResponder.getClass().getName());
 
         return bestResponder;
-
     }
 
 
@@ -268,7 +269,7 @@ public abstract class Dap4Responder extends BesDapResponder  {
 
             Date lmt = new Date(getLastModified(request));
             //Date lmt = new Date((long)-1);
-            SimpleDateFormat httpDateFormat = new SimpleDateFormat(HttpDatFormatString);
+            SimpleDateFormat httpDateFormat = new SimpleDateFormat(HttpDateFormatString);
 
             response.setHeader("Last-Modified",httpDateFormat.format(lmt));
 

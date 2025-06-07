@@ -1,4 +1,12 @@
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+# OLFS Version 1.18.15 (15 January 2025)
+#
+
+* Updated logo.
+* Added logback appender for AWS CloudWatch.
+* Updated landing page on NGAP.
+
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 # OLFS Version 1.18.14 (23 January 2024)
 #
 

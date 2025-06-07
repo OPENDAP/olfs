@@ -32,7 +32,7 @@ import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
 import com.google.gson.Gson;
 import opendap.PathBuilder;
-import opendap.auth.UserProfile;
+import opendap.coreServlet.RequestId;
 import opendap.coreServlet.Scrub;
 import opendap.coreServlet.ServletUtil;
 import org.slf4j.Logger;
@@ -50,10 +50,8 @@ import java.security.Principal;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
-<<<<<<< Updated upstream
 import static opendap.auth.IdFilter.USER_PROFILE;
 
-=======
 class json_log_entry{
     String client_ip;
     String user_id;
@@ -66,7 +64,6 @@ class json_log_entry{
     String query_string;
     String dap4_function;
 }
->>>>>>> Stashed changes
 
 /**
  * User: ndp
@@ -95,9 +92,6 @@ public class ServletLogUtil {
     public static final String ADMIN_ACCESS_LOG_ID = "HyraxAdminAccess";
     public static final String ADMIN_ACCESS_LAST_MODIFIED_LOG_ID = "HyraxAdminLastModifiedAccess";
 
-    public static final String S3_SERVICE_ACCESS_LOG_ID = "S3ServiceAccess";
-    public static final String S3_SERVICE_LAST_MODIFIED_LOG_ID = "S3ServiceLastModifiedAccess";
-
     public static final String WCS_ACCESS_LOG_ID = "WCSAccess";
     public static final String WCS_LAST_MODIFIED_ACCESS_LOG_ID = "WCSLastModifiedAccess";
 
@@ -108,9 +102,9 @@ public class ServletLogUtil {
 
 
 
-    private static final String ID_KEY = "ID";
-    private static final String SOURCE_KEY = "SOURCE";
-    private static final String HOST_KEY = "host";
+    private static final String REQUEST_ID_KEY = "ID";
+    private static final String HTTP_VERB_KEY = "SOURCE";
+    private static final String CLIENT_HOST_KEY = "host";
     private static final String SESSION_ID_KEY = "ident";
     private static final String USER_ID_KEY = "userid";
     private static final String USER_AGENT_KEY = "UserAgent";
@@ -128,17 +122,19 @@ public class ServletLogUtil {
     private static final AtomicBoolean useCombinedLog = new AtomicBoolean(false);
     public static final AtomicBoolean useDualCloudWatchLogs = new AtomicBoolean(false);
 
+    public static final int MISSING_SIZE_VALUE = -1;
 
-    private static Logger log;
+
+    private static final Logger log;
     static{
-        System.out.print("+++LogUtil.static - Instantiating Logger ... \n");
-
+        System.out.println("+++LogUtil.static - Instantiating Logger ...");
         try {
             log = org.slf4j.LoggerFactory.getLogger(ServletLogUtil.class);
-            log.info("Logger instantiated. class: {}",log.getClass().getCanonicalName());
+            //log.info("Logger instantiated. class: " + log.getClass().getCanonicalName());
+            System.out.println("Logger instantiated. class: " + log.getClass().getCanonicalName());
         }
-        catch(NoClassDefFoundError e) {
-            System.err.println("\n\n[ERROR]  +++LogUtil.initLogging() -  Unable to instantiate Logger. java.lang.NoClassDefFoundError: "+e.getMessage()+"  [ERROR]\n");
+        catch(Exception e) {
+            System.err.println("\n\n[ERROR]  +++LogUtil.static -  Unable to instantiate Logger. message: "+e.getMessage()+"  [ERROR]\n");
             throw e;
         }
     }
@@ -303,7 +299,7 @@ public class ServletLogUtil {
             log.error("Caught {} Message: {}",je.getClass().getName(),je.getMessage());
             StringWriter sw = new StringWriter();
             je.printStackTrace(new PrintWriter(sw));
-            log.error("Stack trace: \n{}",sw.toString());
+            log.error("Stack trace: \n{}",sw);
         }
     }
 
@@ -394,13 +390,13 @@ public class ServletLogUtil {
      * @param reqID The request ID, implemented as the request number.
      *
      */
-    public static void logServerAccessStart(HttpServletRequest req, String logName,  String httpVerb, String reqID) {
+    public static void logServerAccessStart(HttpServletRequest req, String logName,  String httpVerb, RequestId reqID) {
 
         HttpSession session = req.getSession(false);
 
-        MDC.put(ID_KEY, reqID);
-        MDC.put(SOURCE_KEY, httpVerb);
-        MDC.put(HOST_KEY, req.getRemoteHost());
+        MDC.put(REQUEST_ID_KEY, reqID.logId());
+        MDC.put(HTTP_VERB_KEY, httpVerb);
+        MDC.put(CLIENT_HOST_KEY, req.getRemoteHost());
         MDC.put(SESSION_ID_KEY, (session == null) ? "-" : session.getId());
 
         String uid = opendap.auth.Util.getUID(req);
@@ -415,17 +411,16 @@ public class ServletLogUtil {
         MDC.put(RESOURCE_ID_KEY,resourceID);
 
         String query = Scrub.simpleQueryString(req.getQueryString());
-        query = (query == null) ? "" : query;
+        query = (query == null || query.isEmpty()) ? "-" : query;
         MDC.put(QUERY_STRING_KEY, query);
 
         if(log.isInfoEnabled()) {
-            StringBuilder startMsg = new StringBuilder();
-            startMsg.append("REQUEST START - ");
-            startMsg.append("RemoteHost: '").append(LogUtil.scrubEntry(req.getRemoteHost())).append("' ");
-            startMsg.append("RequestedResource: '").append(resourceID).append("' ");
-            startMsg.append("QueryString: '").append(query).append("' ");
-            startMsg.append("AccessLog: ").append(logName);
-            log.info(startMsg.toString());
+            String startMsg = "REQUEST START - " +
+                    "RemoteHost: '" + LogUtil.scrubEntry(req.getRemoteHost()) + "' " +
+                    "RequestedResource: '" + resourceID + "' " +
+                    "QueryString: '" + query + "' " +
+                    "AccessLog: " + logName;
+            log.info(startMsg);
         }
         if(logName.equals(HYRAX_ACCESS_LOG_ID) && useDualCloudWatchLogs.get()){
             Logger cwRequestLog = org.slf4j.LoggerFactory.getLogger(CLOUDWATCH_REQUEST_LOG);
@@ -456,21 +451,22 @@ public class ServletLogUtil {
      *
      * @return The BESlog formatted log line for this request
      */
-    public static String getLogEntryForBesLogOLD(){
+    public static String getLogEntryForBesLog(){
 
 
         StringBuilder alb = new StringBuilder();
         if(useCombinedLog.get()) {
             String sep = "|&|";
 
-            alb.append(MDC.get(HOST_KEY)).append(sep);
+            alb.append(MDC.get(CLIENT_HOST_KEY)).append(sep);
             alb.append(MDC.get(USER_AGENT_KEY)).append(sep);
             alb.append(MDC.get(SESSION_ID_KEY)).append(sep);
             alb.append(MDC.get(USER_ID_KEY)).append(sep);
             alb.append(MDC.get(START_TIME_KEY)).append(sep);
-            alb.append(MDC.get(ID_KEY)).append(sep);
-            alb.append(MDC.get(SOURCE_KEY)).append(sep);
+            alb.append(MDC.get(REQUEST_ID_KEY)).append(sep);
+            alb.append(MDC.get(HTTP_VERB_KEY)).append(sep);
             alb.append(MDC.get(RESOURCE_ID_KEY)).append(sep);
+
 
             String ce = MDC.get(QUERY_STRING_KEY);
             if(ce == null || ce.isEmpty()) {
@@ -483,39 +479,41 @@ public class ServletLogUtil {
         return alb.toString();
     }
 
-    public static String getLogEntryForBesLog(){
+    public static String getLogEntryJson(){
 
-        json_log_entry log_entry = new json_log_entry();
+        json_log_entry jlog_entry = new json_log_entry();
         if(useCombinedLog.get()) {
-            log_entry.client_ip = MDC.get(CLIENT_HOST_KEY);
-            log_entry.user_agent = MDC.get(USER_AGENT_KEY);
-            log_entry.user_id = MDC.get(USER_ID_KEY);
-            log_entry.session_id = MDC.get(SESSION_ID_KEY);
-            log_entry.start_time = System.currentTimeMillis();
-            log_entry.request_id = MDC.get(REQUEST_ID_KEY);
-            log_entry.http_verb = MDC.get(HTTP_VERB_KEY);
-            log_entry.resource_id = MDC.get(RESOURCE_ID_KEY);
+            jlog_entry.client_ip = MDC.get(CLIENT_HOST_KEY);
+            jlog_entry.user_agent = MDC.get(USER_AGENT_KEY);
+            jlog_entry.user_id = MDC.get(USER_ID_KEY);
+            jlog_entry.session_id = MDC.get(SESSION_ID_KEY);
+            jlog_entry.start_time = System.currentTimeMillis();
+            jlog_entry.request_id = MDC.get(REQUEST_ID_KEY);
+            jlog_entry.http_verb = MDC.get(HTTP_VERB_KEY);
+            jlog_entry.resource_id = MDC.get(RESOURCE_ID_KEY);
 
             String ce = MDC.get(QUERY_STRING_KEY);
             if(ce == null || ce.isEmpty()) {
                 ce = "-";
             }
-            log_entry.query_string = ce;
+            jlog_entry.query_string = ce;
         }
         Gson gson = new Gson();
-        return gson.toJson(log_entry);
+        return gson.toJson(jlog_entry);
     }
 
 
     /**
      * Used in various places in the server to add the response size to the log.
-     * @param size The size, in bytes, of the response. Values less than 0 will be ignored.
+     * Will set the response if it has not already been set or if it's value is empty.
+     * @param size The size, in bytes, of the response. A value of -1 indicates that the size is unknown
      */
     public static void setResponseSize(long size){
-        // Only set the size if it's not equal to the missing value (-1)
-        if(size>=0) {
-            MDC.put(RESPONSE_SIZE_KEY, Long.toString(size) + " bytes");
-        }
+
+        String mdc_size = MDC.get(RESPONSE_SIZE_KEY);
+        // Was it set? Is it empty??
+        if(mdc_size==null || mdc_size.isEmpty())
+            MDC.put(RESPONSE_SIZE_KEY, Long.toString(size));
     }
 
 
@@ -526,9 +524,8 @@ public class ServletLogUtil {
      * @param logName the name of the Logger to which to write stuff.
      */
     public static void logServerAccessEnd(int httpStatus, String logName) {
-        logServerAccessEnd(httpStatus, -1, logName);
+        logServerAccessEnd(httpStatus, MISSING_SIZE_VALUE, logName);
     }
-
 
     /**
      * Write log entry to named log.
@@ -543,7 +540,7 @@ public class ServletLogUtil {
         long  duration = -1;
         String sTime = MDC.get("startTime");
         if(sTime!=null) {
-            long startTime = Long.valueOf(sTime);
+            long startTime = Long.parseLong(sTime);
             duration = endTime - startTime;
         }
         MDC.put(DURATION_KEY, (duration>=0)?Long.toString(duration):"unknown" +" ms");
@@ -580,9 +577,9 @@ public class ServletLogUtil {
         //
         // These were set in logServerAccessStart()
         //
-        MDC.remove(ID_KEY);
-        MDC.remove(SOURCE_KEY);
-        MDC.remove(HOST_KEY);
+        MDC.remove(REQUEST_ID_KEY);
+        MDC.remove(HTTP_VERB_KEY);
+        MDC.remove(CLIENT_HOST_KEY);
         MDC.remove(SESSION_ID_KEY);
         MDC.remove(USER_ID_KEY);
         MDC.remove(START_TIME_KEY);
@@ -605,18 +602,12 @@ public class ServletLogUtil {
 
     public static void useCombinedLog(boolean value) {
         useCombinedLog.set(value);
+        log.info("Combined OLFS/BES Log Is {}", value ? "ENABLED." : "DISABLED");
     }
 
     public static void useDualCloudWatchLogs(boolean value) {
         useDualCloudWatchLogs.set(value);
-    }
-
-    public static void mdcPut(String key, String value){
-        MDC.put(key, value);
-    }
-
-    public static String mdcGet(String key){
-        return MDC.get(key);
+        log.info("CloudWatch Logs Are {}", value ? "ENABLED." : "DISABLED");
     }
 
 }

@@ -56,7 +56,7 @@
                 <!--                                                        -->
                 <!--                                                        -->
 
-                <img alt="OPeNDAP Logo" src='{$docsService}/images/logo.png'/>
+                <img alt="OPeNDAP Logo" src='{$docsService}/images/logo.svg'/>
                 <h1>
                     Dataset Services Response
                     <div class="medium">

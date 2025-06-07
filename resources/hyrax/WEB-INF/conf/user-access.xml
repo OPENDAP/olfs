@@ -96,7 +96,7 @@
 
     </PolicyDecisionPoint>
 
-    <!-- This local in-memory PDP definition allows everyone access to everything -->
+    <!-- This local in-memory PDP definition allows everyone to access to everything -->
     <!-- PolicyDecisionPoint class="opendap.auth.SimplePDP">
         <Policy class="opendap.auth.RegexPolicy">
             <role>.*$</role>

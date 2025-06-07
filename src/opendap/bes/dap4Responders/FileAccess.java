@@ -283,7 +283,7 @@ public class FileAccess extends Dap4Responder {
         pw.println("</head>");
         pw.println("");
         pw.println("<body>");
-        pw.println("<img alt=\"OPeNDAP Logo\" src=\"" + context + "/docs/images/logo.png\"/>");
+        pw.println("<img alt=\"OPeNDAP Logo\" src=\"" + context + "/docs/images/logo.svg\"/>");
 
         pw.println("<h1>Hyrax : Access Denied (403) </h1>");
         pw.println("<hr align=\"left\" size=\"1\" noshade=\"noshade\" />");

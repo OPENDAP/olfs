@@ -47,7 +47,7 @@ import java.util.regex.Pattern;
  * User: dan
  * Date: 2/13/20
  * Time: 1:35 PM
- * Cloned from: opendap.gateway
+ * Cloned from: opendap/gateway
  * To change this template use File | Settings | File Templates.
  */
 public class NgapDispatchHandler extends BesDapDispatcher {
@@ -70,13 +70,11 @@ public class NgapDispatchHandler extends BesDapDispatcher {
         reqCounter = new AtomicLong(0);
     }
 
-    private Logger log;
+    private final Logger log;
     private boolean _initialized;
     private String _prefix;
     private NgapBesApi _besApi;
     //private NGAPForm _ngapForm;
-
-    private static final String d_landingPage="/docs/ngap/ngap.html";
 
     public NgapDispatchHandler() {
         super();
@@ -113,7 +111,7 @@ public class NgapDispatchHandler extends BesDapDispatcher {
             throws Exception {
 
         String relativeURL = ReqInfo.getLocalUrl(request);
-        log.debug("relativeURL:    "+relativeURL);
+        log.debug("relativeURL: {}",relativeURL);
 
         while(relativeURL.startsWith(THE_SLASH) && relativeURL.length()>1)
             relativeURL = relativeURL.substring(1);
@@ -127,7 +125,7 @@ public class NgapDispatchHandler extends BesDapDispatcher {
 
                 if(itsJustThePrefixWithoutTheSlash ){
                     response.sendRedirect(_prefix);
-                    log.debug("Sent redirect to service prefix: "+_prefix);
+                    log.debug("Sent redirect to service prefix: {}",_prefix);
                     return true;
                 }
 
@@ -185,7 +183,7 @@ public class NgapDispatchHandler extends BesDapDispatcher {
         if (_prefix.startsWith("/"))
             _prefix = _prefix.substring(1);
 
-        log.info("Using prefix=" + _prefix);
+        log.info("Using service prefix: {}", _prefix);
 
     }
 

@@ -31,6 +31,7 @@ import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestCache;
 import opendap.coreServlet.ServletUtil;
+import opendap.coreServlet.RequestId;
 import opendap.http.error.Forbidden;
 import opendap.logging.ServletLogUtil;
 import org.jdom.Element;
@@ -84,8 +85,10 @@ public class IdFilter implements Filter {
         try {
             if (isInitialized)
                 return;
+
             this.filterConfig = filterConfig;
             try {
+                System.out.println("IdFilter.init() - config file: " + filterConfig.getInitParameter(CONFIG_PARAMETER_NAME));
                 init();
             } catch (IOException | JDOMException se) {
                 log.warn("init() - INITIALIZATION HAS BEEN POSTPONED! FAILED TO INITIALIZE IdFilter! " +
@@ -176,14 +179,14 @@ public class IdFilter implements Filter {
 
             HttpServletRequest request = (HttpServletRequest) sreq;
             RequestCache.open(request);
-            String requestId = RequestCache.getRequestId();
+            RequestId requestId = RequestCache.getRequestId();
 
             HttpServletRequest hsReq = request;
 
             ServletLogUtil.logServerAccessStart(request,logName,request.getMethod(), requestId);
             // Get session, make new as needed.
             HttpSession session = hsReq.getSession(true);
-            log.debug("BEGIN (requestId: {}) (session: {})",requestId, session.getId());
+            log.debug("BEGIN ({}) (session: {})",requestId, session.getId());
             Util.debugHttpRequest(request,log);
 
             HttpServletResponse hsRes = (HttpServletResponse) response;

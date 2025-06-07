@@ -442,7 +442,7 @@ public class HttpGetHandler implements opendap.coreServlet.DispatchHandler {
         page += "        <title>OPeNDAP Hyrax WCS Test</title>";
         page += "    </head>";
         page += "    <body>";
-        page += "    <img alt=\"OPeNDAP Logo\" src='"+docsService+"/images/logo.png'/>";
+        page += "    <img alt=\"OPeNDAP Logo\" src='"+docsService+"/images/logo.svg'/>";
         page += "    <h2>OPeNDAP WCS Test Harness</h2>";
         page += "    How Nice! You sent a WCS request.";
         page += "    <h3>KVP request: </h3>";
