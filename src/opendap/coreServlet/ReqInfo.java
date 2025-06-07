@@ -956,7 +956,7 @@ public class ReqInfo {
             // DEFAULT
             // No service chain request ID appears in the expected request headers
             // so make a homegrown request_id and send it on.
-            // The no paramater cobstrutor Contains a fresh uuid
+            // The no parameter constructor mints a fresh uuid
             reqId = new RequestId();
         }
         return reqId;
