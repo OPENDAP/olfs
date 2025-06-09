@@ -479,7 +479,7 @@ public class ServletLogUtil {
         return alb.toString();
     }
 
-    public static String getLogEntryJson(){
+    public static String getBesLogEntryJson(){
 
         json_log_entry jlog_entry = new json_log_entry();
         if(useCombinedLog.get()) {
