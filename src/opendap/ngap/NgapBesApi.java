@@ -579,25 +579,23 @@ public class NgapBesApi extends BesApi implements Cloneable {
         //String besDataSource = getBES(dataSource).trimPrefix(dataSource);
 
         RequestId rid = RequestCache.getRequestId();
-        request.setAttribute(BesApi.REQUEST_ID_KEY, rid.id() );
-        request.setAttribute(BesApi.REQUEST_UUID_KEY, rid.uuid().toString() );
+        request.setAttribute(REQUEST_ID_KEY, rid.id() );
+        request.setAttribute(REQUEST_UUID_KEY, rid.uuid().toString() );
 
         request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
 
-        request.addContent(setContextElement(BesApi.EXPLICIT_CONTAINERS_CONTEXT,"no"));
-
-        request.addContent(setContextElement(BesApi.ERRORS_CONTEXT, BesApi.XML_ERRORS));
+        request.addContent(setContextElement(ERRORS_CONTEXT, XML_ERRORS));
 
         String logEntryForBes = ServletLogUtil.getLogEntryForBesLog();
         if(!logEntryForBes.isEmpty())
-            request.addContent(setContextElement(BesApi.OLFS_LOG_CONTEXT,logEntryForBes));
+            request.addContent(setContextElement(OLFS_LOG_CONTEXT,logEntryForBes));
 
 
         if(user.getMaxResponseSize()>=0)
-            request.addContent(setContextElement(BesApi.MAX_RESPONSE_SIZE_CONTEXT,user.getMaxResponseSize()+""));
+            request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,user.getMaxResponseSize()+""));
 
         if(user.getMaxVariableSize()>=0)
-            request.addContent(setContextElement(BesApi.MAX_VARIABLE_SIZE_CONTEXT,user.getMaxVariableSize()+""));
+            request.addContent(setContextElement(MAX_VARIABLE_SIZE_CONTEXT,user.getMaxVariableSize()+""));
 
 
         addEdlAuthToken(request,user);
