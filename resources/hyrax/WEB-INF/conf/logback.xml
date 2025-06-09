@@ -99,6 +99,24 @@
         <MaxSize>512</MaxSize>
     </appender>
 
+    <conversionRule conversionWord="json_msg"
+                    converterClass="opendap.logging.LogMessageToJsonConverter" />
+
+    <appender name="JsonLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${logdir}/olfs-log.json</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <FileNamePattern>${logdir}/olfs-log.%i.zip</FileNamePattern>
+            <MinIndex>1</MinIndex>
+            <MaxIndex>3</MaxIndex>
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>5MB</MaxFileSize>
+        </triggeringPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>{ "date": "%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}", "thread": "%t", "request_id": "%X{ID}", "user_ip": "%X{host}", "user_agent": "%X{UserAgent}", "user_id": "%X{userid}", "http_verb": "%X{SOURCE}", "resource_id": "%X{resourceID}", "query_string": "%X{query}", "rel_time": "%r", "response_size": "%X{size}", "duration": "%X{duration}", "log_level": "%-5p", "logger_id": "%c.%M", "message": "%json_msg" }%n</pattern>
+        </encoder>
+    </appender>
+
     <appender name="ErrorLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>${logdir}/HyraxErrors.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
