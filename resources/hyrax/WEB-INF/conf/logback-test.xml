@@ -93,7 +93,7 @@
             <MaxFileSize>5MB</MaxFileSize>
         </triggeringPolicy>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>{ "date": "%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}", "thread": "%t", "request_id": "%X{ID}", "user_ip": "%X{host}", "user_agent": "%X{UserAgent}", "user_id": "%X{userid}", "http_verb": "%X{SOURCE}", "resource_id": "%X{resourceID}", "query_string": "%X{query}", "rel_time": "%r", "response_size": "%X{size}", "duration": "%X{duration}", "log_level": "%-5p", "logger_id": "%c.%M", "message": "%json_msg" }%n</pattern>
+            <pattern>{ "date": "%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}", "thread": "%t", "request_id": "%X{ID}", "user_ip": "%X{host}", "user_agent": "%X{UserAgent}", "user_id": "%X{userid}", "http_verb": "%X{SOURCE}", "resource_id": "%X{resourceID}", "query_string": "%X{query}", "rel_time": "%r", "response_size": "%X{size}", "duration": "%X{duration}", "log_level": "%-5p", "logger_id": "%c.%M", "message": %json_msg }%n</pattern>
         </encoder>
     </appender>
 
