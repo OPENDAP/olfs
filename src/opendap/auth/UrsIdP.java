@@ -57,6 +57,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.security.PublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Base64;
 import java.util.HashMap;
@@ -251,17 +252,23 @@ public class UrsIdP extends IdProvider{
     // https://urs.earthdata.nasa.gov/oauth/tokens/user
 
     /**
-     * TODO: add docstring? etc
-     * TODO: reconsider exception
-     * 
-     * @param accessToken
-     * @return
+     * Return key in `jwksPublicKeys` with key id ("kid") `publicKeyId`;
+     * return `null` if no matching key.
+     *
+     * @param jwksPublicKeys JSON Web Key Set (JWKS) of public keys
+     * @param publicKeyId The key id of the requested key in `jwksPublicKeys`
+     * @return The requested public `key` if present; `null` otherwise
+     * @throws InvalidPublicKeyException
+     * @throws JsonParseException
+     * @throws IllegalStateException
      */
-    RSAPublicKey getPublicKeyForId(String publicKeyId) throws InvalidPublicKeyException, JsonParseException {
-        // 1. Get the key set (JSON web key set, i.e. JWKS)
-        String jwksStr = getUrsClientAppPublicKeys();
-        JsonObject jwks = JsonParser.parseString(jwksStr).getAsJsonObject();
+    RSAPublicKey getPublicKeyForId(String jwksPublicKeys, String publicKeyId) throws InvalidPublicKeyException, JsonParseException, IllegalStateException {
+        // 1. Parse the key set (JSON web key set, i.e. JWKS)
+        JsonObject jwks = JsonParser.parseString(jwksPublicKeys).getAsJsonObject();
         JsonArray jwksKeys = jwks.getAsJsonArray("keys");
+         if (jwksKeys == null) {
+            return null;
+        }
 
         // 2. Pull out the requested key
         JsonObject jwkJson = null;
@@ -282,13 +289,9 @@ public class UrsIdP extends IdProvider{
             jwkValues.put(entry.getKey(), entry.getValue().getAsString());
         }
 
-        try {
-            Jwk jwk = Jwk.fromValues(jwkValues);
-            return (RSAPublicKey) jwk.getPublicKey();
-        } catch (InvalidPublicKeyException e) {
-            log.error("Unable to get public key. Details: {}", e);
-        }
-        return null;
+        Jwk jwk = Jwk.fromValues(jwkValues);
+        PublicKey j = jwk.getPublicKey();
+        return (RSAPublicKey) j;
     }
 
     /**
@@ -362,12 +365,13 @@ public class UrsIdP extends IdProvider{
             log.error("Access token missing required field `sig`.");
             return null;
         }
+        log.error("HERE WE AREEEEEE");
 
         // 2. From the set of public access keys provided, get the one specifically
         // required by our access token
         RSAPublicKey publicKey;
         try {
-            publicKey = getPublicKeyForId(publicKeyId);
+            publicKey = getPublicKeyForId(publicKeys, publicKeyId);
         } catch (InvalidPublicKeyException | JsonParseException e) {
             log.error("No valid matching public key found in `{}`. Details: {}", publicKeys, e);
             return null;

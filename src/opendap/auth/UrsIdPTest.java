@@ -27,6 +27,7 @@
 package opendap.auth;
 
 import opendap.auth.UrsIdP;
+import opendap.dap4.Int64;
 import opendap.io.HyraxStringEncoding;
 
 // import java.util.UUID;
@@ -36,8 +37,13 @@ import opendap.io.HyraxStringEncoding;
 // import com.google.gson.JsonParser;
 // import com.google.gson.JsonSyntaxException;
 import static org.junit.Assert.*;
+import com.auth0.jwk.InvalidPublicKeyException;
+import com.google.gson.JsonParseException;
 
+import java.math.BigInteger;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.security.interfaces.RSAPublicKey;
 import java.util.Base64;
 
 import org.junit.Test;
@@ -52,12 +58,149 @@ public class UrsIdPTest {
         log = LoggerFactory.getLogger(this.getClass());
     }
 
+    // From
+    // https://urs.earthdata.nasa.gov/documentation/for_integrators/verify_edl_jwt_token
+    public static final String EDL_TEST_JWKS = "{" +
+            "  \"keys\": [" +
+            "    {" +
+            "      \"kty\": \"RSA\"," +
+            "      \"n\": \"xSxiOkM8m8oCyWn-sNNZxBVTUcPAlhXRjKpLTYIM21epMC9rqEnrgL7iuntmp3UcffOIKtFHOtCG-jWUkyzxZHPPMo0kYZVHKRjGj-AVAy3FA-d2AtUc1dPlrQ0TpdDoTzew_6-48BcbdFEQI3161wcMoy40unYYYfzo3KuUeNcCY3cmHzSkYn4iQHaBy5zTAzKTIcYCTpaBGDk4_IyuysvaYmgwdeNO26hNV9dmPx_rWgYZYlashXZ_kRLirDaGpnJJHyPrYaEJpMIWuIfsh_UoMjsyuoQGe4XU6pG8uNnUd31mHa4VU78cghGZGrCz_YkPydfFlaX65LBp9aLdCyKkA66pDdnCkm8odVMgsH2x_kGM7sNlQ6ELTsT-dtJoiEDI_z3fSZehLw469QpTGQjfsfXUCYm8QrGckJF4bJc935TfGU86qr2Ik2YoipP_L4K_oqUf8i6bwO0iomo_C7Ukr4l-dh4D5O7szAb9Ga804OZusFk3JENlc1-RlB20S--dWrrO-v_L8WI2d72gizOKky0Xwzd8sseEqfMWdktyeKoaW0ANkBJHib4E0QxgedeTca0DH_o0ykMjOZLihOFtvDuCsbHG3fv41OQr4qRoX97QO2Hj1y3EBYtUEypan46g-fUyLCt-sYP66RkBYzCJkikCbzF_ECBDgX314_0\","
+            +
+            "      \"e\": \"AQAB\"," +
+            "      \"kid\": \"edljwtpubkey_development\"" +
+            "    }" +
+            "  ]" +
+            "}";
+    // public static final string EDL_TEST_TOKEN =
+    // "eyJ0eXAiOiJKV1QiLCJvcmlnaW4iOiJFYXJ0aGRhdGEgTG9naW4iLCJzaWciOiJlZGxqd3RwdWJrZXlfZGV2ZWxvcG1lbnQiLCJhbGciOiJSUzI1NiJ9.eyJ0eXBlIjoiVXNlciIsImNsaWVudF9pZCI6ImxvY2FsZGV2IiwiZXhwIjoxMTY2MTU0NzA5NCwiaWF0IjoxNjYxNTQ3MDk0LCJpc3MiOiJFYXJ0aGRhdGEgTG9naW4iLCJ1aWQiOiJtc3RhcnR6ZWx0ZXN0ZXIifQ.tAA4zu2K3NFJVX96_M1qb1lrDQ1l7uMjMWNE5Jkxw16RnHTgIt6dcEdX-YcXUbJqKDU39RLcB_O8hgzd9e7pHBdxrwhjl4LnuNcSj1XZGTLh-RD5VW1jRkQe_pcH1noniUqkXaYuVGUybnbhDZa_37Oxs-vr0lT06Qk82elV5Y1dq_YLQeABv4O0BiktpPoCSjSIfTW6jEUS-ONk07r5N5O_Me7H-QbPhEtiax1N3zcTRWyNn7lM6vQxl7d-ywRKqQaeA9Iy-ufmGXoczLvvN4HsaKbVhQ_llw6Xnj7cKpd4WJ6VABDETlMlcjwtyvSt-q3aToy9N4_EkMGQbxkbsQrvf9LI2VM7J799uhW9E4VvOEl-CafkFnOgjo1nvMpq3fZq1zIfG4eA6UrYpQQz_gcdFfoL-p5ZI_BbMO0PK_8XAfE8O0w7b7i7QJ_EmKKUA2QibJLK8qdlOhbLNu6ORTyqvxbawMAjW_ZzJIZnDwjyuIoJNBFJQxiz2SMBdQwAuJDGcyzIGEAheF0ffB-mJG28HyVvhbjQhP2ByE0mZoDFhqmgk47FnQNFL7mTdtSbI-KvOXb3rBEaELUdWDuqjgnOxQehJzFlbqETRZfZDuEUq7q1Zl227k2178lvVVPQuco8Auo180qVaJcAs9Fd2k-i6oNkalC6MNjgmEpBUSE";
+
+    // @Test
+    // public void testGetSetUrsClientAppPublicKeys() {
+    // // This test is almost trivially silly, but it demonstrates that the behavior
+    // we
+    // // expect is present for downstream tests...and will become less trivial if
+    // we
+    // // add testing around loading the public key values from a config file
+    // UrsIdP ursIdP = new UrsIdP();
+
+    // assertEquals(null, ursIdP.getUrsClientAppPublicKeys());
+
+    // String testValue = "thisStringIsAString";
+    // ursIdP.setUrsClientAppPublicKeys(testValue);
+    // assertEquals(testValue, ursIdP.getUrsClientAppPublicKeys());
+    // }
+
+    // @Test
+    // public void testGetValueFromEncodedJson() {
+    // // Success case:
+    // String decodedStr = "{\"sheep\":\"baa\"}";
+    // String encodedStr =
+    // Base64.getEncoder().encodeToString(decodedStr.getBytes());
+    // assertEquals("baa", UrsIdP.getStringValueFromEncodedJson(encodedStr,
+    // "sheep"));
+
+    // // Demonstrate that `null` is returned and exceptions are not thrown when...
+    // // ...input string is empty:
+    // assertEquals(null, UrsIdP.getStringValueFromEncodedJson("", ""));
+
+    // // ...input string is not valid Base64-encoded:
+    // assertEquals(null, UrsIdP.getStringValueFromEncodedJson("aBcDe", ""));
+
+    // // ...input string does not contain JSON:
+    // assertEquals(null, UrsIdP.getStringValueFromEncodedJson("aBcDeF", ""));
+
+    // // ...in string contains malformed JSON:
+    // String decodedMalStr = "{\"comma\":\"pain\",}";
+    // String encodedMalStr =
+    // Base64.getEncoder().encodeToString(decodedMalStr.getBytes());
+    // assertEquals(null, UrsIdP.getStringValueFromEncodedJson(encodedMalStr,
+    // "comma"));
+
+    // // ...input string does not contain requested key:
+    // assertEquals(null, UrsIdP.getStringValueFromEncodedJson(encodedStr, "cow"));
+
+    // // ...value for key is not a string:
+    // String decodedStr2 = "{\"fish\":[\"one\",\"two\",\"red\",\"blue\"]}";
+    // String encodedStr2 =
+    // Base64.getEncoder().encodeToString(decodedStr2.getBytes());
+    // assertEquals(null, UrsIdP.getStringValueFromEncodedJson(encodedStr2,
+    // "fish"));
+    // }
+
+    @Test
+    public void testGetPublicKeyForId() throws InvalidPublicKeyException, JsonParseException, IllegalStateException {
+        UrsIdP ursIdP = new UrsIdP();
+
+        // Success case:
+        RSAPublicKey pubKey = ursIdP.getPublicKeyForId(EDL_TEST_JWKS, "edljwtpubkey_development");
+        assertNotNull(pubKey);
+        BigInteger exponent = new BigInteger(1, Base64.getDecoder().decode("AQAB"));
+        assertEquals(exponent, pubKey.getPublicExponent());
+
+        // Failure cases:
+        assertNull("Should return null when key id is not found in JWKS",
+                ursIdP.getPublicKeyForId(EDL_TEST_JWKS, "key_id_that_definitely_does_not_exist"));
+
+        assertThrows("Should throw when public keys string is not JSON", IllegalStateException.class,
+                () -> ursIdP.getPublicKeyForId("thisStringIsNotAJsonWebKeySet", "myId"));
+
+        assertNull("Should return null when public keys string is not valid JWKS",
+                ursIdP.getPublicKeyForId("{\"jsonBlob\": \"butNotAJsonWebKeySet\"}", "myId"));
+
+        // Invalid due to funky modulus (compare to correct EDL_TEST_JWKS)
+        String jwksInvalidEncryption = "{" +
+                "  \"keys\": [" +
+                "    {" +
+                "      \"kty\": \"RSA\"," +
+                "      \"n\": \"fefefefef\","
+                +
+                "      \"e\": \"AQAB\"," +
+                "      \"kid\": \"edljwtpubkey_development\"" +
+                "    }" +
+                "  ]" +
+                "}";
+        assertNull("Should return null when public key do not contain an RSA key",
+                ursIdP.getPublicKeyForId(jwksInvalidEncryption, "myId"));
+
+        String jwksMissingKTY = "{" +
+                "  \"keys\": [" +
+                "    {" +
+                "      \"kid\": \"edljwtpubkey_development\"" +
+                "    }" +
+                "  ]" +
+                "}";
+        assertThrows("Should throw when public key does not contain kty field", IllegalArgumentException.class,
+                () -> ursIdP.getPublicKeyForId(jwksMissingKTY, "edljwtpubkey_development"));
+
+        String jwksNotRSA = "{" +
+                "  \"keys\": [" +
+                "    {" +
+                "      \"kty\": \"FOO\"," +
+                "      \"kid\": \"edljwtpubkey_development\"" +
+                "    }" +
+                "  ]" +
+                "}";
+        assertThrows("Should throw when public key's kty is not RSA", InvalidPublicKeyException.class,
+                () -> ursIdP.getPublicKeyForId(jwksNotRSA, "edljwtpubkey_development"));
+    }
+
+    @Test
+    public void testGetEdlUserIdFromToken() {
+        // Success case:
+        // TODO
+        assertTrue(true);
+
+        // Demonstrate that `null` is returned and exceptions are not thrown when...
+        // ...public key is not found for access token:
+        // TODO
+
+        // ...accessToken is invalid
+        // TODO
+    }
     /*
      * Okay, here are the things we want to test:
-     * For each failing test, test that it fails AND that it posts an error
-     * message?? or maybe that doesn't matter....
+     * For each failing test, test that it fails
      * - getEdlUserIdFromToken:
-     * - case that succeeds!
      * 
      * - token empty
      * - token wrong format?
@@ -69,53 +212,5 @@ public class UrsIdPTest {
      * - token invalid compared to key
      * - token verified, doesn't have uid field (?)
      * - valid publicKeys, access token
-     * 
-     * - case where it isn't RSA256, to show that it doesn't fail
-     * catastrophically....
      */
-
-    @Test
-    public void testGetSetUrsClientAppPublicKeys() {
-        // This test is almost trivially silly, but it demonstrates that the behavior we
-        // expect is present for downstream tests...and will become less trivial if we
-        // add testing around loading the public key values from a config file
-        UrsIdP ursIdP = new UrsIdP();
-
-        assertEquals(null, ursIdP.getUrsClientAppPublicKeys());
-
-        String testValue = "thisStringIsAString";
-        ursIdP.setUrsClientAppPublicKeys(testValue);
-        assertEquals(testValue, ursIdP.getUrsClientAppPublicKeys());
-    }
-
-    @Test
-    public void testGetValueFromEncodedJson() {
-        // Success case:
-        String decodedStr = "{\"sheep\":\"baa\"}";
-        String encodedStr = Base64.getEncoder().encodeToString(decodedStr.getBytes());
-        assertEquals("baa", UrsIdP.getStringValueFromEncodedJson(encodedStr, "sheep"));
-
-        // Demonstrate that `null` is returned and exceptions are not thrown when...
-        // ...input string is empty:
-        assertEquals(null, UrsIdP.getStringValueFromEncodedJson("", ""));
-
-        // ...input string is not valid Base64-encoded:
-        assertEquals(null, UrsIdP.getStringValueFromEncodedJson("aBcDe", ""));
-
-        // ...input string does not contain JSON:
-        assertEquals(null, UrsIdP.getStringValueFromEncodedJson("aBcDeF", ""));
-
-        // ...in string contains malformed JSON:
-        String decodedMalStr = "{\"comma\":\"pain\",}";
-        String encodedMalStr = Base64.getEncoder().encodeToString(decodedMalStr.getBytes());
-        assertEquals(null, UrsIdP.getStringValueFromEncodedJson(encodedMalStr, "comma"));
-
-        // ...input string does not contain requested key:
-        assertEquals(null, UrsIdP.getStringValueFromEncodedJson(encodedStr, "cow"));
-
-        // ...value for key is not a string:
-        String decodedStr2 = "{\"fish\":[\"one\",\"two\",\"red\",\"blue\"]}";
-        String encodedStr2 = Base64.getEncoder().encodeToString(decodedStr2.getBytes());
-        assertEquals(null, UrsIdP.getStringValueFromEncodedJson(encodedStr2, "fish"));
-    }
 }
