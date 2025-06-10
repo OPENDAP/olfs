@@ -37,7 +37,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.stream.MalformedJsonException;
 import opendap.PathBuilder;
 import opendap.coreServlet.ReqInfo;
 import opendap.http.error.Forbidden;
@@ -254,7 +257,7 @@ public class UrsIdP extends IdProvider{
      * @param accessToken
      * @return
      */
-    RSAPublicKey getPublicKeyForId(String publicKeyId) throws InvalidPublicKeyException, JsonSyntaxException {
+    RSAPublicKey getPublicKeyForId(String publicKeyId) throws InvalidPublicKeyException, JsonParseException {
         // 1. Get the key set (JSON web key set, i.e. JWKS)
         String jwksStr = getUrsClientAppPublicKeys();
         JsonObject jwks = JsonParser.parseString(jwksStr).getAsJsonObject();
@@ -289,25 +292,52 @@ public class UrsIdP extends IdProvider{
     }
 
     /**
-     * Return the value for `key` from the encoded JSON string `inputStr`;
-     * return value will be `null` if encoded string is not JSON or if
-     * `key` is not found in object.
+     * Return value of `key` after decoding `inputStr` into JSON object;
+     * return `null` if encoded string does not contain JSON, 
+     * `key` is not present in decoded object, or return value is not a String.
      *
-     * @param inputStr
-     * @param key
-     * @return The value of `key`, null if not found
+     * @param inputStr Base64-encoded JSON
+     * @param key The key of the value to be returned from the decoded `inputStr`
+     * @return The value of `key` if present in encoded `inputStr` and a String, `null` otherwise
      */
-    private String getValueFromEncodedJson(String inputStr, String key) {
-        String decodedStr = new String(Base64.getDecoder().decode(inputStr),
-                HyraxStringEncoding.getCharset());
-        JsonObject decodedJson;
+    static String getStringValueFromEncodedJson(String inputStr, String key) {
+        String decodedStr = null;
         try {
-            decodedJson = JsonParser.parseString(decodedStr).getAsJsonObject();
-        } catch (JsonSyntaxException e) {
-            log.error("{}", e);
+            decodedStr = new String(Base64.getDecoder().decode(inputStr),
+                HyraxStringEncoding.getCharset());
+            if (decodedStr == null || decodedStr.isEmpty()) {
+                return null;
+            }
+        } catch (IllegalArgumentException e) {
             return null;
         }
-        return decodedJson.has(key) ? decodedJson.get(key).getAsString() : null;
+        
+        JsonElement json;
+        try {
+            json = JsonParser.parseString(decodedStr);
+        } catch (JsonSyntaxException e) {
+            return null;
+        }
+        if (!json.isJsonObject()) {
+            return null;
+        }
+
+        JsonObject decodedJson;
+        try {
+            decodedJson = json.getAsJsonObject();
+        } catch (JsonParseException e) {
+            return null;
+        }
+
+        if (decodedJson != null && decodedJson.has(key)) {
+            JsonElement value = decodedJson.get(key);
+            try {
+                return value.getAsString();
+            } catch (IllegalStateException e) {
+                return null;
+            }
+        }
+        return null;
     }
 
     /**
@@ -323,11 +353,11 @@ public class UrsIdP extends IdProvider{
         DecodedJWT unverifiedJwt = null;
         try {
             unverifiedJwt = JWT.decode(accessToken);
-        } catch (JsonSyntaxException e) {
+        } catch (JsonParseException e) {
             log.error("Unable to load access token as JWT. Details: {}", e);
             return null;
         }
-        String publicKeyId = getValueFromEncodedJson(unverifiedJwt.getHeader(), "sig");
+        String publicKeyId = getStringValueFromEncodedJson(unverifiedJwt.getHeader(), "sig");
         if (publicKeyId == null) {
             log.error("Access token missing required field `sig`.");
             return null;
@@ -338,7 +368,7 @@ public class UrsIdP extends IdProvider{
         RSAPublicKey publicKey;
         try {
             publicKey = getPublicKeyForId(publicKeyId);
-        } catch (InvalidPublicKeyException | JsonSyntaxException e) {
+        } catch (InvalidPublicKeyException | JsonParseException e) {
             log.error("No valid matching public key found in `{}`. Details: {}", publicKeys, e);
             return null;
         }
@@ -357,7 +387,7 @@ public class UrsIdP extends IdProvider{
         }
 
         // ...finally, pull user id from the payload! 
-        String uid = getValueFromEncodedJson(unverifiedJwt.getPayload(), "uid");
+        String uid = getStringValueFromEncodedJson(unverifiedJwt.getPayload(), "uid");
         log.debug("uid: {}", uid);
         return uid;
     }
