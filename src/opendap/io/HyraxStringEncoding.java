@@ -28,12 +28,23 @@ public class HyraxStringEncoding {
         Lock lock = _rwLock.readLock();
         try {
             lock.lock();
-            return Charset.forName(_currentCharSet.name());
+            return _currentCharSet;
         }
         finally {
             lock.unlock();
         }
     }
+    public static String getCharsetName(){
+        Lock lock = _rwLock.readLock();
+        try {
+            lock.lock();
+            return _currentCharSet.name();
+        }
+        finally {
+            lock.unlock();
+        }
+    }
+
     public static Charset setCharset(Charset newCharset){
         Lock lock = _rwLock.writeLock();
         try {
