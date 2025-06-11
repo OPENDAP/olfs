@@ -40,9 +40,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonParseException;
-import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
-import com.google.gson.stream.MalformedJsonException;
 import opendap.PathBuilder;
 import opendap.coreServlet.ReqInfo;
 import opendap.http.error.Forbidden;
@@ -64,7 +62,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
+// import java.util.Set;
 
 import static opendap.auth.IdFilter.USER_PROFILE;
 
@@ -124,6 +122,7 @@ public class UrsIdP extends IdProvider{
         e = config.getChild(REJECT_UNSUPPORTED_AUTHZ_SCHEMES_KEY);
         if(e != null)
             rejectUnsupportedAuthzSchemes = true;
+
     }
 
 
@@ -406,12 +405,10 @@ public class UrsIdP extends IdProvider{
 
     /**
      * Old Way:
-     * curl -X POST -d 'token=<token>&client_id=<‘your application client_id’>
-     * https://urs.earthdata.nasa.gov/oauth/tokens/user
+     * curl -X POST -d 'token=<token>&client_id=<‘your application client_id’> https://urs.earthdata.nasa.gov/oauth/tokens/user
      *
      * New Way:
-     * curl -X POST -d 'token=<token>’ -H ‘Authorization: ‘Basic <base64appcreds>’
-     * https://urs.earthdata.nasa.gov/oauth/tokens/user
+     * curl -X POST -d 'token=<token>’ -H ‘Authorization: ‘Basic <base64appcreds>’ https://urs.earthdata.nasa.gov/oauth/tokens/user
      *
      *
      * @param accessToken
