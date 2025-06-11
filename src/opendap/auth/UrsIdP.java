@@ -27,9 +27,11 @@
 package opendap.auth;
 
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
+
 import com.auth0.jwt.JWT;
 import com.auth0.jwk.Jwk;
 import com.auth0.jwk.InvalidPublicKeyException;
@@ -263,6 +265,11 @@ public class UrsIdP extends IdProvider{
      * @throws IllegalStateException
      */
     RSAPublicKey getPublicKeyForId(String jwksPublicKeys, String publicKeyId) throws InvalidPublicKeyException, JsonParseException, IllegalStateException {
+        // Safety first!
+        if (jwksPublicKeys == null || jwksPublicKeys.isEmpty() || publicKeyId == null) {
+            return null;
+        }
+
         // 1. Parse the key set (JSON web key set, i.e. JWKS)
         JsonObject jwks = JsonParser.parseString(jwksPublicKeys).getAsJsonObject();
         JsonArray jwksKeys = jwks.getAsJsonArray("keys");
@@ -345,10 +352,10 @@ public class UrsIdP extends IdProvider{
 
     /**
      * Return the value of "uid" from the `accessToken` JWT's payload;
-     * `null` if `accessToken` is invalid.
+     * `null` if `accessToken` is fails verification.
      *
-     * @param publicKeys  A stringified JWK Set
-     * @param accessToken An pre-verified EDL JWT token
+     * @param publicKeys A stringified JWK Set
+     * @param accessToken An EDL JWT token
      * @return The `accessToken`'s user id (`uid`)
      */
     String getEdlUserIdFromToken(String publicKeys, String accessToken) {
@@ -356,8 +363,8 @@ public class UrsIdP extends IdProvider{
         DecodedJWT unverifiedJwt = null;
         try {
             unverifiedJwt = JWT.decode(accessToken);
-        } catch (JsonParseException e) {
-            log.error("Unable to load access token as JWT. Details: {}", e);
+        } catch (JWTDecodeException e) {
+            log.error("Unable to load access token as JWT. Details: {}", e.getMessage());
             return null;
         }
         String publicKeyId = getStringValueFromEncodedJson(unverifiedJwt.getHeader(), "sig");
@@ -365,7 +372,6 @@ public class UrsIdP extends IdProvider{
             log.error("Access token missing required field `sig`.");
             return null;
         }
-        log.error("HERE WE AREEEEEE");
 
         // 2. From the set of public access keys provided, get the one specifically
         // required by our access token
@@ -373,7 +379,7 @@ public class UrsIdP extends IdProvider{
         try {
             publicKey = getPublicKeyForId(publicKeys, publicKeyId);
         } catch (InvalidPublicKeyException | JsonParseException e) {
-            log.error("No valid matching public key found in `{}`. Details: {}", publicKeys, e);
+            log.error("No valid matching public key found in `{}`. Details: {}", publicKeys, e.getMessage());
             return null;
         }
         if (publicKey == null) {
@@ -386,7 +392,7 @@ public class UrsIdP extends IdProvider{
             JWTVerifier verifier = JWT.require(algorithm).build();
             verifier.verify(unverifiedJwt);
         } catch (JWTVerificationException e) {
-            log.error("Access token failed verification. Details: {}", e);
+            log.error("Access token failed verification. Details: {}", e.getMessage());
             return null;
         }
 
