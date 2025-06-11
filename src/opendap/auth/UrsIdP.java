@@ -153,7 +153,7 @@ public class UrsIdP extends IdProvider{
         Element e = config.getChild(childName);
         if(e == null){
             String msg = this.getClass().getSimpleName() + " configuration does not contain optional <" + childName + "> element.";
-            log.debug("{}", msg);
+            log.info("{}", msg);
         }
         return e;
     }
