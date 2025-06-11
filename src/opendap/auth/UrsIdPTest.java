@@ -76,30 +76,30 @@ public class UrsIdPTest {
         assertEquals("baa", UrsIdP.getStringValueFromEncodedJson(encodedStr,
                 "sheep"));
 
-        // Demonstrate that `null` is returned and exceptions are not thrown when...
-        // ...input string is empty:
-        assertEquals(null, UrsIdP.getStringValueFromEncodedJson("", ""));
+        // Failure cases:
+        assertEquals("Should return null when input string is empty", null,
+                UrsIdP.getStringValueFromEncodedJson("", ""));
 
-        // ...input string is not valid Base64-encoded:
-        assertEquals(null, UrsIdP.getStringValueFromEncodedJson("aBcDe", ""));
+        assertEquals("Should return null when input string is input string is not valid Base64-encoded", null,
+                UrsIdP.getStringValueFromEncodedJson("aBcDe", ""));
 
-        // ...input string does not contain JSON:
-        assertEquals(null, UrsIdP.getStringValueFromEncodedJson("aBcDeF", ""));
+        assertEquals("Should return null when input string does not contain JSON", null,
+                UrsIdP.getStringValueFromEncodedJson("aBcDeF", ""));
 
-        // ...in string contains malformed JSON:
         String decodedMalStr = "{\"comma\":\"pain\",}";
         String encodedMalStr = Base64.getEncoder().encodeToString(decodedMalStr.getBytes());
-        assertEquals(null, UrsIdP.getStringValueFromEncodedJson(encodedMalStr,
-                "comma"));
+        assertEquals("Should return null when input string contains malformed JSON", null,
+                UrsIdP.getStringValueFromEncodedJson(encodedMalStr,
+                        "comma"));
 
-        // ...input string does not contain requested key:
-        assertEquals(null, UrsIdP.getStringValueFromEncodedJson(encodedStr, "cow"));
+        assertEquals("Should return null when input string does not contain requested key", null,
+                UrsIdP.getStringValueFromEncodedJson(encodedStr, "cow"));
 
-        // ...value for key is not a string:
         String decodedStr2 = "{\"fish\":[\"one\",\"two\",\"red\",\"blue\"]}";
         String encodedStr2 = Base64.getEncoder().encodeToString(decodedStr2.getBytes());
-        assertEquals(null, UrsIdP.getStringValueFromEncodedJson(encodedStr2,
-                "fish"));
+        assertEquals("Should return null when value for key is not a string", null,
+                UrsIdP.getStringValueFromEncodedJson(encodedStr2,
+                        "fish"));
     }
 
     @Test

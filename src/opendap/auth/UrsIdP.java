@@ -124,8 +124,6 @@ public class UrsIdP extends IdProvider{
         e = config.getChild(REJECT_UNSUPPORTED_AUTHZ_SCHEMES_KEY);
         if(e != null)
             rejectUnsupportedAuthzSchemes = true;
-
-        log.error("\n\tALSO WE ARE HERE `{}`", clientAppPublicKeys);
     }
 
 
@@ -147,16 +145,16 @@ public class UrsIdP extends IdProvider{
     }
 
     /**
-     * Another little worker method.
+     * Worker method to get value of `childName` from `config`
      * @param config
      * @param childName
-     * @return element found in `config`; will be `null` if `childName` not present
+     * @return element found in `config`, `null` if `childName` not present
      */
     private Element getOptionalConfigElement(Element config, String childName) {
         Element e = config.getChild(childName);
         if(e == null){
             String msg = this.getClass().getSimpleName() + " configuration does not contain optional <" + childName + "> element.";
-            log.error("{}",msg);
+            log.debug("{}", msg);
         }
         return e;
     }
@@ -350,26 +348,28 @@ public class UrsIdP extends IdProvider{
         return null;
     }
 
+    
     /**
      * Return the value of "uid" from the `accessToken` JWT's payload;
      * `null` if `accessToken` is fails verification.
      *
-     * @param publicKeys A stringified JWK Set
+     * @param publicKeys  A stringified JWK Set
      * @param accessToken An EDL JWT token
      * @return The `accessToken`'s user id (`uid`)
      */
     String getEdlUserIdFromToken(String publicKeys, String accessToken) {
+        String errorPrefix = "Failure to validate access token locally;";
         // 1. Figure out which public key the access token requires
         DecodedJWT unverifiedJwt = null;
         try {
             unverifiedJwt = JWT.decode(accessToken);
         } catch (JWTDecodeException e) {
-            log.error("Unable to load access token as JWT. Details: {}", e.getMessage());
+            log.error("{}{} unable to load access token as JWT. Details: {}", ERR_PREFIX, errorPrefix, e.getMessage());
             return null;
         }
         String publicKeyId = getStringValueFromEncodedJson(unverifiedJwt.getHeader(), "sig");
         if (publicKeyId == null) {
-            log.error("Access token missing required field `sig`.");
+            log.error("{}{} access token missing required field `sig`.", ERR_PREFIX, errorPrefix);
             return null;
         }
 
@@ -379,10 +379,12 @@ public class UrsIdP extends IdProvider{
         try {
             publicKey = getPublicKeyForId(publicKeys, publicKeyId);
         } catch (InvalidPublicKeyException | JsonParseException e) {
-            log.error("No valid matching public key found in `{}`. Details: {}", publicKeys, e.getMessage());
+            log.error("{}{} no valid matching public key found in `{}`. Details: {}", ERR_PREFIX, errorPrefix, publicKeys,
+                    e.getMessage());
             return null;
         }
         if (publicKey == null) {
+            log.error("{}{} no public key found for access token", ERR_PREFIX, errorPrefix);
             return null;
         }
 
@@ -392,11 +394,11 @@ public class UrsIdP extends IdProvider{
             JWTVerifier verifier = JWT.require(algorithm).build();
             verifier.verify(unverifiedJwt);
         } catch (JWTVerificationException e) {
-            log.error("Access token failed verification. Details: {}", e.getMessage());
+            log.error("{}{} access token failed verification. Details: {}", ERR_PREFIX, errorPrefix, e.getMessage());
             return null;
         }
 
-        // ...finally, pull user id from the payload! 
+        // ...finally, pull user id from the payload
         String uid = getStringValueFromEncodedJson(unverifiedJwt.getPayload(), "uid");
         log.debug("uid: {}", uid);
         return uid;
@@ -505,13 +507,13 @@ public class UrsIdP extends IdProvider{
                 if (!getUrsClientAppPublicKeys().isEmpty()) {
                     String uid = getEdlUserIdFromToken(getUrsClientAppPublicKeys(), token);
                     if (uid == null) {
-                        log.error("Unable to validate EDL access token locally; falling back to remote validation");
+                        log.error("{}Unable to validate EDL access token locally; falling back to remote validation", ERR_PREFIX);
                     } else {
                         userProfile.setUID(uid);
                         foundValidAuthToken = true;
                     }
                 }
-                log.error("\nLOCAL AUTHENTICATION OUTCOME: \n\tTOKEN VALID? {} \n\tUSER ID: {}", foundValidAuthToken, userProfile.getUID()); // TODO-remove debug log
+                log.debug("Local EDL token validation result: valid={}, uid={}", foundValidAuthToken, userProfile.getUID());
 
                 // Fall back to the EDL endpoint on local failure or lack of local public keys
                 if (!foundValidAuthToken) {
@@ -520,7 +522,7 @@ public class UrsIdP extends IdProvider{
 
                     // Successful retrieval indicates that the token is valid
                     foundValidAuthToken = userProfile.getUID() != null;
-                    log.error("\nREMOTE AUTHENTICATION OUTCOME: \n\tTOKEN VALID? {} \n\tUSER ID: {}", foundValidAuthToken, userProfile.getUID()); // TODO-remove debug log
+                    log.debug("Remote EDL token validation result: valid={}, uid={}", foundValidAuthToken, userProfile.getUID());
                 }
             }
             else if (rejectUnsupportedAuthzSchemes) {
