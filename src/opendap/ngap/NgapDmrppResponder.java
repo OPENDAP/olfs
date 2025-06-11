@@ -24,57 +24,53 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-package opendap.bes.dap4Responders.DatasetMetadata;
+package opendap.ngap;
 
-import opendap.bes.Version;
 import opendap.bes.BesApi;
+import opendap.bes.Version;
+import opendap.ngap.NgapBesApi;
 import opendap.bes.dap4Responders.Dap4Responder;
 import opendap.bes.dap4Responders.MediaType;
 import opendap.coreServlet.*;
 import opendap.dap.User;
 import opendap.dap4.QueryParameters;
-import opendap.http.mediaTypes.DMR;
+import opendap.http.mediaTypes.TextXml;
 import opendap.logging.ServletLogUtil;
 import org.slf4j.Logger;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.DataOutputStream;
 
 
-public class NormativeDMR extends Dap4Responder {
+public class NgapDmrppResponder extends Dap4Responder {
+
+
+
     private Logger log;
-    private static String defaultRequestSuffix = ".dmr";
+    private static String defaultRequestSuffix = ".dmrpp";
 
 
-    public NormativeDMR(String sysPath, BesApi besApi, boolean addTypeSuffixToDownloadFilename, boolean enforceRequiredUserSelection, boolean showDmrppLink) {
-        this(sysPath, null, defaultRequestSuffix, besApi, addTypeSuffixToDownloadFilename,enforceRequiredUserSelection, showDmrppLink);
+
+    public NgapDmrppResponder(String sysPath, NgapBesApi besApi, boolean addTypeSuffixToDownloadFilename) {
+        this(sysPath,null, defaultRequestSuffix, besApi, addTypeSuffixToDownloadFilename);
     }
 
-    public NormativeDMR(
-            String sysPath,
-            String pathPrefix,
-            String requestSuffix,
-            BesApi besApi,
-            boolean addFileoutTypeSuffixToDownloadFilename,
-            boolean enforceRequiredUserSelection,
-            boolean showDmrppLink) {
-        super(sysPath, pathPrefix, requestSuffix, besApi);
+    public NgapDmrppResponder(String sysPath, String pathPrefix, NgapBesApi besApi, boolean addTypeSuffixToDownloadFilename) {
+        this(sysPath, pathPrefix, defaultRequestSuffix, besApi, addTypeSuffixToDownloadFilename);
+    }
+
+    public NgapDmrppResponder(String sysPath, String pathPrefix, String requestSuffixRegex, NgapBesApi besApi, boolean addTypeSuffixToDownloadFilename) {
+        super(sysPath, pathPrefix, requestSuffixRegex, besApi);
         log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
-        addTypeSuffixToDownloadFilename(addFileoutTypeSuffixToDownloadFilename);
+        addTypeSuffixToDownloadFilename(addTypeSuffixToDownloadFilename);
         setServiceRoleId("http://services.opendap.org/dap4/dataset-metadata");
-        setServiceTitle("Dataset Metadata Response");
-        setServiceDescription("DAP4 Dataset Description and Attribute XML Document.");
-        setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#Dataset_Metadata_Response");
+        setServiceTitle("DMR++ annotated DMR.");
+        setServiceDescription("An annotated Dataset Metadata Response document containing dmr++ markup for remote data access.");
+        setServiceDescriptionLink("https://opendap.github.io/DMRpp-wiki/DMRpp.html");
 
-        setNormativeMediaType(new DMR(getRequestSuffix()));
-
-        addAltRepResponder(new XmlDMR   (sysPath, pathPrefix, besApi, addFileoutTypeSuffixToDownloadFilename));
-        addAltRepResponder(new HtmlDMR  (sysPath, pathPrefix, besApi, enforceRequiredUserSelection, showDmrppLink));
-        addAltRepResponder(new RdfDMR   (sysPath, pathPrefix, besApi, addFileoutTypeSuffixToDownloadFilename));
-        addAltRepResponder(new JsonDMR  (sysPath, pathPrefix, besApi, addFileoutTypeSuffixToDownloadFilename));
-        addAltRepResponder(new IjsonDMR (sysPath, pathPrefix, besApi, addFileoutTypeSuffixToDownloadFilename));
+        setNormativeMediaType(new TextXml(getRequestSuffix()));
 
         log.debug("Using RequestSuffix:              '{}'", getRequestSuffix());
         log.debug("Using CombinedRequestSuffixRegex: '{}'", getCombinedRequestSuffixRegex());
@@ -87,6 +83,14 @@ public class NormativeDMR extends Dap4Responder {
     public boolean isMetadataResponder(){ return true; }
 
 
+    @Override
+    public BesApi getBesApi() {
+        BesApi besApi = super.getBesApi();
+        if(besApi instanceof NgapBesApi)
+            return besApi;
+
+        return null;
+    }
 
     public void sendNormativeRepresentation(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
@@ -95,7 +99,11 @@ public class NormativeDMR extends Dap4Responder {
         String xmlBase = getXmlBase(request);
         String resourceID = getResourceId(requestedResourceId, false);
 
-        BesApi besApi = getBesApi();
+        NgapBesApi besApi = (NgapBesApi) getBesApi();
+        if (besApi == null){
+            throw new OPeNDAPException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,"An instance of NgapBesApi was not found. Unable to proceed with dmr++ response as the" +
+                    "NgapBesApi contains a specialization required for this feature." );
+        }
 
         log.debug("Sending {} for dataset: {}",getServiceTitle(),resourceID);
 
@@ -107,11 +115,12 @@ public class NormativeDMR extends Dap4Responder {
         response.setContentType(responseMediaType.getMimeType());
         Version.setOpendapMimeHeaders(request,response);
         response.setHeader("Content-Description", getNormativeMediaType().getMimeType());
+        //response.setHeader("Content-Disposition", " attachment; filename=\"" +getDownloadFileName(resourceID)+"\"");
 
         TransmitCoordinator tc = new ServletResponseTransmitCoordinator(response);
         DataOutputStream os = new DataOutputStream(response.getOutputStream());
         User user = new User(request);
-        besApi.writeDMR(user, resourceID, qp, xmlBase, os, tc);
+        besApi.writeDmrpp(user,resourceID,qp,xmlBase,os, tc);
         os.flush();
         ServletLogUtil.setResponseSize(os.size());
         log.debug("Sent {} size:{}",getServiceTitle(),os.size());

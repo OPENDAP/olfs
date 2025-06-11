@@ -95,7 +95,7 @@ public class Version extends Dap4Responder {
 
         response.setStatus(HttpServletResponse.SC_OK);
 
-        PrintStream ps = new PrintStream(response.getOutputStream(), false, HyraxStringEncoding.getCharset().name());
+        PrintStream ps = new PrintStream(response.getOutputStream(), false, HyraxStringEncoding.getCharsetName());
 
         Document vdoc = besApi.getCombinedVersionDocument();
 

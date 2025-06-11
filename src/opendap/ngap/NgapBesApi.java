@@ -49,6 +49,7 @@ import org.slf4j.Logger;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -65,6 +66,7 @@ import java.util.regex.Pattern;
 public class NgapBesApi extends BesApi implements Cloneable {
 
     public static final String EDL_AUTH_TOKEN_CONTEXT = "edl_auth_token";
+    public static final String RETURN_AS_DMRPP = "dmrpp";
 
     private Logger log;
     private String _servicePrefix;
@@ -567,4 +569,106 @@ public class NgapBesApi extends BesApi implements Cloneable {
         }
         return root;
     }
+
+
+    public Document getDmrppRequest(User user, String dataSource, QueryParameters qp, String xmlbase) {
+
+        log.debug("Constructing BES get dmr++ request. dataSource: {}",dataSource);
+        Element request = new Element("request", BES.BES_NS);
+
+        //String besDataSource = getBES(dataSource).trimPrefix(dataSource);
+
+        RequestId rid = RequestCache.getRequestId();
+        request.setAttribute(REQUEST_ID_KEY, rid.id() );
+        request.setAttribute(REQUEST_UUID_KEY, rid.uuid().toString() );
+
+        request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
+
+        request.addContent(setContextElement(ERRORS_CONTEXT, XML_ERRORS));
+
+        String logEntryForBes = ServletLogUtil.getLogEntryForBesLog();
+        if(!logEntryForBes.isEmpty())
+            request.addContent(setContextElement(OLFS_LOG_CONTEXT,logEntryForBes));
+
+
+        if(user.getMaxResponseSize()>=0)
+            request.addContent(setContextElement(MAX_RESPONSE_SIZE_CONTEXT,user.getMaxResponseSize()+""));
+
+        if(user.getMaxVariableSize()>=0)
+            request.addContent(setContextElement(MAX_VARIABLE_SIZE_CONTEXT,user.getMaxVariableSize()+""));
+
+
+        addEdlAuthToken(request,user);
+
+        //Create the setContainer command
+        Element setContainerElem = new Element("setContainer",BES.BES_NS);
+        setContainerElem.setAttribute("name",getBesContainerName());
+        setContainerElem.setAttribute("space",getBesSpaceName());
+        setContainerElem.setText(dataSource);
+        request.addContent(setContainerElem);
+
+        // Create the definition element
+        String defName = "d1";
+        Element defineElem = new Element("define",BES.BES_NS);
+        defineElem.setAttribute("name",defName);
+        defineElem.setAttribute("space","default");
+
+        Element containerElem = new Element("container",BES.BES_NS);
+        containerElem.setAttribute("name",getBesContainerName());
+
+        if(qp.getCe()!=null && !qp.getCe().equals("")) {
+            Element ceElem = new Element("dap4constraint",BES.BES_NS);
+            // We replace the space characters in the CE with %20
+            // so the libdap ce parsers don't blow a gasket.
+            String encoded_ce = qp.getCe().replaceAll(" ","%20");
+            ceElem.setText(encoded_ce);
+            containerElem.addContent(ceElem);
+        }
+
+        if(qp.getFunc()!=null && !qp.getFunc().equals("")) {
+            // e.addContent(dap4FunctionElement(qp.getFunc()));
+            Element d4FuncElem = new Element("dap4function",BES.BES_NS);
+            d4FuncElem.setText(qp.getFunc());
+            containerElem.addContent(d4FuncElem);
+        }
+        defineElem.addContent(containerElem);
+
+        request.addContent(defineElem);
+
+        // Build and add the <get /> element
+        Element getElement = new Element("get",BES.BES_NS);
+        getElement.setAttribute("type",BesApi.DAP4_DATA);
+        getElement.setAttribute("definition",defName);
+        getElement.setAttribute("returnAs",RETURN_AS_DMRPP);
+
+        if(qp.getAsync()!=null && !qp.getAsync().isEmpty())
+            getElement.setAttribute("async",qp.getAsync());
+
+        if(qp.getStoreResultRequestServiceUrl()!=null && !qp.getStoreResultRequestServiceUrl().isEmpty())
+            getElement.setAttribute("store_result",qp.getStoreResultRequestServiceUrl());
+
+        request.addContent(getElement);
+
+        log.debug("Built request for NGAP BES dmr++ response.");
+
+        return new Document(request);
+    }
+
+
+
+    public void writeDmrpp(User user,
+                         String dataSource,
+                         QueryParameters qp,
+                         String xmlBase,
+                         OutputStream os,
+                         TransmitCoordinator tc)
+            throws BadConfigurationException, BESError, IOException, PPTException {
+
+        besTransaction(
+                dataSource,
+                getDmrppRequest(user, dataSource, qp, xmlBase),
+                os, tc);
+    }
+
+
 }

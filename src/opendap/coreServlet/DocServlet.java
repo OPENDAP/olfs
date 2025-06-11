@@ -224,7 +224,7 @@ public class DocServlet extends HttpServlet {
 
     private static String readFileAsString(File file) throws IOException {
 
-        Scanner scanner = new Scanner(file, HyraxStringEncoding.getCharset().name());
+        Scanner scanner = new Scanner(file, HyraxStringEncoding.getCharsetName());
         StringBuilder stringBuilder = new StringBuilder();
 
         try {

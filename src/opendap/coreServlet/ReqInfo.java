@@ -351,7 +351,7 @@ public class ReqInfo {
     private static String convertStreamToString(java.io.InputStream is) throws IOException {
         // Using the scanner with the \A delimiter basically says "from the beginning of the input"
         // So then we get one big token from teh scanner and (see comment below)
-        java.util.Scanner s = new java.util.Scanner(is, HyraxStringEncoding.getCharset().name()).useDelimiter("\\A");
+        java.util.Scanner s = new java.util.Scanner(is, HyraxStringEncoding.getCharsetName()).useDelimiter("\\A");
         // Since the Scanner is going to make one token from the whole shebang, either the  InputStream
         // is empty (in which case we return an empty string, or it's not empty and we return the single token.
         return s.hasNext() ? s.next() : "";
@@ -730,7 +730,7 @@ public class ReqInfo {
         String ce = getConstraintExpression(request);
         String decoded_ce= "";
         if(!ce.isEmpty()){
-            decoded_ce = URLDecoder.decode(ce, HyraxStringEncoding.getCharset().name());
+            decoded_ce = URLDecoder.decode(ce, HyraxStringEncoding.getCharsetName());
             request_url += "?" + ce;
         }
         JSONObject param = new JSONObject();
@@ -956,7 +956,7 @@ public class ReqInfo {
             // DEFAULT
             // No service chain request ID appears in the expected request headers
             // so make a homegrown request_id and send it on.
-            // The no paramater cobstrutor Contains a fresh uuid
+            // The no parameter constructor mints a fresh uuid
             reqId = new RequestId();
         }
         return reqId;

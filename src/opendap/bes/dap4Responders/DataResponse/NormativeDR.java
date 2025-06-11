@@ -75,7 +75,7 @@ public class NormativeDR extends Dap4Responder {
         addTypeSuffixToDownloadFilename(addTypeSuffixToDownloadFilename);
         setServiceRoleId("http://services.opendap.org/dap4/data");
         setServiceTitle("DAP4 Data Response");
-        setServiceDescription("DAP4 Data Response object.");
+        setServiceDescription("DAP4 Data Response object");
         setServiceDescriptionLink("http://docs.opendap.org/index.php/DAP4:_Specification_Volume_2#DAP4:_Data_Response");
 
 
@@ -179,7 +179,7 @@ public class NormativeDR extends Dap4Responder {
             Dap4Error d4e = new Dap4Error();
             d4e.setHttpStatusCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             d4e.setMessage(msg);
-            d4e.setOtherInformation(besResponse.toString( HyraxStringEncoding.getCharset().name()));
+            d4e.setOtherInformation(besResponse.toString( HyraxStringEncoding.getCharsetName()));
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             sos.write(d4e.toString().getBytes(HyraxStringEncoding.getCharset()));
             sos.flush();

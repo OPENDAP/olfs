@@ -33,6 +33,7 @@ import opendap.http.error.NotFound;
 import opendap.logging.ServletLogUtil;
 import opendap.logging.Procedure;
 import opendap.logging.Timer;
+import opendap.ngap.NgapDapDispatcher;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.slf4j.Logger;
@@ -271,12 +272,12 @@ public class DispatchServlet extends HttpServlet {
         httpGetHandlers.add(new opendap.gateway.DispatchHandler());
 
         // The NgapDispatchHandler needs to come before BesDapDispatcher
-        httpGetHandlers.add(new opendap.ngap.NgapDispatchHandler());
+        httpGetHandlers.add(new NgapDapDispatcher());
         httpGetHandlers.add(new opendap.bes.BesDapDispatcher());
 
         if (enablePost) {
             // The NgapDispatchHandler does POST, and needs to come before BesDapDispatcher
-            httpPostHandlers.add(new opendap.ngap.NgapDispatchHandler());
+            httpPostHandlers.add(new NgapDapDispatcher());
 
             // The BesDapDispatcher does POST
             httpPostHandlers.add( new opendap.bes.BesDapDispatcher());
