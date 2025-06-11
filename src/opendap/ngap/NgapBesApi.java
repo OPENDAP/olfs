@@ -666,7 +666,7 @@ public class NgapBesApi extends BesApi implements Cloneable {
 
         besTransaction(
                 dataSource,
-                getDmrppRequest(user, dataSource,qp,xmlBase),
+                getDmrppRequest(user, dataSource, qp, xmlBase),
                 os, tc);
     }
 
