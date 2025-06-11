@@ -31,19 +31,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Implmentations of this interface may plugged into the DispatchServlet_OLD (via the web.xml file) to
- * provide specific Server responses to HTTP GET requests. The DispatchServlet_OLD REQUIRES an implmentation of this interface
+ * Implementations of this interface may be plugged into the DispatchServlet_OLD (via the web.xml file) to
+ * provide specific Server responses to HTTP GET requests. The DispatchServlet_OLD REQUIRES an implementation of this interface
  * to be identified in the web.xml file.
  */
 public interface OpendapHttpDispatchHandler extends DispatchHandler {
 
-
-
-
     public ResourceInfo getDataSourceInfo(String dataSourceName) throws Exception;
-
-
-
 
     /**
      * Handles the client's DDX request.

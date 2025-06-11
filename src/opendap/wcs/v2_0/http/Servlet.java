@@ -203,7 +203,8 @@ public class Servlet extends HttpServlet {
 
         int request_status = HttpServletResponse.SC_OK;
         try {
-            ServletLogUtil.logServerAccessStart(req, ServletLogUtil.WCS_ACCESS_LOG_ID, "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
+            RequestCache.open(req);
+            ServletLogUtil.logServerAccessStart(req, ServletLogUtil.WCS_ACCESS_LOG_ID, "HTTP-GET", RequestCache.getRequestId());
             httpGetService.handleRequest(req, resp);
         }
         catch (Throwable t) {
@@ -220,8 +221,8 @@ public class Servlet extends HttpServlet {
                     msg.append("Message: ").append(t.getMessage()).append("\n");
 
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    t.printStackTrace(new PrintStream(baos,true,HyraxStringEncoding.getCharset().name()));
-                    msg.append("StackTrace: ").append(baos.toString(HyraxStringEncoding.getCharset().name())).append("\n");
+                    t.printStackTrace(new PrintStream(baos,true,HyraxStringEncoding.getCharsetName()));
+                    msg.append("StackTrace: ").append(baos.toString(HyraxStringEncoding.getCharsetName())).append("\n");
 
                     myBadThang = new WcsException(msg.toString(),WcsException.NO_APPLICABLE_CODE);
                     myBadThang.setHttpStatusCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -269,7 +270,8 @@ public class Servlet extends HttpServlet {
     public void doPost(HttpServletRequest req, HttpServletResponse resp){
         int request_status = HttpServletResponse.SC_OK;
         try {
-            ServletLogUtil.logServerAccessStart(req, ServletLogUtil.WCS_ACCESS_LOG_ID, "HTTP-POST", Integer.toString(reqNumber.incrementAndGet()));
+            RequestCache.open(req);
+            ServletLogUtil.logServerAccessStart(req, ServletLogUtil.WCS_ACCESS_LOG_ID, "HTTP-POST", RequestCache.getRequestId());
 
             if(wcsPostService.requestCanBeHandled(req)){
                 wcsPostService.handleRequest(req,resp);
@@ -285,7 +287,6 @@ public class Servlet extends HttpServlet {
                 log.error("{}",msg);
                 request_status = OPeNDAPException.anyExceptionHandler(new BadRequest(msg), this,  resp);
             }
-
         }
         catch (Throwable t) {
             try {
@@ -316,7 +317,6 @@ public class Servlet extends HttpServlet {
 
         RequestCache.open(req);
         ServletLogUtil.logServerAccessStart(req, ServletLogUtil.WCS_LAST_MODIFIED_ACCESS_LOG_ID, "LastModified", RequestCache.getRequestId());
-
         try {
             return new Date().getTime();
         } finally {
@@ -327,7 +327,6 @@ public class Servlet extends HttpServlet {
 
 
     }
-
 
     @Override
     public void destroy() {
@@ -341,6 +340,4 @@ public class Servlet extends HttpServlet {
         super.destroy();
     }
 
-
-
-}
+} // class BES

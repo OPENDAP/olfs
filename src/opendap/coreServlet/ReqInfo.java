@@ -101,6 +101,12 @@ public class ReqInfo {
     private static final String JAVAX_SERVLET_FORWARD_QUERY_STRING = "javax.servlet.forward.query_string";
     private static final String MISSING = "MISSING";
 
+    /**
+     * A request header key/name used by a client to transmit  a request id.
+     */
+    public static final String REQUEST_ID_HEADER_KEY ="a-api-request-uuid";
+
+
     private static Logger log;
     static {
         log = org.slf4j.LoggerFactory.getLogger(ReqInfo.class);
@@ -345,7 +351,7 @@ public class ReqInfo {
     private static String convertStreamToString(java.io.InputStream is) throws IOException {
         // Using the scanner with the \A delimiter basically says "from the beginning of the input"
         // So then we get one big token from teh scanner and (see comment below)
-        java.util.Scanner s = new java.util.Scanner(is, HyraxStringEncoding.getCharset().name()).useDelimiter("\\A");
+        java.util.Scanner s = new java.util.Scanner(is, HyraxStringEncoding.getCharsetName()).useDelimiter("\\A");
         // Since the Scanner is going to make one token from the whole shebang, either the  InputStream
         // is empty (in which case we return an empty string, or it's not empty and we return the single token.
         return s.hasNext() ? s.next() : "";
@@ -639,21 +645,22 @@ public class ReqInfo {
     public static String toString(HttpServletRequest request){
         String s = "";
 
-        s += "getLocalUrl(): "+ getLocalUrl(request) + "\n";
-        s += "getBesDataSourceID(): "+ getBesDataSourceID(getLocalUrl(request)) + "\n";
-        s += "getServiceUrl(): "+ getServiceUrl(request) + "\n";
-        s += "getCollectionName(): "+ ReqInfo.getCollectionName(request) + "\n";
+        s += "ReqInfo:\n";
+        s += "               getLocalUrl(): "+ getLocalUrl(request) + "\n";
+        s += "        getBesDataSourceID(): "+ getBesDataSourceID(getLocalUrl(request)) + "\n";
+        s += "             getServiceUrl(): "+ getServiceUrl(request) + "\n";
+        s += "         getCollectionName(): "+ ReqInfo.getCollectionName(request) + "\n";
 
-        s += "getConstraintExpression(): ";
+        s += "   getConstraintExpression(): ";
         try {
             s += ReqInfo.getConstraintExpression(request) + "\n";
         } catch (IOException e) {
             s += "Encountered IOException when attempting get the constraint expression! Msg: " + e.getMessage() + "\n";
         }
-        s += "getDataSetName(): "+ ReqInfo.getDataSetName(request) + "\n";
-        s += "getRequestSuffix(): "+ ReqInfo.getRequestSuffix(request) + "\n";
-        s += "requestForOpendapContents(): "+ ReqInfo.requestForOpendapContents(request) + "\n";
-        s += "requestForTHREDDSCatalog(): "+ ReqInfo.requestForTHREDDSCatalog(request) + "\n";
+        s += "             getDataSetName(): "+ ReqInfo.getDataSetName(request) + "\n";
+        s += "           getRequestSuffix(): "+ ReqInfo.getRequestSuffix(request) + "\n";
+        s += "  requestForOpendapContents(): "+ ReqInfo.requestForOpendapContents(request) + "\n";
+        s += "   requestForTHREDDSCatalog(): "+ ReqInfo.requestForTHREDDSCatalog(request) + "\n";
 
         return s;
 
@@ -723,7 +730,7 @@ public class ReqInfo {
         String ce = getConstraintExpression(request);
         String decoded_ce= "";
         if(!ce.isEmpty()){
-            decoded_ce = URLDecoder.decode(ce, HyraxStringEncoding.getCharset().name());
+            decoded_ce = URLDecoder.decode(ce, HyraxStringEncoding.getCharsetName());
             request_url += "?" + ce;
         }
         JSONObject param = new JSONObject();
@@ -786,7 +793,7 @@ public class ReqInfo {
      * determined because of CDN, Firewall, or internal server redirect URL rewriting.
      *
      * The method checks for the presence of the request headers: CLOUD_FRONT_FORWARDED_PROTOCOL
-     * and X_FORWARDED_PROTOCOL to determine f the protocol of the request was rewritten by
+     * and X_FORWARDED_PROTOCOL to determine if the protocol of the request was rewritten by
      * some forwarding agent (such as the AWS CloudFront Content Delivery Network).
      *
      * It can often be the case that the forwarding entity is supporting TLS on an outward facing
@@ -862,7 +869,7 @@ public class ReqInfo {
         }
         // We know that the values of the request headers CLOUD_FRONT_FORWARDED_PROTOCOL
         // and X_FORWARDED_PROTOCOL don't end with the PROTOCOL_TERMINATION (aka "://")
-        // zso we check for the absence of a trailing PROTOCOL_TERMINATION and add it
+        // so we check for the absence of a trailing PROTOCOL_TERMINATION and add it
         // as needed.
         if(!client_request_protcol.endsWith(PROTOCOL_TERMINATION)){
             client_request_protcol += PROTOCOL_TERMINATION;
@@ -924,41 +931,35 @@ public class ReqInfo {
         return requestUrlStr;
     }
 
-    /**
-     * A request header key/name to check for a request id.
-     */
-    public static final String REQUEST_UUID_KEY="a-api-request-uuid";
 
     /**
-     * Returns the unique id of this request. If upstream service chain
-     * components have provided one in the request headers it will be sanitized
-     * and returned. Otherwise, a new request ID will be minted and returned.
+     * Produces the unique id of this request. If upstream service chain
+     * components have provided a request id string in the request headers it will
+     * be sanitized and used to construct a new RequestId. Otherwise,
+     * a new RequestId will be minted and returned.
      * @param req
      * @return
      */
-    public static String getRequestId(HttpServletRequest req){
-        String reqID;
+    public static RequestId getRequestId(HttpServletRequest req){
+        RequestId reqId;
 
-        reqID = req.getHeader(REQUEST_UUID_KEY);
-        if(reqID != null) {
+        // Add additional req.getHeader() calls for different keys as needed.
+        String request_id_header = req.getHeader(REQUEST_ID_HEADER_KEY);
+        if(request_id_header != null) {
             // TODO Determine the allowed characters and associated format
             //  for the REQUEST_UUID_KEY and use that to implement a closely
             //  tailored Scrub method to use for sanitizing this input
-            reqID = Scrub.simpleString(reqID);
-            return reqID;
+            reqId = new RequestId(Scrub.simpleString(request_id_header));
         }
-        // Add additional req.getHeader() calls for different keys as needed.
-
-
-        // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-        // DEFAULT
-        // No service chain request ID appears in the expected request headers
-        // so make a homegrown request_id and send it on.
-        UUID uuid = UUID.randomUUID();
-        reqID = Thread.currentThread().getName() +
-                "_" + Thread.currentThread().getId() +
-                "_" + uuid;
-        return reqID;
+        else {
+            // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+            // DEFAULT
+            // No service chain request ID appears in the expected request headers
+            // so make a homegrown request_id and send it on.
+            // The no parameter constructor mints a fresh uuid
+            reqId = new RequestId();
+        }
+        return reqId;
     }
 
 }

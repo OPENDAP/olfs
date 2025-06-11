@@ -28,6 +28,9 @@
 package opendap.ppt;
 
 import opendap.bes.BESError;
+import opendap.bes.BesApi;
+import opendap.coreServlet.RequestCache;
+import opendap.coreServlet.RequestId;
 import opendap.io.HyraxStringEncoding;
 import opendap.xml.Util;
 import org.apache.commons.cli.*;
@@ -703,7 +706,11 @@ public class OPeNDAPClient {
 
     public Document getShowStatusRequestDocument(){
         Element request = new Element("request", BES_NS);
-        request.setAttribute("reqID", "client: " + getID() + ":"+ commandCount );
+        RequestId rid = RequestCache.getRequestId();
+        request.setAttribute(BesApi.REQUEST_ID_KEY, rid.id() );
+        request.setAttribute(BesApi.REQUEST_UUID_KEY, rid.uuid().toString() );
+        request.setAttribute(BesApi.BES_CLIENT_ID_KEY, getID() );
+        request.setAttribute(BesApi.BES_CLIENT_CMD_COUNT_KEY, Integer.toString(commandCount) );
         request.addContent(new Element("showStatus"));
         return new Document(request);
     }
@@ -725,7 +732,7 @@ public class OPeNDAPClient {
             throw new PPTException("Received error content from BES showStatus " +
                     "command! error_mdg: " + error);
         }
-        return response.toString(HyraxStringEncoding.getCharset());
+        return response.toString(HyraxStringEncoding.getCharsetName());
     }
 
     public boolean isOk(){

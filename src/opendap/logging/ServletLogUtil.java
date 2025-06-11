@@ -31,6 +31,7 @@ import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
 import opendap.PathBuilder;
+import opendap.coreServlet.RequestId;
 import opendap.coreServlet.Scrub;
 import opendap.coreServlet.ServletUtil;
 import org.slf4j.Logger;
@@ -75,9 +76,6 @@ public class ServletLogUtil {
     public static final String ADMIN_ACCESS_LOG_ID = "HyraxAdminAccess";
     public static final String ADMIN_ACCESS_LAST_MODIFIED_LOG_ID = "HyraxAdminLastModifiedAccess";
 
-    public static final String S3_SERVICE_ACCESS_LOG_ID = "S3ServiceAccess";
-    public static final String S3_SERVICE_LAST_MODIFIED_LOG_ID = "S3ServiceLastModifiedAccess";
-
     public static final String WCS_ACCESS_LOG_ID = "WCSAccess";
     public static final String WCS_LAST_MODIFIED_ACCESS_LOG_ID = "WCSLastModifiedAccess";
 
@@ -108,8 +106,10 @@ public class ServletLogUtil {
     private static final AtomicBoolean useCombinedLog = new AtomicBoolean(false);
     public static final AtomicBoolean useDualCloudWatchLogs = new AtomicBoolean(false);
 
+    public static final int MISSING_SIZE_VALUE = -1;
 
-    private static Logger log;
+
+    private static final Logger log;
     static{
         System.out.println("+++LogUtil.static - Instantiating Logger ...");
         try {
@@ -283,7 +283,7 @@ public class ServletLogUtil {
             log.error("Caught {} Message: {}",je.getClass().getName(),je.getMessage());
             StringWriter sw = new StringWriter();
             je.printStackTrace(new PrintWriter(sw));
-            log.error("Stack trace: \n{}",sw.toString());
+            log.error("Stack trace: \n{}",sw);
         }
     }
 
@@ -374,11 +374,11 @@ public class ServletLogUtil {
      * @param reqID The request ID, implemented as the request number.
      *
      */
-    public static void logServerAccessStart(HttpServletRequest req, String logName,  String httpVerb, String reqID) {
+    public static void logServerAccessStart(HttpServletRequest req, String logName,  String httpVerb, RequestId reqID) {
 
         HttpSession session = req.getSession(false);
 
-        MDC.put(REQUEST_ID_KEY, reqID);
+        MDC.put(REQUEST_ID_KEY, reqID.logId());
         MDC.put(HTTP_VERB_KEY, httpVerb);
         MDC.put(CLIENT_HOST_KEY, req.getRemoteHost());
         MDC.put(SESSION_ID_KEY, (session == null) ? "-" : session.getId());
@@ -395,17 +395,16 @@ public class ServletLogUtil {
         MDC.put(RESOURCE_ID_KEY,resourceID);
 
         String query = Scrub.simpleQueryString(req.getQueryString());
-        query = (query == null) ? "" : query;
+        query = (query == null || query.isEmpty()) ? "-" : query;
         MDC.put(QUERY_STRING_KEY, query);
 
         if(log.isInfoEnabled()) {
-            StringBuilder startMsg = new StringBuilder();
-            startMsg.append("REQUEST START - ");
-            startMsg.append("RemoteHost: '").append(LogUtil.scrubEntry(req.getRemoteHost())).append("' ");
-            startMsg.append("RequestedResource: '").append(resourceID).append("' ");
-            startMsg.append("QueryString: '").append(query).append("' ");
-            startMsg.append("AccessLog: ").append(logName);
-            log.info(startMsg.toString());
+            String startMsg = "REQUEST START - " +
+                    "RemoteHost: '" + LogUtil.scrubEntry(req.getRemoteHost()) + "' " +
+                    "RequestedResource: '" + resourceID + "' " +
+                    "QueryString: '" + query + "' " +
+                    "AccessLog: " + logName;
+            log.info(startMsg);
         }
         if(logName.equals(HYRAX_ACCESS_LOG_ID) && useDualCloudWatchLogs.get()){
             Logger cwRequestLog = org.slf4j.LoggerFactory.getLogger(CLOUDWATCH_REQUEST_LOG);
@@ -467,13 +466,15 @@ public class ServletLogUtil {
 
     /**
      * Used in various places in the server to add the response size to the log.
-     * @param size The size, in bytes, of the response. Values less than 0 will be ignored.
+     * Will set the response if it has not already been set or if it's value is empty.
+     * @param size The size, in bytes, of the response. A value of -1 indicates that the size is unknown
      */
     public static void setResponseSize(long size){
-        // Only set the size if it's not equal to the missing value (-1)
-        if(size>=0) {
-            MDC.put(RESPONSE_SIZE_KEY, Long.toString(size) + " bytes");
-        }
+
+        String mdc_size = MDC.get(RESPONSE_SIZE_KEY);
+        // Was it set? Is it empty??
+        if(mdc_size==null || mdc_size.isEmpty())
+            MDC.put(RESPONSE_SIZE_KEY, Long.toString(size));
     }
 
 
@@ -484,9 +485,8 @@ public class ServletLogUtil {
      * @param logName the name of the Logger to which to write stuff.
      */
     public static void logServerAccessEnd(int httpStatus, String logName) {
-        logServerAccessEnd(httpStatus, -1, logName);
+        logServerAccessEnd(httpStatus, MISSING_SIZE_VALUE, logName);
     }
-
 
     /**
      * Write log entry to named log.
@@ -501,7 +501,7 @@ public class ServletLogUtil {
         long  duration = -1;
         String sTime = MDC.get("startTime");
         if(sTime!=null) {
-            long startTime = Long.valueOf(sTime);
+            long startTime = Long.parseLong(sTime);
             duration = endTime - startTime;
         }
         MDC.put(DURATION_KEY, (duration>=0)?Long.toString(duration):"unknown" +" ms");
@@ -563,18 +563,12 @@ public class ServletLogUtil {
 
     public static void useCombinedLog(boolean value) {
         useCombinedLog.set(value);
+        log.info("Combined OLFS/BES Log Is {}", value ? "ENABLED." : "DISABLED");
     }
 
     public static void useDualCloudWatchLogs(boolean value) {
         useDualCloudWatchLogs.set(value);
-    }
-
-    public static void mdcPut(String key, String value){
-        MDC.put(key, value);
-    }
-
-    public static String mdcGet(String key){
-        return MDC.get(key);
+        log.info("CloudWatch Logs Are {}", value ? "ENABLED." : "DISABLED");
     }
 
 }

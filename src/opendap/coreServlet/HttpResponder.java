@@ -49,7 +49,7 @@ public abstract class HttpResponder {
         log = org.slf4j.LoggerFactory.getLogger(HttpResponder.class);
     }
 
-    public static final String HttpDatFormatString = "EEE, d MMM yyyy hh:mm:ss z";
+    public static final String HttpDateFormatString = "EEE, d MMM yyyy hh:mm:ss z";
 
 
 
@@ -116,7 +116,7 @@ public abstract class HttpResponder {
 
     public static String readFileAsString(String fileName) throws IOException {
         StringBuilder stringBuilder = new StringBuilder();
-        Scanner scanner = new Scanner(new File(fileName), HyraxStringEncoding.getCharset().name());
+        Scanner scanner = new Scanner(new File(fileName), HyraxStringEncoding.getCharsetName());
 
         try {
             while (scanner.hasNextLine()) {

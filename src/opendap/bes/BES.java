@@ -766,24 +766,19 @@ public class BES {
 
 
     /**
-     * Helper method that adds the bes client identifier to the request ID.
+     * Helper method that adds the bes client identifier to the request.
      * @param request
      * @param oc
      * @throws IOException
      */
-    private void tweakRequestId(Document request, OPeNDAPClient oc) throws IOException {
+    private void addBesClientInfo(Document request, OPeNDAPClient oc) throws IOException {
         Element reqElement = request.getRootElement();
         if(reqElement==null){
             throw new IOException("The BES Request document must have a root element!");
         }
-        String reqID = reqElement.getAttributeValue(BesApi.REQUEST_ID);
-        if(reqID==null)
-            reqID="";
-
-        reqID += "[bes_client:"+oc.getID()+"]";
-        reqElement.setAttribute(BesApi.REQUEST_ID,reqID);
+        reqElement.setAttribute(BesApi.BES_CLIENT_ID_KEY ,oc.getID());
+        reqElement.setAttribute(BesApi.BES_CLIENT_CMD_COUNT_KEY , Integer.toString(oc.getCommandCount()));
     }
-
 
     /**
      * Executes a command/response transaction with the BES and returns the
@@ -879,7 +874,7 @@ public class BES {
                     throw new PPTException(msg);
                 }
 
-                tweakRequestId(request, oc);
+                addBesClientInfo(request, oc);
                 if (log.isDebugEnabled()) {
                     log.debug("besTransaction() request document: \n-----------\n{}-----------\n", showRequest(request));
                 }
@@ -894,7 +889,7 @@ public class BES {
                 if (!result) {
                     // We got back an error object from the BES in the baos.
                     // We feed that to the BESError class to build the error object.
-                    log.debug("BESError: \n{}", errorOutputStream.toString(HyraxStringEncoding.getCharset()));
+                    log.debug("BESError: \n{}", errorOutputStream.toString(HyraxStringEncoding.getCharsetName()));
                     ByteArrayInputStream bais = new ByteArrayInputStream(errorOutputStream.toByteArray());
                     BESError besError = new BESError(bais);
 
@@ -960,7 +955,7 @@ public class BES {
         Element admin     = new Element("Administrator",BES_NS);
 
         errorResponse.addNamespaceDeclaration(BES_NS);
-        errorResponse.setAttribute(BesApi.REQUEST_ID, reqId);
+        errorResponse.setAttribute(BesApi.REQUEST_ID_KEY, reqId);
 
         type.setText("1");
         message.setText("BES returned an empty error document! That's a bad thing!");

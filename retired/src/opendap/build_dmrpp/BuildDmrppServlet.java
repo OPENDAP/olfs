@@ -199,10 +199,9 @@ public class BuildDmrppServlet extends HttpServlet {
         int request_status = HttpServletResponse.SC_OK;
         try {
             RequestCache.open(request);
+            ServletLogUtil.logServerAccessStart(request, ServletLogUtil.BUILD_DMRPP_ACCESS_LOG_ID, "HTTP-GET", RequestCache.getRequestId());
 
-            ServletLogUtil.logServerAccessStart(request, ServletLogUtil.BUILD_DMRPP_ACCESS_LOG_ID, "HTTP-GET", Integer.toString(reqNumber.incrementAndGet()));
             if (!redirect(request, response)) {
-
                 if(!buildDmrppDispatchHandler.requestDispatch(request,response,true)){
                     if(!response.isCommitted()){
                         log.info("Unrecognized build_dmrpp request.");

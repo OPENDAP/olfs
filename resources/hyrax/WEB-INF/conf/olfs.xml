@@ -115,7 +115,7 @@
 
 
     <ThreddsService  prefix="thredds" useMemoryCache="true" allowRemote="false" />
-    <GatewayService  prefix="gateway" useMemoryCache="true" />
+    <GatewayService  prefix="gateway" />
 
     <!-- <UseDAP2ResourceUrlResponse />
     @DEPRECATED - Use the <DatasetUrlResponse /> and <DataRequestForm /> elements to
@@ -192,6 +192,12 @@
     redirects to content with URLs that reference the server (ex: the xml:base attribute in the DMR)
     -->
     <!-- ForceLinksToHttps /  -->
+
+    <!--
+        'ShowDmrppLink' - When present will cause the Data Request Form pages to display a link the dmr++ file.
+         This only works for NGAP deployments at this time.
+    -->
+    <!-- ShowDmrppLink / -->
 
 
     <!--

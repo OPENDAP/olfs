@@ -29,6 +29,9 @@ package opendap.ngap;
 import opendap.bes.BadConfigurationException;
 import opendap.bes.BesDapDispatcher;
 import opendap.bes.BesApi;
+import opendap.bes.dap4Responders.Dap4Responder;
+import opendap.bes.dap4Responders.DataResponse.NormativeDR;
+import opendap.coreServlet.OPeNDAPException;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.Util;
 import org.jdom.Element;
@@ -39,6 +42,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Vector;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
 
@@ -47,10 +51,10 @@ import java.util.regex.Pattern;
  * User: dan
  * Date: 2/13/20
  * Time: 1:35 PM
- * Cloned from: opendap.gateway
+ * Cloned from: opendap/gateway
  * To change this template use File | Settings | File Templates.
  */
-public class NgapDispatchHandler extends BesDapDispatcher {
+public class NgapDapDispatcher extends BesDapDispatcher {
 
     private static final String DEFAULT_PREFIX = "ngap";
     private static final String THE_SLASH = "/";
@@ -70,15 +74,13 @@ public class NgapDispatchHandler extends BesDapDispatcher {
         reqCounter = new AtomicLong(0);
     }
 
-    private Logger log;
+    private final Logger log;
     private boolean _initialized;
     private String _prefix;
     private NgapBesApi _besApi;
     //private NGAPForm _ngapForm;
 
-    private static final String d_landingPage="/docs/ngap/ngap.html";
-
-    public NgapDispatchHandler() {
+    public NgapDapDispatcher() {
         super();
         log = org.slf4j.LoggerFactory.getLogger(getClass());
         _initialized = false;
@@ -98,12 +100,38 @@ public class NgapDispatchHandler extends BesDapDispatcher {
         if(_initialized)
             return;
 
+        log.debug("BEGIN");
+
         ingestPrefix(config);
 
         _besApi = new NgapBesApi(_prefix);
         super.init(servlet, config, _besApi);
-        //_ngapForm  =  new NGAPForm(getSystemPath(), _prefix);
+
+        // By default, addResponder() will make it the last responder in the vector, and the last to be checked.
+        // If there is some conflict with an upstream "greedy" responder this responder may not be called.
+        //
+        // addResponder(new NgapDmrppResponder(getSystemPath(),_besApi, true));
+        //
+        // So instead we can put it anywhere in the vector like this:
+        Vector<Dap4Responder> responders = getResponders();
+        //responders.add(0, new NgapDmrppResponder(getSystemPath(),_besApi, _addFileoutTypeSuffixToDownloadFilename));
+
+        int add_count=0;
+        for( Dap4Responder responder : responders){
+            // We use introspection here because it's a start-up (i.e. one time) time cost
+            if(responder instanceof NormativeDR){
+                responder.addAltRepResponder(new NgapDmrppResponder(getSystemPath(),_besApi, addFileoutTypeSuffixToDownloadFilename()));
+                log.debug("Added the NgapDmrppResponder as an 'alternative representation' to the '{}' service.", responder.getServiceTitle());
+                add_count++;
+            }
+        }
+        if (add_count != 1) {
+            throw new OPeNDAPException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,"Failed to located the Normative DAP4 data responder.");
+        }
+        log.debug("Added {} NgapDmrppResponders as alt responders", add_count);
+
         _initialized=true;
+        log.debug("END");
     }
 
     @Override
@@ -113,7 +141,7 @@ public class NgapDispatchHandler extends BesDapDispatcher {
             throws Exception {
 
         String relativeURL = ReqInfo.getLocalUrl(request);
-        log.debug("relativeURL:    "+relativeURL);
+        log.debug("relativeURL: {}",relativeURL);
 
         while(relativeURL.startsWith(THE_SLASH) && relativeURL.length()>1)
             relativeURL = relativeURL.substring(1);
@@ -127,7 +155,7 @@ public class NgapDispatchHandler extends BesDapDispatcher {
 
                 if(itsJustThePrefixWithoutTheSlash ){
                     response.sendRedirect(_prefix);
-                    log.debug("Sent redirect to service prefix: "+_prefix);
+                    log.debug("Sent redirect to service prefix: {}",_prefix);
                     return true;
                 }
 
@@ -151,7 +179,6 @@ public class NgapDispatchHandler extends BesDapDispatcher {
                     dapServiceCounter.incrementAndGet();
                 }
             }
-
         }
         return isMyRequest;
     }
@@ -185,7 +212,7 @@ public class NgapDispatchHandler extends BesDapDispatcher {
         if (_prefix.startsWith("/"))
             _prefix = _prefix.substring(1);
 
-        log.info("Using prefix=" + _prefix);
+        log.info("Using service prefix: {}", _prefix);
 
     }
 

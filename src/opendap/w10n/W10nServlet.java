@@ -25,14 +25,7 @@
  */
 package opendap.w10n;
 
-import opendap.coreServlet.ServletUtil;
-import opendap.coreServlet.RequestCache;
-import opendap.coreServlet.ReqInfo;
-import opendap.coreServlet.LicenseManager;
-import opendap.coreServlet.Util;
-import opendap.coreServlet.Debug;
-import opendap.coreServlet.OPeNDAPException;
-import opendap.coreServlet.Scrub;
+import opendap.coreServlet.*;
 import opendap.logging.ServletLogUtil;
 import opendap.logging.Timer;
 import opendap.logging.Procedure;
@@ -122,8 +115,8 @@ public class W10nServlet extends HttpServlet   {
                 }
                 RequestCache.open(request);
 
-                String reqId = RequestCache.getRequestId();
-                ServletLogUtil.logServerAccessStart(request, ServletLogUtil.HYRAX_ACCESS_LOG_ID, "HTTP-GET",reqId );
+                RequestId reqId = RequestCache.getRequestId();
+                ServletLogUtil.logServerAccessStart(request, ServletLogUtil.HYRAX_ACCESS_LOG_ID, "HTTP-GET", reqId );
                 LOG.debug(Util.getMemoryReport());
                 LOG.debug(ServletUtil.showRequest(request, reqId));
                 //log.debug(AwsUtil.probeRequest(this, request));

@@ -27,6 +27,7 @@
 <xsl:stylesheet version="2.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:dap="http://xml.opendap.org/ns/DAP/4.0#"
+                xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                 xmlns:fn="http://xml.opendap.org/ns/xsl/functions/1.0#"
 >
     <xsl:output method="xml" version="1.1" encoding="UTF-8" indent="yes"/>
@@ -42,6 +43,7 @@
     <xsl:param name="enforceSelection" />
     <xsl:param name="forceDataRequestFormLinkToHttps" />
     <xsl:param name="allowDirectDataSourceAccess" />
+    <xsl:param name="showDmrppLink" />
 
 
     <xsl:variable name="debug" select="false()"/>
@@ -86,8 +88,9 @@
 <!--###########################################################################-->
 
     <xsl:function name="fn:DimSize">
-        <xsl:param name="fqn"/>
-        <xsl:value-of select="$DimsMap/entry[@key=$fqn]/dap:Dimension/@size"/>
+        <xsl:param name="fqn" as="xsd:string"/>
+        <xsl:variable name="dimension" select="$DimsMap/entry[@key=$fqn]/dap:Dimension" />
+        <xsl:value-of select="$dimension/@size"/>
     </xsl:function>
 
     <xsl:function name="fn:GetDimension">
@@ -188,7 +191,10 @@
                     <div
                         class="small"
                         style="background-color: #527CC1; float: right; font-weight: normal; font-style: italic; padding: 7px 7px 0px 0px">
-                        <a style="color: white;" title="XML encoded DMR document" href="{@name}.dmr.xml">dmr</a>
+                        (<a style="color: white;" title="XML encoded DMR document" href="{$datasetUrl}.dmr.xml">dmr</a>)
+                        <xsl:if test="$showDmrppLink">
+                            (<a style="color: white;" title="The DMR++ document for this dataset" href="{$datasetUrl}.dap.dmrpp">dmr++</a>)
+                        </xsl:if>
                     </div>
                 </h1>
 
@@ -551,8 +557,7 @@
     <xsl:template name="DimSize">
         <xsl:choose>
             <xsl:when test="./@name">
-                <xsl:variable name="fqn"> <xsl:value-of select="translate(./@name,' .','__')"/></xsl:variable>
-                <xsl:value-of select="fn:DimSize($fqn)"/>
+                <xsl:value-of select="fn:DimSize(@name)"/>
             </xsl:when>
             <xsl:otherwise><xsl:value-of select="./@size"/> </xsl:otherwise>
         </xsl:choose>

@@ -90,7 +90,7 @@ public class RequestCache {
             HashMap<String,CachedObj> tcache = cache.get(thisThread);
             CachedObj idObj = tcache.get(REQUEST_ID_KEY);
             if(idObj==null || !(idObj.getObj() instanceof String) ){
-                String reqId = ReqInfo.getRequestId(request);
+                RequestId reqId = ReqInfo.getRequestId(request);
                 put(REQUEST_ID_KEY,reqId);
                 log.info("Cached new request id: {}", reqId);
             }
@@ -102,7 +102,7 @@ public class RequestCache {
             HashMap<String, CachedObj> hm = new HashMap<>();
             cache.put(thisThread, hm);
             log.info("Created request cache for thread: {}", thisThread.getName());
-            String reqId = ReqInfo.getRequestId(request);
+            RequestId reqId = ReqInfo.getRequestId(request);
             put(REQUEST_ID_KEY,reqId);
             log.info("Cached new request id: {}", reqId);
         }
@@ -164,12 +164,12 @@ public class RequestCache {
      *
      * @return The request id being serviced by the current thread.
      */
-    public static String getRequestId(){
+    public static RequestId getRequestId(){
         Object id = get(REQUEST_ID_KEY);
         if(id != null){
-            return (String)id;
+            return (RequestId)id;
         }
-        return "THIS_GETS_FIXED_LATER";
+        return new RequestId("ERROR(NOT FATAL): No request id was located in the RequestCache.");
     }
 
 }
