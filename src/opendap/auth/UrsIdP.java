@@ -501,7 +501,7 @@ public class UrsIdP extends IdProvider{
                 // as no id will be returned for an invalid access token.
                 // Attempt local verification if public keys have been provided...
                 String token = edlat.getAccessToken();
-                if (!getUrsClientAppPublicKeys().isEmpty()) {
+                if (token != null && !getUrsClientAppPublicKeys().isEmpty()) {
                     String uid = getEdlUserIdFromToken(getUrsClientAppPublicKeys(), token);
                     if (uid == null) {
                         log.error("{}Unable to validate EDL access token locally; falling back to remote validation", ERR_PREFIX);
