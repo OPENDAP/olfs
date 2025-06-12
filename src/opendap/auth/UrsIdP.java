@@ -62,7 +62,6 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
-// import java.util.Set;
 
 import static opendap.auth.IdFilter.USER_PROFILE;
 
