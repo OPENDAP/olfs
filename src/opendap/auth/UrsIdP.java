@@ -358,6 +358,12 @@ public class UrsIdP extends IdProvider{
      */
     String getEdlUserIdFromToken(String publicKeys, String accessToken) {
         String errorPrefix = "Failure to validate access token locally;";
+        // Safety first!
+        if (accessToken == null) {
+            log.error("{}{} access token is null.", ERR_PREFIX, errorPrefix);
+            return null;
+        }
+
         // 1. Figure out which public key the access token requires
         DecodedJWT unverifiedJwt = null;
         try {
@@ -383,7 +389,7 @@ public class UrsIdP extends IdProvider{
             return null;
         }
         if (publicKey == null) {
-            log.error("{}{} no public key found for access token", ERR_PREFIX, errorPrefix);
+            log.error("{}{} no public key found for access token `{}`.", ERR_PREFIX, errorPrefix, publicKeyId);
             return null;
         }
 
@@ -501,7 +507,7 @@ public class UrsIdP extends IdProvider{
                 // as no id will be returned for an invalid access token.
                 // Attempt local verification if public keys have been provided...
                 String token = edlat.getAccessToken();
-                if (token != null && !getUrsClientAppPublicKeys().isEmpty()) {
+                if (!getUrsClientAppPublicKeys().isEmpty()) {
                     String uid = getEdlUserIdFromToken(getUrsClientAppPublicKeys(), token);
                     if (uid == null) {
                         log.error("{}Unable to validate EDL access token locally; falling back to remote validation", ERR_PREFIX);
