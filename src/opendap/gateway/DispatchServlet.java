@@ -34,10 +34,10 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.slf4j.Logger;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -90,7 +90,7 @@ public class DispatchServlet extends HttpServlet {
      * Loads the configuration file specified in the servlet parameter
      * GatewayConfigFileName.
      *
-     * @throws javax.servlet.ServletException When the file is missing, unreadable, or fails
+     * @throws jakarta.servlet.ServletException When the file is missing, unreadable, or fails
      *                                        to parse (as an XML document).
      */
     private Element loadConfig() throws ServletException {
