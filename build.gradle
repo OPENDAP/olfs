@@ -16,9 +16,9 @@ buildscript {
     dependencies {
         classpath group: 'org.apache.ant', name: 'ant', version: '1.9.4'
     }
-}
+} v
 
-plugins {
+plugins { gateway
     id 'java'
     id 'war'
     id 'eclipse'
@@ -44,7 +44,6 @@ sonarqube {
                                     "src/opendap/**/*Test.java"
         property "sonar.java.binaries", "build"
         property "sonar.java.libraries", "lib/*.jar"
-        property "sonar.branch.name", ${TRAVIS_BRANCH}
     }
 }
 
