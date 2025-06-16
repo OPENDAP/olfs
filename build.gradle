@@ -16,9 +16,9 @@ buildscript {
     dependencies {
         classpath group: 'org.apache.ant', name: 'ant', version: '1.9.4'
     }
-} v
+}
 
-plugins { gateway
+plugins {
     id 'java'
     id 'war'
     id 'eclipse'

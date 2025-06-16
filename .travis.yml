@@ -138,7 +138,7 @@ jobs:
       addons: sonarcloud
       script:
         - export STAGE=scan
-        - sonar-scanner -Dproject.settings=sonar-olfs.properties -Dsonar.login=$SONAR_LOGIN -Dsonar.branch.name=$TRAVIS_BRANCH
+        - sonar-scanner -Dproject.settings=sonar-olfs.properties -Dsonar.login=$SONAR_LOGIN
         - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=opendap-olfs | grep "QUALITY GATE PASS"
 
     - stage: scan
@@ -149,7 +149,7 @@ jobs:
         - export STAGE=scan
         # Various edits to the build.gradle file to get this to work. jhrg 1/22/24
         # - travis_wait 30 gradle buildDists sonarqube -Dsonar.token=$SONAR_LOGIN -Dsonar.qualitygate.timeout=1800 -Dsonar.qualitygate.wait=true
-        - travis_wait 30 gradle sonar -Dsonar.login=$SONAR_LOGIN -Dsonar.qualitygate.timeout=1800 -Dsonar.qualitygate.wait=true -Dsonar.branch.name=$TRAVIS_BRANCH
+        - travis_wait 30 gradle sonar -Dsonar.login=$SONAR_LOGIN -Dsonar.qualitygate.timeout=1800 -Dsonar.qualitygate.wait=true
         - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=opendap-olfs | grep "QUALITY GATE PASS"
 
     - stage: snappah
