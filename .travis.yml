@@ -133,6 +133,15 @@ jobs:
         - ./run-snyk.sh
 
     - stage: scan
+      name: "sonarscan (jdk17)"
+      jdk: openjdk17
+      addons: sonarcloud
+      script:
+        - export STAGE=scan
+        - sonar-scanner -Dproject.settings=sonar-olfs.properties -Dsonar.login=$SONAR_LOGIN -Dsonar.branch.name=$TRAVIS_BRANCH
+        - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=opendap-olfs | grep "QUALITY GATE PASS"
+
+    - stage: scan
       name: "gradle sonarscan (jdk17)"
       jdk: openjdk17
       addons: sonarcloud
