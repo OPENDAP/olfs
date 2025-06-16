@@ -338,17 +338,6 @@ public class NcmlManager {
         return serviceURLs;
     }
 
-
-    /*
-    private static String getServerUrlString(String url)  throws InterruptedException, MalformedURLException {
-
-        URL u = new URL(url);
-
-        return getServerUrlString(u);
-
-    }
-    */
-
     private static String getServerUrlString(URL url)  throws InterruptedException{
 
         String baseURL = null;

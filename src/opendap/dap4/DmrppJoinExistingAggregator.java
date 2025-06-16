@@ -211,52 +211,6 @@ public class DmrppJoinExistingAggregator {
             }
             aggFileList.add(targetUrl);
         }
-
-            /*
-        if(dmrpp_urls.size()>1) {
-        }
-        else if(dmrpp_urls.size()==1){
-            File arg0 = new File(dmrpp_urls.iterator().next());
-            if(!arg0.exists())
-                throw new DmrppAggException("Unable to locate file: "+arg0);
-
-            if(arg0.isDirectory()) {
-                File[] contents = arg0.listFiles();
-                for (File f : contents) {
-                    aggFileList.add(f.toURI().toURL());
-                }
-            }
-            else if(arg0.isFile()){
-
-                HashSet<String> aggFileNames = new HashSet<>();
-                loadListFile(arg0.getAbsolutePath(),aggFileNames);
-                for(String aggFileName:aggFileNames){
-                    URL aggFileURL;
-                    if(aggFileName.startsWith(HTTP_PROTOCOL) ||
-                            aggFileName.startsWith(HTTPS_PROTOCOL) ||
-                            aggFileName.startsWith(FILE_PROTOCOL)
-                            ){
-                        aggFileURL = new URL(aggFileName);
-                    }
-                    else {
-                        File aggFile = new File(aggFileName);
-                        if (!aggFile.exists() || !aggFile.isFile() || !aggFile.canRead()) {
-                            throw new DmrppAggException("Unable to read aggFile: " + aggFile);
-                        }
-                        aggFileURL = aggFile.toURI().toURL();
-                    }
-                    log.debug("Adding aggFile: {}", aggFileURL);
-                    aggFileList.add(aggFileURL);
-                }
-            }
-            else {
-                throw new DmrppAggException("The named file is neither a file or a dir: "+arg0);
-            }
-        }
-        else {
-            throw new DmrppAggException("This business won't work if you don't provide some dmr++ files my friend.");
-        }
-        */
     }
 
     /**
@@ -861,14 +815,6 @@ public class DmrppJoinExistingAggregator {
         log.setLevel(Level.ERROR);
         log = (Logger) LoggerFactory.getLogger(opendap.xml.Util.class);
         log.setLevel(Level.ERROR);
-        /*
-        Iterator<Appender<ILoggingEvent>> it = log.iteratorForAppenders();
-        while (it.hasNext()) {
-            Appender<ILoggingEvent> app = it.next();
-            System.out.println( app.getName() );
-        }
-        */
-
 
         try {
             //----------------------------------------------------------------------

@@ -127,21 +127,7 @@ public class ApacheIdP extends IdProvider {
         else {
             // We have a user - so let's make sure they have a profile,
             // and then we just try to bounce them back to IdFilter.RETURN_TO_URL
-
             log.info("doLogin() - User has uid: {}", LogUtil.scrubEntry(uid));
-            /*
-
-            // Do they have a profile?
-            UserProfile up = (UserProfile) session.getAttribute(IdFilter.USER_PROFILE);
-            if (up == null){
-                // Nope. Make one.
-                up = new UserProfile();
-                up.setIdP(this);
-                up.setAttribute("uid", uid);
-            }
-            session.setAttribute(IdFilter.USER_PROFILE, up);
-
-            */
             redirectUrl = (String) session.getAttribute(IdFilter.RETURN_TO_URL);
         }
         if(redirectUrl==null){

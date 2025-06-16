@@ -189,20 +189,6 @@ public class Transformer {
         transform.setDestination(destination.getCurrentTransform());
     }
 
-
-    /*    Unused method, dumping.    ndp - 09/14/2015
-    public void transform(Source inputDocumentSource,  StreamSource transformDocumentSource, OutputStream os) throws SaxonApiException {
-
-        // Transformer t = new Transformer(transformDocumentSource);
-
-        serializer.setOutputStream(os);
-        transform.setSource(inputDocumentSource);
-        transform.setDestination(serializer);
-        transform.transform();
-
-    }
-  */
-
     public static ByteArrayInputStream transform(Source inputDocumentSource,  StreamSource transformDocumentSource) throws SaxonApiException {
 
         Transformer t = new Transformer(transformDocumentSource);
@@ -536,37 +522,6 @@ public class Transformer {
     }
 
 
-    /*
-    private static String getXSLTImpl(){
-
-        String str = "SystemProperty javax.xml.transform.TransformerFactory: \n";
-
-
-        try {
-
-            String impl = System.getProperty("javax.xml.transform.TransformerFactory");
-
-            if(impl!=null){
-
-                Class classDefinition = Class.forName(impl);
-                javax.xml.transform.TransformerFactory s = (javax.xml.transform.TransformerFactory) classDefinition.newInstance();
-
-                str += "    TransformerFactory class  = "+s.getClass().getName() +"\n";
-                str += "    Transformer class         = "+s.newTransformer().getClass().getName()+"\n";
-            }
-            else {
-                str += "    Java System Property Not Set.\n";
-            }
-        }
-        catch(Exception e){
-            e.printStackTrace(System.serializer);
-            System.exit(1);
-        }
-
-        return str;
-
-    }
-    */
     private static void saxonXsltTransform(String srcDocUri, String xslTransformUri, OutputStream os) throws IOException, SaxonApiException {
 
 

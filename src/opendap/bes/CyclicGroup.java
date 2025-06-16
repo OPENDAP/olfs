@@ -65,20 +65,6 @@ public class CyclicGroup<E> {
     }
 
 
-    /*
-    public void addBes(BESConfig config) throws Exception {
-
-        if(!config.getPrefix().equals(prefix))
-            throw new BadConfigurationException("Members of a BesGroup must all have the same prefix. " +
-                    "This ring has prefix '"+prefix+"' the BESConfig  has a prefix of '"+config.getPrefix()+"'.");
-
-        BES bes = new BES(config);
-        add(bes);
-
-
-    }
-    */
-
     public boolean add(String name, E e) {
         lock.lock();
         try {

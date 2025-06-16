@@ -288,18 +288,6 @@ public class DirectoryDispatchHandler implements DispatchHandler {
 
         collectionName = PathBuilder.normalizePath(collectionName, true, true);
 
-        /*
-        while(!collectionName.equals("/") && collectionName.startsWith("/"))
-            collectionName = collectionName.substring(1);
-
-        if(!collectionName.equals("/"))
-            collectionName = "/" + collectionName;
-
-        if(!collectionName.endsWith("/"))
-            collectionName += "/";
-
-        */
-
         log.debug("collectionName:  "+collectionName);
 
         return collectionName;

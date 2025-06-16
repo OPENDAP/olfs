@@ -402,24 +402,6 @@ public class NgapBesApi extends BesApi implements Cloneable {
 
     }
 
-    /*
-
-    @Override
-    public boolean getInfo(String dataSource, Document response) throws
-            PPTException,
-            BadConfigurationException,
-            IOException,
-            JDOMException {
-
-
-        String besDataSourceId = getBesDataSourceID(dataSource);
-
-        return super.getInfo(besDataSourceId, response);
-
-    }
-    */
-
-
     String stripPrefix(String dataSource){
 
 

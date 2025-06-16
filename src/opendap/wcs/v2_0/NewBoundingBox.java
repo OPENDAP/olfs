@@ -80,14 +80,6 @@ public class NewBoundingBox {
             _dimensions.put(newDim.getName(),newDim);
         }
 
-        /*
-        for(String coordinate : dims.keySet()) {
-            CoordinateDimension dim = dims.get(coordinate);
-            CoordinateDimension newDim = new CoordinateDimension(dim);
-            _dimensions.put(coordinate,newDim);
-        }
-        */
-
         if(startTime!=null && endTime!=null) {
 
             if(startTime.after(endTime))
@@ -373,33 +365,6 @@ public class NewBoundingBox {
         return _srsName;
     }
 
-
-    /*
-
-    public String getDapGeogridFunctionElevationSubset(String dapElevationVariableName){
-        String subset=null;
-        if(hasElevation()){
-            subset = "\""+getElevationMin() + "<="+dapElevationVariableName+"<="+getElevationMax()+"\"";
-        }
-        return subset;
-
-    }
-
-    public boolean hasElevation(){
-        if(_lowerCorner.length>2 && _upperCorner.length>2)
-            return true;
-        return false;
-
-    }
-    public double getElevationMin(){
-        return _lowerCorner[2];
-    }
-
-    public double getElevationMax(){
-        return _upperCorner[2];
-    }
-
-*/
 
     /**
      *

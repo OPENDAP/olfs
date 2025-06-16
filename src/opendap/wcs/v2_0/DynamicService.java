@@ -292,35 +292,7 @@ public class DynamicService {
 
     public void addDomainCoordinate(DomainCoordinate dc){
         _domainCoordinates.add(dc);
-        //_dcMap.put(dc.getPrefix(),dc);
     }
-
-
-
-    /*
-    public DomainCoordinate getDomainCoordinate(String coordinateName){
-        return _dcMap.get(coordinateName);
-    }
-    private void orderPreservingCoordinateReplace(DomainCoordinate newCoordinate, DomainCoordinate oldCoordinate){
-        if(oldCoordinate==null){
-            _domainCoordinates.add(newCoordinate);
-            return;
-        }
-        if(_domainCoordinates.contains(oldCoordinate)){
-            int index = _domainCoordinates.indexOf(oldCoordinate);
-            if(index>=0){
-                _domainCoordinates.insertElementAt(newCoordinate,index);
-            }
-            else {
-                _domainCoordinates.add(newCoordinate);
-            }
-            _domainCoordinates.remove(oldCoordinate);
-        }
-        else{
-            _domainCoordinates.add(newCoordinate);
-        }
-    }
-    */
 
 
     public void setSrs(SimpleSrs srs){ _srs = srs; }
@@ -341,24 +313,11 @@ public class DynamicService {
     public void setPrefix(String prefix) { _prefix = prefix; }
     public String getPrefix() { return _prefix; }
 
-    //public void setDapServiceUrl(String dapServiceUrl) throws MalformedURLException {
-    //    _dapServiceUrlString = new URL(dapServiceUrl);
-    //}
     public String getDapServiceUrlString(){ return _dapServiceUrlString; }
 
 
     @Override
     public String toString(){
-        /*
-    private Logger _log;
-    private String _prefix;
-    private String _longName;
-    private String _dapServiceUrlString;
-    private SimpleSrs _srs;
-    private Vector<DomainCoordinate> _domainCoordinates;
-    private ConcurrentHashMap<String,FieldDef> _wcsFieldsByDapID;
-    private String _pathMatchRegexString;
-        */
         StringBuilder sb = new StringBuilder();
         sb.append("DynamicService {\n)");
         sb.append("  prefix: ").append(_prefix).append("\n");

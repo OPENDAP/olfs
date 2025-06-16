@@ -186,20 +186,6 @@ public class VersionDispatchHandler implements DispatchHandler {
         xout.output(vdoc, ps);
         ps.flush();
 
-/*
-        if (Debug.isSet("showResponse")) {
-            xout.output(getGroupVersionDocument(), System.out);
-            System.out.println("Document Sent.");
-            System.out.println("\nMIME Headers:");
-            System.out.println("    XDODS-Server: " + getXDODSServerVersion());
-            System.out.println("    XOPeNDAP-Server: " + getXOPeNDAPServerVersion());
-            System.out.println("    XDAP: " + getXDAPVersion(request));
-            System.out.println("\nEnd Response.");
-        }
-
-*/
-
-
     }
 
 

@@ -315,13 +315,6 @@ public class BesControlApi extends HttpResponder {
 
                     case getConfig:
                         module = kvp.get(besCmds.module.toString());
-                        /*
-                        sb.append("You issued a getConfig command");
-                        if(module!=null)
-                            sb.append(" for module '").append(module).append("'.\n");
-                        else
-                            sb.append(".\n");
-                         */
                         status.append(bes.getConfiguration(module));
                         sb.append(status);
                         break;
@@ -332,17 +325,6 @@ public class BesControlApi extends HttpResponder {
                         if(isPost && submittedConfiguration!=null ){
 
                             module = kvp.get(besCmds.module.toString());
-
-                            /*
-                            sb.append("You issued a setConfig command");
-                            if(module!=null)
-                                sb.append(" for module '").append(module).append("'.\n");
-                            else
-                                sb.append(".\n");
-
-                            sb.append("Your Configuration: \n");
-                            sb.append(submittedConfiguration);
-                             */
 
                             status.append(bes.setConfiguration(module, submittedConfiguration));
                             sb.append(processStatus(status.toString()));

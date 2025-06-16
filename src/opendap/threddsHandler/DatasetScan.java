@@ -290,22 +290,6 @@ public class DatasetScan  extends Dataset {
             besCatalogResourceId = besCatalogResourceId.substring(getUrlPrefix().length());
         }
 
-
-
-
-        /*
-        Replaced by catalogPath computation above
-
-        if(besCatalogResourceId.endsWith(WcsServiceManager.DEFAULT_CATALOG_NAME)){
-            besCatalogResourceId = besCatalogResourceId.substring(0,besCatalogResourceId.lastIndexOf(WcsServiceManager.DEFAULT_CATALOG_NAME));
-        }
-         */
-
-
-
-
-
-
         while(besCatalogResourceId.startsWith("/") && besCatalogResourceId.length()>1)
             besCatalogResourceId = besCatalogResourceId.substring(1);
 
@@ -318,16 +302,6 @@ public class DatasetScan  extends Dataset {
         besCatalogResourceId = location + "/" + besCatalogResourceId;
 
         Vector<Element> metadata = getMetadata();
-
-
-        /*
-        Replaced by catalogPath computation above
-        if(catalogKey.endsWith(WcsServiceManager.DEFAULT_CATALOG_NAME))
-            catalogKey = catalogKey.substring(0,catalogKey.length() - WcsServiceManager.DEFAULT_CATALOG_NAME.length());
-
-        */
-
-
 
         Namer namer = new Namer(getNamer(), catalogPath);
         AddTimeCoverage addTimeCoverage = new AddTimeCoverage(getAddTimeCoverage(), catalogPath);

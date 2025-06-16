@@ -238,37 +238,6 @@ public class OPeNDAPClient {
         return success;
     }
 
-    /**
-     * Sends a single XML request document.
-     * <p/>
-     * The response is written to the output stream if one is specified,
-     * otherwise the output is ignored.
-     *
-     * @param request The XML request that is sent to
-     *            the BES to handle.
-     *
-     *
-     * @return True if successful, false if the server returned an error.
-     * @throws PPTException Thrown if there is a problem sending the request
-     *                      to the server or a problem receiving the response
-     *                      from the server.
-     * @throws JDOMException if the response fails to parse.
-     * @see String
-     * @see PPTException
-     */
-    /*
-    public Document sendRequest( Document request)
-            throws PPTException, JDOMException {
-
-
-        _client.sendXMLRequest(request);
-        Document doc = _client.getXMLResponse();
-        commandCount++;
-        return doc;
-    }
-    */
-
-
 
     /**
      * Sends a single XML request document.

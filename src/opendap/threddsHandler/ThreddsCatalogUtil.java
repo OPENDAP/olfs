@@ -765,39 +765,6 @@ public class ThreddsCatalogUtil {
 
         return serviceURLs;
 	}
-
-	/**
-	 * Returns a vector of data access URIs from The THREDDS catalog located at
-	 * the URL contained in the passed parameter String
-	 * <code>catalogUrlString</code>.
-	 * 
-	 * @param catalogUrlString
-	 *            The THREDDS catalog to crawl.
-	 * @param catalogDoc
-	 * @param service
-	 *            The SERVICE whose data access URLs you wish to get.
-	 * @param recurse
-	 *            Controls recursion. A value of True will cause the software to
-	 *            recursively traverse the catalog (via thredds:catalogRef
-	 *            elements) in search of data access URLs.
-	 * @return The vector of data access URLs.
-	 */
-	/*
-	private Vector<String> getDataAccessURLs(String catalogUrlString,
-			Document catalogDoc, SERVICE service, boolean recurse) {
-
-		Vector<String> serviceURLs;
-
-		Element catalog = catalogDoc.getRootElement();
-
-		serviceURLs = getDataAccessURLs(catalogUrlString, catalog, service,
-				recurse);
-
-		return serviceURLs;
-
-		// log.warn("Thredds Catalog ingest not yet supported.");
-	}
-	*/
 	
 	/**
 	 * Returns a vector of data access URIs from The THREDDS catalog located at

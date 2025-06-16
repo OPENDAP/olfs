@@ -740,14 +740,6 @@ public class StaticCatalogDispatch implements DispatchHandler {
         log.debug("init() - Top Level Catalog - urlPrefix: " + thisUrlPrefix);
         log.debug("init() - Top Level Catalog - fileName: " + fileName);
 
-        /*
-        ServiceManager.addRootCatalog(
-                pathPrefix,
-                thisUrlPrefix,
-                fileName,
-                useMemoryCache);
-        */
-
         log.debug("init() - Memory report prior to static thredds catalog ingest: \n{}", opendap.coreServlet.Util.getMemoryReport());
 
         CatalogManager.addCatalog(

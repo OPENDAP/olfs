@@ -187,36 +187,7 @@ public class DomainCoordinate {//implements Cloneable  {
         if (_size < 0) {
             throw new BadParameterException("In DomainCoordinate the 'size' parameter may not less than zero.");
         }
-    }
-
-
-
-             /*
-
-    @Override
-        public DomainCoordinate clone()
-        {
-            DomainCoordinate dc;
-            try
-            {
-                dc = (DomainCoordinate) super.clone();
-            }
-            catch (CloneNotSupportedException e)
-            {
-                throw new Error();
-            }
-            // Deep clone member fields here
-
-            dc._name = _name;
-            dc._dapId = _dapId;
-            dc._units = _units;
-            dc._arraySubset = _arraySubset;
-            dc._size = _size;
-
-            return dc;
-        }
-        */
-             
+    } 
 
     @XmlAttribute(name="dapId")
     public String getDapID(){
@@ -249,13 +220,13 @@ public class DomainCoordinate {//implements Cloneable  {
 
 
     public double getMin(){ return _min; }
-    // public void setMin(String minStr) { setMin(Double.parseDouble(minStr)); }
+
     public void setMin(double min) {
         _min = min;
     }
 
     public double getMax(){ return _max; }
-    //public void setMax(String maxStr) { setMax(Double.parseDouble(maxStr)); }
+
     public void setMax(double max) {
         _max = max;
     }

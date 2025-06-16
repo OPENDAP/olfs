@@ -307,17 +307,6 @@ public class FileAccess extends Dap4Responder {
         pw.println("</html>");
         pw.flush();
 
-        /*
-        pw.println("<table width=\"100%\" border=\"0\">");
-        pw.println("  <tr>");
-        pw.println("    <td><img src=\"/opendap/docs/images/forbidden.png\" alt=\"Forbidden!\" width=\"350\" height=\"313\" /></td> ");
-        pw.println("    <td align=\"center\"><strong>You do not have permission to access the requested resource. </strong>");
-        pw.println("      <p align=\"left\">&nbsp;</p>");
-        pw.println("      <p align=\"left\">&nbsp;</p></td>");
-        pw.println("  </tr>");
-        pw.println("</table>");
-        */
-
     }
 
 

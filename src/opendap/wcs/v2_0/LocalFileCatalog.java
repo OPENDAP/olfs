@@ -153,19 +153,6 @@ public class LocalFileCatalog implements WcsCatalog {
         }
         log.debug("CatalogFile: " + _catalogConfigFile);
 
-
-        /*
-        e1 = config.getChild("Credentials");
-        if (e1 == null) {
-            _credsProvider = opendap.http.Util.getNetRCCredentialsProvider();
-            log.debug("Using Credentials file: ~/.netrc");
-        } else {
-            String credsFilename = e1.getTextTrim();
-            _credsProvider = opendap.http.Util.getNetRCCredentialsProvider(credsFilename, true);
-            log.debug("Using Credentials file: {}", credsFilename);
-        }
-        */
-
         ingestCatalog();
 
         _cacheTime = new Date();

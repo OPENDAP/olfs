@@ -355,34 +355,6 @@ public class ChunkedOutputStream  extends OutputStream {
         chunkedOutputStream.finish();
         String buffer = new String(baos.toByteArray(),HyraxStringEncoding.getCharset());
         System.out.println("Buffer: "+buffer);
-
-
-        /*
-
-        // This was a viable crawlTest when we used 4 bytes to encode the chunk size.
-        // That meant that the MAX_SIZE was only 2^16. Now that it's 2^28 it's
-        // not feasible to crawlTest the boundary condition of a chunk larger than
-        // the maximum chunk size.
-        baos.reset();
-
-        byte[] buf = new byte[Chunk.MAX_SIZE +10];
-
-        for(int i=0; i< Chunk.MAX_SIZE +10 ; i++)
-            buf[i] = (byte) i;
-
-        cs.write(buf);
-
-        cs.close();
-
-        buffer = new String(baos.toByteArray());
-
-
-
-        System.out.println("Buffer: "+buffer);
-
-        */
-
-
     }
 
 

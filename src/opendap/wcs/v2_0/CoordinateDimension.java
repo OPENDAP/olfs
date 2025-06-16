@@ -57,19 +57,6 @@ public class CoordinateDimension { //implements Cloneable {
         setMax(max);
     }
 
-    /*
-    @Override
-    public CoordinateDimension clone() throws CloneNotSupportedException {
-        CoordinateDimension cd;
-        cd = (CoordinateDimension) super.clone();
-        // Deep clone member fields here
-        cd._name = _name;
-        cd._lowerBound = _lowerBound;
-        cd._upperBound = _upperBound;
-        return cd;
-    }
-   */
-
     public void setMin(double min){ _lowerBound = min; }
     public double getMin(){ return _lowerBound;}
 

@@ -182,26 +182,6 @@ public class GodivaWebService implements WebServiceHandler {
         return sb.toString();
     }
 
-    /*   Unused, dumping.  ndp - 09/14/2015
-    private String computeDefaultServiceBase(HttpServlet servlet){
-
-        String context = servlet.getServletContext().getContextPath();
-        String servletName = servlet.getServletName();
-
-        String servletBase = context + "/" + servletName;
-
-
-
-
-
-
-        System.out.println(ServletUtil.probeServlet(servlet));
-
-        return "";
-
-    }
-    */
-
     public String getThreddsServiceType() {
         return null;
     }

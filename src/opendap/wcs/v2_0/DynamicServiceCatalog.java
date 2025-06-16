@@ -105,65 +105,6 @@ public class DynamicServiceCatalog implements WcsCatalog{
         if(_intialized)
             return;
 
-        /*
-        Element e1;
-        String msg;
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-
-        ///////////////////////////////////////////////////////////////
-        // Sort out access credentials for getting things from places
-        // that require such...
-        _credsProvider = null;
-        e1 = config.getChild("Credentials");
-        if(e1!=null){
-            // There was a Credentials thing in the config, lets try it...
-            String filename = e1.getTextTrim();
-            try {
-                _credsProvider = opendap.http.Util.getNetRCCredentialsProvider(filename, true);
-            }
-            catch (IOException ioe){
-                _log.error("init() - The file '{}' cannot be processed as a .netrc file. " +
-                        "msg: {}",filename,ioe.getMessage());
-            }
-        }
-        if(_credsProvider==null){
-            _log.warn("Looking in default location for .netrc");
-            try {
-                _credsProvider = opendap.http.Util.getNetRCCredentialsProvider();
-            } catch (IOException e) {
-                msg = "Unable to load authentication credentials from defult location. " +
-                        "Try specifying the credentials location if credentials are required.";
-                _log.warn(msg);
-            }
-
-        }
-        */
-
-        /*
-        e1 = config.getChild("CacheDirectory");
-        if(e1==null){
-
-            String defaultCacheDir = cacheDir + this.getClass().getSimpleName();
-
-            File defaultCatDir = new File(defaultCacheDir);
-
-            if(!defaultCatDir.exists()){
-                if(!defaultCatDir.mkdirs()){
-                    msg = "Default Cache Directory ("+defaultCacheDir+")does not exist and cannot be " +
-                            "created. Could not find CoveragesDirectory element in " +
-                            "configuration element: "+ xmlo.outputString(config);
-                    _log.error(msg);
-                    throw new IOException(msg);
-                }
-            }
-            _cacheDir = defaultCacheDir;
-        }
-        else {
-            _cacheDir =  e1.getTextTrim();
-        }
-        _log.debug("WCS-2.0 Cache Directory: " + _cacheDir);
-        */
-
         List<Element> dynamicServices = config.getChildren("DynamicService");
         for(Element dsElement:dynamicServices) {
             DynamicService dynamicService = new DynamicService(dsElement);
@@ -456,17 +397,7 @@ public class DynamicServiceCatalog implements WcsCatalog{
     public Element getCoverageSummaryElement(User user, String coverageId) throws InterruptedException, WcsException {
         CoverageDescription cDesc = getCoverageDescription(user, coverageId);
         if(cDesc!=null){
-
             return cDesc.getCoverageSummary();
-            /*
-            Element covSum = new Element("CoverageSummary",WCS.WCS_NS);
-            Element coverageID = cDesc.getCoverageIdElement();
-            covSum.addContent(coverageID);
-            Element coverageSubtype = new Element("CoverageSubtype",WCS.WCS_NS);
-            covSum.addContent(coverageSubtype);
-            coverageSubtype.addContent(cDesc.getCoverageDescriptionElement());
-            return covSum;
-            */
         }
         return null;
     }

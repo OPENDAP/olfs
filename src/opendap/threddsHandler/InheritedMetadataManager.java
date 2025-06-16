@@ -282,27 +282,6 @@ public class InheritedMetadataManager {
                     metadataElement.detach();
                     log.debug("ingestInheritedMetadata() - Found inherited metadata.");
 
-
-                    //################################################################################
-                    //@todo Right now it removes the serviceName elements. Why is that a good thing?
-                    //@todo If we leave them then we have to see if the serviceName resolves in the
-                    //@todo code that produces uses the metadata in a new catalog. Right now that's
-                    //@todo in BESThreddsDispatchHandler.handleRequest()
-                    /*
-                    i = metadataElement.getChildren("serviceName", THREDDS.NS).iterator();
-                    Vector<Element> serviceNameElements = new Vector<Element>();
-                    while (i.hasNext()) {
-                        serviceNameElements.add((Element) i.next());
-                    }
-                    for (Element serviceName : serviceNameElements) {
-                        serviceName.detach();
-                        log.debug("Removed Element <thredds:serviceName>" + serviceName.getTextTrim() + "</thredds:serviceName> from inherited metadata.");
-                    }
-                    */
-                    //@todo We should probably carry the serviceName and service definitions through to the output catalog.
-                    //################################################################################
-
-
                     // The THREDDS specification states that multiple serviceName Elements will be ignored.
                     // So we're only going to get the first one.
                     // see http://www.unidata.ucar.edu/projects/THREDDS/tech/catalog/v1.0.2/InvCatalogSpec.html#threddsMetadataGroup
@@ -497,33 +476,6 @@ public class InheritedMetadataManager {
             readLock.unlock();
         }
     }
-
-    /*
-    public static boolean hasInheritedServices(String catalogKey) {
-
-        ReentrantReadWriteLock.ReadLock readLock = _inventoryLock.readLock();
-
-        try {
-            readLock.lock();
-
-            Enumeration<String> metadataRootPaths = _inheritedServices.keys();
-            String metadataRootPath;
-
-            while (metadataRootPaths.hasMoreElements()) {
-                metadataRootPath = metadataRootPaths.nextElement();
-                if (catalogKey.startsWith(metadataRootPath)) {
-                    log.debug("Found inherited metadata for catalog '"+catalogKey+"'");
-                    return true;
-                }
-            }
-
-            return false;
-        }
-        finally {
-            readLock.unlock();
-        }
-    }
-    */
 
     public static Vector<Element> getInheritedMetadata(String catalogKey) {
 
