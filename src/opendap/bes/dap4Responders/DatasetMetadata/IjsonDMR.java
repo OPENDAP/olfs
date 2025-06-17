@@ -52,16 +52,16 @@ public class IjsonDMR extends Dap4Responder {
 
 
     private Logger log;
-    private static String defaultRequestSuffix = ".ijsn";
+    private static final String DEFAULT_REQUEST_SUFFIX = ".ijsn";
 
 
 
     public IjsonDMR(String sysPath, BesApi besApi, boolean addTypeSuffixToDownloadFilename) {
-        this(sysPath, null, defaultRequestSuffix, besApi, addTypeSuffixToDownloadFilename);
+        this(sysPath, null, DEFAULT_REQUEST_SUFFIX, besApi, addTypeSuffixToDownloadFilename);
     }
 
     public IjsonDMR(String sysPath, String pathPrefix, BesApi besApi, boolean addTypeSuffixToDownloadFilename) {
-        this(sysPath, pathPrefix, defaultRequestSuffix, besApi, addTypeSuffixToDownloadFilename);
+        this(sysPath, pathPrefix, DEFAULT_REQUEST_SUFFIX, besApi, addTypeSuffixToDownloadFilename);
     }
 
     public IjsonDMR(String sysPath, String pathPrefix, String requestSuffixRegex, BesApi besApi, boolean addTypeSuffixToDownloadFilename) {

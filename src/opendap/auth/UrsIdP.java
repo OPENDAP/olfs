@@ -171,9 +171,6 @@ public class UrsIdP extends IdProvider{
         this.ursUrl = ursUrl;
     }
 
-
-
-
     public String getUrsClientAppId() {
         return clientAppId;
     }
