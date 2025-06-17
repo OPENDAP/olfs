@@ -62,7 +62,6 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
-// import java.util.Set;
 
 import static opendap.auth.IdFilter.USER_PROFILE;
 
@@ -171,9 +170,6 @@ public class UrsIdP extends IdProvider{
 
         this.ursUrl = ursUrl;
     }
-
-
-
 
     public String getUrsClientAppId() {
         return clientAppId;
