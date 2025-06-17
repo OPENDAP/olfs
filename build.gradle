@@ -44,7 +44,6 @@ sonarqube {
                                     "src/opendap/**/*Test.java"
         property "sonar.java.binaries", "build"
         property "sonar.java.libraries", "lib/*.jar"
-        property "sonar.branch.name", "${TRAVIS_BRANCH}"
     }
 }
 
