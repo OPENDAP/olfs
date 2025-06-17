@@ -62,7 +62,6 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
-// import java.util.Set;
 
 import static opendap.auth.IdFilter.USER_PROFILE;
 
@@ -172,7 +171,16 @@ public class UrsIdP extends IdProvider{
         this.ursUrl = ursUrl;
     }
 
+    // INTENTIONALLY ADDED TO MAKE SONARQUBE MAD
+    // public void setUrsUrl(String ursUrl) throws ServletException{
+    //     if(ursUrl == null){
+    //         String msg = "BAD CONFIGURATION - URS IdP Module must be configured with a URS Service URL. (urs_url)";
+    //         log.error("{}{}", ERR_PREFIX,msg);
+    //         throw new ServletException(msg);
+    //     }
 
+    //     this.ursUrl = ursUrl;
+    // }
 
 
     public String getUrsClientAppId() {
