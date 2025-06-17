@@ -24,7 +24,7 @@ plugins {
     id 'eclipse'
     id 'idea'
     // Updated the version from 3.3. Needed to get the sonar target working. jhrg 1/22/24
-    id 'org.sonarqube' version '4.4.1.3373'
+    id 'org.sonarqube' version '6.2.0.5505'
 }
 
 // While these properties are inside a 'sonarqube' block, the task is called 'sonar.' jhrg 1/22/24
