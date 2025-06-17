@@ -89,40 +89,40 @@ cache:
 jobs:
   include:
 
-    - stage: build
-      name: "jdk17"
-      jdk: openjdk17
-      script:
-        - export STAGE=build
-        - ant -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build show server
+    # - stage: build
+    #   name: "jdk17"
+    #   jdk: openjdk17
+    #   script:
+    #     - export STAGE=build
+    #     - ant -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build show server
 
-    - stage: build
-      name: "gradle (jdk17)"
-      jdk: openjdk17
-      script:
-        - export STAGE=build
-        - gradle --version
-        - gradle tasks
-        - gradle war
+    # - stage: build
+    #   name: "gradle (jdk17)"
+    #   jdk: openjdk17
+    #   script:
+    #     - export STAGE=build
+    #     - gradle --version
+    #     - gradle tasks
+    #     - gradle war
 
-    - stage: disabled
-      name: "jdk11"
-      jdk: openjdk11
-      script:
-        - export STAGE=test
-        - ant show check
+    # - stage: disabled
+    #   name: "jdk11"
+    #   jdk: openjdk11
+    #   script:
+    #     - export STAGE=test
+    #     - ant show check
 
-    # I think doesn't work because the sonarscan/sonarqube 'ant task' s no longer supported. jhrg 1/22/24
-    - stage: disabled
-      name: "sonarscan (jdk17)"
-      jdk: openjdk17
-      addons: sonarcloud
-      script:
-        - export STAGE=scan
-        - export ANT_OPTS="-Xms256m -Xmx8g"
-        - ant -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build show server
-        - travis_wait 45 ant -Dsonar.token=$SONAR_LOGIN -Dsonar.qualitygate.timeout=2700 -Dsonar.qualitygate.wait=true show sonar
-        - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=opendap-olfs | grep "QUALITY GATE PASS"
+    # # I think doesn't work because the sonarscan/sonarqube 'ant task' s no longer supported. jhrg 1/22/24
+    # - stage: disabled
+    #   name: "sonarscan (jdk17)"
+    #   jdk: openjdk17
+    #   addons: sonarcloud
+    #   script:
+    #     - export STAGE=scan
+    #     - export ANT_OPTS="-Xms256m -Xmx8g"
+    #     - ant -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build show server
+    #     - travis_wait 45 ant -Dsonar.token=$SONAR_LOGIN -Dsonar.qualitygate.timeout=2700 -Dsonar.qualitygate.wait=true show sonar
+    #     - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=opendap-olfs | grep "QUALITY GATE PASS"
 
     - stage: scan
       name: "synk (jdk17)"
@@ -131,15 +131,6 @@ jobs:
         - export STAGE=scan
         - echo $STAGE
         - ./run-snyk.sh
-
-    - stage: scan
-      name: "sonarscan (jdk17)"
-      jdk: openjdk17
-      addons: sonarcloud
-      script:
-        - export STAGE=scan
-        - sonar-scanner -Dproject.settings=sonar-olfs.properties -Dsonar.login=$SONAR_LOGIN
-        - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=opendap-olfs | grep "QUALITY GATE PASS"
 
     - stage: scan
       name: "gradle sonarscan (jdk17)"
@@ -152,88 +143,88 @@ jobs:
         - travis_wait 30 gradle sonar -Dsonar.login=$SONAR_LOGIN -Dsonar.qualitygate.timeout=1800 -Dsonar.qualitygate.wait=true
         - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=opendap-olfs | grep "QUALITY GATE PASS"
 
-    - stage: snappah
-      name: "olfs-snapshot (jdk17)"
-      jdk: openjdk17
-      script:
-        - export STAGE=snappah
-        - echo "STAGE is ${STAGE}"
-        - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
-        - source ./travis/compute_build_tags.sh
-        - ant -DHYRAX_VERSION="${HYRAX_BUILD_VERSION}" -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DOLFS_DIST_BASE=olfs-snapshot DISTRO
-        - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
-        - echo "Built Distribution Bundles:"
-        - ls -l ./build/dist/*.tgz
-        - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
-        - ls -l ${TRAVIS_BUILD_DIR}/package/
+#     - stage: snappah
+#       name: "olfs-snapshot (jdk17)"
+#       jdk: openjdk17
+#       script:
+#         - export STAGE=snappah
+#         - echo "STAGE is ${STAGE}"
+#         - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
+#         - source ./travis/compute_build_tags.sh
+#         - ant -DHYRAX_VERSION="${HYRAX_BUILD_VERSION}" -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DOLFS_DIST_BASE=olfs-snapshot DISTRO
+#         - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
+#         - echo "Built Distribution Bundles:"
+#         - ls -l ./build/dist/*.tgz
+#         - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
+#         - ls -l ${TRAVIS_BUILD_DIR}/package/
 
-    - stage: snappah
-      name: "olfs-build-number (jdk17)"
-      jdk: openjdk17
-      script:
-        - export STAGE=snappah
-        - echo "STAGE is ${STAGE}"
-        - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
-        - source ./travis/compute_build_tags.sh
-        - ant -DHYRAX_VERSION="${HYRAX_BUILD_VERSION}" -DOLFS_VERSION="${OLFS_BUILD_VERSION}" DISTRO
-        - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
-        - echo "Built Distribution Bundles:"
-        - ls -l ./build/dist/*.tgz
-        - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
-        - ls -l ${TRAVIS_BUILD_DIR}/package/
+#     - stage: snappah
+#       name: "olfs-build-number (jdk17)"
+#       jdk: openjdk17
+#       script:
+#         - export STAGE=snappah
+#         - echo "STAGE is ${STAGE}"
+#         - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
+#         - source ./travis/compute_build_tags.sh
+#         - ant -DHYRAX_VERSION="${HYRAX_BUILD_VERSION}" -DOLFS_VERSION="${OLFS_BUILD_VERSION}" DISTRO
+#         - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
+#         - echo "Built Distribution Bundles:"
+#         - ls -l ./build/dist/*.tgz
+#         - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
+#         - ls -l ${TRAVIS_BUILD_DIR}/package/
 
-    - stage: snappah
-      name: "ngap-snapshot (jdk17)"
-      jdk: openjdk17
-      script:
-        - export STAGE=snappah
-        - echo "STAGE is ${STAGE}"
-        - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
-        - source ./travis/compute_build_tags.sh
-        - ant -DHYRAX_VERSION="${HYRAX_BUILD_VERSION}" -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DNGAP_DIST_BASE=ngap-snapshot ngap-dist
-        - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
-        - echo "Build Bundles:"
-        - ls -l ./build/dist/*.tgz
-        - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
-        - ls -l ${TRAVIS_BUILD_DIR}/package/
+#     - stage: snappah
+#       name: "ngap-snapshot (jdk17)"
+#       jdk: openjdk17
+#       script:
+#         - export STAGE=snappah
+#         - echo "STAGE is ${STAGE}"
+#         - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
+#         - source ./travis/compute_build_tags.sh
+#         - ant -DHYRAX_VERSION="${HYRAX_BUILD_VERSION}" -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DNGAP_DIST_BASE=ngap-snapshot ngap-dist
+#         - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
+#         - echo "Build Bundles:"
+#         - ls -l ./build/dist/*.tgz
+#         - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
+#         - ls -l ${TRAVIS_BUILD_DIR}/package/
 
-    - stage: snappah
-      name: "ngap-build-number (jdk17)"
-      jdk: openjdk17
-      script:
-        - export STAGE=snappah
-        - echo "STAGE is ${STAGE}"
-        - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
-        - source ./travis/compute_build_tags.sh
-        - ant -DHYRAX_VERSION="${HYRAX_BUILD_VERSION}" -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DNGAP_DIST_BASE="ngap-${OLFS_BUILD_VERSION}" ngap-dist
-        - echo "Build Bundles:"
-        - ls -l ./build/dist/*.tgz
-        - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
-        - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
-        - ls -l ${TRAVIS_BUILD_DIR}/package/
+#     - stage: snappah
+#       name: "ngap-build-number (jdk17)"
+#       jdk: openjdk17
+#       script:
+#         - export STAGE=snappah
+#         - echo "STAGE is ${STAGE}"
+#         - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
+#         - source ./travis/compute_build_tags.sh
+#         - ant -DHYRAX_VERSION="${HYRAX_BUILD_VERSION}" -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DNGAP_DIST_BASE="ngap-${OLFS_BUILD_VERSION}" ngap-dist
+#         - echo "Build Bundles:"
+#         - ls -l ./build/dist/*.tgz
+#         - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
+#         - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
+#         - ls -l ${TRAVIS_BUILD_DIR}/package/
 
-    # The hyrax-docker-trigger stage grabs the hyrax-docker project, sets the current
-    # snapshot time and pushes the result to GitHub. This push triggers TravisCI
-    # to build the Docker containers for all the Hyrax snapshot products.
-    # I moved this into its own stage instead of after_deploy so that it would
-    # reliably run once after everything else worked. -ndp 3/10/21
-    - stage: hyrax-docker-trigger
-      name: "Triggering hyrax-docker snapshot build"
-      script:
-        - export STAGE=hyrax-docker
-        - echo $STAGE
-        - source ./travis/compute_build_tags.sh
-        - ./travis/trigger-hyrax-docker.sh
+#     # The hyrax-docker-trigger stage grabs the hyrax-docker project, sets the current
+#     # snapshot time and pushes the result to GitHub. This push triggers TravisCI
+#     # to build the Docker containers for all the Hyrax snapshot products.
+#     # I moved this into its own stage instead of after_deploy so that it would
+#     # reliably run once after everything else worked. -ndp 3/10/21
+#     - stage: hyrax-docker-trigger
+#       name: "Triggering hyrax-docker snapshot build"
+#       script:
+#         - export STAGE=hyrax-docker
+#         - echo $STAGE
+#         - source ./travis/compute_build_tags.sh
+#         - ./travis/trigger-hyrax-docker.sh
 
-# The "deploy" section copies the snapshot build product to our S3 bucket
-deploy:
-  - provider: s3
-    edge: true
-    access_key_id: $AWS_ACCESS_KEY_ID
-    secret_access_key: $AWS_SECRET_ACCESS_KEY
-    bucket: opendap.travis.build
-    skip_cleanup: true
-    local_dir: $TRAVIS_BUILD_DIR/package
-    on:
-      all_branches: true
-      condition: $STAGE =~ ^snappah$
+# # The "deploy" section copies the snapshot build product to our S3 bucket
+# deploy:
+#   - provider: s3
+#     edge: true
+#     access_key_id: $AWS_ACCESS_KEY_ID
+#     secret_access_key: $AWS_SECRET_ACCESS_KEY
+#     bucket: opendap.travis.build
+#     skip_cleanup: true
+#     local_dir: $TRAVIS_BUILD_DIR/package
+#     on:
+#       all_branches: true
+#       condition: $STAGE =~ ^snappah$
