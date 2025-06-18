@@ -139,6 +139,7 @@ jobs:
       script:
         - export STAGE=scan
         - | 
+          # multiline build instructions incoming!
           if test -z "$TRAVIS_PULL_REQUEST_BRANCH"; then 
             # If no travis pull request branch was found, this is not a pull request!
             travis_wait 30 gradle sonar -Dsonar.token=$SONAR_LOGIN -Dsonar.qualitygate.timeout=1800 -Dsonar.qualitygate.wait=true -Dsonar.branch.name="$TRAVIS_BRANCH"
