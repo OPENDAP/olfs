@@ -29,9 +29,9 @@ package opendap.coreServlet;
 import opendap.bes.BesApi;
 import org.jdom.Element;
 
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  *
@@ -100,7 +100,7 @@ public interface DispatchHandler {
      *
      * @param req The request for which we need to get a last modified date.
      * @return The last modified date of the URI referenced in th request.
-     * @see javax.servlet.http.HttpServlet
+     * @see jakarta.servlet.http.HttpServlet
      */
     public long getLastModified(HttpServletRequest req);
 
