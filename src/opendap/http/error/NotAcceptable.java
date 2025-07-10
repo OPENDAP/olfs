@@ -27,7 +27,7 @@ package opendap.http.error;
 
 import opendap.coreServlet.OPeNDAPException;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * The resource identified by the request is only capable of generating
