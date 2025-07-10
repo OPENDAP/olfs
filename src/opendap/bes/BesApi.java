@@ -123,6 +123,7 @@ public class BesApi implements Cloneable {
 
     public static final String STORE_RESULT_CONTEXT  = "store_result";
     public static final String UID_CONTEXT  = "uid";
+    public static final String DAP4_CHECKSUMS_CONTEXT  = "dap4_checksums";
 
 
     public static final String XDAP_ACCEPT_CONTEXT = "xdap_accept";
@@ -2466,7 +2467,8 @@ public class BesApi implements Cloneable {
             }
         }
 
-
+        if(qp.computeChecksums())
+            request.addContent(setContextElement(DAP4_CHECKSUMS_CONTEXT,"true"));
 
         request.addContent(setContainerElement(getBesContainerName(),getBesSpaceName(),besDataSource,type));
 
