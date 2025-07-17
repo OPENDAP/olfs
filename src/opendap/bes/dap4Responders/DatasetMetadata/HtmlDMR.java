@@ -63,7 +63,7 @@ import java.util.Vector;
 public class HtmlDMR extends Dap4Responder {
 
     private final Logger log;
-    private static final String defaultRequestSuffix = ".html";
+    private static final String DEFAULT_REQUEST_SUFFIX = ".html";
     private final boolean _enforceRequiredUserSelection;
     private boolean _showDmrppLink;
 
@@ -71,7 +71,7 @@ public class HtmlDMR extends Dap4Responder {
     private final String indent_inc = "  ";
 
     public HtmlDMR(String sysPath, String pathPrefix, BesApi besApi, boolean enforceRequiredUserSelection, boolean showDmrppLink) {
-        this(sysPath, pathPrefix, defaultRequestSuffix, besApi, enforceRequiredUserSelection, showDmrppLink);
+        this(sysPath, pathPrefix, DEFAULT_REQUEST_SUFFIX, besApi, enforceRequiredUserSelection, showDmrppLink);
     }
 
     public HtmlDMR(String sysPath, String pathPrefix, String requestSuffix, BesApi besApi, boolean enforceRequiredUserSelection, boolean showDmrppLink) {

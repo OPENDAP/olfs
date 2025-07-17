@@ -23,8 +23,7 @@ plugins {
     id 'war'
     id 'eclipse'
     id 'idea'
-    // Updated the version from 3.3. Needed to get the sonar target working. jhrg 1/22/24
-    id 'org.sonarqube' version '4.4.1.3373'
+    id 'org.sonarqube' version '6.2.0.5505'
 }
 
 // While these properties are inside a 'sonarqube' block, the task is called 'sonar.' jhrg 1/22/24
@@ -216,6 +215,9 @@ dependencies {
     implementation group: 'aws-java-sdk-core', name: 'aws-java-sdk-core', version: '1.12.734'
     implementation group: 'aws-java-sdk-ec2', name: 'aws-java-sdk-ec2', version: '1.12.734'
     implementation group: 'aws-java-sdk-logs', name: 'aws-java-sdk-logs', version: '1.12.734'
+
+    implementation group: 'com.auth0', name: 'java-jwt', version: '4.5.0'
+    implementation group: 'com.auth0', name: 'jwks-rsa', version: '0.22.1'
 
     implementation group: 'jackson', name: 'jackson-core', version: '2.17.0'
     implementation group: 'jackson', name: 'jackson-databind', version: '2.17.0'

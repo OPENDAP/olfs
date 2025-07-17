@@ -318,20 +318,20 @@ public class DmrppJoinNewAggregator {
             else if (kid.getName().equals(DAP4.SEQUENCE)){
                 aggContainer(kid, dataURL, chunkIndex);
             }
-            else if (kid.getName().equals(DAP4.INT8)   |
-                    kid.getName().equals(DAP4.UINT8)   |
-                    kid.getName().equals(DAP4.BYTE)    |
-                    kid.getName().equals(DAP4.CHAR)    |
-                    kid.getName().equals(DAP4.INT16)   |
-                    kid.getName().equals(DAP4.UINT16)  |
-                    kid.getName().equals(DAP4.INT32)   |
-                    kid.getName().equals(DAP4.UINT32)  |
-                    kid.getName().equals(DAP4.INT64)   |
-                    kid.getName().equals(DAP4.UINT64)  |
-                    kid.getName().equals(DAP4.FLOAT32) |
-                    kid.getName().equals(DAP4.FLOAT64) |
-                    kid.getName().equals(DAP4.STRING)  |
-                    kid.getName().equals(DAP4.D_URI)   |
+            else if (kid.getName().equals(DAP4.INT8)   ||
+                    kid.getName().equals(DAP4.UINT8)   ||
+                    kid.getName().equals(DAP4.BYTE)    ||
+                    kid.getName().equals(DAP4.CHAR)    ||
+                    kid.getName().equals(DAP4.INT16)   ||
+                    kid.getName().equals(DAP4.UINT16)  ||
+                    kid.getName().equals(DAP4.INT32)   ||
+                    kid.getName().equals(DAP4.UINT32)  ||
+                    kid.getName().equals(DAP4.INT64)   ||
+                    kid.getName().equals(DAP4.UINT64)  ||
+                    kid.getName().equals(DAP4.FLOAT32) ||
+                    kid.getName().equals(DAP4.FLOAT64) ||
+                    kid.getName().equals(DAP4.STRING)  ||
+                    kid.getName().equals(DAP4.D_URI)   ||
                     kid.getName().equals(DAP4.OPAQUE)
                     ){
 

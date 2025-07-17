@@ -345,20 +345,20 @@ public class DmrppJoinExistingAggregator {
             else if (dapObject.getName().equals(DAP4.SEQUENCE)){
                 aggContainer(dapObject, dataURL, chunkIndex);
             }
-            else if (dapObject.getName().equals(DAP4.INT8)   |
-                    dapObject.getName().equals(DAP4.UINT8)   |
-                    dapObject.getName().equals(DAP4.BYTE)    |
-                    dapObject.getName().equals(DAP4.CHAR)    |
-                    dapObject.getName().equals(DAP4.INT16)   |
-                    dapObject.getName().equals(DAP4.UINT16)  |
-                    dapObject.getName().equals(DAP4.INT32)   |
-                    dapObject.getName().equals(DAP4.UINT32)  |
-                    dapObject.getName().equals(DAP4.INT64)   |
-                    dapObject.getName().equals(DAP4.UINT64)  |
-                    dapObject.getName().equals(DAP4.FLOAT32) |
-                    dapObject.getName().equals(DAP4.FLOAT64) |
-                    dapObject.getName().equals(DAP4.STRING)  |
-                    dapObject.getName().equals(DAP4.D_URI)   |
+            else if (dapObject.getName().equals(DAP4.INT8)   ||
+                    dapObject.getName().equals(DAP4.UINT8)   ||
+                    dapObject.getName().equals(DAP4.BYTE)    ||
+                    dapObject.getName().equals(DAP4.CHAR)    ||
+                    dapObject.getName().equals(DAP4.INT16)   ||
+                    dapObject.getName().equals(DAP4.UINT16)  ||
+                    dapObject.getName().equals(DAP4.INT32)   ||
+                    dapObject.getName().equals(DAP4.UINT32)  ||
+                    dapObject.getName().equals(DAP4.INT64)   ||
+                    dapObject.getName().equals(DAP4.UINT64)  ||
+                    dapObject.getName().equals(DAP4.FLOAT32) ||
+                    dapObject.getName().equals(DAP4.FLOAT64) ||
+                    dapObject.getName().equals(DAP4.STRING)  ||
+                    dapObject.getName().equals(DAP4.D_URI)   ||
                     dapObject.getName().equals(DAP4.OPAQUE)
                     ){
 
