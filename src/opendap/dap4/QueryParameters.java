@@ -47,6 +47,7 @@ public class QueryParameters {
     public static final String DAP4_CONSTRAINT_EXPRESSION_KEY = "dap4.ce";
     public static final String DAP4_FUNCTION_KEY = "dap4.function";
     public static final String DAP4_ASYNC_KEY = "dap4.async";
+    public static final String DAP4_CHECKSUM_KEY = "dap4.checksum";
     public static final String CLOUDY_DAP = "cloudydap";
 
 
@@ -55,6 +56,7 @@ public class QueryParameters {
     private boolean isStoreResultRequest;
     private String func;
     private String ce;
+    private boolean d_computeChecksums;
     private String queryRemainder;
     private String cloudyDap;
 
@@ -65,6 +67,7 @@ public class QueryParameters {
         isStoreResultRequest = false;
         func = null;
         ce = null;
+        d_computeChecksums = false;
         queryRemainder = null;
         cloudyDap=null;
     }
@@ -118,11 +121,27 @@ public class QueryParameters {
 
 
     public void setCe(String dap4ce){
-         ce = dap4ce;
+        ce = dap4ce;
     }
 
     public String getCe(){
         return ce;
+    }
+
+    /**
+     * Setter for a checksummed dap4 data response
+     * @param state
+     */
+    public void computeChecksums(String state){
+        d_computeChecksums =  (state!=null && state.equalsIgnoreCase("true"));
+    }
+
+    /**
+     * Getter for checksummed dap4 data response state.
+     * @return True to compute checksums, false otherwise
+     */
+    public boolean computeChecksums(){
+        return d_computeChecksums;
     }
 
     /**  Added for cloudydap experiment - ndp 1/19/17 - - - - - - - - - - - - - - - - - - */
@@ -158,6 +177,10 @@ public class QueryParameters {
                 }
                 if(key.equals(DAP4_CONSTRAINT_EXPRESSION_KEY)){
                     setCe(req.getParameter(key));
+                    dropList.add(key);
+                }
+                if(key.equals(DAP4_CHECKSUM_KEY)){
+                    computeChecksums(req.getParameter(key));
                     dropList.add(key);
                 }
                 if(key.equals(DAP4_FUNCTION_KEY)){
