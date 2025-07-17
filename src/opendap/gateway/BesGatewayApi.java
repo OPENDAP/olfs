@@ -224,6 +224,8 @@ public class BesGatewayApi extends BesApi implements Cloneable {
         if(user.getMaxVariableSize()>=0)
             request.addContent(setContextElement(MAX_VARIABLE_SIZE_CONTEXT,user.getMaxVariableSize()+""));
 
+        if(qp.computeChecksums())
+            request.addContent(setContextElement(DAP4_CHECKSUMS_CONTEXT,"true"));
 
         request.addContent(setContainerElement("gatewayContainer","gateway",remoteDataSourceUrl,type));
 

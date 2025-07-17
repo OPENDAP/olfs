@@ -273,6 +273,9 @@ public class NgapBesApi extends BesApi implements Cloneable {
 
         addEdlAuthToken(request,user);
 
+        if(qp.computeChecksums())
+            request.addContent(setContextElement(DAP4_CHECKSUMS_CONTEXT,"true"));
+
         request.addContent(setContainerElement(getBesContainerName(),
                 getBesSpaceName(),remoteDataSourceUrl,type));
 
