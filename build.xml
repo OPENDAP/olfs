@@ -239,7 +239,7 @@
     <property name="junit.lib" value="junit-4.13.2.jar"/>
     <property name="hamcrest-all.lib" value="hamcrest-all-1.3.jar"/>
     <property name="jdom.lib" value="jdom-1.1.1.jar"/>
-    <property name="urlRewrite.lib" value="urlrewrite-3.2.0.jar"/>
+    <property name="urlRewrite.lib" value="urlrewrite-5.1.3.jar"/>
 
 
     <property name="slf4j.lib" value="slf4j-api-2.0.16.jar"/> <!-- updated version 01/23/25 - ndp -->
