@@ -128,13 +128,21 @@ public class QueryParameters {
         return ce;
     }
 
+    /**
+     * Setter for a checksummed dap4 data response
+     * @param state
+     */
     public void computeChecksums(String state){
         d_computeChecksums =  (state!=null && state.equalsIgnoreCase("true"));
     }
+
+    /**
+     * Getter for checksummed dap4 data response state.
+     * @return True to compute checksums, false otherwise
+     */
     public boolean computeChecksums(){
         return d_computeChecksums;
     }
-
 
     /**  Added for cloudydap experiment - ndp 1/19/17 - - - - - - - - - - - - - - - - - - */
     public void setCloudyDap(String cloudyDapString) { cloudyDap = cloudyDapString; }
@@ -167,17 +175,14 @@ public class QueryParameters {
                     setStoreResultRequestServiceUrl(new Request(null, req).getServiceUrl());
                     dropList.add(key);
                 }
-
                 if(key.equals(DAP4_CONSTRAINT_EXPRESSION_KEY)){
                     setCe(req.getParameter(key));
                     dropList.add(key);
                 }
-
                 if(key.equals(DAP4_CHECKSUM_KEY)){
                     computeChecksums(req.getParameter(key));
                     dropList.add(key);
                 }
-
                 if(key.equals(DAP4_FUNCTION_KEY)){
                     setFunc(req.getParameter(key));
                     dropList.add(key);
