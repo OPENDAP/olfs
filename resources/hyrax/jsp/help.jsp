@@ -34,7 +34,7 @@
 </head>
 
 <body>
-<a href="http://www.opendap.org"><img src="<%= contextPath %>/docs/images/logo.gif" alt="Logo" width="206" height="93" border="0"/></a>
+<a href="https://www.opendap.org"><img class="banner_logo_img" alt="OPeNDAP Logo" src="/docs/images/logo.svg"/></a>
 
 <h1 align="left">Hyrax Server Help </h1>
 <hr size="1" noshade="noshade"/>
