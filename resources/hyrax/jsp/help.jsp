@@ -120,8 +120,20 @@ The Hyrax server supports both the DAP2 and DAP4 data access protocols.
 </table>
 <p>&nbsp;</p>
 <h2>DAP2 API</h2>
-<p>To access most of the DAP2 features of this OPeNDAP server, append one of the following a eleven suffixes to the URL of a dataset: .das,
-    .dds, .ddx, .rdf, .dods, .nc, ascii, .xdods, .info, .ver or .help. </p>
+<p>
+    The DAP4 request API is made of two primary request interfaces, metadata and data. There are two primary catagories
+    of metadata in DAP2: syntactic and sematic. Syntactic metadata is the metadata that describes the structure and
+    types of the dataset variables. This includes things like atomic and "constructor" types and the names one uses to
+    refer to the variables in the dataset. The syntactic metadata is returned in a DDS document. The semantic metedata
+    is all the metadata that is not part of the syntactic metadata.  The semantic metadata document is called the
+    DAS.
+</p>
+
+<p>
+    To access most of the DAP2 features of this OPeNDAP server, append one of the following a eleven suffixes to the
+    URL of a dataset: .das (DAS), .dds (DDS), .ddx, .rdf, .dods (DAP2 Data Response), .nc, ascii, .xdods, .info,
+    .ver or .help.
+</p>
 
 <p>Using these suffixes, you can ask this server for metadata and data responses for a particular dataset.</p>
 
@@ -190,7 +202,7 @@ The Hyrax server supports both the DAP2 and DAP4 data access protocols.
 
 <hr/>
 
-<p>For example, to request the DAS object from the FNOC1 dataset at URI/GSO (a experiments dataset) you would append
+<p>For example, to request the DAP2 DAS object from the FNOC1 dataset at URI/GSO (a experiments dataset) you would append
     `.das' to the URL: http://test.opendap.org/opendap/data/nc/fnoc1.nc.das.<br/>
 </p>
 
