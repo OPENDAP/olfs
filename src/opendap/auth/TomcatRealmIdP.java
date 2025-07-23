@@ -45,7 +45,7 @@ public class TomcatRealmIdP extends IdProvider {
     public static final String DEFAULT_AUTHENICATION_CONTEXT ="realm";
 
 
-    private Logger log;
+    private final Logger log;
 
 
     public TomcatRealmIdP(){
