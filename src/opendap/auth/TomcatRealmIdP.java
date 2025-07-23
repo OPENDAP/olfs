@@ -65,8 +65,10 @@ public class TomcatRealmIdP extends IdProvider {
      */
     @Override
     public boolean doLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        //Redirect the user back to the their original requested resource.
+        //Redirect the user back to their original requested resource.
         HttpSession session = request.getSession();
+        log.debug("BEGIN (session: {})",session.getId());
+        log.debug("session.isNew(): {}", session.isNew());
         String redirectUrl = request.getContextPath();
         if(session!=null){
             String url = (String) session.getAttribute(IdFilter.RETURN_TO_URL);
