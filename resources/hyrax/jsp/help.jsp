@@ -44,7 +44,7 @@ The Hyrax server supports both the DAP2 and DAP4 data access protocols.
     The DAP4 API supports data types, such as <code>Int64</code> & <code>Group</code>, that were not addressed in the
     DAP2 specification.</p>
 <p>
-    The DAP4 request API is made of two primary request interfaces, metadata and data.
+    The DAP4 API is made of two primary request interfaces, metadata and data.
 </p>
 <p>
     DAP4 Metadata Access URLs utilize a primary URL extension suffix of <code>.dmr</code> which, when used alone,
