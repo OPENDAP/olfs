@@ -288,7 +288,9 @@ dependencies {
     ngapDep implementation("com.esotericsoftware:reflectasm:1.11.9")
 
     ngapDep implementation( "org.redisson:redisson:3.22.0")
-
+    // https://mvnrepository.com/artifact/de.ruedigermoeller/fst
+    implementation("de.ruedigermoeller:fst:2.57")
+    
     // This form:
     //    implementation group: 'org.redisson', name: 'redisson', version: '3.22.0'
     // Can be rewritten as a dependency:

@@ -895,12 +895,13 @@
             <fileset dir="${ngapResources.dir}/lib">
 
                 <!-- We exclude these because they get placed into
-                $CATALINA_HOM/lib when the Docker containers are built.-->
+                $CATALINA_HOME/lib when the Docker containers are built.-->
                 <exclude name="elasticache-java-cluster-client-1.1.2.jar"/>
                 <exclude name="memcached-session-manager-2.3.2.jar"/>
                 <exclude name="memcached-session-manager-tc9-2.3.2.jar"/>
                 <exclude name="redisson-all-3.22.0.jar"/>
                 <exclude name="redisson-tomcat-9-3.22.0.jar"/>
+                <exclude name="fst-2.57.jar"/>
 
             </fileset>
 
