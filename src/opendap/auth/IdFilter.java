@@ -80,6 +80,7 @@ public class IdFilter implements Filter {
         isInitialized = false;
     }
 
+    @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         initLock.lock();
         try {
@@ -367,6 +368,7 @@ public class IdFilter implements Filter {
     /**
      *
      */
+    @Override
     public void destroy() {
         log = null;
     }
@@ -426,13 +428,13 @@ public class IdFilter implements Filter {
      * Performs the user login operations.
      * This method does not actually generate any output. It performs a series
      * of redirects, depending upon the current state.
-     *
+     * <p>
      * 1) If the user is already logged in, it just redirects them back to the
      *    home page.
-     *
+     * <p>
      * 2) If no 'code' query parameter is found, it will redirect the user to URS
      *    to start the authentication process.
-     *
+     * <p>
      * 3) If a 'code' query parameter is found, it assumes the call is a redirect
      *    from a successful URS authentication, and will attempt to perform the
      *    token exchange.

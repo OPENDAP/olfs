@@ -34,9 +34,11 @@ public class ClickjackFilter implements Filter
         chain.doFilter(request, response);
     }
 
+    @Override
     public void destroy() {
     }
 
+    @Override
     public void init(FilterConfig filterConfig) {
         String configMode = filterConfig.getInitParameter("mode");
         if ( configMode != null ) {
