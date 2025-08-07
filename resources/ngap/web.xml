@@ -272,7 +272,7 @@
         <filter-class>org.tuckey.web.filters.urlrewrite.UrlRewriteFilter</filter-class>
         <init-param>
             <param-name>logLevel</param-name>
-            <param-value>sysout:DEBUG</param-value>
+            <param-value>sysout:ERROR</param-value>
         </init-param>
         <init-param>
             <param-name>RewriteLog</param-name>
