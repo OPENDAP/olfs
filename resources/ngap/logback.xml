@@ -70,10 +70,11 @@
         <MaxSize>512</MaxSize>
     </appender>
 
-    <appender name="ReddisLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <File>${logdir}/Reddis.log</File>
+
+    <appender name="RedissonLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${logdir}/redisson.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-            <FileNamePattern>${logdir}/Reddis.%i.log.zip</FileNamePattern>
+            <FileNamePattern>${logdir}/redisson.%i.log.zip</FileNamePattern>
             <MinIndex>1</MinIndex>
             <MaxIndex>3</MaxIndex>
         </rollingPolicy>
@@ -81,7 +82,8 @@
             <MaxFileSize>5MB</MaxFileSize>
         </triggeringPolicy>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z} [thread:%t] [%r] %-5p - %c.%M - %m%n"</pattern>
+            <!-- pattern>{ "date": "%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}", "thread": "%t", "rel_time": %r, "log_level": "%-5p", "logger_id": "%c.%M", "message": "%m"}%n</pattern -->
+            <pattern>|&amp;|date: "%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}"|&amp;|thread: %t|&amp;|rel_time: %r|&amp;|log_level: %-5p|&amp;|logger_id: "%c.%M"|&amp;|message: "%m"%n</pattern>
         </encoder>
     </appender>
 
@@ -226,8 +228,8 @@
         <appender-ref ref="ErrorLog"/>
     </logger>
 
-    <logger name="org." level="all">
-        <appender-ref ref="ErrorLog"/>
+    <logger name="org.redission" level="all">
+        <appender-ref ref="RedissonLog"/>
     </logger>
 
 
