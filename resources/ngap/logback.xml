@@ -70,6 +70,21 @@
         <MaxSize>512</MaxSize>
     </appender>
 
+    <appender name="ReddisLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${logdir}/Reddis.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <FileNamePattern>${logdir}/Reddis.%i.log.zip</FileNamePattern>
+            <MinIndex>1</MinIndex>
+            <MaxIndex>3</MaxIndex>
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>5MB</MaxFileSize>
+        </triggeringPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z} [thread:%t] [%r] %-5p - %c.%M - %m%n"</pattern>
+        </encoder>
+    </appender>
+
     <appender name="ErrorLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>${logdir}/HyraxErrors.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
@@ -210,6 +225,13 @@
     <logger name="opendap" level="error">
         <appender-ref ref="ErrorLog"/>
     </logger>
+
+    <logger name="org." level="all">
+        <appender-ref ref="ErrorLog"/>
+    </logger>
+
+
+
 
     <logger name="HyraxAccess" level="info">
         <appender-ref ref="HyraxAccessLog"/>

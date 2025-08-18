@@ -94,8 +94,10 @@ dependencies {
     implementation group: 'de.javakaffee.msm', name: 'msm-kryo-serializer', version: '2.3.2'
     //objenesis-3.2.jar
     testImplementation group: 'org.objenesis', name: 'objenesis', version: '3.2'
-    //redisson-all-3.5.5.jar
-    implementation group: 'org.redisson', name: 'redisson-all', version: '3.11.6'
+
+    implementation group: 'org.redisson', name: 'redisson-all', version: '3.50.0'
+    implementation group: 'org.redisson', name: 'redisson-tomcat-11', version: '3.50.0'
+
     implementation group: 'com.esotericsoftware', name: 'reflectasm', version: '1.11.9'
 
 }
