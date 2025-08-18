@@ -26,11 +26,25 @@
 
 package opendap.auth;
 
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import com.auth0.jwt.interfaces.JWTVerifier;
+
+import com.auth0.jwt.JWT;
+import com.auth0.jwk.Jwk;
+import com.auth0.jwk.InvalidPublicKeyException;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSyntaxException;
 import opendap.PathBuilder;
 import opendap.coreServlet.ReqInfo;
 import opendap.http.error.Forbidden;
+import opendap.io.HyraxStringEncoding;
 import opendap.logging.LogUtil;
 import opendap.logging.Procedure;
 import opendap.logging.Timer;
@@ -43,6 +57,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.security.PublicKey;
+import java.security.interfaces.RSAPublicKey;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,6 +76,7 @@ public class UrsIdP extends IdProvider{
     public static final String URS_URL_KEY = "UrsUrl";
     public static final String URS_CLIENT_ID_KEY = "UrsClientId";
     public static final String URS_CLIENT_AUTH_CODE_KEY = "UrsClientAuthCode";
+    public static final String URS_CLIENT_APP_PUBLIC_KEYS_KEY = "UrsClientAppPublicKeys";
 
     public static final String REJECT_UNSUPPORTED_AUTHZ_SCHEMES_KEY = "RejectUnsupportedAuthzSchemes";
 
@@ -67,6 +85,7 @@ public class UrsIdP extends IdProvider{
     private String ursUrl;
     private String clientAppId;
     private String clientAppAuthCode;
+    private String clientAppPublicKeys;
     private boolean rejectUnsupportedAuthzSchemes;
 
     private static final String ERR_PREFIX = "ERROR! msg: ";
@@ -96,6 +115,9 @@ public class UrsIdP extends IdProvider{
         e = getConfigElement(config,URS_CLIENT_AUTH_CODE_KEY);
         clientAppAuthCode = e.getTextTrim();
 
+        e = getOptionalConfigElement(config,URS_CLIENT_APP_PUBLIC_KEYS_KEY);
+        clientAppPublicKeys = e != null ? e.getTextTrim() : "";
+
         e = config.getChild(REJECT_UNSUPPORTED_AUTHZ_SCHEMES_KEY);
         if(e != null)
             rejectUnsupportedAuthzSchemes = true;
@@ -120,7 +142,20 @@ public class UrsIdP extends IdProvider{
         return e;
     }
 
-
+    /**
+     * Worker method to get value of `childName` from `config`
+     * @param config
+     * @param childName
+     * @return element found in `config`, `null` if `childName` not present
+     */
+    private Element getOptionalConfigElement(Element config, String childName) {
+        Element e = config.getChild(childName);
+        if(e == null){
+            String msg = this.getClass().getSimpleName() + " configuration does not contain optional <" + childName + "> element.";
+            log.info("{}", msg);
+        }
+        return e;
+    }
 
     public String getUrsUrl() {
         return ursUrl;
@@ -135,9 +170,6 @@ public class UrsIdP extends IdProvider{
 
         this.ursUrl = ursUrl;
     }
-
-
-
 
     public String getUrsClientAppId() {
         return clientAppId;
@@ -169,7 +201,13 @@ public class UrsIdP extends IdProvider{
         this.clientAppAuthCode = ursClientAppAuthCode;
     }
 
+    public String getUrsClientAppPublicKeys() {
+        return clientAppPublicKeys;
+    }
 
+    public void setUrsClientAppPublicKeys(String ursClientAppPublicKeys) {
+        this.clientAppPublicKeys = ursClientAppPublicKeys;
+    }
 
     void getEDLUserProfile(UserProfile userProfile) throws IOException {
 
@@ -205,10 +243,167 @@ public class UrsIdP extends IdProvider{
         userProfile.ingestJsonProfileString(contents);
     }
 
-// curl -X POST -d 'token=<token>&client_id=<‘your application client_id’> https://urs.earthdata.nasa.gov/oauth/tokens/user
+    // curl -X POST -d 'token=<token>&client_id=<‘your application client_id’>
+    // https://urs.earthdata.nasa.gov/oauth/tokens/user
 
+    /**
+     * Return key in `jwksPublicKeys` with key id ("kid") `publicKeyId`;
+     * return `null` if no matching key.
+     *
+     * @param jwksPublicKeys JSON Web Key Set (JWKS) of public keys
+     * @param publicKeyId The key id of the requested key in `jwksPublicKeys`
+     * @return The requested public `key` if present; `null` otherwise
+     * @throws InvalidPublicKeyException
+     * @throws JsonParseException
+     * @throws IllegalStateException
+     */
+    RSAPublicKey getPublicKeyForId(String jwksPublicKeys, String publicKeyId) throws InvalidPublicKeyException, JsonParseException, IllegalStateException {
+        // Safety first!
+        if (jwksPublicKeys == null || jwksPublicKeys.isEmpty() || publicKeyId == null) {
+            return null;
+        }
 
+        // 1. Parse the key set (JSON web key set, i.e. JWKS)
+        JsonObject jwks = JsonParser.parseString(jwksPublicKeys).getAsJsonObject();
+        JsonArray jwksKeys = jwks.getAsJsonArray("keys");
+         if (jwksKeys == null) {
+            return null;
+        }
 
+        // 2. Pull out the requested key
+        JsonObject jwkJson = null;
+        for (int i = 0; i < jwksKeys.size(); i++) {
+            JsonObject jwk = jwksKeys.get(i).getAsJsonObject();
+            if (jwk.has("kid") && jwk.get("kid").getAsString().equals(publicKeyId)) {
+                jwkJson = jwk;
+                break;
+            }
+        }
+        if (jwkJson == null) {
+            return null;
+        }
+
+        // 3. Convert key's json entry to a public key
+        Map<String, Object> jwkValues = new HashMap<>();
+        for (Map.Entry<String, JsonElement> entry : jwkJson.entrySet()) {
+            jwkValues.put(entry.getKey(), entry.getValue().getAsString());
+        }
+
+        Jwk jwk = Jwk.fromValues(jwkValues);
+        PublicKey j = jwk.getPublicKey();
+        return (RSAPublicKey) j;
+    }
+
+    /**
+     * Return value of `key` after decoding `inputStr` into JSON object;
+     * return `null` if encoded string does not contain JSON, 
+     * `key` is not present in decoded object, or return value is not a String.
+     *
+     * @param inputStr Base64-encoded JSON
+     * @param key The key of the value to be returned from the decoded `inputStr`
+     * @return The value of `key` if present in encoded `inputStr` and a String, `null` otherwise
+     */
+    static String getStringValueFromEncodedJson(String inputStr, String key) {
+        String decodedStr = null;
+        try {
+            decodedStr = new String(Base64.getDecoder().decode(inputStr),
+                HyraxStringEncoding.getCharset());
+            if (decodedStr == null || decodedStr.isEmpty()) {
+                return null;
+            }
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+        
+        JsonElement json;
+        try {
+            json = JsonParser.parseString(decodedStr);
+        } catch (JsonSyntaxException e) {
+            return null;
+        }
+        if (!json.isJsonObject()) {
+            return null;
+        }
+
+        JsonObject decodedJson;
+        try {
+            decodedJson = json.getAsJsonObject();
+        } catch (JsonParseException e) {
+            return null;
+        }
+
+        if (decodedJson != null && decodedJson.has(key)) {
+            JsonElement value = decodedJson.get(key);
+            try {
+                return value.getAsString();
+            } catch (IllegalStateException e) {
+                return null;
+            }
+        }
+        return null;
+    }
+
+    
+    /**
+     * Return the value of "uid" from the `accessToken` JWT's payload;
+     * `null` if `accessToken` is fails verification.
+     *
+     * @param publicKeys  A stringified JWK Set
+     * @param accessToken An EDL JWT token
+     * @return The `accessToken`'s user id (`uid`)
+     */
+    String getEdlUserIdFromToken(String publicKeys, String accessToken) {
+        String errorPrefix = "Failure to validate access token locally;";
+        // Safety first!
+        if (accessToken == null) {
+            log.error("{}{} access token is null.", ERR_PREFIX, errorPrefix);
+            return null;
+        }
+
+        // 1. Figure out which public key the access token requires
+        DecodedJWT unverifiedJwt = null;
+        try {
+            unverifiedJwt = JWT.decode(accessToken);
+        } catch (JWTDecodeException e) {
+            log.error("{}{} unable to load access token as JWT. Details: {}", ERR_PREFIX, errorPrefix, e.getMessage());
+            return null;
+        }
+        String publicKeyId = getStringValueFromEncodedJson(unverifiedJwt.getHeader(), "sig");
+        if (publicKeyId == null) {
+            log.error("{}{} access token missing required field `sig`.", ERR_PREFIX, errorPrefix);
+            return null;
+        }
+
+        // 2. From the set of public access keys provided, get the one specifically
+        // required by our access token
+        RSAPublicKey publicKey;
+        try {
+            publicKey = getPublicKeyForId(publicKeys, publicKeyId);
+        } catch (InvalidPublicKeyException | JsonParseException e) {
+            log.error("{}{} no valid matching public key found in `{}`. Details: {}", ERR_PREFIX, errorPrefix, publicKeys,
+                    e.getMessage());
+            return null;
+        }
+        if (publicKey == null) {
+            log.error("{}{} no public key found for access token `{}`.", ERR_PREFIX, errorPrefix, publicKeyId);
+            return null;
+        }
+
+        // 3. Use that key to verify the access token
+        try {
+            Algorithm algorithm = Algorithm.RSA256(publicKey);
+            JWTVerifier verifier = JWT.require(algorithm).build();
+            verifier.verify(unverifiedJwt);
+        } catch (JWTVerificationException e) {
+            log.error("{}{} access token failed verification. Details: {}", ERR_PREFIX, errorPrefix, e.getMessage());
+            return null;
+        }
+
+        // ...finally, pull user id from the payload
+        String uid = getStringValueFromEncodedJson(unverifiedJwt.getPayload(), "uid");
+        log.debug("uid: {}", uid);
+        return uid;
+    }
 
     /**
      * Old Way:
@@ -304,21 +499,30 @@ public class UrsIdP extends IdProvider{
                 userProfile.setEDLAccessToken(edlat);
                 userProfile.setAuthContext(getAuthContext());
 
+                // Get the user's ID, which implicitly validates the access token
+                // as no id will be returned for an invalid access token.
+                // Attempt local verification if public keys have been provided...
+                String token = edlat.getAccessToken();
+                if (!getUrsClientAppPublicKeys().isEmpty()) {
+                    String uid = getEdlUserIdFromToken(getUrsClientAppPublicKeys(), token);
+                    if (uid == null) {
+                        log.error("{}Unable to validate EDL access token locally; falling back to remote validation", ERR_PREFIX);
+                    } else {
+                        userProfile.setUID(uid);
+                        foundValidAuthToken = true;
+                    }
+                }
+                log.debug("Local EDL token validation result: valid={}, uid={}", foundValidAuthToken, userProfile.getUID());
 
-                String uid = getEdlUserId(edlat.getAccessToken());
-                userProfile.setUID(uid);
+                // Fall back to the EDL endpoint on local failure or lack of local public keys
+                if (!foundValidAuthToken) {
+                    String uid = getEdlUserId(token);
+                    userProfile.setUID(uid);
 
-                // I am hesitant to remove thiscall to getEDLUserProfile().
-                // Everything seems to work
-                // without it, and retrieving the user profile adds the time
-                // cost of another round-trip to EDL. We always have to
-                // grab the UID regardless, we need it  as part of the mvp state
-                // of the UserProfile, and we want the EDL user profile we have
-                // know the UId to ask for it. Which means two trips...
-                //
-                // getEDLUserProfile(userProfile);
-
-                foundValidAuthToken = userProfile.getUID() != null;
+                    // Successful retrieval indicates that the token is valid
+                    foundValidAuthToken = userProfile.getUID() != null;
+                    log.debug("Remote EDL token validation result: valid={}, uid={}", foundValidAuthToken, userProfile.getUID());
+                }
             }
             else if (rejectUnsupportedAuthzSchemes) {
                     String msg = "Received an unsolicited/unsupported/unanticipated/unappreciated ";
