@@ -90,18 +90,13 @@
         </encoder>
     </appender>
 
-    <!--
-       This appender, HAI_DEBUG_LOGGER, is used by the Hyrax Admin interface
-       and it must defined and added to the root logger in order to catch all the stuff,
-       and in order for the Java software to be able to locate it at run time.
-   -->
-    <appender name="HAI_DEBUG_LOGGER" class="ch.qos.logback.core.read.CyclicBufferAppender">
-        <MaxSize>512</MaxSize>
-    </appender>
 
+    <!-- ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## -->
+    <!-- Returns a JSON string value formatted message string for a LogEvent. -->
     <conversionRule conversionWord="json_msg"
                     converterClass="opendap.logging.LogMessageToJsonConverter" />
 
+    <!-- Produces JSON formatted log content. -->
     <appender name="JsonLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>${logdir}/olfs-log.json</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
@@ -113,8 +108,19 @@
             <MaxFileSize>5MB</MaxFileSize>
         </triggeringPolicy>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!--pattern>{ "date": "%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}", "thread": "%t", "request_id": "%X{ID}", "user_ip": "%X{host}", "user_agent": "%X{UserAgent}", "user_id": "%X{userid}", "http_verb": "%X{SOURCE}", "resource_id": "%X{resourceID}", "query_string": "%X{query}", "rel_time": "%r", "response_size": "%X{size}", "duration": "%X{duration}", "log_level": "%-5p", "logger_id": "%c.%M", "message": %m }%n</pattern -->
             <pattern>{ "date": "%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}", "thread": "%t", "request_id": "%X{ID}", "user_ip": "%X{host}", "user_agent": "%X{UserAgent}", "user_id": "%X{userid}", "http_verb": "%X{SOURCE}", "resource_id": "%X{resourceID}", "query_string": "%X{query}", "rel_time": "%r", "response_size": "%X{size}", "duration": "%X{duration}", "log_level": "%-5p", "logger_id": "%c.%M", "message": %json_msg }%n</pattern>
         </encoder>
+    </appender>
+    <!-- ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## -->
+
+    <!--
+       This appender, HAI_DEBUG_LOGGER, is used by the Hyrax Admin interface
+       and it must defined and added to the root logger in order to catch all the stuff,
+       and in order for the Java software to be able to locate it at run time.
+   -->
+    <appender name="HAI_DEBUG_LOGGER" class="ch.qos.logback.core.read.CyclicBufferAppender">
+        <MaxSize>512</MaxSize>
     </appender>
 
     <appender name="ErrorLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -171,6 +177,7 @@
     <!-- OPeNDAP Hyrax Logging -->
 
     <logger name="opendap" level="error" >
+        <!--appender-ref ref="JsonLog"/ -->
         <appender-ref ref="stdout"/>
         <appender-ref ref="ErrorLog"/>
     </logger>

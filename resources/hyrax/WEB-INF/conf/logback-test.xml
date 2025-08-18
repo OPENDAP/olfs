@@ -55,6 +55,31 @@
         </encoder>
     </appender>
 
+
+    <!-- ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## -->
+    <!-- Returns a JSON string value formatted message string for a LogEvent. -->
+    <conversionRule conversionWord="json_msg"
+                    converterClass="opendap.logging.LogMessageToJsonConverter" />
+
+    <!-- Produces JSON formatted log content. -->
+    <appender name="JsonLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${logdir}/olfs-log.json</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <FileNamePattern>${logdir}/olfs-log.%i.zip</FileNamePattern>
+            <MinIndex>1</MinIndex>
+            <MaxIndex>3</MaxIndex>
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>5MB</MaxFileSize>
+        </triggeringPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!--pattern>{ "date": "%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}", "thread": "%t", "request_id": "%X{ID}", "user_ip": "%X{host}", "user_agent": "%X{UserAgent}", "user_id": "%X{userid}", "http_verb": "%X{SOURCE}", "resource_id": "%X{resourceID}", "query_string": "%X{query}", "rel_time": "%r", "response_size": "%X{size}", "duration": "%X{duration}", "log_level": "%-5p", "logger_id": "%c.%M", "message": %m }%n</pattern -->
+            <pattern>{ "date": "%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}", "thread": "%t", "request_id": "%X{ID}", "user_ip": "%X{host}", "user_agent": "%X{UserAgent}", "user_id": "%X{userid}", "http_verb": "%X{SOURCE}", "resource_id": "%X{resourceID}", "query_string": "%X{query}", "rel_time": "%r", "response_size": "%X{size}", "duration": "%X{duration}", "log_level": "%-5p", "logger_id": "%c.%M", "message": %json_msg }%n</pattern>
+        </encoder>
+    </appender>
+    <!-- ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## -->
+
+
     <!--
        This appender, HAI_DEBUG_LOGGER, is used by the Hyrax Admin interface
        and it must defined and added to the root logger in order to catch all the stuff,
@@ -144,6 +169,7 @@
     <logger name="opendap" level="error">
         <appender-ref ref="ErrorLog"/>
         <appender-ref ref="stdout"/>
+        <!-- appender-ref ref="JsonLog"/ -->
     </logger>
 
     <logger name="opendap.io" level="info" />
