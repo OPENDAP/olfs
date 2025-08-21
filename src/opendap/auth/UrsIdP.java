@@ -489,7 +489,7 @@ public class UrsIdP extends IdProvider{
         if (userProfile == null) {
             return false;
         }
-        log.info("HYRAX1835 - TIMESTAMP_ID_TODO - 2a Start token authentication");
+        log.info("HYRAX1835 - 2a Start token authentication");
 
         boolean foundValidAuthToken = false;
 
@@ -517,7 +517,7 @@ public class UrsIdP extends IdProvider{
 
                 // Fall back to the EDL endpoint on local failure or lack of local public keys
                 if (!foundValidAuthToken) {
-                    log.info("HYRAX1835 - TIMESTAMP_ID_TODO - 2b Request EDL authentication");
+                    log.info("HYRAX1835 - 2b Request EDL authentication");
                     String uid = getEdlUserId(token);
                     userProfile.setUID(uid);
 
@@ -545,7 +545,7 @@ public class UrsIdP extends IdProvider{
                 log.warn(msg, AuthorizationHeader.getScheme(authz_hdr_value));
             }
         }
-        log.info("HYRAX1835 - TIMESTAMP_ID_TODO - 2c End token authentication");
+        log.info("HYRAX1835 - 2c End token authentication");
         return foundValidAuthToken;
     }
 

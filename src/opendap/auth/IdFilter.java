@@ -161,7 +161,7 @@ public class IdFilter implements Filter {
 
 
     public void doFilter(ServletRequest sreq, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
-
+        log.info("HYRAX1835 - 1a Received request");
         // Ensure initialization has been accomplished
         if (!isInitialized) {
             try {
@@ -176,7 +176,6 @@ public class IdFilter implements Filter {
         }
 
         try {
-
             HttpServletRequest request = (HttpServletRequest) sreq;
             RequestCache.open(request);
             RequestId requestId = RequestCache.getRequestId();
@@ -353,7 +352,7 @@ public class IdFilter implements Filter {
 
             // This call leads to the PEPFilter, wooo!
             filterChain.doFilter(hsReq, hsRes);
-
+            log.info("HYRAX1835 - 1b Concluded request"); // Is this true?
             log.debug("END (session: {})",session.getId());
             ServletLogUtil.logServerAccessEnd(200,logName);
         }
