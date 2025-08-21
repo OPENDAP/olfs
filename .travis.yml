@@ -156,6 +156,12 @@ jobs:
             travis_wait 30 gradle sonar -Dsonar.token=$SONAR_LOGIN -Dsonar.qualitygate.timeout=1800 -Dsonar.qualitygate.wait=true -Dsonar.pullrequest.key="$TRAVIS_PULL_REQUEST" -Dsonar.pullrequest.branch="$TRAVIS_PULL_REQUEST_BRANCH" -Dsonar.pullrequest.base="$TRAVIS_BRANCH"
           fi
         - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=opendap-olfs | grep "QUALITY GATE PASS"
+      before_install:
+        - wget http://services.gradle.org/distributions/gradle-8.14.3-bin.zip
+        - unzip -qq gradle-8.14.3-bin.zip
+        - export GRADLE_HOME=$PWD/gradle-8.14.3
+        - export PATH=$GRADLE_HOME/bin:$PATH
+        - gradle -v
 
     - stage: snappah
       name: "olfs-snapshot (jdk17)"
