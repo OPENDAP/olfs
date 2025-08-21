@@ -22,8 +22,7 @@ plugins {
     id 'java'
     id 'war'
     id 'idea'
-    // Updated the version from 3.3. Needed to get the sonar target working. jhrg 1/22/24
-    id 'org.sonarqube' version '4.4.1.3373'
+    id 'org.sonarqube' version '6.2.0.5505'
 }
 
 // While these properties are inside a 'sonarqube' block, the task is called 'sonar.' jhrg 1/22/24
@@ -61,8 +60,8 @@ group = 'org.opendap'
 description = 'The OLFs build'
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_1_9
+    targetCompatibility = JavaVersion.VERSION_1_9
 }
 
 // sourceCompatibility = 1.8

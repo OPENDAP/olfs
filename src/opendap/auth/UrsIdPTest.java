@@ -26,8 +26,6 @@
 
 package opendap.auth;
 
-import opendap.auth.UrsIdP;
-
 import com.auth0.jwk.InvalidPublicKeyException;
 import com.google.gson.JsonParseException;
 import java.math.BigInteger;

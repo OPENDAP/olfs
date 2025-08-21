@@ -1121,6 +1121,19 @@
         <xsl:apply-templates mode="findD4Types"/>
     </xsl:template>
 
+    <!-- We skip Enumeration because it defines a "kind" of enumeration but
+         it's not an instance of an Enum variable (which references an Enumeration by FQN)
+    <xsl:template match="dap:Enumeration" mode="findD4Types">
+        <xsl:call-template name="varDecl" />
+        <xsl:apply-templates mode="findD4Types"/>
+    </xsl:template>
+    -->
+
+    <xsl:template match="dap:Enum" mode="findD4Types">
+        <xsl:call-template name="varDecl" />
+        <xsl:apply-templates mode="findD4Types"/>
+    </xsl:template>
+
     <!--
     Old version u=had Int8 which is not compatible with DAP2 but is compatible with NetCDF-3 and since
     we dropped DAP2 binary responses from the form only NetCDF-3 matters for this test.
