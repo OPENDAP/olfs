@@ -155,7 +155,7 @@ jobs:
             # Because Travis's `TRAVIS_BRANCH` is the name of the target branch **when Travis is triggered by a pull request**, that is the pullrequest.base
             travis_wait 30 gradle sonar -Dsonar.token=$SONAR_LOGIN -Dsonar.qualitygate.timeout=1800 -Dsonar.qualitygate.wait=true -Dsonar.pullrequest.key="$TRAVIS_PULL_REQUEST" -Dsonar.pullrequest.branch="$TRAVIS_PULL_REQUEST_BRANCH" -Dsonar.pullrequest.base="$TRAVIS_BRANCH"
           fi
-          curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=opendap-olfs | grep "QUALITY GATE PASS"
+        - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=opendap-olfs | grep "QUALITY GATE PASS"
 
     - stage: snappah
       name: "olfs-snapshot (jdk17)"
