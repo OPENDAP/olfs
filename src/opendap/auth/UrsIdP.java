@@ -95,7 +95,7 @@ public class UrsIdP extends IdProvider{
         super();
         log = LoggerFactory.getLogger(this.getClass());
         setAuthContext(DEFAULT_AUTH_CONTEXT);
-        setDescription("The NASA Earthdata Login (formerly known as URS)");
+        setDescription("NASA Earthdata Login");
         rejectUnsupportedAuthzSchemes =  false;
     }
 
@@ -573,6 +573,7 @@ public class UrsIdP extends IdProvider{
     {
         HttpSession session = request.getSession();
         log.debug("BEGIN (session: {})",session.getId());
+        log.debug("session.isNew(): {}", session.isNew());
 
         UserProfile userProfile = new UserProfile();
         userProfile.setAuthContext(getAuthContext());
