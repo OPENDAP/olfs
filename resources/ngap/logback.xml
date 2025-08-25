@@ -70,6 +70,23 @@
         <MaxSize>512</MaxSize>
     </appender>
 
+
+    <appender name="RedissonLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${logdir}/redisson.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <FileNamePattern>${logdir}/redisson.%i.log.zip</FileNamePattern>
+            <MinIndex>1</MinIndex>
+            <MaxIndex>3</MaxIndex>
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>5MB</MaxFileSize>
+        </triggeringPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!-- pattern>{ "date": "%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}", "thread": "%t", "rel_time": %r, "log_level": "%-5p", "logger_id": "%c.%M", "message": "%m"}%n</pattern -->
+            <pattern>|&amp;|date: "%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}"|&amp;|thread: %t|&amp;|rel_time: %r|&amp;|log_level: %-5p|&amp;|logger_id: "%c.%M"|&amp;|message: "%m"%n</pattern>
+        </encoder>
+    </appender>
+
     <appender name="ErrorLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>${logdir}/HyraxErrors.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
@@ -210,6 +227,13 @@
     <logger name="opendap" level="error">
         <appender-ref ref="ErrorLog"/>
     </logger>
+
+    <logger name="org.redission" level="all">
+        <appender-ref ref="RedissonLog"/>
+    </logger>
+
+
+
 
     <logger name="HyraxAccess" level="info">
         <appender-ref ref="HyraxAccessLog"/>
