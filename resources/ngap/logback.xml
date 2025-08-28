@@ -150,17 +150,6 @@
         </encoder>
     </appender>
 
-    <appender name="AuthLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <File>${logdir}/auth.log</File>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${logdir}/auth.%d{yyyy-MM-dd}.log</FileNamePattern>
-            <!-- keep 30 days worth of history -->
-            <MaxHistory>30</MaxHistory>
-        </rollingPolicy>
-        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>${FORMAT}</pattern>
-        </encoder>
-    </appender>
 
     <!--
     NGAP Request Required Fields
@@ -205,6 +194,18 @@
         </layout>
     </appender>
 
+    <appender name="EDLProfilerAppender" class="com.j256.cloudwatchlogbackappender.CloudWatchAppender">
+        <region>us-west-2</region>
+        <logGroup>hyrax_edl_profile</logGroup>
+        <logStream>hyrax-%instanceId</logStream>
+        <layout>
+            <pattern>{ "request_id": "%X{ID}", "user_id": "%X{userid}", "user_ip": "%X{host}", "edl_auth_path": "%X{auth_path}", "rangeEndDateTime": "", "collectionId": "%X{resourceID}", "query_string": "%X{query}", "parameters": { "service_name": "hyrax", "service_provider": "OPeNDAP", "service_id": "hyrax_prod" } }%n</pattern>
+        </layout>
+    </appender>
+
+    <logger name="EDLProfiler" level="info">
+        <appender-ref ref="EDLProfilerAppender"/>
+    </logger>
 
 
     <logger name="opendap" level="error">
