@@ -72,6 +72,8 @@ public class IdFilter implements Filter {
     private static final String CONFIG_PARAMETER_NAME = "config";
     private static final String DEFAULT_CONFIG_FILE_NAME = "user-access.xml";
 
+    private static final String SHOW_USER_INFO_ELEM = "ShowUserInfoOnProfilePage";
+    private static boolean SHOW_USER_INFO = false;
     private static final String MAX_SESSION_LIFE_ELEM = "MaxSessionLife";
     private static final String UNITS_ATTR = "units";
     private static final long DEFAULT_MAX_SESSION_TIME_SECONDS = 60; // 60 seconds in milliseconds
@@ -205,10 +207,17 @@ public class IdFilter implements Filter {
             Element config;
             config = opendap.xml.Util.getDocumentRoot(configFile);
 
+            Element e;
             //    <MaxSessionLife units="seconds">15</MaxSessionLife>
-            Element e = config.getChild(MAX_SESSION_LIFE_ELEM);
+            e = config.getChild(MAX_SESSION_LIFE_ELEM);
             if(e!=null){
                 maxSessionTimeSeconds = computeMaxSessionTimeSeconds(e.getTextTrim(), e.getAttributeValue(UNITS_ATTR));
+            }
+
+            //    <ShowUserInfoInProfile />
+            e = config.getChild(SHOW_USER_INFO_ELEM);
+            if(e!=null){
+                SHOW_USER_INFO = true;;
             }
 
             e = config.getChild("EnableGuestProfile");
@@ -285,11 +294,10 @@ public class IdFilter implements Filter {
 
             ServletLogUtil.logServerAccessStart(request,logName,request.getMethod(), requestId);
 
-            // Get session, make new as needed, invalidate expired as needed.
+            // Get session, make new as needed, invalidate expired session as needed.
             HttpSession session = getSession(request);
             log.debug("BEGIN ({}) (session: {})",requestId, session.getId());
             log.debug("session.isNew(): {}", session.isNew());
-
 
             Util.debugHttpRequest(request,log);
 
@@ -610,8 +618,8 @@ public class IdFilter implements Filter {
     }
 
     /**
-     * Displays the application home page.
-     * This method displays a welcome page for users. If the user has authenticated,
+     * Displays the users profile page.
+     * This method displays a profile page for users. If the user has authenticated,
      * then it will display his/her name, and provide a logout link. If the user
      * has not authenticated, then a login link will be displayed.
      *
@@ -624,7 +632,6 @@ public class IdFilter implements Filter {
         response.setContentType("text/html");
         response.setHeader("Content-Description", "Login Page");
         response.setHeader("Cache-Control", "max-age=0, no-cache, no-store");
-
         log.debug("doLandingPage() - Writing page contents.");
 
         // Generate the html page header
@@ -657,19 +664,23 @@ public class IdFilter implements Filter {
             UserProfile userProfile = (UserProfile) session.getAttribute(USER_PROFILE);
             if( userProfile != null ){
                 IdProvider userIdP = userProfile.getIdP();
-                /*
-                String firstName = userProfile.getAttribute("first_name");
-                if(firstName!=null)
-                    firstName = firstName.replaceAll("\"","");
+                String name = userProfile.getUID();
+                String lastName = "";
+                if (SHOW_USER_INFO) {
 
-                String lastName =  userProfile.getAttribute("last_name");
-                if(lastName!=null)
-                    lastName = lastName.replaceAll("\"","");
-*/
-    		    out.println("<p>Greetings <strong>" + userProfile.getUID() + "</strong>, this is your profile.</p>");
+                    name = userProfile.getAttribute("first_name");
+                    if(name!=null)
+                        name = name.replaceAll("\"","");
+
+                    lastName =  userProfile.getAttribute("last_name");
+                    if(lastName!=null)
+                        lastName = lastName.replaceAll("\"","");
+                }
+    		    out.println("<p>Greetings <strong>" + name + " " + lastName + "</strong>, this is your profile page.</p>");
     		    out.println("You logged into Hyrax with <em>"+userIdP.getDescription()+"</em>");
     		    out.println("<pre><b><a href=\"" + userIdP.getLogoutEndpoint() + "\">Click Here To Logout</a></b></pre>");
-                //out.println("<h3>"+userProfile.getUID()+"'s Profile</h3>");
+
+                out.println("<h3>"+name+"'s Profile</h3>");
 
                 String origUrl = (String) session.getAttribute(RETURN_TO_URL);
 
@@ -679,10 +690,10 @@ public class IdFilter implements Filter {
                 }
                 out.println(dtsb + "token:"+ bsdt +"<dd><pre>" + userProfile.getEDLAccessToken()+"</pre></dd>");
 
+                if(SHOW_USER_INFO) {
+                    out.println(dtsb + USER_PROFILE + bsdt + "<dd><pre>" + userProfile + "</pre></dd>");
+                }
 
-
-
-                //out.println(dtb + USER_PROFILE+"</b></dt><dd><pre>"+userProfile+"</pre></dd>");
                 out.println("</dl>");
 
                 out.println("<hr />");
