@@ -73,7 +73,7 @@ public class IdFilter implements Filter {
     private static final String DEFAULT_CONFIG_FILE_NAME = "user-access.xml";
 
     private static final String SHOW_USER_INFO_ELEM = "ShowUserInfoOnProfilePage";
-    private static boolean SHOW_USER_INFO = false;
+    private static boolean d_show_user_info = false;
     private static final String MAX_SESSION_LIFE_ELEM = "MaxSessionLife";
     private static final String UNITS_ATTR = "units";
     private static final long DEFAULT_MAX_SESSION_TIME_SECONDS = 60; // 60 seconds in milliseconds
@@ -107,7 +107,7 @@ public class IdFilter implements Filter {
 
     }
 
-    private enum TimeUnits { MILLISECONDS, SECONDS, MINUTES, HOURS, DAYS, WEEKS };
+    private enum TimeUnits { MILLISECONDS, SECONDS, MINUTES, HOURS, DAYS, WEEKS }
 
     /**
      * Convert a time units string to an enum value.
@@ -145,7 +145,7 @@ public class IdFilter implements Filter {
      * @return The time in seconds represented by valueStr and unitsStr
      */
     double computeMaxSessionTimeSeconds(String valueStr, String unitsStr){
-        double value = Double.valueOf(valueStr);
+        double value = Double.parseDouble(valueStr);
         double valueSeconds;
         switch (stringToTimeUnits(unitsStr)) {
             case MILLISECONDS:
@@ -218,7 +218,7 @@ public class IdFilter implements Filter {
             //    <ShowUserInfoInProfile />
             e = config.getChild(SHOW_USER_INFO_ELEM);
             if(e!=null){
-                SHOW_USER_INFO = true;;
+                d_show_user_info = true;
             }
 
             e = config.getChild("EnableGuestProfile");
@@ -576,10 +576,10 @@ public class IdFilter implements Filter {
         }
 	}
 
-    private static final String dts = "<dt><strong>";
-    private static final String sdt = "</strong></dt>";
-    private static final String dtsb = "<dt><pre><strong>";
-    private static final String bsdt = "</strong></pre></dt>";
+    private static final String DTS = "<dt><strong>";
+    private static final String SDT = "</strong></dt>";
+    private static final String DTPS = "<dt><pre><strong>";
+    private static final String SPDT = "</strong></pre></dt>";
 
     private String noProfileContent(String contextPath, HttpSession session){
         log.debug("Building noProfile String.");
@@ -610,7 +610,7 @@ public class IdFilter implements Filter {
             String origUrl = (String) session.getAttribute(RETURN_TO_URL);
             noProfile.append("<dl>");
             if(origUrl!=null){
-                noProfile.append(dts).append("After authenticating you will be returned to:").append(sdt);
+                noProfile.append(DTS).append("After authenticating you will be returned to:").append(SDT);
                 noProfile.append("<dd><pre><a href='").append(origUrl).append("'>").append(origUrl).append("</a></pre></dd>");
             }
             noProfile.append("</dl>");
@@ -667,7 +667,7 @@ public class IdFilter implements Filter {
                 IdProvider userIdP = userProfile.getIdP();
                 String name = userProfile.getUID();
                 String lastName = "";
-                if (SHOW_USER_INFO) {
+                if (d_show_user_info) {
                     name = userProfile.getAttribute("first_name");
                     if(name!=null)
                         name = name.replaceAll("\"","");
@@ -686,12 +686,12 @@ public class IdFilter implements Filter {
 
                 out.println("<dl>");
                 if(origUrl!=null){
-                    out.println(dtsb + RETURN_TO_URL + bsdt +"<dd><pre><a href='"+origUrl+"'>"+origUrl+"</a></pre></dd>");
+                    out.println(DTPS + RETURN_TO_URL + SPDT +"<dd><pre><a href='"+origUrl+"'>"+origUrl+"</a></pre></dd>");
                 }
-                out.println(dtsb + "token:"+ bsdt +"<dd><pre>" + userProfile.getEDLAccessToken()+"</pre></dd>");
+                out.println(DTPS + "token:"+ SPDT +"<dd><pre>" + userProfile.getEDLAccessToken()+"</pre></dd>");
 
-                if(SHOW_USER_INFO) {
-                    out.println(dtsb + USER_PROFILE + bsdt + "<dd><pre>" + userProfile + "</pre></dd>");
+                if(d_show_user_info) {
+                    out.println(DTPS + USER_PROFILE + SPDT + "<dd><pre>" + userProfile + "</pre></dd>");
                 }
 
                 out.println("</dl>");
