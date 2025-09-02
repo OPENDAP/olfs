@@ -73,7 +73,7 @@ public class IdFilter implements Filter {
     private static final String DEFAULT_CONFIG_FILE_NAME = "user-access.xml";
 
     private static final String SHOW_USER_INFO_ELEM = "ShowUserInfoOnProfilePage";
-    private static boolean d_show_user_info = false;
+    private static boolean showUserProfileDetails = false;
     private static final String MAX_SESSION_LIFE_ELEM = "MaxSessionLife";
     private static final String UNITS_ATTR = "units";
     private static final long DEFAULT_MAX_SESSION_TIME_SECONDS = 60; // 60 seconds in milliseconds
@@ -218,7 +218,7 @@ public class IdFilter implements Filter {
             //    <ShowUserInfoInProfile />
             e = config.getChild(SHOW_USER_INFO_ELEM);
             if(e!=null){
-                d_show_user_info = true;
+                showUserProfileDetails = true;
             }
 
             e = config.getChild("EnableGuestProfile");
@@ -667,7 +667,7 @@ public class IdFilter implements Filter {
                 IdProvider userIdP = userProfile.getIdP();
                 String name = userProfile.getUID();
                 String lastName = "";
-                if (d_show_user_info) {
+                if (showUserProfileDetails) {
                     name = userProfile.getAttribute("first_name");
                     if(name!=null)
                         name = name.replaceAll("\"","");
@@ -690,7 +690,7 @@ public class IdFilter implements Filter {
                 }
                 out.println(DTPS + "token:"+ SPDT +"<dd><pre>" + userProfile.getEDLAccessToken()+"</pre></dd>");
 
-                if(d_show_user_info) {
+                if(showUserProfileDetails) {
                     out.println(DTPS + USER_PROFILE + SPDT + "<dd><pre>" + userProfile + "</pre></dd>");
                 }
 
