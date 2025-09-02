@@ -106,7 +106,8 @@ public class IdFilter implements Filter {
         }
 
     }
-    enum TimeUnits { MILLISECONDS, SECONDS, MINUTES, HOURS, DAYS, WEEKS };
+
+    private enum TimeUnits { MILLISECONDS, SECONDS, MINUTES, HOURS, DAYS, WEEKS };
 
     /**
      * Convert a time units string to an enum value.
