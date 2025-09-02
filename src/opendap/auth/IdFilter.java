@@ -106,7 +106,7 @@ public class IdFilter implements Filter {
         }
 
     }
-    enum TimeUnits { milliseconds, seconds, minutes, hours, days, weeks };
+    enum TimeUnits { MILLISECONDS, SECONDS, MINUTES, HOURS, DAYS, WEEKS };
 
     /**
      * Convert a time units string to an enum value.
@@ -115,26 +115,26 @@ public class IdFilter implements Filter {
      */
     TimeUnits stringToTimeUnits(String timeUnitsStr) {
         if(timeUnitsStr!=null){
-            if(timeUnitsStr.toLowerCase().startsWith("milliseconds")){
-                return TimeUnits.milliseconds;
+            if(timeUnitsStr.equalsIgnoreCase("milliseconds")){
+                return TimeUnits.MILLISECONDS;
             }
-            if(timeUnitsStr.toLowerCase().startsWith("seconds")){
-                return TimeUnits.seconds;
+            if(timeUnitsStr.equalsIgnoreCase("seconds")){
+                return TimeUnits.SECONDS;
             }
-            if(timeUnitsStr.toLowerCase().startsWith("minutes")){
-                return TimeUnits.minutes;
+            if(timeUnitsStr.equalsIgnoreCase("minutes")){
+                return TimeUnits.MINUTES;
             }
-            if(timeUnitsStr.toLowerCase().startsWith("hours")){
-                return TimeUnits.hours;
+            if(timeUnitsStr.equalsIgnoreCase("hours")){
+                return TimeUnits.HOURS;
             }
-            if(timeUnitsStr.toLowerCase().startsWith("days")){
-                return TimeUnits.days;
+            if(timeUnitsStr.equalsIgnoreCase("days")){
+                return TimeUnits.DAYS;
             }
-            if(timeUnitsStr.toLowerCase().startsWith("weeks")){
-                return TimeUnits.weeks;
+            if(timeUnitsStr.equalsIgnoreCase("weeks")){
+                return TimeUnits.WEEKS;
             }
         }
-        return TimeUnits.seconds;
+        return TimeUnits.SECONDS;
     }
 
     /**
@@ -147,22 +147,22 @@ public class IdFilter implements Filter {
         double value = Double.valueOf(valueStr);
         double valueSeconds;
         switch (stringToTimeUnits(unitsStr)) {
-            case milliseconds:
+            case MILLISECONDS:
                 valueSeconds = value / 1000; // milliseconds to seconds
                 break;
-            case seconds:
+            case SECONDS:
                 valueSeconds = value;
                 break;
-            case minutes:
+            case MINUTES:
                 valueSeconds = value * 60; // Minutes to seconds
                 break;
-            case hours:
+            case HOURS:
                 valueSeconds = value * 60 * 60; // Hours to seconds
                 break;
-            case days:
+            case DAYS:
                 valueSeconds = value * 60 * 60 * 24; // days to seconds
                 break;
-            case weeks:
+            case WEEKS:
                 valueSeconds = value * 60 * 60 * 24 * 7; // weeks to seconds.
                 break;
             default:
@@ -667,7 +667,6 @@ public class IdFilter implements Filter {
                 String name = userProfile.getUID();
                 String lastName = "";
                 if (SHOW_USER_INFO) {
-
                     name = userProfile.getAttribute("first_name");
                     if(name!=null)
                         name = name.replaceAll("\"","");
