@@ -572,15 +572,8 @@ public class UrsIdP extends IdProvider{
             throws IOException, Forbidden
     {
         HttpSession session = request.getSession();
-        log.debug("BEGIN (session: {})",session.getId());
+        log.debug("BEGIN (session-id: {})",session.getId());
 
-        UserProfile userProfile = new UserProfile();
-        userProfile.setAuthContext(getAuthContext());
-
-        // Add this instance of UserProfile to the session for retrieval
-        // down stream on this request.
-        // We set the state of the instance of userProfile below.
-        session.setAttribute(USER_PROFILE, userProfile);
 
         Util.debugHttpRequest(request,log);
 
@@ -600,7 +593,7 @@ public class UrsIdP extends IdProvider{
             log.info("Redirecting client to EDL SSO. URS Code Request URL: {}", LogUtil.scrubEntry(url));
             response.sendRedirect(url);
 
-            log.debug("END (session: {})", session.getId());
+            log.debug("END (session-id: {})", session.getId());
             return false;
         }
 
@@ -632,6 +625,8 @@ public class UrsIdP extends IdProvider{
         JsonParser jparse = new JsonParser();
         JsonObject json = jparse.parse(contents).getAsJsonObject();
 
+        UserProfile userProfile = new UserProfile(request);
+        userProfile.setAuthContext(getAuthContext());
 
         EarthDataLoginAccessToken edlat = new EarthDataLoginAccessToken(json, getUrsClientAppId());
         userProfile.setEDLAccessToken(edlat);
@@ -640,16 +635,30 @@ public class UrsIdP extends IdProvider{
 
         // Finally, redirect the user back to the original requested resource.
         String redirectUrl = (String) session.getAttribute(IdFilter.RETURN_TO_URL);
-        log.debug("session.getAttribute(RETURN_TO_URL): {} (session: {})", redirectUrl, session.getId());
+        log.debug("session.getAttribute(RETURN_TO_URL): {} (session-id: {})", redirectUrl, session.getId());
 
         if (redirectUrl == null) {
             redirectUrl = PathBuilder.normalizePath(serviceContext, true, false);
         }
+
+        session.setAttribute(IdFilter.RETURN_TO_URL, null);
+        session.setAttribute(USER_PROFILE, null);
+
+        session.invalidate();
+
+        session = request.getSession(true);
+        session.setAttribute(IdFilter.RETURN_TO_URL, redirectUrl);
+        // Add this instance of UserProfile to the session for retrieval
+        // down stream on this request.
+        // We set the state of the instance of userProfile below.
+
+        session.setAttribute(IdFilter.USER_PROFILE, userProfile);
+
         log.info("Authentication Completed. Redirecting client to redirectUrl: {}", redirectUrl);
 
         response.sendRedirect(redirectUrl);
 
-        log.debug("END (session: {})", session.getId());
+        log.debug("END (session-id: {})", session.getId());
         return true;
 
 	}

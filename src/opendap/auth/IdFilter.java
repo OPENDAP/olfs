@@ -301,6 +301,13 @@ public class IdFilter implements Filter {
             // user and then pass it on to the filter chain.
             //
             UserProfile up = (UserProfile) session.getAttribute(USER_PROFILE);
+            if(up != null && !up.validateUserFootPrint(hsReq)){
+                up = null;
+                session.setAttribute(USER_PROFILE, null);
+                session.invalidate();
+                session = request.getSession(true);
+            }
+
             if (up != null) {
                 log.debug("Found UserProfile object in Session, this is an authenticated request for user: {}",up.getUID());
                 AuthenticatedHttpRequest authReq = new AuthenticatedHttpRequest(hsReq);
@@ -314,7 +321,7 @@ public class IdFilter implements Filter {
                         "Checking Authorization headers...");
                 if (IdPManager.hasDefaultProvider()) {
                     try {
-                        UserProfile userProfile = new UserProfile();
+                        UserProfile userProfile = new UserProfile(request);
                         boolean retVal;
                         retVal = IdPManager.getDefaultProvider().doTokenAuthentication(request, userProfile);
                         if(retVal){

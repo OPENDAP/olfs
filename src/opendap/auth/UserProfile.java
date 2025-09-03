@@ -28,6 +28,7 @@ package opendap.auth;
 
 import com.google.gson.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.util.*;
 
@@ -36,6 +37,9 @@ import java.util.*;
  * Created by ndp on 9/25/14.
  */
 public class UserProfile implements Serializable {
+
+    //private static final String CLIENT_HOST_KEY = "client-host";
+    private static final String USER_AGENT_KEY = "User-Agent";
 
     /* @serial */
     private Date objectCreationTime;
@@ -58,17 +62,26 @@ public class UserProfile implements Serializable {
 
     // private String edlClientAppId;
 
+    private String d_clientIp;
+    private String d_clientUserAgent;
 
     public UserProfile() {
         objectCreationTime = new Date();
         d_groups = new HashSet<>();
         d_roles = new HashSet<>();
 
+        d_clientIp = null;
+        d_clientUserAgent = null;
         d_profile = null;
         d_authContext = null;
         d_edlAccessToken = null;
         // edlClientAppId ="";
         d_uid = null;
+    }
+
+    public UserProfile(HttpServletRequest request) {
+        this();
+        setUserFootPrint(request);
     }
 
     /**
@@ -84,17 +97,21 @@ public class UserProfile implements Serializable {
     }
 
     private JsonObject getProfile(){
-        if(d_profile==null && d_jsonStr !=null){
-            JsonParser jparse = new JsonParser();
-            d_profile = jparse.parse(d_jsonStr).getAsJsonObject();
+        if(d_profile == null && d_jsonStr != null){
+            ingestJsonProfileString();
         }
         return d_profile;
     }
 
-    void ingestJsonProfileString(String jsonStr){
-        this.d_jsonStr = jsonStr;
-        JsonObject profile = getProfile();
-        JsonElement uid=profile.get("uid");
+    public void ingestJsonProfileString(String jsonStr){
+        d_jsonStr = jsonStr;
+        ingestJsonProfileString();
+    }
+
+    private  void ingestJsonProfileString(){
+        JsonParser jparse = new JsonParser();
+        d_profile = jparse.parse(d_jsonStr).getAsJsonObject();
+        JsonElement uid = d_profile.get("uid");
         d_uid = uid.getAsString();
     }
 
@@ -116,7 +133,7 @@ public class UserProfile implements Serializable {
 
     public String getAttribute(String attrName){
         JsonObject profile = getProfile();
-        if(profile !=null) {
+        if(profile != null) {
             JsonElement val = profile.get(attrName);
             if (val == null)
                 return null;
@@ -185,6 +202,41 @@ public class UserProfile implements Serializable {
 
     public HashSet<String> getRoles(){
         return new HashSet<String>(d_roles);
+    }
+
+
+    /**
+     * Collects user specific information from the request for later examination.
+     * @param request The request to exam,ine.
+     */
+    private void setUserFootPrint(HttpServletRequest request) {
+        d_clientIp =  request.getRemoteHost();
+        d_clientUserAgent = request.getHeader(USER_AGENT_KEY);
+    }
+
+    /**
+     *
+     * @param request The request to validate.
+     * @return True if the request matches the existing client footprint, false otherwise
+     */
+    boolean validateUserFootPrint(HttpServletRequest request) {
+        String s = request.getRemoteHost();
+        if( d_clientIp == null ) {
+            return false;
+        }
+        else if( !d_clientIp.equals(s) ) {
+            return false;
+        }
+
+        s = request.getHeader(USER_AGENT_KEY);
+        if( d_clientUserAgent == null ) {
+            return false;
+        }
+        else if( !d_clientUserAgent.equals(s) ) {
+            return false;
+        }
+
+        return true;
     }
 
 
