@@ -108,8 +108,10 @@ public class ApacheIdP extends IdProvider {
         /**
          * Redirect the user back to their original requested resource.
          */
-        HttpSession session = request.getSession(false);
-        String redirectUrl = null;
+        HttpSession session = request.getSession();
+        log.debug("BEGIN (session: {})", session.getId());
+        log.debug("session.isNew(): {}", session.isNew());
+        String redirectUrl;
 
         String uid = Util.getUID(request);
         if (uid==null) {
