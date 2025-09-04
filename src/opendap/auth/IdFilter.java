@@ -666,60 +666,66 @@ public class IdFilter implements Filter {
             if( userProfile != null ){
                 IdProvider userIdP = userProfile.getIdP();
                 String name = userProfile.getUID();
-                String lastName = "";
                 if (showUserProfileDetails) {
                     name = userProfile.getAttribute("first_name");
                     if(name!=null)
                         name = name.replaceAll("\"","");
 
-                    lastName =  userProfile.getAttribute("last_name");
+                    String lastName =  userProfile.getAttribute("last_name");
                     if(lastName!=null)
-                        lastName = lastName.replaceAll("\"","");
+                        name += " " + lastName.replaceAll("\"","");
                 }
-    		    out.println("<p>Greetings <strong>" + name + " " + lastName + "</strong>, this is your profile page.</p>");
+
+                if(showUserProfileDetails) {
+                    out.println("<p>Greetings <strong>" + name + "</strong>, this is your profile page.</p>");
+                }
+
     		    out.println("You logged into Hyrax with <em>"+userIdP.getDescription()+"</em>");
     		    out.println("<pre><b><a href=\"" + userIdP.getLogoutEndpoint() + "\">Click Here To Logout</a></b></pre>");
 
-                out.println("<h3>"+name+"'s Profile</h3>");
-
-                String origUrl = (String) session.getAttribute(RETURN_TO_URL);
-
-                out.println("<dl>");
-                if(origUrl!=null){
-                    out.println(DTPS + RETURN_TO_URL + SPDT +"<dd><pre><a href='"+origUrl+"'>"+origUrl+"</a></pre></dd>");
-                }
-                out.println(DTPS + "token:"+ SPDT +"<dd><pre>" + userProfile.getEDLAccessToken()+"</pre></dd>");
-
                 if(showUserProfileDetails) {
-                    out.println(DTPS + USER_PROFILE + SPDT + "<dd><pre>" + userProfile + "</pre></dd>");
-                }
+                    out.println("<h3>"+name+"'s Profile</h3>");
 
-                out.println("</dl>");
+                    String origUrl = (String) session.getAttribute(RETURN_TO_URL);
 
-                out.println("<hr />");
-                out.println("<pre>");
-                out.print("<b>session attributes</b>: [ ");
-
-                Enumeration<String> attrNames = session.getAttributeNames();
-                if(attrNames.hasMoreElements()){
-                    while(attrNames.hasMoreElements()){
-                        String attrName = attrNames.nextElement();
-                        out.print("\""+attrName+"\"");
-                        out.print((attrNames.hasMoreElements()?", ":""));
+                    out.println("<dl>");
+                    if(origUrl!=null){
+                        out.println(DTPS + RETURN_TO_URL + SPDT +"<dd><pre><a href='"+origUrl+"'>"+origUrl+"</a></pre></dd>");
                     }
+
+                    out.println(DTPS + "token:"+ SPDT +"<dd><pre>" + userProfile.getEDLAccessToken()+"</pre></dd>");
+
+                    out.println(DTPS + USER_PROFILE + SPDT + "<dd><pre>" + userProfile + "</pre></dd>");
+
+                    out.println("</dl>");
+
+                    out.println("<hr />");
+                    out.println("<pre>");
+                    out.print("<b>session attributes</b>: [ ");
+
+                    Enumeration<String> attrNames = session.getAttributeNames();
+                    if(attrNames.hasMoreElements()){
+                        while(attrNames.hasMoreElements()){
+                            String attrName = attrNames.nextElement();
+                            out.print("\""+attrName+"\"");
+                            out.print((attrNames.hasMoreElements()?", ":""));
+                        }
+                    }
+                    out.println(" ]</pre>");
+
+                    long timeNow = System.currentTimeMillis();
+                    double sessionInUseTime = (timeNow-session.getCreationTime())/1000.0;
+                    out.println("<pre>");
+                    out.println("                     session.isNew():  " + session.isNew());
+                    out.println("                     session.getId():  " + session.getId());
+                    out.println("    session.getMaxInactiveInterval():  " + session.getMaxInactiveInterval() + " seconds.");
+                    out.println("           session.getCreationTime():  " + session.getCreationTime() + " milliseconds since epoch.");
+                    out.println("               maxSessionTimeSeconds:  " + maxSessionTimeSeconds + " seconds.");
+                    out.println("                    sessionInUseTime:  " + sessionInUseTime + " seconds.");
+
+                    out.println("</pre>");
                 }
-                out.println(" ]</pre>");
 
-                long timeNow = System.currentTimeMillis();
-                double sessionInUseTime = (timeNow-session.getCreationTime())/1000.0;
-                out.println("<pre>");
-                out.println("                     session.isNew():  " + session.isNew());
-                out.println("    session.getMaxInactiveInterval():  " + session.getMaxInactiveInterval() + " seconds.");
-                out.println("           session.getCreationTime():  " + session.getCreationTime() + " milliseconds since epoch.");
-                out.println("               maxSessionTimeSeconds:  " + maxSessionTimeSeconds + " seconds.");
-                out.println("                    sessionInUseTime:  " + sessionInUseTime + " seconds.");
-
-                out.println("</pre>");
                 out.println("<hr />");
             }
             else if(request.getUserPrincipal() != null){
