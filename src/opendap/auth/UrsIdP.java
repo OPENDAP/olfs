@@ -240,7 +240,7 @@ public class UrsIdP extends IdProvider{
 
         log.info("URS User Profile: {}", contents);
 
-        userProfile.ingestJsonProfileString(contents);
+        userProfile.ingestEDLProfileStringJson(contents);
     }
 
     // curl -X POST -d 'token=<token>&client_id=<‘your application client_id’>

@@ -38,13 +38,13 @@ import java.util.*;
 public class UserProfile implements Serializable {
 
     /* @serial */
-    private Date objectCreationTime;
+    private final Date d_objectCreationTime;
     /* @serial */
-    private String d_jsonStr;
+    private String d_EdlProfileJsonStr;
     /* @serial */
-    private HashSet<String> d_groups;
+    private final HashSet<String> d_groups;
     /* @serial */
-    private HashSet<String> d_roles;
+    private final HashSet<String> d_roles;
 
     /* @serial */
     private String d_authContext;
@@ -54,17 +54,17 @@ public class UserProfile implements Serializable {
     /* @serial */
     private String d_uid;
 
-    private transient JsonObject d_profile;
+    private transient JsonObject d_EdlProfile;
 
     // private String edlClientAppId;
 
 
     public UserProfile() {
-        objectCreationTime = new Date();
+        d_objectCreationTime = new Date();
         d_groups = new HashSet<>();
         d_roles = new HashSet<>();
 
-        d_profile = null;
+        d_EdlProfile = null;
         d_authContext = null;
         d_edlAccessToken = null;
         // edlClientAppId ="";
@@ -76,29 +76,25 @@ public class UserProfile implements Serializable {
      * and email address. We store these in the session. These four
      * parameters are mandatory, and will always exist in the user
      * d_profile.
-     * @param jsonStr
+     * @param jsonStr \
      */
     public UserProfile(String jsonStr){
         this();
-        ingestJsonProfileString(jsonStr);
+        ingestEDLProfileStringJson(jsonStr);
     }
 
     private JsonObject getProfile(){
-        if(d_profile == null && d_jsonStr != null){
-            ingestJsonProfileString();
+        if(d_EdlProfile == null && d_EdlProfileJsonStr != null){
+            ingestEDLProfileStringJson(d_EdlProfileJsonStr);
         }
-        return d_profile;
+        return d_EdlProfile;
     }
 
-    public void ingestJsonProfileString(String jsonStr){
-        d_jsonStr = jsonStr;
-        ingestJsonProfileString();
-    }
-
-    private  void ingestJsonProfileString(){
+    public void ingestEDLProfileStringJson(String jsonStr){
+        d_EdlProfileJsonStr = jsonStr;
         JsonParser jparse = new JsonParser();
-        d_profile = jparse.parse(d_jsonStr).getAsJsonObject();
-        JsonElement uid = d_profile.get("uid");
+        d_EdlProfile = jparse.parse(d_EdlProfileJsonStr).getAsJsonObject();
+        JsonElement uid = d_EdlProfile.get("uid");
         d_uid = uid.getAsString();
     }
 
@@ -163,32 +159,28 @@ public class UserProfile implements Serializable {
     }
 
 
-    public void addGroups(HashSet<String> groupMemberships){
+    protected void addGroups(HashSet<String> groupMemberships){
         d_groups.addAll(groupMemberships);
-
     }
 
-    public void addGroup(String group){
+    protected void addGroup(String group){
         d_groups.add(group);
-
     }
 
-    public void addRoles(HashSet<String> roles){
-        this.d_roles.addAll(roles);
-
+    protected void addRoles(HashSet<String> roles){
+        d_roles.addAll(roles);
     }
-    public void addRole(String role){
+    protected void addRole(String role){
         d_roles.add(role);
-
     }
 
 
     public HashSet<String> getGroups(){
-        return new HashSet<String>(d_groups);
+        return new HashSet<>(d_groups);
     }
 
     public HashSet<String> getRoles(){
-        return new HashSet<String>(d_roles);
+        return new HashSet<>(d_roles);
     }
 
 
@@ -268,8 +260,13 @@ public class UserProfile implements Serializable {
         String l2i = l1i +indent_inc;
         String jsonObjName = getClass().getName().replace(".","_");
         sb.append(indent).append("\"").append(jsonObjName).append("\" : {\n");
+        sb.append(l1i).append("\"d_objectCreationTime\": \"").append(d_objectCreationTime).append("\",\n");
         sb.append(l1i).append("\"d_uid\": \"").append(d_uid).append("\",\n");
 
+        sb.append(l1i).append("\"d_jsonStr\": \"").append(d_EdlProfileJsonStr).append("\",\n");
+        sb.append(l1i).append("\"d_groups\": \"").append(d_groups).append("\",\n");
+        sb.append(l1i).append("\"d_roles\": \"").append(d_roles).append("\",\n");
+        sb.append(l1i).append("\"d_authContext\": \"").append(d_authContext).append("\",\n");
 
         sb.append(l1i).append("\"").append("edl_profile").append("\" : {");
         JsonObject profile = getProfile();
@@ -301,7 +298,12 @@ public class UserProfile implements Serializable {
         //up.d_clientIp = "10.7.0.1";
         //up.d_clientUserAgent = "ImmaTestHarness";
         up.setEDLAccessToken(new EarthDataLoginAccessToken());
+        up.addGroup("fiddle");
+        up.addGroup("faddle");
+        up.addRole("twiddle");
+        up.addRole("piddle");
 
+        // end::[]
         System.out.println("Calling UserProfile.toString() on instance of UserProfile:");
         String baseline = up.toString();
         System.out.print(baseline);
@@ -336,7 +338,6 @@ public class UserProfile implements Serializable {
                 System.out.println("Calling UserProfile.toString() on deserialized UserProfile:");
                 result = deserializedObj.toString();
                 System.out.print(result);
-
             }
             else{
                 throw new IOException("serialized object is null");
@@ -354,5 +355,6 @@ public class UserProfile implements Serializable {
         System.out.println(hr);
         System.exit(status);
     }
+
 
 }
