@@ -81,7 +81,7 @@ public class ServletLogUtil {
 
     public static final String CLOUDWATCH_REQUEST_LOG = "CloudWatchRequestLog";
     public static final String CLOUDWATCH_RESPONSE_LOG = "CloudWatchResponseLog";
-
+    public static final String CLOUDWATCH_PROFILING_LOG = "CloudWatchProfilingLog";
 
 
 
