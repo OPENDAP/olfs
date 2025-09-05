@@ -28,7 +28,7 @@ package opendap.auth;
 
 import com.google.gson.*;
 
-import java.io.Serializable;
+import java.io.*;
 import java.util.*;
 
 
@@ -84,17 +84,21 @@ public class UserProfile implements Serializable {
     }
 
     private JsonObject getProfile(){
-        if(d_profile==null && d_jsonStr !=null){
-            JsonParser jparse = new JsonParser();
-            d_profile = jparse.parse(d_jsonStr).getAsJsonObject();
+        if(d_profile == null && d_jsonStr != null){
+            ingestJsonProfileString();
         }
         return d_profile;
     }
 
-    void ingestJsonProfileString(String jsonStr){
-        this.d_jsonStr = jsonStr;
-        JsonObject profile = getProfile();
-        JsonElement uid=profile.get("uid");
+    public void ingestJsonProfileString(String jsonStr){
+        d_jsonStr = jsonStr;
+        ingestJsonProfileString();
+    }
+
+    private  void ingestJsonProfileString(){
+        JsonParser jparse = new JsonParser();
+        d_profile = jparse.parse(d_jsonStr).getAsJsonObject();
+        JsonElement uid = d_profile.get("uid");
         d_uid = uid.getAsString();
     }
 
@@ -116,7 +120,7 @@ public class UserProfile implements Serializable {
 
     public String getAttribute(String attrName){
         JsonObject profile = getProfile();
-        if(profile !=null) {
+        if(profile != null) {
             JsonElement val = profile.get(attrName);
             if (val == null)
                 return null;
@@ -261,22 +265,29 @@ public class UserProfile implements Serializable {
         StringBuilder sb = new StringBuilder();
 
         String l1i = indent +indent_inc;
+        String l2i = l1i +indent_inc;
+        String jsonObjName = getClass().getName().replace(".","_");
+        sb.append(indent).append("\"").append(jsonObjName).append("\" : {\n");
+        sb.append(l1i).append("\"d_uid\": \"").append(d_uid).append("\",\n");
+        //sb.append(l1i).append("\"d_clientIp\": \"").append(d_clientIp).append("\",\n");
+        //sb.append(l1i).append("\"d_clientUserAgent\": \"").append(d_clientUserAgent).append("\",\n");
 
-        sb.append(indent).append("\"").append(getClass().getName()).append("\" : {");
 
+        sb.append(l1i).append("\"").append("edl_profile").append("\" : {");
         JsonObject profile = getProfile();
         if(profile != null) {
             boolean comma = false;
             for (Map.Entry<String, JsonElement> e : profile.entrySet()) {
                 sb.append(comma ? ",\n" : "\n");
-                sb.append(l1i).append("\"").append(e.getKey()).append("\" : ").append(e.getValue());
+                sb.append(l2i).append("\"").append(e.getKey()).append("\" : ").append(e.getValue());
                 comma = true;
             }
             sb.append(indent).append("\n");
         }
         if(d_edlAccessToken !=null){
-            sb.append(d_edlAccessToken.toString(l1i,indent_inc));
+            sb.append(d_edlAccessToken.toString(l2i,indent_inc));
         }
+        sb.append(l1i).append("}\n");
         sb.append(indent).append("}\n");
         return sb.toString();
     }
@@ -284,12 +295,66 @@ public class UserProfile implements Serializable {
 
 
     public static void main(String args[]){
-        String ursUserProfile = "{\"d_uid\":\"ndp_opendap\",\"first_name\":\"Nathan\",\"last_name\":\"Potter\",\"registered_date\":\"23 Sep 2014 17:33:09PM\",\"email_address\":\"ndp@opendap.org\",\"country\":\"United States\",\"study_area\":\"Other\",\"user_type\":\"Public User\",\"affiliation\":\"Non-profit\",\"authorized_date\":\"24 Oct 2017 15:01:18PM\",\"allow_auth_app_emails\":true,\"agreed_to_meris_eula\":false,\"agreed_to_sentinel_eula\":false,\"user_groups\":[],\"user_authorized_apps\":2}";
+        String edlUserProfile = "{\"uid\":\"ndp_opendap\",\"first_name\":\"Nathan\",\"last_name\":\"Potter\",\"registered_date\":\"23 Sep 2014 17:33:09PM\",\"email_address\":\"ndp@opendap.org\",\"country\":\"United States\",\"study_area\":\"Other\",\"user_type\":\"Public User\",\"affiliation\":\"Non-profit\",\"authorized_date\":\"24 Oct 2017 15:01:18PM\",\"allow_auth_app_emails\":true,\"agreed_to_meris_eula\":false,\"agreed_to_sentinel_eula\":false,\"user_groups\":[],\"user_authorized_apps\":2}";
+        String hr = "################################################";
+        System.out.println(hr);
 
-        UserProfile up = new UserProfile(ursUserProfile);
+        UserProfile up = new UserProfile(edlUserProfile);
+        //up.d_clientIp = "10.7.0.1";
+        //up.d_clientUserAgent = "ImmaTestHarness";
         up.setEDLAccessToken(new EarthDataLoginAccessToken());
-        System.out.println(up.toString());
 
+        System.out.println("Calling UserProfile.toString() on instance of UserProfile:");
+        String baseline = up.toString();
+        System.out.print(baseline);
+        byte serializedObject[] = null;
+        String result = null;
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+
+            System.out.println(hr);
+            System.out.println("Serializing instance of UserProfile...");
+            oos.writeObject(up);
+            serializedObject = new byte[baos.size()];
+            serializedObject = baos.toByteArray();
+            System.out.println("Serialized data is " + serializedObject.length + " bytes.");
+            oos.close();
+            baos.close();
+        }
+        catch (IOException ioe){
+            ioe.printStackTrace();
+            System.exit(1);
+        }
+        try {
+            if(serializedObject != null){
+                System.out.println(hr);
+                System.out.println("Deserializing instance of UserProfile...");
+                ByteArrayInputStream bais = new ByteArrayInputStream(serializedObject);
+                ObjectInputStream ois = new ObjectInputStream(bais);
+                UserProfile deserializedObj = (UserProfile) ois.readObject();
+                ois.close();
+                bais.close();
+                System.out.println("Calling UserProfile.toString() on deserialized UserProfile:");
+                result = deserializedObj.toString();
+                System.out.print(result);
+
+            }
+            else{
+                throw new IOException("serialized object is null");
+            }
+        }
+        catch (ClassNotFoundException | IOException ioe){
+            ioe.printStackTrace();
+            System.exit(1);
+        }
+        int status = 1;
+        if(result != null && result.equals(baseline)){
+            System.out.println("Result matched baseline.");
+            status = 0;
+        }
+        System.out.println(hr);
+        System.exit(status);
     }
 
 }
