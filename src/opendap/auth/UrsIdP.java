@@ -521,15 +521,18 @@ public class UrsIdP extends IdProvider{
 
                 // Fall back to the EDL endpoint on local failure or lack of local public keys
                 if (!foundValidAuthToken) {
+                    logProfiling.info("Profile timing: Request EDL authentication - {}", Instant.now());
                     String uid = getEdlUserId(token);
                     userProfile.setUID(uid);
 
                     // Successful retrieval indicates that the token is valid
                     foundValidAuthToken = userProfile.getUID() != null;
                     log.debug("Remote EDL token validation result: valid={}, uid={}", foundValidAuthToken, userProfile.getUID());
+                    logProfiling.info("Profile timing: Receive EDL authentication response - {} - Valid token: {}", Instant.now(), foundValidAuthToken);
                 }
             }
             else if (rejectUnsupportedAuthzSchemes) {
+                logProfiling.info("Profile timing: Fail token authentication - {}", Instant.now());
                     String msg = "Received an unsolicited/unsupported/unanticipated/unappreciated ";
                     msg += "header. 'Authorization Scheme: ";
                     msg += AuthorizationHeader.getScheme(authz_hdr_value) + "' ";
