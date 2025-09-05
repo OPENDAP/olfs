@@ -205,28 +205,14 @@
         </layout>
     </appender>
 
-    <!--
-        NGAP Request Required Fields
-        "required": [
-            "request_id",
-            "user_id",
-            "user_ip",
-            "rangeBeginDateTime",
-            "rangeEndDateTime",
-            "collectionId",
-            "query_string", # Added by us because..."
-            "bbox",
-            "parameters"
-        ]
-        -->
-        <appender name="CloudWatchProfilingLogAppender" class="com.j256.cloudwatchlogbackappender.CloudWatchAppender">
-            <region>us-west-2</region>
-            <logGroup>hyrax_request_log</logGroup>
-            <logStream>hyrax-%instanceId</logStream>
-            <layout>
-                <pattern>{ "request_id": "%X{ID}", "user_id": "%X{userid}", "user_ip": "%X{host}", "rangeBeginDateTime": "", "rangeEndDateTime": "", "collectionId": "%X{resourceID}", "query_string": "%X{query}", "parameters": { "service_name": "hyrax", "service_provider": "OPeNDAP", "service_id": "hyrax_prod", "message": "%m" } }%n</pattern>
-            </layout>
-        </appender>
+    <appender name="CloudWatchProfilingLogAppender" class="com.j256.cloudwatchlogbackappender.CloudWatchAppender">
+        <region>us-west-2</region>
+        <logGroup>hyrax_request_log</logGroup>
+        <logStream>hyrax-%instanceId</logStream>
+        <layout>
+            <pattern>{ "request_id": "%X{ID}", "message": "%m" } }%n</pattern>
+        </layout>
+    </appender>
 
     <logger name="opendap" level="error">
         <appender-ref ref="ErrorLog"/>
