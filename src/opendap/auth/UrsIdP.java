@@ -410,6 +410,15 @@ public class UrsIdP extends IdProvider{
     }
 
     /**
+     * Worker method to post contents of `msg` to `logProfiling`
+     * @param msg
+     * @return void
+     */
+    private void writeToProfilingLog(String msg) {
+        logProfiling.info("Profile timing: {} - {}", msg, Instant.now());
+    }
+
+    /**
      * Old Way:
      * curl -X POST -d 'token=<token>&client_id=<‘your application client_id’> https://urs.earthdata.nasa.gov/oauth/tokens/user
      *
@@ -434,7 +443,7 @@ public class UrsIdP extends IdProvider{
 
         String contents;
         try {
-            logProfiling.info("Profile timing: Request EDL authentication - {}", Instant.now());
+            writeToProfilingLog("Request EDL authentication");
             Logger edlLog = LoggerFactory.getLogger("EDL_LOG");
             Timer.enable();
             Timer.reset();
@@ -445,7 +454,7 @@ public class UrsIdP extends IdProvider{
             edlLog.info(report);
         }
         finally {
-            logProfiling.info("Profile timing: Receive EDL authentication response - {}", Instant.now());
+            writeToProfilingLog("Receive EDL authentication response");
             Timer.reset();
             Timer.disable();
         }
@@ -496,7 +505,7 @@ public class UrsIdP extends IdProvider{
             return false;
         }
 
-        logProfiling.info("Profile timing: Start token authentication - {}", Instant.now());
+        writeToProfilingLog("Start token authentication");
         boolean foundValidAuthToken = false;
 
         String authz_hdr_value = request.getHeader(AUTHORIZATION_HEADER_KEY);
@@ -532,7 +541,7 @@ public class UrsIdP extends IdProvider{
                 }
             }
             else if (rejectUnsupportedAuthzSchemes) {
-                logProfiling.info("Profile timing: Failed token authentication - {}", Instant.now());
+                writeToProfilingLog("Failed token authentication");
                     String msg = "Received an unsolicited/unsupported/unanticipated/unappreciated ";
                     msg += "header. 'Authorization Scheme: ";
                     msg += AuthorizationHeader.getScheme(authz_hdr_value) + "' ";
@@ -551,7 +560,7 @@ public class UrsIdP extends IdProvider{
                 log.warn(msg, AuthorizationHeader.getScheme(authz_hdr_value));
             }
         }
-        logProfiling.info("Profile timing: End token authentication - {} - Valid token: {}", Instant.now(), foundValidAuthToken);
+        writeToProfilingLog("End token authentication - Valid token:" + foundValidAuthToken);
         return foundValidAuthToken;
     }
 
