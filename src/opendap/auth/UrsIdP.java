@@ -48,6 +48,7 @@ import opendap.io.HyraxStringEncoding;
 import opendap.logging.LogUtil;
 import opendap.logging.Procedure;
 import opendap.logging.Timer;
+import opendap.logging.ServletLogUtil;
 import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,6 +60,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.security.PublicKey;
 import java.security.interfaces.RSAPublicKey;
+import java.time.Instant;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -81,6 +83,7 @@ public class UrsIdP extends IdProvider{
     public static final String REJECT_UNSUPPORTED_AUTHZ_SCHEMES_KEY = "RejectUnsupportedAuthzSchemes";
 
     private Logger log;
+    private Logger logProfiling;
 
     private String ursUrl;
     private String clientAppId;
@@ -94,6 +97,7 @@ public class UrsIdP extends IdProvider{
     public UrsIdP(){
         super();
         log = LoggerFactory.getLogger(this.getClass());
+        logProfiling = org.slf4j.LoggerFactory.getLogger(ServletLogUtil.CLOUDWATCH_PROFILING_LOG);
         setAuthContext(DEFAULT_AUTH_CONTEXT);
         setDescription("The NASA Earthdata Login (formerly known as URS)");
         rejectUnsupportedAuthzSchemes =  false;
@@ -490,6 +494,7 @@ public class UrsIdP extends IdProvider{
             return false;
         }
 
+        logProfiling.info("Profile timing: Start token authentication - {}", Instant.now());
         boolean foundValidAuthToken = false;
 
         String authz_hdr_value = request.getHeader(AUTHORIZATION_HEADER_KEY);
@@ -543,6 +548,7 @@ public class UrsIdP extends IdProvider{
                 log.warn(msg, AuthorizationHeader.getScheme(authz_hdr_value));
             }
         }
+        logProfiling.info("Profile timing: End token authentication - {} - Valid token: {}", Instant.now(), foundValidAuthToken);
         return foundValidAuthToken;
     }
 
