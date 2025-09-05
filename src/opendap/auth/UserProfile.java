@@ -285,11 +285,25 @@ public class UserProfile implements Serializable {
     }
 
 
+    public String toJson(){
+        Gson gson = new Gson();
+        return gson.toJson(this);
+    }
+
+    public static String toJson(Object o){
+        Gson gson = new Gson();
+        return gson.toJson(o);
+    }
+
+    public static UserProfile fromJson(String jsonStr){
+        Gson gson = new Gson();
+        return gson.fromJson(jsonStr, UserProfile.class);
+    }
 
     public static void main(String args[]){
-        String edlUserProfile = "{\"uid\":\"ndp_opendap\",\"first_name\":\"Nathan\",\"last_name\":\"Potter\",\"registered_date\":\"23 Sep 2014 17:33:09PM\",\"email_address\":\"ndp@opendap.org\",\"country\":\"United States\",\"study_area\":\"Other\",\"user_type\":\"Public User\",\"affiliation\":\"Non-profit\",\"authorized_date\":\"24 Oct 2017 15:01:18PM\",\"allow_auth_app_emails\":true,\"agreed_to_meris_eula\":false,\"agreed_to_sentinel_eula\":false,\"user_groups\":[],\"user_authorized_apps\":2}";
-        String hr = "################################################";
-        System.out.println(hr);
+        String edlUserProfile = "{\"uid\":\"moo\",\"first_name\":\"Imma\",\"last_name\":\"Cow\",\"registered_date\":\"23 Sep 1985 14:63:34PM\",\"email_address\":\"imma.cow@opendap.org\",\"country\":\"United States\",\"study_area\":\"Other\",\"user_type\":\"Public User\",\"affiliation\":\"Non-profit\",\"authorized_date\":\"15 Aug 1998 10:12:37PM\",\"allow_auth_app_emails\":true,\"agreed_to_meris_eula\":false,\"agreed_to_sentinel_eula\":false,\"user_groups\":[],\"user_authorized_apps\":2}";
+        String hr0 = "################################################";
+        String hr1 = "------------------------------------------------";
 
         UserProfile up = new UserProfile(edlUserProfile);
         //up.d_clientIp = "10.7.0.1";
@@ -300,7 +314,21 @@ public class UserProfile implements Serializable {
         up.addRole("twiddle");
         up.addRole("piddle");
 
-        // end::[]
+        // --------------------------------------------------------------------
+        System.out.println(hr0);
+        System.out.println("GSON serialize and deserialize user profile...");
+        String jsonStr = UserProfile.toJson(up);
+        System.out.println("UserProfile.toJson(): ");
+        System.out.println(jsonStr);
+
+        System.out.println(hr1);
+        System.out.println("UserProfile.fromJson().toString(): ");
+        UserProfile fromJsonStr = UserProfile.fromJson(jsonStr);
+        System.out.println(fromJsonStr);
+
+        // --------------------------------------------------------------------
+        System.out.println(hr0);
+        System.out.println("Java Native serialize and deserialize user profile...");
         System.out.println("Calling UserProfile.toString() on instance of UserProfile:");
         String baseline = up.toString();
         System.out.print(baseline);
@@ -310,7 +338,7 @@ public class UserProfile implements Serializable {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ObjectOutputStream oos = new ObjectOutputStream(baos);
 
-            System.out.println(hr);
+            System.out.println(hr0);
             System.out.println("Serializing instance of UserProfile...");
             oos.writeObject(up);
             serializedObject = new byte[baos.size()];
@@ -318,6 +346,8 @@ public class UserProfile implements Serializable {
             System.out.println("Serialized data is " + serializedObject.length + " bytes.");
             oos.close();
             baos.close();
+
+
         }
         catch (IOException ioe){
             ioe.printStackTrace();
@@ -325,7 +355,7 @@ public class UserProfile implements Serializable {
         }
         try {
             if(serializedObject != null){
-                System.out.println(hr);
+                System.out.println(hr0);
                 System.out.println("Deserializing instance of UserProfile...");
                 ByteArrayInputStream bais = new ByteArrayInputStream(serializedObject);
                 ObjectInputStream ois = new ObjectInputStream(bais);
@@ -349,7 +379,7 @@ public class UserProfile implements Serializable {
             System.out.println("Result matched baseline.");
             status = 0;
         }
-        System.out.println(hr);
+        System.out.println(hr0);
         System.exit(status);
     }
 
