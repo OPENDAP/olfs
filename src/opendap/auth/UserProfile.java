@@ -269,8 +269,6 @@ public class UserProfile implements Serializable {
         String jsonObjName = getClass().getName().replace(".","_");
         sb.append(indent).append("\"").append(jsonObjName).append("\" : {\n");
         sb.append(l1i).append("\"d_uid\": \"").append(d_uid).append("\",\n");
-        //sb.append(l1i).append("\"d_clientIp\": \"").append(d_clientIp).append("\",\n");
-        //sb.append(l1i).append("\"d_clientUserAgent\": \"").append(d_clientUserAgent).append("\",\n");
 
 
         sb.append(l1i).append("\"").append("edl_profile").append("\" : {");
