@@ -415,7 +415,9 @@ public class UrsIdP extends IdProvider{
      * @return void
      */
     private void writeToProfilingLog(String msg) {
-        logProfiling.info("Profile timing: {} - {}", msg, Instant.now());
+        if(ServletLogUtil.useDualCloudWatchLogs.get()) {
+            logProfiling.info("Profile timing: {} - {}", msg, Instant.now());
+        }
     }
 
     /**
