@@ -54,9 +54,8 @@ public class UserProfile implements Serializable {
     /* @serial */
     private String d_uid;
 
+    /* The transient tag tells the serializer to skip this variable.*/
     private transient JsonObject d_EdlProfile;
-
-    // private String edlClientAppId;
 
 
     public UserProfile() {
@@ -67,7 +66,6 @@ public class UserProfile implements Serializable {
         d_EdlProfile = null;
         d_authContext = null;
         d_edlAccessToken = null;
-        // edlClientAppId ="";
         d_uid = null;
     }
 
@@ -92,8 +90,7 @@ public class UserProfile implements Serializable {
 
     public void ingestEDLProfileStringJson(String jsonStr){
         d_EdlProfileJsonStr = jsonStr;
-        JsonParser jparse = new JsonParser();
-        d_EdlProfile = jparse.parse(d_EdlProfileJsonStr).getAsJsonObject();
+        d_EdlProfile = JsonParser.parseString(d_EdlProfileJsonStr).getAsJsonObject();
         JsonElement uid = d_EdlProfile.get("uid");
         d_uid = uid.getAsString();
     }

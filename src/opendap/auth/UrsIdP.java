@@ -443,16 +443,12 @@ public class UrsIdP extends IdProvider{
             Timer.reset();
             Timer.disable();
         }
-
         log.debug("url {} returned contents: {}",url,contents);
 
-        JsonParser jparse = new JsonParser();
-        JsonObject profile = jparse.parse(contents).getAsJsonObject();
+        JsonObject profile = JsonParser.parseString(contents).getAsJsonObject();
+
         String uid = profile.get("uid").getAsString();
-
-
         log.debug("uid: {}",uid);
-
         return uid;
     }
 
@@ -624,14 +620,10 @@ public class UrsIdP extends IdProvider{
         log.info("URS Token Request Authorization Header: {}", authHeader);
 
         String contents = Util.submitHttpRequest(url, headers, postData);
-
         log.info("URS Token: {}", contents);
 
-
         // Parse the json to extract the token.
-        JsonParser jparse = new JsonParser();
-        JsonObject json = jparse.parse(contents).getAsJsonObject();
-
+        JsonObject json = JsonParser.parseString(contents).getAsJsonObject();
 
         EarthDataLoginAccessToken edlat = new EarthDataLoginAccessToken(json, getUrsClientAppId());
         userProfile.setEDLAccessToken(edlat);
