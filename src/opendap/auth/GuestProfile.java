@@ -38,11 +38,11 @@ public class GuestProfile extends UserProfile implements Serializable {
     public GuestProfile(){
         super();
         setUID("GUEST");
-        setAttribute("first_name", "Guest");
-        setAttribute("last_name", "Profile");
-        setAttribute("email_address", "guest_profile@opendap.org");
-        setAttribute("country", "Erewhon");
-        setAttribute("affiliation", "unknown");
+        setEdlProfileAttribute("first_name", "Guest");
+        setEdlProfileAttribute("last_name", "Profile");
+        setEdlProfileAttribute("email_address", "guest_profile@opendap.org");
+        setEdlProfileAttribute("country", "Erewhon");
+        setEdlProfileAttribute("affiliation", "unknown");
 
         addGroup("guest");
         addRole("guest");

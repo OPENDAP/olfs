@@ -81,7 +81,7 @@ public class UserProfile implements Serializable {
         ingestEDLProfileStringJson(jsonStr);
     }
 
-    private JsonObject getProfile(){
+    private JsonObject getEdlProfile(){
         if(d_EdlProfile == null && d_EdlProfileJsonStr != null){
             ingestEDLProfileStringJson(d_EdlProfileJsonStr);
         }
@@ -111,8 +111,8 @@ public class UserProfile implements Serializable {
     }
 
 
-    public String getAttribute(String attrName){
-        JsonObject profile = getProfile();
+    public String getEdlProfileAttribute(String attrName){
+        JsonObject profile = getEdlProfile();
         if(profile != null) {
             JsonElement val = profile.get(attrName);
             if (val == null)
@@ -122,16 +122,16 @@ public class UserProfile implements Serializable {
         return null;
     }
 
-    public void setAttribute(String attrName, String value){
-        JsonObject profile = getProfile();
+    protected void setEdlProfileAttribute(String attrName, String value){
+        JsonObject profile = getEdlProfile();
         if(profile !=null) {
             profile.add(attrName, new JsonPrimitive(value));
         }
     }
 
-    public Vector<String> getAttributeNames(){
+    public Vector<String> getEdlProfileAttributeNames(){
         Vector<String> keys = new Vector<>();
-        JsonObject profile = getProfile();
+        JsonObject profile = getEdlProfile();
         if(profile !=null) {
             for (Map.Entry<String, JsonElement> e : profile.entrySet()) {
                 keys.add(e.getKey());
@@ -255,23 +255,38 @@ public class UserProfile implements Serializable {
 
         String l1i = indent +indent_inc;
         String l2i = l1i +indent_inc;
-        String jsonObjName = getClass().getName().replace(".","_");
-        sb.append(indent).append("\"").append(jsonObjName).append("\" : {\n");
-        sb.append(l1i).append("\"d_objectCreationTime\": \"").append(d_objectCreationTime).append("\",\n");
-        sb.append(l1i).append("\"d_uid\": \"").append(d_uid).append("\",\n");
+        String classname = getClass().getName();
+        sb.append(indent).append(classname).append(": \n");
+        sb.append(l1i).append("d_objectCreationTime: ").append(d_objectCreationTime).append(",\n");
+        sb.append(l1i).append("d_uid: ").append(d_uid).append(",\n");
 
-        sb.append(l1i).append("\"d_jsonStr\": \"").append(d_EdlProfileJsonStr).append("\",\n");
-        sb.append(l1i).append("\"d_groups\": \"").append(d_groups).append("\",\n");
-        sb.append(l1i).append("\"d_roles\": \"").append(d_roles).append("\",\n");
-        sb.append(l1i).append("\"d_authContext\": \"").append(d_authContext).append("\",\n");
+        sb.append(l1i).append("d_jsonStr: ").append(d_EdlProfileJsonStr).append(",\n");
+        sb.append(l1i).append("d_groups: ").append(d_groups).append(",\n");
+        sb.append(l1i).append("d_roles: ").append(d_roles).append(",\n");
+        sb.append(l1i).append("d_authContext: ").append(d_authContext).append(",\n");
 
-        sb.append(l1i).append("\"").append("edl_profile").append("\" : {");
-        JsonObject profile = getProfile();
+        sb.append(l1i).append("").append("edl_profile").append(": \n");
+        JsonObject profile = getEdlProfile();
         if(profile != null) {
             boolean comma = false;
             for (Map.Entry<String, JsonElement> e : profile.entrySet()) {
-                sb.append(comma ? ",\n" : "\n");
-                sb.append(l2i).append("\"").append(e.getKey()).append("\" : ").append(e.getValue());
+                sb.append(l2i).append(e.getKey().replace("\"",""));
+                sb.append(": ");
+                JsonElement value = e.getValue();
+                if(value !=null && !value.isJsonNull()){
+                    if(value.isJsonArray()){
+                        sb.append(e.getValue().getAsJsonArray().toString());
+                    }
+                    else {
+                        sb.append(e.getValue().getAsString());
+                    }
+                    //sb.append((e.getValue()!=null && !e.getValue().isJsonNull())?e.getValue().getAsString():"");
+                    sb.append("\n");
+
+                }
+                else {
+                    sb.append("null");
+                }
                 comma = true;
             }
             sb.append(indent).append("\n");
@@ -279,22 +294,34 @@ public class UserProfile implements Serializable {
         if(d_edlAccessToken !=null){
             sb.append(d_edlAccessToken.toString(l2i,indent_inc));
         }
-        sb.append(l1i).append("}\n");
-        sb.append(indent).append("}\n");
+        sb.append(l1i).append("\n");
+        sb.append(indent).append("\n");
         return sb.toString();
     }
 
-
+    /**
+     *
+     * @return This object serialized as a json string by gson.
+     */
     public String toJson(){
         Gson gson = new Gson();
         return gson.toJson(this);
     }
 
+    /**
+     * @param o The object, o,  to serialize to json.
+     * @return The object, o, serialized as a json string by gson.
+     */
     public static String toJson(Object o){
         Gson gson = new Gson();
         return gson.toJson(o);
     }
 
+    /**
+     *
+     * @param jsonStr A string containing the gson json serialization of an instance of the UserProfile class.
+     * @return A UserProfile class built from the passed jsonStr.
+     */
     public static UserProfile fromJson(String jsonStr){
         Gson gson = new Gson();
         return gson.fromJson(jsonStr, UserProfile.class);
@@ -317,14 +344,23 @@ public class UserProfile implements Serializable {
         // --------------------------------------------------------------------
         System.out.println(hr0);
         System.out.println("GSON serialize and deserialize user profile...");
-        String jsonStr = UserProfile.toJson(up);
+        String jsonStr1 = UserProfile.toJson(up);
+        String jsonStr2 = up.toJson();
+        if(!jsonStr1.equals(jsonStr2)){
+            System.out.println("The gson json serializations do not match!");
+            System.out.println("jsonStr1: " + jsonStr1);
+            System.out.println("jsonStr2: " + jsonStr2);
+            System.exit(1);
+        }
+
         System.out.println("UserProfile.toJson(): ");
-        System.out.println(jsonStr);
+        System.out.println(jsonStr1);
 
         System.out.println(hr1);
         System.out.println("UserProfile.fromJson().toString(): ");
-        UserProfile fromJsonStr = UserProfile.fromJson(jsonStr);
+        UserProfile fromJsonStr = UserProfile.fromJson(jsonStr1);
         System.out.println(fromJsonStr);
+
 
         // --------------------------------------------------------------------
         System.out.println(hr0);

@@ -546,11 +546,11 @@ public class IdFilter implements Filter {
             UserProfile userProfile = (UserProfile) session.getAttribute(USER_PROFILE);
             if( userProfile != null ){
                 IdProvider userIdP = userProfile.getIdP();
-                String firstName = userProfile.getAttribute("first_name");
+                String firstName = userProfile.getEdlProfileAttribute("first_name");
                 if(firstName!=null)
                     firstName = firstName.replaceAll("\"","");
 
-                String lastName =  userProfile.getAttribute("last_name");
+                String lastName =  userProfile.getEdlProfileAttribute("last_name");
                 if(lastName!=null)
                     lastName = lastName.replaceAll("\"","");
 
