@@ -62,7 +62,9 @@ public class UserProfile implements Serializable {
 
     // private String edlClientAppId;
 
+    /* @serial */
     private String d_clientIp;
+    /* @serial */
     private String d_clientUserAgent;
 
     public UserProfile() {
