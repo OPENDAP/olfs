@@ -159,6 +159,14 @@ public class IdFilter implements Filter {
 
     }
 
+    void doForbidden(Exception e, HttpServletRequest req, HttpServletResponse resp, IdProvider idProvider) throws IOException {
+        String msg = "Your Login Transaction FAILED!   " +
+                "Authentication Context: '"+idProvider.getAuthContext()+
+                "' Message: "+ e.getMessage();
+        log.error("doForbidden() - {}", msg);
+        OPeNDAPException.setCachedErrorMessage(msg);
+        resp.sendError(HttpServletResponse.SC_UNAUTHORIZED,msg);
+    }
 
     public void doFilter(ServletRequest sreq, ServletResponse sresp, FilterChain filterChain) throws IOException, ServletException {
 
@@ -278,12 +286,7 @@ public class IdFilter implements Filter {
 
 
                         } catch (IOException | Forbidden e) {
-                            String msg = "Your Login Transaction FAILED!   " +
-                                    "Authentication Context: '"+idProvider.getAuthContext()+
-                                    "' Message: "+ e.getMessage();
-                            log.error("doFilter() - {}", msg);
-                            OPeNDAPException.setCachedErrorMessage(msg);
-                            ((HttpServletResponse)response).sendError(HttpServletResponse.SC_UNAUTHORIZED,msg);
+                            doForbidden(e,request,response,idProvider);
                             log.debug("END (session: {})",session.getId());
                             return;
                         }
@@ -342,7 +345,8 @@ public class IdFilter implements Filter {
                     }
                     catch (Forbidden http_403){
                         log.error("Unable to validate Authorization header. Message: "+http_403.getMessage());
-                        OPeNDAPException.anyExceptionHandler(http_403,request.getServletContext(),response);
+                        doForbidden(e,request,response,idProvider);
+                        log.debug("END (session: {})",session.getId());
                     }
                 }
             }

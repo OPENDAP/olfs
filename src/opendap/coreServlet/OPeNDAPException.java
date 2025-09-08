@@ -514,7 +514,7 @@ public class OPeNDAPException extends Exception {
         // for the JSP to retrieve. The RequestCache  for this thread gets destroyed when the doGet/doPost
         // methods exit which is normal and expected behavior, but the JSP page is invoked afterward so we
         // need a rendezvous for the message. We utilize this errorMessage cache for this purpose. The only
-        // public method for retrieving the message is tied to the thread of execution and it removes the
+        // public method for retrieving the message is tied to the thread of execution, and it removes the
         // message from the cache (clears the cache for the thread) once it is retrieved.
         _errorMessageCache.put(Thread.currentThread(), getMessage());
 
