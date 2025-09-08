@@ -573,8 +573,9 @@ public class ServletLogUtil {
     }
 
     /**
-     * If `useDualCloudWatchLogs` enabled, post `Profile timing: {msg} - {<timestamp>}"`
-     * to `CLOUDWATCH_PROFILING_LOG`
+     * If `useDualCloudWatchLogs` enabled, post `Profile timing [<timestamp>]: {msg}"` to `CLOUDWATCH_PROFILING_LOG`,
+     * where timestamp is UTC formatted, e.g. `2025-09-08T20:16:50.535901Z`
+     *
      * @param msg
      * @return void
      */
@@ -582,7 +583,7 @@ public class ServletLogUtil {
         ServletLogUtil.useDualCloudWatchLogs(true); // TODO-H remove! for dev purposes only :)
         if(ServletLogUtil.useDualCloudWatchLogs.get()) {
             Logger cwProfilingLog = org.slf4j.LoggerFactory.getLogger(CLOUDWATCH_PROFILING_LOG);
-            cwProfilingLog.info("Profile timing: {} - {}", msg, Instant.now());
+            cwProfilingLog.info("Profile timing [{}]: {}", Instant.now(), msg);
         }
     }
 }

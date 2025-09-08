@@ -441,9 +441,9 @@ public class UrsIdP extends IdProvider{
             Timer.stop(timedProc);
             String report = Timer.report();
             edlLog.info(report);
+            logCloudWatchProfiling("Receive EDL authentication response");
         }
         finally {
-            logCloudWatchProfiling("Receive EDL authentication response");
             Timer.reset();
             Timer.disable();
         }
@@ -494,7 +494,7 @@ public class UrsIdP extends IdProvider{
             return false;
         }
 
-        logCloudWatchProfiling("Start token authentication");
+        logCloudWatchProfiling("Attempt token authentication");
         boolean foundValidAuthToken = false;
 
         String authz_hdr_value = request.getHeader(AUTHORIZATION_HEADER_KEY);
@@ -578,7 +578,7 @@ public class UrsIdP extends IdProvider{
 	public boolean doLogin(HttpServletRequest request, HttpServletResponse response)
             throws IOException, Forbidden
     {
-        logCloudWatchProfiling("Start login");
+        logCloudWatchProfiling("Attempt login");
         HttpSession session = request.getSession();
         log.debug("BEGIN (session: {})",session.getId());
 
@@ -596,7 +596,7 @@ public class UrsIdP extends IdProvider{
         // redirect the user to EDL to start the authentication process.
         String code = request.getParameter("code");
         if (code == null) {
-            logCloudWatchProfiling("Send user to EDL for authentication");
+            logCloudWatchProfiling("Redirect to EDL for authentication");
             String url;
             url = PathBuilder.pathConcat(getUrsUrl(), "/oauth/authorize?");
             url += "client_id=" + getUrsClientAppId();
@@ -632,9 +632,9 @@ public class UrsIdP extends IdProvider{
         log.info("URS Token Request POST data: {}", LogUtil.scrubEntry(postData));
         log.info("URS Token Request Authorization Header: {}", authHeader);
 
-        logCloudWatchProfiling("Start token request from EDL");
+        logCloudWatchProfiling("Request token exchange from EDL");
         String contents = Util.submitHttpRequest(url, headers, postData);
-        logCloudWatchProfiling("End token request from EDL"); //TODO- new phrasing??
+        logCloudWatchProfiling("End token exchange from EDL");
 
         log.info("URS Token: {}", contents);
 
@@ -657,7 +657,7 @@ public class UrsIdP extends IdProvider{
             redirectUrl = PathBuilder.normalizePath(serviceContext, true, false);
         }
         log.info("Authentication Completed. Redirecting client to redirectUrl: {}", redirectUrl);
-        logCloudWatchProfiling("End authentication via doLogin"); //TODO-H diff message? include redirect?
+        logCloudWatchProfiling("End attempt login");
         response.sendRedirect(redirectUrl);
 
         log.debug("END (session: {})", session.getId());
