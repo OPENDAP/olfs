@@ -38,7 +38,6 @@ import java.util.*;
  */
 public class UserProfile implements Serializable {
 
-    //private static final String CLIENT_HOST_KEY = "client-host";
     private static final String USER_AGENT_KEY = "User-Agent";
 
     /* @serial */
@@ -222,19 +221,15 @@ public class UserProfile implements Serializable {
      * @return True if the request matches the existing client footprint, false otherwise
      */
     boolean validateUserFootPrint(HttpServletRequest request) {
-        String s = request.getRemoteHost();
-        if( d_clientIp == null ) {
-            return false;
-        }
-        else if( !d_clientIp.equals(s) ) {
+        String value;
+
+        value = request.getRemoteHost();
+        if( d_clientIp == null || !d_clientIp.equals(value) ) {
             return false;
         }
 
-        s = request.getHeader(USER_AGENT_KEY);
-        if( d_clientUserAgent == null ) {
-            return false;
-        }
-        else if( !d_clientUserAgent.equals(s) ) {
+        value = request.getHeader(USER_AGENT_KEY);
+        if( d_clientUserAgent == null || !d_clientUserAgent.equals(value) ) {
             return false;
         }
 
