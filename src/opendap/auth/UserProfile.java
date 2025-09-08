@@ -327,7 +327,7 @@ public class UserProfile implements Serializable {
         return gson.fromJson(jsonStr, UserProfile.class);
     }
 
-    public static void main(String args[]){
+    public static void main(String[] args){
         String edlUserProfile = "{\"uid\":\"moo\",\"first_name\":\"Imma\",\"last_name\":\"Cow\",\"registered_date\":\"23 Sep 1985 14:63:34PM\",\"email_address\":\"imma.cow@opendap.org\",\"country\":\"United States\",\"study_area\":\"Other\",\"user_type\":\"Public User\",\"affiliation\":\"Non-profit\",\"authorized_date\":\"15 Aug 1998 10:12:37PM\",\"allow_auth_app_emails\":true,\"agreed_to_meris_eula\":false,\"agreed_to_sentinel_eula\":false,\"user_groups\":[],\"user_authorized_apps\":2}";
         String hr0 = "################################################";
         String hr1 = "------------------------------------------------";
