@@ -45,6 +45,7 @@ import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.time.Instant;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -571,4 +572,17 @@ public class ServletLogUtil {
         log.info("CloudWatch Logs Are {}", value ? "ENABLED." : "DISABLED");
     }
 
+    /**
+     * If `useDualCloudWatchLogs` enabled, post `Profile timing: {msg} - {<timestamp>}"`
+     * to `CLOUDWATCH_PROFILING_LOG`
+     * @param msg
+     * @return void
+     */
+    public static void logCloudWatchProfiling(String msg) {
+        ServletLogUtil.useDualCloudWatchLogs(true); // TODO-H remove! for dev purposes only :)
+        if(ServletLogUtil.useDualCloudWatchLogs.get()) {
+            Logger cwProfilingLog = org.slf4j.LoggerFactory.getLogger(CLOUDWATCH_PROFILING_LOG);
+            cwProfilingLog.info("Profile timing: {} - {}", msg, Instant.now());
+        }
+    }
 }

@@ -60,12 +60,12 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.security.PublicKey;
 import java.security.interfaces.RSAPublicKey;
-import java.time.Instant;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
 import static opendap.auth.IdFilter.USER_PROFILE;
+import static opendap.logging.ServletLogUtil.logCloudWatchProfiling;
 
 /**
  * Created by ndp on 9/25/14.
@@ -83,7 +83,6 @@ public class UrsIdP extends IdProvider{
     public static final String REJECT_UNSUPPORTED_AUTHZ_SCHEMES_KEY = "RejectUnsupportedAuthzSchemes";
 
     private Logger log;
-    private Logger logProfiling;
 
     private String ursUrl;
     private String clientAppId;
@@ -97,7 +96,6 @@ public class UrsIdP extends IdProvider{
     public UrsIdP(){
         super();
         log = LoggerFactory.getLogger(this.getClass());
-        logProfiling = org.slf4j.LoggerFactory.getLogger(ServletLogUtil.CLOUDWATCH_PROFILING_LOG);
         setAuthContext(DEFAULT_AUTH_CONTEXT);
         setDescription("The NASA Earthdata Login (formerly known as URS)");
         rejectUnsupportedAuthzSchemes =  false;
@@ -410,17 +408,6 @@ public class UrsIdP extends IdProvider{
     }
 
     /**
-     * Worker method to post contents of `msg` to `logProfiling`
-     * @param msg
-     * @return void
-     */
-    private void writeToProfilingLog(String msg) {
-        if(ServletLogUtil.useDualCloudWatchLogs.get()) {
-            logProfiling.info("Profile timing: {} - {}", msg, Instant.now());
-        }
-    }
-
-    /**
      * Old Way:
      * curl -X POST -d 'token=<token>&client_id=<‘your application client_id’> https://urs.earthdata.nasa.gov/oauth/tokens/user
      *
@@ -445,7 +432,7 @@ public class UrsIdP extends IdProvider{
 
         String contents;
         try {
-            writeToProfilingLog("Request EDL authentication");
+            logCloudWatchProfiling("Request EDL authentication");
             Logger edlLog = LoggerFactory.getLogger("EDL_LOG");
             Timer.enable();
             Timer.reset();
@@ -456,7 +443,7 @@ public class UrsIdP extends IdProvider{
             edlLog.info(report);
         }
         finally {
-            writeToProfilingLog("Receive EDL authentication response");
+            logCloudWatchProfiling("Receive EDL authentication response");
             Timer.reset();
             Timer.disable();
         }
@@ -507,7 +494,7 @@ public class UrsIdP extends IdProvider{
             return false;
         }
 
-        writeToProfilingLog("Start token authentication");
+        logCloudWatchProfiling("Start token authentication");
         boolean foundValidAuthToken = false;
 
         String authz_hdr_value = request.getHeader(AUTHORIZATION_HEADER_KEY);
@@ -543,7 +530,7 @@ public class UrsIdP extends IdProvider{
                 }
             }
             else if (rejectUnsupportedAuthzSchemes) {
-                writeToProfilingLog("Failed token authentication");
+                logCloudWatchProfiling("Failed token authentication for invalid authorization scheme");
                     String msg = "Received an unsolicited/unsupported/unanticipated/unappreciated ";
                     msg += "header. 'Authorization Scheme: ";
                     msg += AuthorizationHeader.getScheme(authz_hdr_value) + "' ";
@@ -562,7 +549,7 @@ public class UrsIdP extends IdProvider{
                 log.warn(msg, AuthorizationHeader.getScheme(authz_hdr_value));
             }
         }
-        writeToProfilingLog("End token authentication - Valid token:" + foundValidAuthToken);
+        logCloudWatchProfiling("End token authentication - Valid token: " + foundValidAuthToken);
         return foundValidAuthToken;
     }
 
@@ -591,6 +578,7 @@ public class UrsIdP extends IdProvider{
 	public boolean doLogin(HttpServletRequest request, HttpServletResponse response)
             throws IOException, Forbidden
     {
+        logCloudWatchProfiling("Start login");
         HttpSession session = request.getSession();
         log.debug("BEGIN (session: {})",session.getId());
 
@@ -608,6 +596,7 @@ public class UrsIdP extends IdProvider{
         // redirect the user to EDL to start the authentication process.
         String code = request.getParameter("code");
         if (code == null) {
+            logCloudWatchProfiling("Send user to EDL for authentication");
             String url;
             url = PathBuilder.pathConcat(getUrsUrl(), "/oauth/authorize?");
             url += "client_id=" + getUrsClientAppId();
@@ -643,7 +632,9 @@ public class UrsIdP extends IdProvider{
         log.info("URS Token Request POST data: {}", LogUtil.scrubEntry(postData));
         log.info("URS Token Request Authorization Header: {}", authHeader);
 
+        logCloudWatchProfiling("Start token request from EDL");
         String contents = Util.submitHttpRequest(url, headers, postData);
+        logCloudWatchProfiling("End token request from EDL"); //TODO- new phrasing??
 
         log.info("URS Token: {}", contents);
 
@@ -666,7 +657,7 @@ public class UrsIdP extends IdProvider{
             redirectUrl = PathBuilder.normalizePath(serviceContext, true, false);
         }
         log.info("Authentication Completed. Redirecting client to redirectUrl: {}", redirectUrl);
-
+        logCloudWatchProfiling("End authentication via doLogin"); //TODO-H diff message? include redirect?
         response.sendRedirect(redirectUrl);
 
         log.debug("END (session: {})", session.getId());
