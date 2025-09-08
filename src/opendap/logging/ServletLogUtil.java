@@ -580,7 +580,6 @@ public class ServletLogUtil {
      * @return void
      */
     public static void logCloudWatchProfiling(String msg) {
-        ServletLogUtil.useDualCloudWatchLogs(true); // TODO-H remove! for dev purposes only :)
         if(ServletLogUtil.useDualCloudWatchLogs.get()) {
             Logger cwProfilingLog = org.slf4j.LoggerFactory.getLogger(CLOUDWATCH_PROFILING_LOG);
             cwProfilingLog.info("Profile timing [{}]: {}", Instant.now(), msg);
