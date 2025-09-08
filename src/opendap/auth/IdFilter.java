@@ -160,7 +160,7 @@ public class IdFilter implements Filter {
     }
 
 
-    public void doFilter(ServletRequest sreq, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
+    public void doFilter(ServletRequest sreq, ServletResponse sresp, FilterChain filterChain) throws IOException, ServletException {
 
         // Ensure initialization has been accomplished
         if (!isInitialized) {
@@ -178,6 +178,7 @@ public class IdFilter implements Filter {
         try {
 
             HttpServletRequest request = (HttpServletRequest) sreq;
+            HttpServletResponse response = (HttpServletResponse) sresp;
             RequestCache.open(request);
             RequestId requestId = RequestCache.getRequestId();
 
@@ -341,6 +342,7 @@ public class IdFilter implements Filter {
                     }
                     catch (Forbidden http_403){
                         log.error("Unable to validate Authorization header. Message: "+http_403.getMessage());
+                        OPeNDAPException.anyExceptionHandler(http_403,request.getServletContext(),response);
                     }
                 }
             }
