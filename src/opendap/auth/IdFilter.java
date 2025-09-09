@@ -170,7 +170,7 @@ public class IdFilter implements Filter {
 
     void doForbidden(Exception e, HttpServletRequest req, HttpServletResponse resp, IdProvider idProvider) throws IOException {
         String msg = "Your Login Transaction FAILED!   " +
-                "Authentication Context: '"+idProvider.getAuthContext()+
+                "Authentication Context: '" + idProvider.getAuthContext() +
                 "' Message: "+ e.getMessage();
         log.error("doForbidden() - {}", msg);
         OPeNDAPException.setCachedErrorMessage(msg);
@@ -326,10 +326,11 @@ public class IdFilter implements Filter {
                 log.debug("No UserProfile object found in Session. Request is not yet authenticated. " +
                         "Checking Authorization headers...");
                 if (IdPManager.hasDefaultProvider()) {
+                    IdProvider idProvider = IdPManager.getDefaultProvider();
                     try {
                         UserProfile userProfile = new UserProfile();
                         boolean retVal;
-                        retVal = IdPManager.getDefaultProvider().doTokenAuthentication(request, userProfile);
+                        retVal = idProvider.doTokenAuthentication(request, userProfile);
                         if(retVal){
                             log.info("Validated Authorization header. uid: {}", userProfile.getUID());
                             // By adding the UserProfile to the session here
@@ -353,8 +354,8 @@ public class IdFilter implements Filter {
                         }
                     }
                     catch (Forbidden http_403){
-                        log.error("Unable to validate Authorization header. Message: "+http_403.getMessage());
-                        doForbidden(e, request, response, idProvider);
+                        log.error("Unable to validate Authorization header. Message: {}", http_403.getMessage());
+                        doForbidden(http_403, request, response, idProvider);
                         log.debug("END (session: {})", session.getId());
                     }
                 }
