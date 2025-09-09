@@ -45,7 +45,6 @@ import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.time.Instant;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -84,9 +83,6 @@ public class ServletLogUtil {
     public static final String CLOUDWATCH_RESPONSE_LOG = "CloudWatchResponseLog";
     public static final String CLOUDWATCH_EDL_PROFILING_LOG = "CloudWatchEdlProfilingLog";
 
-
-
-
     private static final String REQUEST_ID_KEY = "ID";
     private static final String HTTP_VERB_KEY = "SOURCE";
     private static final String CLIENT_HOST_KEY = "host";
@@ -99,7 +95,8 @@ public class ServletLogUtil {
     private static final String RESPONSE_SIZE_KEY = "size";
     private static final String DURATION_KEY = "duration";
     private static final String HTTP_STATUS_KEY = "http_status";
-
+    private static final String PROFILING_START_TIME_MS_KEY = "profiling_start_time_ms";
+    private static final String PROFILING_DURATION_MS_KEY = "profiling_duration_ms";
 
     private static final AtomicBoolean isLogInit = new AtomicBoolean(false);
     private static final ReentrantLock initLock =  new ReentrantLock();
@@ -559,6 +556,12 @@ public class ServletLogUtil {
         MDC.remove(RESPONSE_SIZE_KEY);
         MDC.remove(HTTP_STATUS_KEY);
 
+        // -- -- -- -- -- -- -- -- -- -- -- -- -- --
+        //
+        // These were set in logEdlProfiling()
+        //
+        MDC.remove(PROFILING_START_TIME_MS_KEY);
+        MDC.remove(PROFILING_DURATION_MS_KEY);
     }
 
 
@@ -581,8 +584,12 @@ public class ServletLogUtil {
      */
     public static void logEDLProfiling(String msg) {
         if(ServletLogUtil.useDualCloudWatchLogs.get()) {
+            long startTimeMs = System.currentTimeMillis() - 1000; // TODO: arg
+            long currentTime = System.currentTimeMillis();
+            MDC.put(PROFILING_START_TIME_MS_KEY, Long.toString(startTimeMs));
+            MDC.put(PROFILING_DURATION_MS_KEY, Long.toString(currentTime - startTimeMs));
             Logger cwProfilingLog = org.slf4j.LoggerFactory.getLogger(CLOUDWATCH_EDL_PROFILING_LOG);
-            cwProfilingLog.info("Profile timing [{}]: {}", Instant.now(), msg);
+            cwProfilingLog.info(msg);
         }
     }
 }
