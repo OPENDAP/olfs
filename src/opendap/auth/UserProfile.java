@@ -309,7 +309,7 @@ public class UserProfile implements Serializable {
     }
 
     /**
-     * @param o The object, o,  to serialize to json.
+     * @param o The object, o, to serialize as a json string.
      * @return The object, o, serialized as a json string by gson.
      */
     public static String toJson(Object o){
