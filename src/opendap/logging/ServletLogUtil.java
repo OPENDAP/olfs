@@ -576,15 +576,14 @@ public class ServletLogUtil {
     }
 
     /**
-     * If `useDualCloudWatchLogs` enabled, post `Profile timing [<timestamp>]: {msg}"` to `CLOUDWATCH_PROFILING_LOG`,
-     * where timestamp is UTC formatted, e.g. `2025-09-08T20:16:50.535901Z`
+     * If `useDualCloudWatchLogs` enabled, logs `msg`, `startTimeMs`, and duration between `startTimeMs` and now
+     * to `CLOUDWATCH_PROFILING_LOG`, with both logged times in milliseconds from epoch.
      *
-     * @param msg
-     * @return void
+     * @param msg Description of event being timed
+     * @param startTimeMs Time event started, in milliseconds from epoch
      */
-    public static void logEDLProfiling(String msg) {
+    public static void logEDLProfiling(String msg, long startTimeMs) {
         if(ServletLogUtil.useDualCloudWatchLogs.get()) {
-            long startTimeMs = System.currentTimeMillis() - 1000; // TODO: arg
             long currentTime = System.currentTimeMillis();
             MDC.put(PROFILING_START_TIME_MS_KEY, Long.toString(startTimeMs));
             MDC.put(PROFILING_DURATION_MS_KEY, Long.toString(currentTime - startTimeMs));
