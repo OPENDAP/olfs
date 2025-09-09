@@ -279,6 +279,7 @@ public class NgapBesApi extends BesApi implements Cloneable {
         //   FOR A CLIENT TO KNOW THAT A DAP4 DATA RESPONSE CONTAINS CHECKSUMS.
         //
         // if(qp.computeChecksums())
+        if(type.equalsIgnoreCase(DAP4_DATA))
             request.addContent(setContextElement(DAP4_CHECKSUMS_CONTEXT,"true"));
 
         request.addContent(setContainerElement(getBesContainerName(),
