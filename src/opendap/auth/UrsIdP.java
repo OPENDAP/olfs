@@ -436,7 +436,6 @@ public class UrsIdP extends IdProvider{
             Timer.enable();
             Timer.reset();
             Procedure timedProc = Timer.start();
-
             contents = Util.submitHttpRequest(url, headers, post_body.toString());
             Timer.stop(timedProc);
             String report = Timer.report();
@@ -493,6 +492,7 @@ public class UrsIdP extends IdProvider{
         if (userProfile == null) {
             return false;
         }
+
         boolean foundValidAuthToken = false;
 
         String authz_hdr_value = request.getHeader(AUTHORIZATION_HEADER_KEY);
@@ -660,6 +660,7 @@ public class UrsIdP extends IdProvider{
             redirectUrl = PathBuilder.normalizePath(serviceContext, true, false);
         }
         log.info("Authentication Completed. Redirecting client to redirectUrl: {}", redirectUrl);
+
         response.sendRedirect(redirectUrl);
 
         log.debug("END (session: {})", session.getId());
