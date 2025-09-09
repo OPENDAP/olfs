@@ -48,7 +48,6 @@ import opendap.io.HyraxStringEncoding;
 import opendap.logging.LogUtil;
 import opendap.logging.Procedure;
 import opendap.logging.Timer;
-import opendap.logging.ServletLogUtil;
 import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

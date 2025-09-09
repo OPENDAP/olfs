@@ -51,7 +51,6 @@ import java.util.Enumeration;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static opendap.logging.ServletLogUtil.logCloudWatchProfiling;
 
 public class IdFilter implements Filter {
 
