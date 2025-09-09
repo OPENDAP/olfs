@@ -82,7 +82,7 @@ public class ServletLogUtil {
 
     public static final String CLOUDWATCH_REQUEST_LOG = "CloudWatchRequestLog";
     public static final String CLOUDWATCH_RESPONSE_LOG = "CloudWatchResponseLog";
-    public static final String CLOUDWATCH_PROFILING_LOG = "CloudWatchProfilingLog";
+    public static final String CLOUDWATCH_EDL_PROFILING_LOG = "CloudWatchEdlProfilingLog";
 
 
 
@@ -567,7 +567,7 @@ public class ServletLogUtil {
         log.info("Combined OLFS/BES Log Is {}", value ? "ENABLED." : "DISABLED");
     }
 
-    public static void useDualCloudWatchLogs(boolean value) {
+    public static void setUseDualCloudWatchLogs(boolean value) {
         useDualCloudWatchLogs.set(value);
         log.info("CloudWatch Logs Are {}", value ? "ENABLED." : "DISABLED");
     }
@@ -579,9 +579,9 @@ public class ServletLogUtil {
      * @param msg
      * @return void
      */
-    public static void logCloudWatchProfiling(String msg) {
+    public static void logEDLProfiling(String msg) {
         if(ServletLogUtil.useDualCloudWatchLogs.get()) {
-            Logger cwProfilingLog = org.slf4j.LoggerFactory.getLogger(CLOUDWATCH_PROFILING_LOG);
+            Logger cwProfilingLog = org.slf4j.LoggerFactory.getLogger(CLOUDWATCH_EDL_PROFILING_LOG);
             cwProfilingLog.info("Profile timing [{}]: {}", Instant.now(), msg);
         }
     }

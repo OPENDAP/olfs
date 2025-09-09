@@ -64,7 +64,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static opendap.auth.IdFilter.USER_PROFILE;
-import static opendap.logging.ServletLogUtil.logCloudWatchProfiling;
+import static opendap.logging.ServletLogUtil.logEDLProfiling;
 
 /**
  * Created by ndp on 9/25/14.
@@ -431,7 +431,7 @@ public class UrsIdP extends IdProvider{
 
         String contents;
         try {
-            logCloudWatchProfiling("Request EDL authentication");
+            logEDLProfiling("Request EDL authentication");
             Logger edlLog = LoggerFactory.getLogger("EDL_LOG");
             Timer.enable();
             Timer.reset();
@@ -440,7 +440,7 @@ public class UrsIdP extends IdProvider{
             Timer.stop(timedProc);
             String report = Timer.report();
             edlLog.info(report);
-            logCloudWatchProfiling("Receive EDL authentication response");
+            logEDLProfiling("Receive EDL authentication response");
         }
         finally {
             Timer.reset();
@@ -493,7 +493,7 @@ public class UrsIdP extends IdProvider{
             return false;
         }
 
-        logCloudWatchProfiling("Attempt token authentication");
+        logEDLProfiling("Attempt token authentication");
         boolean foundValidAuthToken = false;
 
         String authz_hdr_value = request.getHeader(AUTHORIZATION_HEADER_KEY);
@@ -529,7 +529,7 @@ public class UrsIdP extends IdProvider{
                 }
             }
             else if (rejectUnsupportedAuthzSchemes) {
-                logCloudWatchProfiling("Failed token authentication for invalid authorization scheme");
+                logEDLProfiling("Failed token authentication for invalid authorization scheme");
                     String msg = "Received an unsolicited/unsupported/unanticipated/unappreciated ";
                     msg += "header. 'Authorization Scheme: ";
                     msg += AuthorizationHeader.getScheme(authz_hdr_value) + "' ";
@@ -548,7 +548,7 @@ public class UrsIdP extends IdProvider{
                 log.warn(msg, AuthorizationHeader.getScheme(authz_hdr_value));
             }
         }
-        logCloudWatchProfiling("End token authentication - Valid token: " + foundValidAuthToken);
+        logEDLProfiling("End token authentication - Valid token: " + foundValidAuthToken);
         return foundValidAuthToken;
     }
 
@@ -577,7 +577,7 @@ public class UrsIdP extends IdProvider{
 	public boolean doLogin(HttpServletRequest request, HttpServletResponse response)
             throws IOException, Forbidden
     {
-        logCloudWatchProfiling("Attempt login");
+        logEDLProfiling("Attempt login");
         HttpSession session = request.getSession();
         log.debug("BEGIN (session: {})",session.getId());
 
@@ -595,7 +595,7 @@ public class UrsIdP extends IdProvider{
         // redirect the user to EDL to start the authentication process.
         String code = request.getParameter("code");
         if (code == null) {
-            logCloudWatchProfiling("Redirect to EDL for authentication");
+            logEDLProfiling("Redirect to EDL for authentication");
             String url;
             url = PathBuilder.pathConcat(getUrsUrl(), "/oauth/authorize?");
             url += "client_id=" + getUrsClientAppId();
@@ -631,9 +631,9 @@ public class UrsIdP extends IdProvider{
         log.info("URS Token Request POST data: {}", LogUtil.scrubEntry(postData));
         log.info("URS Token Request Authorization Header: {}", authHeader);
 
-        logCloudWatchProfiling("Request token exchange from EDL");
+        logEDLProfiling("Request token exchange from EDL");
         String contents = Util.submitHttpRequest(url, headers, postData);
-        logCloudWatchProfiling("End token exchange from EDL");
+        logEDLProfiling("End token exchange from EDL");
 
         log.info("URS Token: {}", contents);
 
@@ -656,7 +656,7 @@ public class UrsIdP extends IdProvider{
             redirectUrl = PathBuilder.normalizePath(serviceContext, true, false);
         }
         log.info("Authentication Completed. Redirecting client to redirectUrl: {}", redirectUrl);
-        logCloudWatchProfiling("End attempt login");
+        logEDLProfiling("End attempt login");
         response.sendRedirect(redirectUrl);
 
         log.debug("END (session: {})", session.getId());

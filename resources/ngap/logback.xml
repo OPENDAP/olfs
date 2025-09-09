@@ -205,9 +205,9 @@
         </layout>
     </appender>
 
-    <appender name="CloudWatchProfilingLogAppender" class="com.j256.cloudwatchlogbackappender.CloudWatchAppender">
+    <appender name="CloudWatchEdlProfilingLogAppender" class="com.j256.cloudwatchlogbackappender.CloudWatchAppender">
         <region>us-west-2</region>
-        <logGroup>hyrax_edl_log</logGroup>
+        <logGroup>hyrax_edl_profiling_log</logGroup>
         <logStream>hyrax-%instanceId</logStream>
         <layout>
             <pattern>{ "request_id": "%X{ID}", "message": "%m" } }%n</pattern>
@@ -246,8 +246,8 @@
         <appender-ref ref="CloudWatchResponseLogAppender"/>
     </logger>
 
-    <logger name="CloudWatchProfilingLog" level="info">
-        <appender-ref ref="CloudWatchProfilingLogAppender"/>
+    <logger name="CloudWatchEdlProfilingLog" level="info">
+        <appender-ref ref="CloudWatchEdlProfilingLogAppender"/>
     </logger>
 
     <root level="error">
