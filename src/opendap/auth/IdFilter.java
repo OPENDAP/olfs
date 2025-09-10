@@ -326,7 +326,7 @@ public class IdFilter implements Filter {
                         try {
                             retVal = IdPManager.getDefaultProvider().doTokenAuthentication(request, userProfile);
                         } finally {
-                            logEDLProfiling("Do token authentication - Valid token? " + retVal, profilingStartTime);
+                            logEDLProfiling("Validate token - Is valid? " + retVal, profilingStartTime);
                         }
                         if(retVal){
                             log.info("Validated Authorization header. uid: {}", userProfile.getUID());
