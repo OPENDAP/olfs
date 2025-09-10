@@ -637,7 +637,7 @@ public class UrsIdP extends IdProvider{
         try {
             contents = Util.submitHttpRequest(url, headers, postData);
         } finally {
-            logEDLProfiling("Request token exchange from EDL", profilingStartTime);
+            logEDLProfiling("Request token from EDL", profilingStartTime);
         }
 
         log.info("URS Token: {}", contents);
