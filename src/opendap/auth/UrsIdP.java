@@ -617,6 +617,7 @@ public class UrsIdP extends IdProvider{
         // If we get here, the user was redirected by URS back to our application,
         // and we have a code. We now exchange the code for a token, which is
         // returned as a json document.
+        logEDLProfiling("Checkpoint: Client arrived from EDL with authentication code", System.currentTimeMillis());
         String url = getUrsUrl() + "/oauth/token";
 
         String postData = "grant_type=authorization_code&code=" + code +
