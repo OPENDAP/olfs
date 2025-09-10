@@ -290,7 +290,7 @@ public class IdFilter implements Filter {
                             log.debug("END (session: {})",session.getId());
                             return;
                         } finally {
-                            logEDLProfiling("Complete login operation - Login now concluded? " + loginComplete, profilingStartTime);
+                            logEDLProfiling("Handle login operation - Login now concluded? " + loginComplete, profilingStartTime);
                         }
                     }
                 }

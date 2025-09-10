@@ -442,7 +442,7 @@ public class UrsIdP extends IdProvider{
             edlLog.info(report);
         }
         finally {
-            logEDLProfiling("Request EDL authentication",  profilingStartTime);
+            logEDLProfiling("Request EDL user profile",  profilingStartTime);
             Timer.reset();
             Timer.disable();
         }
