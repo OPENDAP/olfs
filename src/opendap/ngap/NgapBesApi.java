@@ -281,6 +281,9 @@ public class NgapBesApi extends BesApi implements Cloneable {
         //  request.addContent(setContextElement(DAP4_CHECKSUMS_CONTEXT,qp.computeChecksums()?"true":"false"));
         request.addContent(setContextElement(DAP4_CHECKSUMS_CONTEXT, "true"));
 
+        request.addContent(setContainerElement(getBesContainerName(),
+                getBesSpaceName(),remoteDataSourceUrl,type));
+
         Element def = defineElement("d1","default");
         e = (containerElement(getBesContainerName()));
 
