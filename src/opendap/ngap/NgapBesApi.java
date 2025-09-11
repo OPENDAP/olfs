@@ -274,17 +274,12 @@ public class NgapBesApi extends BesApi implements Cloneable {
         addEdlAuthToken(request,user);
 
         // @FIXME - THIS IS WHERE WE WOULD INVOKE OPTIONAL CHECKSUMS, BUT WE ARE MAKING THEM MANDATORY TO
-        //   ACCOMMODATE BROKEN CLIENT CODE THAT EXPECTS THEM TO AWLAYS BE THERE. THIS WILL BREAK getdap4
+        //   ACCOMMODATE BROKEN CLIENT CODE THAT EXPECTS THEM TO ALWAYS BE THERE. THIS WILL BREAK getdap4
         //   AND ALL OF THE ASSOCIATED TESTS BECAUSE AT THE TIME THIS IS WRITTEN THERE IS NO WAY FOR A
         //   FOR A CLIENT TO KNOW THAT A DAP4 DATA RESPONSE CONTAINS CHECKSUMS.
         //
-        // if(qp.computeChecksums())
-        if(type.equalsIgnoreCase(DAP4_DATA) ||
-                (type.equalsIgnoreCase(DAP4_DMR) && qp.computeChecksums()) ) {
-            request.addContent(setContextElement(DAP4_CHECKSUMS_CONTEXT, "true"));
-        }
-        request.addContent(setContainerElement(getBesContainerName(),
-                getBesSpaceName(),remoteDataSourceUrl,type));
+        //  request.addContent(setContextElement(DAP4_CHECKSUMS_CONTEXT,qp.computeChecksums()?"true":"false"));
+        request.addContent(setContextElement(DAP4_CHECKSUMS_CONTEXT, "true"));
 
         Element def = defineElement("d1","default");
         e = (containerElement(getBesContainerName()));
