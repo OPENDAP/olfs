@@ -58,6 +58,44 @@ public class UserProfile implements Serializable {
     private transient JsonObject d_EdlProfile;
 
 
+    public String cerealize(){
+        StringBuffer sb = new StringBuffer();
+        sb.append("{ ");
+        sb.append("\"d_objectCreationTime\": ").append(d_objectCreationTime.getTime()).append(",");
+        sb.append("\"d_uid\":\"").append(d_uid).append("\",");
+        sb.append("\"d_EdlProfileJsonStr\":\"").append(d_EdlProfileJsonStr).append("\",");
+        sb.append("\"d_authContext\":\"").append(d_authContext).append("\",");
+
+        sb.append("\"d_groups\": [");
+        boolean first = true;
+        for(String group : d_groups){
+            if(!first){
+                sb.append(", ");
+            }
+            sb.append("\"").append(group).append("\"");
+        }
+        sb.append("],");
+
+        sb.append("\"d_roles\": [");
+        for(String role : d_roles){
+            sb.append("\"").append(role).append("\",");
+        }
+        sb.append("]");
+
+        sb.append("}");
+        return sb.toString();
+    }
+    public static UserProfile decerealize(String jsonStr) {
+        UserProfile up = new UserProfile();
+        JsonObject json = JsonParser.parseString(jsonStr).getAsJsonObject();
+        //up.d_objectCreationTime = new Date(json.get("d_objectCreationTime").getAsLong());
+        up.d_uid = json.get("d_uid").getAsString();
+        up.d_authContext = json.get("d_authContext").getAsString();
+        up.d_EdlProfileJsonStr = json.get("d_EdlProfileJsonStr").getAsString();
+
+        return up;
+    }
+
     public UserProfile() {
         d_objectCreationTime = new Date();
         d_groups = new HashSet<>();
