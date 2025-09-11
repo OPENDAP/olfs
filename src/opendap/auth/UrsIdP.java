@@ -581,6 +581,7 @@ public class UrsIdP extends IdProvider{
         JsonParser jparse = new JsonParser();
         JsonObject json = jparse.parse(contents).getAsJsonObject();
         EarthDataLoginAccessToken edlat = new EarthDataLoginAccessToken(json, getUrsClientAppId());
+        log.debug("edlat.expiresIn(): {}",edlat.getExpiresIn());
         return edlat;
     }
 
