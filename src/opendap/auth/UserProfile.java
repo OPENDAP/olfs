@@ -27,6 +27,7 @@
 package opendap.auth;
 
 import com.google.gson.*;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
 import java.util.*;
@@ -40,45 +41,50 @@ public class UserProfile implements Serializable {
     /* @serial */
     private final Date d_objectCreationTime;
     /* @serial */
-    private String d_EdlProfileJsonStr;
+    private String edlProfileJsonStr;
     /* @serial */
-    private final HashSet<String> d_groups;
+    private final HashSet<String> groups;
     /* @serial */
-    private final HashSet<String> d_roles;
+    private final HashSet<String> roles;
 
     /* @serial */
-    private String d_authContext;
+    private String authContext;
     /* @serial */
-    private EarthDataLoginAccessToken d_edlAccessToken;
+    private EarthDataLoginAccessToken edlAccessToken;
 
     /* @serial */
-    private String d_uid;
+    private String uid;
 
     /* The transient tag tells the serializer to skip this variable.*/
-    private transient JsonObject d_EdlProfile;
+    private transient JsonObject tEdlProfile;
 
 
     public String cerealize(){
+        Gson gson = new Gson();
+
         StringBuffer sb = new StringBuffer();
         sb.append("{ ");
-        sb.append("\"d_objectCreationTime\": ").append(d_objectCreationTime.getTime()).append(",");
-        sb.append("\"d_uid\":\"").append(d_uid).append("\",");
-        sb.append("\"d_EdlProfileJsonStr\":\"").append(d_EdlProfileJsonStr).append("\",");
-        sb.append("\"d_authContext\":\"").append(d_authContext).append("\",");
-
+        //sb.append("\"d_objectCreationTime\": ").append(d_objectCreationTime.getTime()).append(", ");
+        sb.append("\"d_uid\":\"").append(uid).append("\", ");
+        sb.append("\"d_authContext\":\"").append(authContext).append("\", ");
+        sb.append("\"d_EdlProfileJsonStr\": ").append(gson.toJson(edlProfileJsonStr)).append(", ");
+        sb.append("\"d_edlAccessToken\": " + edlAccessToken.cerealize()).append(", ");
         sb.append("\"d_groups\": [");
+
         boolean first = true;
-        for(String group : d_groups){
-            if(!first){
-                sb.append(", ");
-            }
+        for(String group : groups){
+            if(!first){ sb.append(", "); }
             sb.append("\"").append(group).append("\"");
+            first = false;
         }
         sb.append("],");
 
         sb.append("\"d_roles\": [");
-        for(String role : d_roles){
-            sb.append("\"").append(role).append("\",");
+        first = true;
+        for(String role : roles){
+            if(!first){ sb.append(", "); }
+            sb.append("\"").append(role).append("\"");
+            first = false;
         }
         sb.append("]");
 
@@ -88,23 +94,29 @@ public class UserProfile implements Serializable {
     public static UserProfile decerealize(String jsonStr) {
         UserProfile up = new UserProfile();
         JsonObject json = JsonParser.parseString(jsonStr).getAsJsonObject();
-        //up.d_objectCreationTime = new Date(json.get("d_objectCreationTime").getAsLong());
-        up.d_uid = json.get("d_uid").getAsString();
-        up.d_authContext = json.get("d_authContext").getAsString();
-        up.d_EdlProfileJsonStr = json.get("d_EdlProfileJsonStr").getAsString();
+        up.uid = json.get("d_uid").getAsString();
+        up.authContext = json.get("d_authContext").getAsString();
+        up.edlProfileJsonStr = json.get("d_EdlProfileJsonStr").getAsString();
 
+         JsonElement edlAccessTokenElement  = json.get("d_edlAccessToken");
+         jsonStr = edlAccessTokenElement.toString();
+         up.edlAccessToken = EarthDataLoginAccessToken.decerealize(jsonStr);
+
+
+        json.get("d_groups").getAsJsonArray().forEach(group -> up.groups.add(group.getAsString()));
+        json.get("d_roles").getAsJsonArray().forEach(role -> up.roles.add(role.getAsString()));
         return up;
     }
 
     public UserProfile() {
         d_objectCreationTime = new Date();
-        d_groups = new HashSet<>();
-        d_roles = new HashSet<>();
+        groups = new HashSet<>();
+        roles = new HashSet<>();
 
-        d_EdlProfile = null;
-        d_authContext = null;
-        d_edlAccessToken = null;
-        d_uid = null;
+        tEdlProfile = null;
+        authContext = null;
+        edlAccessToken = null;
+        uid = null;
     }
 
     /**
@@ -120,21 +132,21 @@ public class UserProfile implements Serializable {
     }
 
     private JsonObject getEdlProfile(){
-        if(d_EdlProfile == null && d_EdlProfileJsonStr != null){
-            ingestEDLProfileStringJson(d_EdlProfileJsonStr);
+        if(tEdlProfile == null && edlProfileJsonStr != null){
+            ingestEDLProfileStringJson(edlProfileJsonStr);
         }
-        return d_EdlProfile;
+        return tEdlProfile;
     }
 
     public void ingestEDLProfileStringJson(String jsonStr){
-        d_EdlProfileJsonStr = jsonStr;
-        d_EdlProfile = JsonParser.parseString(d_EdlProfileJsonStr).getAsJsonObject();
-        JsonElement uid = d_EdlProfile.get("uid");
-        d_uid = uid.getAsString();
+        edlProfileJsonStr = jsonStr;
+        tEdlProfile = JsonParser.parseString(edlProfileJsonStr).getAsJsonObject();
+        JsonElement uid = tEdlProfile.get("uid");
+        this.uid = uid.getAsString();
     }
 
     public void setEDLAccessToken(EarthDataLoginAccessToken oat){
-        d_edlAccessToken = new EarthDataLoginAccessToken(oat);
+        edlAccessToken = new EarthDataLoginAccessToken(oat);
     }
 
     // public void setEDLClientAppId(String clientAppId){ edlClientAppId = clientAppId; }
@@ -142,10 +154,10 @@ public class UserProfile implements Serializable {
     // public String getEDLClientAppId(){ return edlClientAppId; }
 
     public EarthDataLoginAccessToken getEDLAccessToken(){
-        if(d_edlAccessToken ==null)
+        if(edlAccessToken ==null)
             return null;
 
-        return new EarthDataLoginAccessToken(d_edlAccessToken);
+        return new EarthDataLoginAccessToken(edlAccessToken);
     }
 
 
@@ -179,43 +191,43 @@ public class UserProfile implements Serializable {
     }
 
     public String getUID() {
-        return d_uid;
+        return uid;
     }
 
     public void setUID(String user_id) {
-        d_uid = user_id;
+        uid = user_id;
     }
 
     public IdProvider getIdP(){
-        return IdPManager.getProvider(d_authContext);
+        return IdPManager.getProvider(authContext);
     }
     public void setAuthContext(String context){
-        d_authContext = context;
+        authContext = context;
     }
 
 
     protected void addGroups(HashSet<String> groupMemberships){
-        d_groups.addAll(groupMemberships);
+        groups.addAll(groupMemberships);
     }
 
     protected void addGroup(String group){
-        d_groups.add(group);
+        groups.add(group);
     }
 
     protected void addRoles(HashSet<String> roles){
-        d_roles.addAll(roles);
+        this.roles.addAll(roles);
     }
     protected void addRole(String role){
-        d_roles.add(role);
+        roles.add(role);
     }
 
 
     public HashSet<String> getGroups(){
-        return new HashSet<>(d_groups);
+        return new HashSet<>(groups);
     }
 
     public HashSet<String> getRoles(){
-        return new HashSet<>(d_roles);
+        return new HashSet<>(roles);
     }
 
 
@@ -295,13 +307,13 @@ public class UserProfile implements Serializable {
         String l2i = l1i +indent_inc;
         String classname = getClass().getName();
         sb.append(indent).append(classname).append(": \n");
-        sb.append(l1i).append("d_objectCreationTime: ").append(d_objectCreationTime).append(",\n");
-        sb.append(l1i).append("d_uid: ").append(d_uid).append(",\n");
+        sb.append(l1i).append("d_objectCreationTime: ").append(/*d_objectCreationTime*/"ELIDED").append(",\n");
+        sb.append(l1i).append("d_uid: ").append(uid).append(",\n");
 
-        sb.append(l1i).append("d_jsonStr: ").append(d_EdlProfileJsonStr).append(",\n");
-        sb.append(l1i).append("d_groups: ").append(d_groups).append(",\n");
-        sb.append(l1i).append("d_roles: ").append(d_roles).append(",\n");
-        sb.append(l1i).append("d_authContext: ").append(d_authContext).append(",\n");
+        sb.append(l1i).append("d_jsonStr: ").append(edlProfileJsonStr).append(",\n");
+        sb.append(l1i).append("d_groups: ").append(groups).append(",\n");
+        sb.append(l1i).append("d_roles: ").append(roles).append(",\n");
+        sb.append(l1i).append("d_authContext: ").append(authContext).append(",\n");
 
         sb.append(l1i).append("").append("edl_profile").append(": \n");
         JsonObject profile = getEdlProfile();
@@ -329,8 +341,8 @@ public class UserProfile implements Serializable {
             }
             sb.append(indent).append("\n");
         }
-        if(d_edlAccessToken !=null){
-            sb.append(d_edlAccessToken.toString(l2i,indent_inc));
+        if(edlAccessToken !=null){
+            sb.append(edlAccessToken.toString(l2i,indent_inc));
         }
         sb.append(l1i).append("\n");
         sb.append(indent).append("\n");
@@ -364,48 +376,10 @@ public class UserProfile implements Serializable {
         Gson gson = new Gson();
         return gson.fromJson(jsonStr, UserProfile.class);
     }
-
-    public static void main(String[] args){
-        String edlUserProfile = "{\"uid\":\"moo\",\"first_name\":\"Imma\",\"last_name\":\"Cow\",\"registered_date\":\"23 Sep 1985 14:63:34PM\",\"email_address\":\"imma.cow@opendap.org\",\"country\":\"United States\",\"study_area\":\"Other\",\"user_type\":\"Public User\",\"affiliation\":\"Non-profit\",\"authorized_date\":\"15 Aug 1998 10:12:37PM\",\"allow_auth_app_emails\":true,\"agreed_to_meris_eula\":false,\"agreed_to_sentinel_eula\":false,\"user_groups\":[],\"user_authorized_apps\":2}";
-        String hr0 = "################################################";
-        String hr1 = "------------------------------------------------";
-
-        UserProfile up = new UserProfile(edlUserProfile);
-        //up.d_clientIp = "10.7.0.1";
-        //up.d_clientUserAgent = "ImmaTestHarness";
-        up.setEDLAccessToken(new EarthDataLoginAccessToken());
-        up.addGroup("fiddle");
-        up.addGroup("faddle");
-        up.addRole("twiddle");
-        up.addRole("piddle");
-
-        // --------------------------------------------------------------------
-        System.out.println(hr0);
-        System.out.println("GSON serialize and deserialize user profile...");
-        String jsonStr1 = UserProfile.toJson(up);
-        String jsonStr2 = up.toJson();
-        if(!jsonStr1.equals(jsonStr2)){
-            System.out.println("The gson json serializations do not match!");
-            System.out.println("jsonStr1: " + jsonStr1);
-            System.out.println("jsonStr2: " + jsonStr2);
-            System.exit(1);
-        }
-
-        System.out.println("UserProfile.toJson(): ");
-        System.out.println(jsonStr1);
-
-        System.out.println(hr1);
-        System.out.println("UserProfile.fromJson().toString(): ");
-        UserProfile fromJsonStr = UserProfile.fromJson(jsonStr1);
-        System.out.println(fromJsonStr);
-
-
-        // --------------------------------------------------------------------
+    private static String javaTest(UserProfile up){
         System.out.println(hr0);
         System.out.println("Java Native serialize and deserialize user profile...");
         System.out.println("Calling UserProfile.toString() on instance of UserProfile:");
-        String baseline = up.toString();
-        System.out.print(baseline);
         byte serializedObject[] = null;
         String result = null;
         try {
@@ -446,15 +420,121 @@ public class UserProfile implements Serializable {
         }
         catch (ClassNotFoundException | IOException ioe){
             ioe.printStackTrace();
+        }
+        return result;
+    }
+    private static String gsonTest(UserProfile up){
+        System.out.println(hr0);
+        System.out.println("GSON serialize and deserialize user profile...");
+        String jsonStr1 = UserProfile.toJson(up);
+        String jsonStr2 = up.toJson();
+        if(!jsonStr1.equals(jsonStr2)){
+            System.out.println("The gson json serializations do not match!");
+            System.out.println("jsonStr1: " + jsonStr1);
+            System.out.println("jsonStr2: " + jsonStr2);
             System.exit(1);
         }
-        int status = 1;
-        if(result != null && result.equals(baseline)){
-            System.out.println("Result matched baseline.");
-            status = 0;
-        }
+
+        System.out.println("UserProfile.toJson(): ");
+        System.out.println(jsonStr1);
+
+        System.out.println(hr1);
+        System.out.println("UserProfile.fromJson().toString(): ");
+        UserProfile fromJsonStr = UserProfile.fromJson(jsonStr1);
+        String result = fromJsonStr.toString();
+        System.out.println(result);
+
+        return result;
+    }
+
+    private static String cerealTest(UserProfile up){
         System.out.println(hr0);
-        System.exit(status);
+        System.out.println("Primitive (string only) cerealize and decerealize using Gson user profile...");
+
+        String jsonStr1 = up.cerealize();
+        System.out.println("UserProfile.cerealize(): ");
+        System.out.println(jsonStr1);
+
+        System.out.println(hr1);
+        UserProfile fromDecerealize = UserProfile.decerealize(jsonStr1);
+        String result = fromDecerealize.toString();
+        System.out.println("UserProfile.decerealize().toString(): ");
+        System.out.println(result);
+        return result;
+    }
+
+    private static boolean compare(String baseline, String result){
+        baseline = baseline.trim();
+        result = result.trim();
+        boolean testResult = result != null && result.equals(baseline);
+        if(testResult){
+            System.out.println("PASS - Result matched baseline.");
+        }
+        else {
+            int index = StringUtils.indexOfDifference(baseline,result);
+            String remainder = StringUtils.difference(baseline,result);
+            System.out.println("!! FAIL - Result did not match baseline. Result differs at index: " + index);
+            System.out.println("!!    baseline.length(): " + baseline.length());
+            System.out.println("!!      result.length(): " + result.length());
+            System.out.println("!!   remainder.length(): " + remainder.length());
+            System.out.println("!! Result differs at index: " + index);
+            System.out.println("!! Remainder: ");
+            System.out.println(remainder);
+
+        }
+        return testResult;
+    }
+
+    private static final String hr0 = "################################################";
+    private static final String hr1 = "------------------------------------------------";
+
+    public static void main(String[] args){
+        boolean success = true;
+        String baseline;
+        String result;
+        String edlUserProfile = "{\"uid\":\"moo\",\"first_name\":\"Imma\",\"last_name\":\"Cow\",\"registered_date\":\"23 Sep 1985 14:63:34PM\",\"email_address\":\"imma.cow@opendap.org\",\"country\":\"United States\",\"study_area\":\"Other\",\"user_type\":\"Public User\",\"affiliation\":\"Non-profit\",\"authorized_date\":\"15 Aug 1998 10:12:37PM\",\"allow_auth_app_emails\":true,\"agreed_to_meris_eula\":false,\"agreed_to_sentinel_eula\":false,\"user_groups\":[],\"user_authorized_apps\":2}";
+
+        // --------------------------------------------------------------------
+        // Make the UserProfile instance to test.
+        UserProfile up = new UserProfile(edlUserProfile);
+        //up.d_clientIp = "10.7.0.1";
+        //up.d_clientUserAgent = "ImmaTestHarness";
+        up.setAuthContext("TestyTesty");
+        up.setEDLAccessToken(new EarthDataLoginAccessToken());
+        up.addGroup("fiddle");
+        up.addGroup("faddle");
+        up.addRole("twiddle");
+        up.addRole("piddle");
+        baseline = up.toString();
+
+        System.out.println(hr0);
+        System.out.println("BASELINE - UserProfile.toString():");
+        System.out.print(baseline);
+
+        // --------------------------------------------------------------------
+        result = cerealTest(up);
+        success = compare(baseline, result) && success;
+
+        // --------------------------------------------------------------------
+        result = gsonTest(up);
+        success = compare(baseline, result) && success;
+        // --------------------------------------------------------------------
+        result = cerealTest(up);
+        success = compare(baseline, result) && success;
+
+        // --------------------------------------------------------------------
+        result = javaTest(up);
+        success = compare(baseline, result) && success;
+
+        // --------------------------------------------------------------------
+
+        if(!success){
+            System.out.println("FAILURE - One or more UserProfile Tests FAILED.");
+            System.exit(1);
+        }
+
+        System.out.println("SUCCESS - All UserProfile Tests Passed.");
+        System.exit(0);
     }
 
 

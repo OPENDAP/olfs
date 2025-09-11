@@ -29,6 +29,7 @@ package opendap.auth;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -43,6 +44,8 @@ public class EarthDataLoginAccessToken implements Serializable {
     public static final String EXPIRES_IN_KEY = "expires_in";
     public static final String TOKEN_TYPE_KEY = "token_type";
     public static final String REFRESH_TOKEN_KEY = "refresh_token";
+    public static final String EDL_CLIENT_APP_ID_KEY = "edl_client_app_id";
+    public static final String CREATION_TIME_KEY = "creation_time";
 
     /* @serial */
     private String accessToken;
@@ -68,8 +71,6 @@ public class EarthDataLoginAccessToken implements Serializable {
         refreshToken = null;
         edlClientAppId = null;
     }
-
-
 
     public EarthDataLoginAccessToken(JsonObject json, String appID)  {
         this();
@@ -103,6 +104,32 @@ public class EarthDataLoginAccessToken implements Serializable {
         edlClientAppId = oat.getEdlClientAppId();
     }
 
+    public String cerealize(){
+        StringBuffer sb = new StringBuffer();
+        sb.append("{ ");
+        sb.append("\"").append(CREATION_TIME_KEY).append("\":\"").append(creationTime.getTime()).append("\", ");
+        sb.append("\"").append(ACCESS_TOKEN_KEY).append("\":\"").append(accessToken).append("\", ");
+        sb.append("\"").append(ENDPOINT_KEY).append("\":\"").append(endPoint).append("\", ");
+        sb.append("\"").append(EXPIRES_IN_KEY).append("\":\"").append(expiresIn).append("\", ");
+        sb.append("\"").append(TOKEN_TYPE_KEY).append("\":\"").append(tokenType).append("\", ");
+        sb.append("\"").append(REFRESH_TOKEN_KEY).append("\":\"").append(refreshToken).append("\", ");
+        sb.append("\"").append(EDL_CLIENT_APP_ID_KEY).append("\":\"").append(edlClientAppId).append("\" ");
+        sb.append("}");
+        return sb.toString();
+    }
+
+    public static EarthDataLoginAccessToken decerealize(String jsonStr) {
+        EarthDataLoginAccessToken edlat = new EarthDataLoginAccessToken();
+        JsonObject json = JsonParser.parseString(jsonStr).getAsJsonObject();
+          edlat.creationTime = new Date(json.get(CREATION_TIME_KEY).getAsLong());
+           edlat.accessToken = json.get(ACCESS_TOKEN_KEY).getAsString();
+              edlat.endPoint = json.get(ENDPOINT_KEY).getAsString();
+             edlat.expiresIn = json.get(EXPIRES_IN_KEY).getAsLong();
+             edlat.tokenType = json.get(TOKEN_TYPE_KEY).getAsString();
+          edlat.refreshToken = json.get(REFRESH_TOKEN_KEY).getAsString();
+        edlat.edlClientAppId = json.get(EDL_CLIENT_APP_ID_KEY).getAsString();
+        return edlat;
+    }
 
     public String getAccessToken(){
         return accessToken;
@@ -183,6 +210,7 @@ public class EarthDataLoginAccessToken implements Serializable {
         sb.append(l1i).append(REFRESH_TOKEN_KEY).append(": ").append(refreshToken).append("\n");
         return sb.toString();
     }
+
 
     public String toJson(){
         Gson gson = new Gson();
