@@ -546,6 +546,43 @@ public class UrsIdP extends IdProvider{
         return foundValidAuthToken;
     }
 
+    /**
+     * Retrieves an EDL authorization token from the EDL SSO by presenting EDL Client Application information and the
+     * auth code provided the query string of the incoming client request (after the client's authentication excursion
+     * to the EDL SSO)
+     * This method is called when the user/client was redirected by URS back to our application,
+     * and we have a code. We now exchange the code for a token, which is returned by the EDL SSO as a json document.
+     *
+     * @param code The EDL auth code from the request url query string
+     * @param returnToUrl The URL to which the EDL SSO will send the client after their authentication attempt.
+     * @return An EarthDataLoginAccessToken object built from the response from the EDL SSO.
+     * @throws IOException
+     */
+    public EarthDataLoginAccessToken exchangeAuthCodeForEdlToken(String code, String returnToUrl) throws IOException {
+        log.info("EDL Code: {}", LogUtil.scrubEntry(code));
+
+        String url = getUrsUrl() + "/oauth/token";
+        String postData = "grant_type=authorization_code&code=" + code +
+                "&redirect_uri=" + returnToUrl;
+
+        Map<String, String> headers = new HashMap<>();
+        String authHeader = "Basic " + getUrsClientAppAuthCode();
+        headers.put("Authorization", authHeader);
+
+        log.info("URS Token Request URL: {}", url);
+        log.info("URS Token Request POST data: {}", LogUtil.scrubEntry(postData));
+        log.info("URS Token Request Authorization Header: {}", authHeader);
+
+        String contents = Util.submitHttpRequest(url, headers, postData);
+
+        log.info("EDL Token: {}", contents);
+
+        // Parse the json to extract the token.
+        JsonParser jparse = new JsonParser();
+        JsonObject json = jparse.parse(contents).getAsJsonObject();
+        EarthDataLoginAccessToken edlat = new EarthDataLoginAccessToken(json, getUrsClientAppId());
+        return edlat;
+    }
 
     /**
      *
@@ -577,6 +614,8 @@ public class UrsIdP extends IdProvider{
 
         Util.debugHttpRequest(request,log);
 
+        String returnToUrl = ReqInfo.getRequestUrlPath(request);
+
         // Check to see if we have a code returned from URS. If not, we must
         // redirect the user to EDL to start the authentication process.
         String code = request.getParameter("code");
@@ -585,9 +624,6 @@ public class UrsIdP extends IdProvider{
             url = PathBuilder.pathConcat(getUrsUrl(), "/oauth/authorize?");
             url += "client_id=" + getUrsClientAppId();
             url += "&";
-
-            String returnToUrl = ReqInfo.getRequestUrlPath(request);
-
             url += "response_type=code&redirect_uri=" + returnToUrl;
 
             log.info("Redirecting client to EDL SSO. URS Code Request URL: {}", LogUtil.scrubEntry(url));
@@ -597,38 +633,11 @@ public class UrsIdP extends IdProvider{
             return false;
         }
 
-        log.info("EDL Code: {}", LogUtil.scrubEntry(code));
-
-        // If we get here, the user was redirected by URS back to our application,
-        // and we have a code. We now exchange the code for a token, which is
-        // returned as a json document.
-        String url = getUrsUrl() + "/oauth/token";
-
-        String postData = "grant_type=authorization_code&code=" + code +
-                "&redirect_uri=" + ReqInfo.getRequestUrlPath(request);
-
-        Map<String, String> headers = new HashMap<>();
-
-        String authHeader = "Basic " + getUrsClientAppAuthCode();
-        headers.put("Authorization", authHeader);
-
-        log.info("URS Token Request URL: {}", url);
-        log.info("URS Token Request POST data: {}", LogUtil.scrubEntry(postData));
-        log.info("URS Token Request Authorization Header: {}", authHeader);
-
-        String contents = Util.submitHttpRequest(url, headers, postData);
-
-        log.info("URS Token: {}", contents);
-
-
-        // Parse the json to extract the token.
-        JsonParser jparse = new JsonParser();
-        JsonObject json = jparse.parse(contents).getAsJsonObject();
+        EarthDataLoginAccessToken edlat = exchangeAuthCodeForEdlToken(code, returnToUrl);
 
         UserProfile userProfile = new UserProfile(request);
         userProfile.setAuthContext(getAuthContext());
 
-        EarthDataLoginAccessToken edlat = new EarthDataLoginAccessToken(json, getUrsClientAppId());
         userProfile.setEDLAccessToken(edlat);
         getEDLUserProfile(userProfile);
         log.info("URS UID: {}", userProfile.getUID());
