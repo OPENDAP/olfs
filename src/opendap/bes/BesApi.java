@@ -2467,8 +2467,7 @@ public class BesApi implements Cloneable {
             }
         }
 
-        if(qp.computeChecksums())
-            request.addContent(setContextElement(DAP4_CHECKSUMS_CONTEXT,"true"));
+        request.addContent(setContextElement(DAP4_CHECKSUMS_CONTEXT,qp.computeChecksums()?"true":"false"));
 
         request.addContent(setContainerElement(getBesContainerName(),getBesSpaceName(),besDataSource,type));
 
