@@ -36,6 +36,7 @@ import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -187,6 +188,19 @@ public class OPeNDAPException extends Exception {
     }
 
 
+    /**
+     * ************************************************************************
+     * Recasts any Throwable to be an OPeNDAPException and then transmits it
+     * on to the passed stream as a DAP2 error object. If the passed Throwable
+     * is already an OPeNDAPException, it is not recast.
+     *
+     * @param t        The Exception that caused the problem.
+     * @param servlet  The current servlet. Used to find things shipped in the deployment.
+     * @param response The <code>HttpServletResponse</code> for the client.
+     */
+    public static int anyExceptionHandler(Throwable t, HttpServlet servlet, HttpServletResponse response) {
+        return anyExceptionHandler(t, servlet.getServletContext(), response);
+    }
 
     /**
      * ************************************************************************
@@ -195,17 +209,14 @@ public class OPeNDAPException extends Exception {
      * is already an OPeNDAPException, it is not recast.
      *
      * @param t        The Exception that caused the problem.
+     * @param servletContext The servlet context. Used to find things shipped in the deployment.
      * @param response The <code>HttpServletResponse</code> for the client.
      */
-    public static int anyExceptionHandler(Throwable t, HttpServlet servlet, HttpServletResponse response) {
+    public static int anyExceptionHandler(Throwable t, ServletContext servletContext, HttpServletResponse response) {
 
         Logger log = org.slf4j.LoggerFactory.getLogger(OPeNDAPException.class);
-
-
         try {
-
             log.error("anyExceptionHandler(): " + t);
-
 
             ByteArrayOutputStream baos =new ByteArrayOutputStream();
             PrintStream ps = new PrintStream( baos,  true, HyraxStringEncoding.getCharsetName());
@@ -232,14 +243,13 @@ public class OPeNDAPException extends Exception {
 
                 oe = new OPeNDAPException(UNDEFINED_ERROR, msg);
                 oe.setHttpStatusCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-
             }
 
             if(!response.isCommitted()){
 
                 response.reset();
 
-                oe.setSystemPath(ServletUtil.getSystemPath(servlet,""));
+                oe.setSystemPath(ServletUtil.getSystemPath(servletContext,""));
                 try {
                     oe.sendHttpErrorResponse(response);
                 }
@@ -504,7 +514,7 @@ public class OPeNDAPException extends Exception {
         // for the JSP to retrieve. The RequestCache  for this thread gets destroyed when the doGet/doPost
         // methods exit which is normal and expected behavior, but the JSP page is invoked afterward so we
         // need a rendezvous for the message. We utilize this errorMessage cache for this purpose. The only
-        // public method for retrieving the message is tied to the thread of execution and it removes the
+        // public method for retrieving the message is tied to the thread of execution, and it removes the
         // message from the cache (clears the cache for the thread) once it is retrieved.
         _errorMessageCache.put(Thread.currentThread(), getMessage());
 

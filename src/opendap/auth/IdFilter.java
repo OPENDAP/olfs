@@ -159,8 +159,25 @@ public class IdFilter implements Filter {
 
     }
 
+    void doUnathorized(Exception e, HttpServletResponse resp, IdProvider idProvider) throws IOException {
+        String msg = "Your Login Transaction FAILED!   " +
+                "Authentication Context: '"+idProvider.getAuthContext()+
+                "' Message: "+ e.getMessage();
+        log.error("doUnathorized() - {}", msg);
+        OPeNDAPException.setCachedErrorMessage(msg);
+        resp.sendError(HttpServletResponse.SC_UNAUTHORIZED,msg);
+    }
 
-    public void doFilter(ServletRequest sreq, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
+    void doForbidden(Exception e, HttpServletResponse resp, IdProvider idProvider) throws IOException {
+        String msg = "Your Login Transaction FAILED!   " +
+                "Authentication Context: '" + idProvider.getAuthContext() +
+                "' Message: "+ e.getMessage();
+        log.error("doForbidden() - {}", msg);
+        OPeNDAPException.setCachedErrorMessage(msg);
+        resp.sendError(HttpServletResponse.SC_FORBIDDEN,msg);
+    }
+
+    public void doFilter(ServletRequest sreq, ServletResponse sresp, FilterChain filterChain) throws IOException, ServletException {
 
         // Ensure initialization has been accomplished
         if (!isInitialized) {
@@ -178,6 +195,7 @@ public class IdFilter implements Filter {
         try {
 
             HttpServletRequest request = (HttpServletRequest) sreq;
+            HttpServletResponse response = (HttpServletResponse) sresp;
             RequestCache.open(request);
             RequestId requestId = RequestCache.getRequestId();
 
@@ -277,13 +295,8 @@ public class IdFilter implements Filter {
 
 
                         } catch (IOException | Forbidden e) {
-                            String msg = "Your Login Transaction FAILED!   " +
-                                    "Authentication Context: '"+idProvider.getAuthContext()+
-                                    "' Message: "+ e.getMessage();
-                            log.error("doFilter() - {}", msg);
-                            OPeNDAPException.setCachedErrorMessage(msg);
-                            ((HttpServletResponse)response).sendError(HttpServletResponse.SC_UNAUTHORIZED,msg);
-                            log.debug("END (session: {})",session.getId());
+                            doForbidden(e, response, idProvider);
+                            log.debug("END (session: {})", session.getId());
                             return;
                         }
                     }
@@ -313,10 +326,11 @@ public class IdFilter implements Filter {
                 log.debug("No UserProfile object found in Session. Request is not yet authenticated. " +
                         "Checking Authorization headers...");
                 if (IdPManager.hasDefaultProvider()) {
+                    IdProvider idProvider = IdPManager.getDefaultProvider();
                     try {
                         UserProfile userProfile = new UserProfile();
                         boolean retVal;
-                        retVal = IdPManager.getDefaultProvider().doTokenAuthentication(request, userProfile);
+                        retVal = idProvider.doTokenAuthentication(request, userProfile);
                         if(retVal){
                             log.info("Validated Authorization header. uid: {}", userProfile.getUID());
                             // By adding the UserProfile to the session here
@@ -340,7 +354,9 @@ public class IdFilter implements Filter {
                         }
                     }
                     catch (Forbidden http_403){
-                        log.error("Unable to validate Authorization header. Message: "+http_403.getMessage());
+                        log.error("Unable to validate Authorization header. Message: {}", http_403.getMessage());
+                        doForbidden(http_403, response, idProvider);
+                        log.debug("END (session: {})", session.getId());
                     }
                 }
             }

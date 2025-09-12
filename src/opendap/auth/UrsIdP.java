@@ -627,7 +627,6 @@ public class UrsIdP extends IdProvider{
 
         log.info("URS Token: {}", contents);
 
-
         // Parse the json to extract the token.
         JsonParser jparse = new JsonParser();
         JsonObject json = jparse.parse(contents).getAsJsonObject();
