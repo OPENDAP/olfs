@@ -64,6 +64,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static opendap.auth.IdFilter.USER_PROFILE;
+import static opendap.logging.ServletLogUtil.logEDLProfiling;
 
 /**
  * Created by ndp on 9/25/14.
@@ -429,6 +430,7 @@ public class UrsIdP extends IdProvider{
         log.debug("UID request: url: {} post_body: {}",url,post_body.toString());
 
         String contents;
+        long profilingStartTime = System.currentTimeMillis();
         try {
             Logger edlLog = LoggerFactory.getLogger("EDL_LOG");
             Timer.enable();
@@ -440,6 +442,7 @@ public class UrsIdP extends IdProvider{
             edlLog.info(report);
         }
         finally {
+            logEDLProfiling("Request EDL user profile",  profilingStartTime);
             Timer.reset();
             Timer.disable();
         }
@@ -598,6 +601,11 @@ public class UrsIdP extends IdProvider{
             url += "response_type=code&redirect_uri=" + returnToUrl;
 
             log.info("Redirecting client to EDL SSO. URS Code Request URL: {}", LogUtil.scrubEntry(url));
+
+            // Unlike other actions logged for EDL Profiling, this action is not itself timed---its duration will
+            // be on the order of a millisecond or two. We log it here anyway, as it is a useful checkpoint in the
+            // story of authentication redirects relative to its fellow profiling logs.
+            logEDLProfiling("Checkpoint: Redirect to EDL for authentication", System.currentTimeMillis());
             response.sendRedirect(url);
 
             log.debug("END (session: {})", session.getId());
@@ -609,6 +617,7 @@ public class UrsIdP extends IdProvider{
         // If we get here, the user was redirected by URS back to our application,
         // and we have a code. We now exchange the code for a token, which is
         // returned as a json document.
+        logEDLProfiling("Checkpoint: Client arrived from EDL with authentication code", System.currentTimeMillis());
         String url = getUrsUrl() + "/oauth/token";
 
         String postData = "grant_type=authorization_code&code=" + code +
@@ -623,7 +632,13 @@ public class UrsIdP extends IdProvider{
         log.info("URS Token Request POST data: {}", LogUtil.scrubEntry(postData));
         log.info("URS Token Request Authorization Header: {}", authHeader);
 
-        String contents = Util.submitHttpRequest(url, headers, postData);
+        long profilingStartTime = System.currentTimeMillis();
+        String contents;
+        try {
+            contents = Util.submitHttpRequest(url, headers, postData);
+        } finally {
+            logEDLProfiling("Request token from EDL", profilingStartTime);
+        }
 
         log.info("URS Token: {}", contents);
 

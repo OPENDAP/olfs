@@ -136,7 +136,7 @@ public class DispatchServlet extends HttpServlet {
             ServletLogUtil.useCombinedLog(enableCombinedLog!=null);
 
             Element useDualCWLogs = config.getChild("UseDualCloudWatchLogs");
-            ServletLogUtil.useDualCloudWatchLogs(useDualCWLogs!=null);
+            ServletLogUtil.setUseDualCloudWatchLogs(useDualCWLogs!=null);
 
             boolean enablePost = false;
             Element postConfig = config.getChild("HttpPost");

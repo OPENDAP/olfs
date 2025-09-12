@@ -91,7 +91,7 @@ public class Util {
 
             try {
                 // Here we try to get the response body even if it is an error
-                // because the server may ave sent back something useful in
+                // because the server may have sent back something useful in
                 // addition to the status.
                 InputStream is = connection.getInputStream();
                 // Extract the body of the response so we can return it.
