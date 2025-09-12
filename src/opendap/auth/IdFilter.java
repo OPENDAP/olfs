@@ -325,11 +325,7 @@ public class IdFilter implements Filter {
                         boolean retVal;
                         retVal = IdPManager.getDefaultProvider().doTokenAuthentication(request, userProfile);
                         if(retVal){
-                            log.info("Validated Authorization header. uid: {}", userProfile.getUID());
-
-                            // Change session is post authentication
-                            String newSessionId = request.changeSessionId();
-                            log.debug("New Session Id: {}",newSessionId);
+                            log.info("Validated Authorization header. uid: {}, sessionId: {}", userProfile.getUID(), session.getId());
 
                             // By adding the UserProfile to the session here
                             // it's available for the PEPFilter which is invoked

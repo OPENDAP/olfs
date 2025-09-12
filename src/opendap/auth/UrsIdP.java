@@ -543,6 +543,11 @@ public class UrsIdP extends IdProvider{
                 log.warn(msg, AuthorizationHeader.getScheme(authz_hdr_value));
             }
         }
+        if(foundValidAuthToken) {
+            // Change session id post authentication
+            String newSessionId = request.changeSessionId();
+            log.debug("New Session Id: {}",newSessionId);
+        }
         return foundValidAuthToken;
     }
 
