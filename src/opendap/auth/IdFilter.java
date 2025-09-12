@@ -72,6 +72,10 @@ public class IdFilter implements Filter {
     private static final String CONFIG_PARAMETER_NAME = "config";
     private static final String DEFAULT_CONFIG_FILE_NAME = "user-access.xml";
 
+    private static final String MAX_SESSION_LIFE_ELEM = "MaxSessionLife";
+    private static final String UNITS_ATTR = "units";
+    private static final long DEFAULT_MAX_SESSION_TIME_SECONDS = 60; // 60 seconds in milliseconds
+    private double maxSessionTimeSeconds = DEFAULT_MAX_SESSION_TIME_SECONDS;
 
     private String guestEndpoint;
     private boolean enableGuestProfile;
@@ -101,6 +105,77 @@ public class IdFilter implements Filter {
 
     }
 
+    private enum TimeUnits { MILLISECONDS, SECONDS, MINUTES, HOURS, DAYS, WEEKS }
+
+    /**
+     * Convert a time units string to an enum value.
+     * @param timeUnitsStr The units string
+     * @return The enum value for the units
+     */
+    TimeUnits stringToTimeUnits(String timeUnitsStr) {
+        if(timeUnitsStr!=null){
+            if(timeUnitsStr.equalsIgnoreCase("milliseconds")){
+                return TimeUnits.MILLISECONDS;
+            }
+            if(timeUnitsStr.equalsIgnoreCase("seconds")){
+                return TimeUnits.SECONDS;
+            }
+            if(timeUnitsStr.equalsIgnoreCase("minutes")){
+                return TimeUnits.MINUTES;
+            }
+            if(timeUnitsStr.equalsIgnoreCase("hours")){
+                return TimeUnits.HOURS;
+            }
+            if(timeUnitsStr.equalsIgnoreCase("days")){
+                return TimeUnits.DAYS;
+            }
+            if(timeUnitsStr.equalsIgnoreCase("weeks")){
+                return TimeUnits.WEEKS;
+            }
+        }
+        return TimeUnits.SECONDS;
+    }
+
+    /**
+     * Computes a time duration value in seconds from a value and units string.
+     * @param valueStr A numeric time duration value.
+     * @param unitsStr The units of the time duration value.
+     * @return The time in seconds represented by valueStr and unitsStr
+     */
+    double computeMaxSessionTimeSeconds(String valueStr, String unitsStr){
+        double value = Double.parseDouble(valueStr);
+        double valueSeconds;
+        switch (stringToTimeUnits(unitsStr)) {
+            case MILLISECONDS:
+                valueSeconds = value / 1000; // milliseconds to seconds
+                break;
+            case SECONDS:
+                valueSeconds = value;
+                break;
+            case MINUTES:
+                valueSeconds = value * 60; // Minutes to seconds
+                break;
+            case HOURS:
+                valueSeconds = value * 60 * 60; // Hours to seconds
+                break;
+            case DAYS:
+                valueSeconds = value * 60 * 60 * 24; // days to seconds
+                break;
+            case WEEKS:
+                valueSeconds = value * 60 * 60 * 24 * 7; // weeks to seconds.
+                break;
+            default:
+                valueSeconds = value; // default to units in seconds
+                break;
+        }
+        return valueSeconds;
+    }
+
+    /**
+     *
+     * @throws IOException
+     * @throws JDOMException
+     */
     private void init() throws IOException, JDOMException {
 
         initLock.lock();
@@ -131,8 +206,14 @@ public class IdFilter implements Filter {
             Element config;
             config = opendap.xml.Util.getDocumentRoot(configFile);
 
+            Element e;
+            //    <MaxSessionLife units="seconds">15</MaxSessionLife>
+            e = config.getChild(MAX_SESSION_LIFE_ELEM);
+            if(e!=null){
+                maxSessionTimeSeconds = computeMaxSessionTimeSeconds(e.getTextTrim(), e.getAttributeValue(UNITS_ATTR));
+            }
 
-            Element e = config.getChild("EnableGuestProfile");
+            e = config.getChild("EnableGuestProfile");
             if(e!=null){
                 enableGuestProfile = true;
                 guestEndpoint = PathBuilder.pathConcat(context, "guest");
@@ -160,6 +241,27 @@ public class IdFilter implements Filter {
     }
 
 
+    boolean sessionIsExpired(HttpSession session){
+        boolean expired = false;
+        double sessionInUseTime = (System.currentTimeMillis() - session.getCreationTime())/1000.0;
+        if (sessionInUseTime > maxSessionTimeSeconds) {
+            expired = true;
+        }
+        return expired;
+    }
+
+    HttpSession getSession(HttpServletRequest request){
+        HttpSession session = request.getSession(true);
+        log.debug("session.isNew(): {}", session.isNew());
+
+        if(sessionIsExpired(session)){
+            log.debug("Invalidating expired session: {}", session.getId());
+            session.invalidate();
+            session = request.getSession(true);
+        }
+        return session;
+    }
+
     public void doFilter(ServletRequest sreq, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
 
         // Ensure initialization has been accomplished
@@ -184,9 +286,12 @@ public class IdFilter implements Filter {
             HttpServletRequest hsReq = request;
 
             ServletLogUtil.logServerAccessStart(request,logName,request.getMethod(), requestId);
-            // Get session, make new as needed.
-            HttpSession session = hsReq.getSession(true);
-            log.debug("BEGIN ({}) (session: {})",requestId, session.getId());
+
+            // Get session, make new as needed, invalidate expired session as needed.
+            HttpSession session = getSession(request);
+            log.debug("BEGIN ({}) (session-id: {})",requestId, session.getId());
+            log.debug("session.isNew(): {}", session.isNew());
+
             Util.debugHttpRequest(request,log);
 
             HttpServletResponse hsRes = (HttpServletResponse) response;
