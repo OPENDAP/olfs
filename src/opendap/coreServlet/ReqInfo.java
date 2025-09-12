@@ -104,7 +104,7 @@ public class ReqInfo {
     /**
      * A request header key/name used by a client to transmit  a request id.
      */
-    public static final String REQUEST_ID_HEADER_KEY ="a-api-request-uuid";
+    public static final String CLIENT_REQUEST_ID_KEY ="a-api-request-uuid";
 
 
     private static Logger log;
@@ -944,7 +944,17 @@ public class ReqInfo {
         RequestId reqId;
 
         // Add additional req.getHeader() calls for different keys as needed.
-        String request_id_header = req.getHeader(REQUEST_ID_HEADER_KEY);
+        String request_id_header = req.getHeader(CLIENT_REQUEST_ID_KEY);
+        if(request_id_header != null) {
+            log.debug("Using client request id from request header. {}: {}",CLIENT_REQUEST_ID_KEY, request_id_header);
+        }
+        else { // Not in request headers. Checking query string
+            request_id_header = req.getParameter(CLIENT_REQUEST_ID_KEY);
+            if(request_id_header != null) {
+                log.debug("Using client request id from query string. {}={}",CLIENT_REQUEST_ID_KEY, request_id_header);
+            }
+        }
+
         if(request_id_header != null) {
             // TODO Determine the allowed characters and associated format
             //  for the REQUEST_UUID_KEY and use that to implement a closely
@@ -958,6 +968,8 @@ public class ReqInfo {
             // so make a homegrown request_id and send it on.
             // The no parameter constructor mints a fresh uuid
             reqId = new RequestId();
+            log.debug("Created unique request id: {}", reqId.id());
+
         }
         return reqId;
     }
