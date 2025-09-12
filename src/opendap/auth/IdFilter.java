@@ -328,8 +328,8 @@ public class IdFilter implements Filter {
                             log.info("Validated Authorization header. uid: {}", userProfile.getUID());
 
                             // Change session is post authentication
-                            String newSId = request.changeSessionId();
-                            log.debug("New Session Id: {}",newSId);
+                            String newSessionId = request.changeSessionId();
+                            log.debug("New Session Id: {}",newSessionId);
 
                             // By adding the UserProfile to the session here
                             // it's available for the PEPFilter which is invoked
