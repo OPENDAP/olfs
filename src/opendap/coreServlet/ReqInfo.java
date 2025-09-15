@@ -1004,6 +1004,9 @@ public class ReqInfo {
         hdrValue = "MorkAndMindy,BollAndBobby,JohnAndSally";
         log.debug("#  Found Client IP: {}", getClientIp("10.7.3.4", hdrValue));
 
+        hdrValue = null;
+        log.debug("#  Found Client IP: {}", getClientIp("10.7.3.5", hdrValue));
+
     }
 }
 
