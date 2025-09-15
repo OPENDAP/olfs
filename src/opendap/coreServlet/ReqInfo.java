@@ -990,7 +990,7 @@ public class ReqInfo {
     }
 
 
-    public static void main(String argv[]){
+    public static void main(String[] argv){
         String hdrValue;
         hdrValue = "192.198.64.33,73.981.12.1";
         log.debug("#  Found Client IP: {}", getClientIp("10.7.3.1", hdrValue));
