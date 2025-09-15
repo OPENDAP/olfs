@@ -963,9 +963,10 @@ public class ReqInfo {
     }
 
     private static final
-    Pattern IP_ADDR_PATTERN = Pattern.compile("\\b\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\b *?,\n");
+    Pattern IP_ADDR_PATTERN = Pattern.compile("\\b(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\\b");
+
     public static String getClientIp(HttpServletRequest req){
-        String clientIp = null;
+        String clientIp;
         String xForwardedFor = req.getHeader(X_FORWARDED_FOR);
         if(xForwardedFor != null){
             log.debug("Found header {}: {}",X_FORWARDED_FOR,xForwardedFor);
@@ -984,6 +985,34 @@ public class ReqInfo {
         }
         log.debug("Returning  clientIp:  {}",clientIp);
         return clientIp;
+    }
+
+    private static boolean test_ip_match(String ip){
+        boolean result;
+        result = IP_ADDR_PATTERN.matcher(ip).matches();
+        if(result){
+            System.out.println("ip address: " + ip + " MATCHES pattern: \"" + IP_ADDR_PATTERN.pattern()+"\"");
+        }
+        else {
+            System.out.println("ip address: " + ip + " DOES NOT MATCH pattern: \"" + IP_ADDR_PATTERN.pattern()+"\"");
+        }
+        return result;
+    }
+
+    public static void main(String argv[]){
+        String hdrValue;
+        hdrValue = "192.198.64.33,73.981.12.1";
+        test_ip_match(hdrValue.split(",")[0].trim());
+
+        hdrValue = "192.198.64.33";
+        test_ip_match(hdrValue.split(",")[0].trim());
+
+        hdrValue = "192.921.64.33,192.198.64.33";
+        test_ip_match(hdrValue.split(",")[0].trim());
+
+        hdrValue = "MorkAndMindy,BollAndBobby,JohnAndSally";
+        test_ip_match(hdrValue.split(",")[0].trim());
+
     }
 }
 
