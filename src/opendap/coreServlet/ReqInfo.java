@@ -971,8 +971,9 @@ public class ReqInfo {
     private static String getClientIp(String remoteHost, String xForwardForHeader){
         String clientIp;
         if(xForwardForHeader != null){
-            log.debug("HTTP Header {}: {}",X_FORWARDED_FOR,xForwardForHeader);
+            log.debug("HTTP Header {}: '{}'",X_FORWARDED_FOR,xForwardForHeader);
             String candidateIp = xForwardForHeader.split(",")[0].trim();
+            log.debug("candidateIp: '{}'",candidateIp);
             if( IP_ADDR_PATTERN.matcher(candidateIp).matches() ){
                 clientIp = candidateIp;
             }
@@ -985,27 +986,46 @@ public class ReqInfo {
         else {
             clientIp = remoteHost;
         }
-        log.debug("Returning clientIp: {}",clientIp);
+        log.debug("Returning clientIp: '{}'",clientIp);
         return clientIp;
     }
 
 
     public static void main(String[] argv){
         String hdrValue;
+        String hr="-------------------------------------------------------------------\n";
+
         hdrValue = "192.198.64.33,73.981.12.1";
         log.debug("#  Found Client IP: {}", getClientIp("10.7.3.1", hdrValue));
+        log.debug(hr);
 
         hdrValue = "192.198.64.33";
         log.debug("#  Found Client IP: {}", getClientIp("1.1.1.2", hdrValue));
+        log.debug(hr);
 
         hdrValue = "192.921.64.33,192.198.64.33";
         log.debug("#  Found Client IP: {}", getClientIp("10.7.3.3", hdrValue));
+        log.debug(hr);
+
+        hdrValue = "192.40.64.33 ,192.198.64.33";
+        log.debug("#  Found Client IP: {}", getClientIp("10.7.3.4", hdrValue));
+        log.debug(hr);
+
+        hdrValue = "192.41.64.33, 192.198.64.33";
+        log.debug("#  Found Client IP: {}", getClientIp("10.7.3.5", hdrValue));
+
+        log.debug(hr);
+        hdrValue = "192.42.64.33 , 192.198.64.33";
+        log.debug("#  Found Client IP: {}", getClientIp("10.7.3.6", hdrValue));
+        log.debug(hr);
 
         hdrValue = "MorkAndMindy,BollAndBobby,JohnAndSally";
-        log.debug("#  Found Client IP: {}", getClientIp("10.7.3.4", hdrValue));
+        log.debug("#  Found Client IP: {}", getClientIp("10.7.3.7", hdrValue));
+        log.debug(hr);
 
         hdrValue = null;
-        log.debug("#  Found Client IP: {}", getClientIp("10.7.3.5", hdrValue));
+        log.debug("#  Found Client IP: {}", getClientIp("10.7.3.8", hdrValue));
+        log.debug(hr);
 
     }
 }
