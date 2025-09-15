@@ -93,6 +93,7 @@ public class ReqInfo {
     private static final String CLOUD_FRONT_FORWARDED_PROTOCOL = "CloudFront-Forwarded-Proto";
     private static final String X_FORWARDED_PROTOCOL = "X-Forwarded-Proto";
     private static final String X_FORWARDED_PORT = "X-Forwarded-Port";
+    private static final String X_FORWARDED_FOR ="X-Forwarded-For";
 
     private static final String JAVAX_SERVLET_FORWARD_REQUEST_URI  = "javax.servlet.forward.request_uri";
     private static final String JAVAX_SERVLET_FORWARD_CONTEXT_PATH = "javax.servlet.forward.context_path";
@@ -105,7 +106,6 @@ public class ReqInfo {
      * A request header key/name used by a client to transmit  a request id.
      */
     public static final String REQUEST_ID_HEADER_KEY ="a-api-request-uuid";
-
 
     private static Logger log;
     static {
@@ -962,6 +962,29 @@ public class ReqInfo {
         return reqId;
     }
 
+    private static final
+    Pattern IP_ADDR_PATTERN = Pattern.compile("\\b\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\b *?,\n");
+    public static String getClientIp(HttpServletRequest req){
+        String clientIp = null;
+        String xForwardedFor = req.getHeader(X_FORWARDED_FOR);
+        if(xForwardedFor != null){
+            log.debug("Found header {}: {}",X_FORWARDED_FOR,xForwardedFor);
+            String candidateIp = xForwardedFor.split(",")[0].trim();
+            if( IP_ADDR_PATTERN.matcher(candidateIp).matches() ){
+                clientIp = candidateIp;
+            }
+            else {
+                log.error("Failed to locate valid client ip in the {} header: {} " +
+                        "Using request.getRemoteAddr() instead.", X_FORWARDED_FOR,xForwardedFor);
+                clientIp = req.getRemoteAddr();
+            }
+        }
+        else {
+            clientIp = req.getRemoteAddr();
+        }
+        log.debug("Returning  clientIp:  {}",clientIp);
+        return clientIp;
+    }
 }
 
 

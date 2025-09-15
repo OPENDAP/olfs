@@ -27,6 +27,7 @@
 package opendap.auth;
 
 import com.google.gson.*;
+import opendap.coreServlet.ReqInfo;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
@@ -211,7 +212,7 @@ public class UserProfile implements Serializable {
      * @param request The request to exam,ine.
      */
     private void setUserFootPrint(HttpServletRequest request) {
-        d_clientIp =  request.getRemoteHost();
+        d_clientIp =  ReqInfo.getClientIp(request);
         d_clientUserAgent = request.getHeader(USER_AGENT_KEY);
     }
 
@@ -223,7 +224,7 @@ public class UserProfile implements Serializable {
     boolean validateUserFootPrint(HttpServletRequest request) {
         String value;
 
-        value = request.getRemoteHost();
+        value = ReqInfo.getClientIp(request);
         if( d_clientIp == null || !d_clientIp.equals(value) ) {
             return false;
         }
