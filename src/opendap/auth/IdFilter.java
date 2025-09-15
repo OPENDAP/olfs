@@ -114,25 +114,26 @@ public class IdFilter implements Filter {
      */
     TimeUnits stringToTimeUnits(String timeUnitsStr) {
         if(timeUnitsStr!=null){
-            if(timeUnitsStr.equalsIgnoreCase("milliseconds")){
+            if(timeUnitsStr.toLowerCase().startsWith("mil")){
                 return TimeUnits.MILLISECONDS;
             }
-            if(timeUnitsStr.equalsIgnoreCase("seconds")){
+            if(timeUnitsStr.toLowerCase().startsWith("s")){
                 return TimeUnits.SECONDS;
             }
-            if(timeUnitsStr.equalsIgnoreCase("minutes")){
+            if(timeUnitsStr.toLowerCase().startsWith("min")){
                 return TimeUnits.MINUTES;
             }
-            if(timeUnitsStr.equalsIgnoreCase("hours")){
+            if(timeUnitsStr.toLowerCase().startsWith("h")){
                 return TimeUnits.HOURS;
             }
-            if(timeUnitsStr.equalsIgnoreCase("days")){
+            if(timeUnitsStr.toLowerCase().startsWith("d")){
                 return TimeUnits.DAYS;
             }
-            if(timeUnitsStr.equalsIgnoreCase("weeks")){
+            if(timeUnitsStr.toLowerCase().startsWith("w")){
                 return TimeUnits.WEEKS;
             }
         }
+        log.warn("WARNING - Failed to recognize submitted time units. Falling back to default time units of SECONDS");
         return TimeUnits.SECONDS;
     }
 
