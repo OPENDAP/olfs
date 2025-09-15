@@ -964,54 +964,45 @@ public class ReqInfo {
 
     private static final
     Pattern IP_ADDR_PATTERN = Pattern.compile("\\b(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\\b");
+    public static String getClientIp(HttpServletRequest req) {
+        return getClientIp(req.getRemoteHost(), req.getHeader(X_FORWARDED_FOR));
+    }
 
-    public static String getClientIp(HttpServletRequest req){
+    private static String getClientIp(String remoteHost, String xForwardForHeader){
         String clientIp;
-        String xForwardedFor = req.getHeader(X_FORWARDED_FOR);
-        if(xForwardedFor != null){
-            log.debug("Found header {}: {}",X_FORWARDED_FOR,xForwardedFor);
-            String candidateIp = xForwardedFor.split(",")[0].trim();
+        if(xForwardForHeader != null){
+            log.debug("HTTP Header {}: {}",X_FORWARDED_FOR,xForwardForHeader);
+            String candidateIp = xForwardForHeader.split(",")[0].trim();
             if( IP_ADDR_PATTERN.matcher(candidateIp).matches() ){
                 clientIp = candidateIp;
             }
             else {
                 log.error("Failed to locate valid client ip in the {} header: {} " +
-                        "Using request.getRemoteAddr() instead.", X_FORWARDED_FOR,xForwardedFor);
-                clientIp = req.getRemoteAddr();
+                        "Using request.getRemoteAddr() instead.", X_FORWARDED_FOR,xForwardForHeader);
+                clientIp = remoteHost;
             }
         }
         else {
-            clientIp = req.getRemoteAddr();
+            clientIp = remoteHost;
         }
-        log.debug("Returning  clientIp:  {}",clientIp);
+        log.debug("Returning clientIp: {}",clientIp);
         return clientIp;
     }
 
-    private static boolean test_ip_match(String ip){
-        boolean result;
-        result = IP_ADDR_PATTERN.matcher(ip).matches();
-        if(result){
-            System.out.println("ip address: " + ip + " MATCHES pattern: \"" + IP_ADDR_PATTERN.pattern()+"\"");
-        }
-        else {
-            System.out.println("ip address: " + ip + " DOES NOT MATCH pattern: \"" + IP_ADDR_PATTERN.pattern()+"\"");
-        }
-        return result;
-    }
 
     public static void main(String argv[]){
         String hdrValue;
         hdrValue = "192.198.64.33,73.981.12.1";
-        test_ip_match(hdrValue.split(",")[0].trim());
+        log.debug("#  Found Client IP: {}", getClientIp("10.7.3.1", hdrValue));
 
         hdrValue = "192.198.64.33";
-        test_ip_match(hdrValue.split(",")[0].trim());
+        log.debug("#  Found Client IP: {}", getClientIp("1.1.1.2", hdrValue));
 
         hdrValue = "192.921.64.33,192.198.64.33";
-        test_ip_match(hdrValue.split(",")[0].trim());
+        log.debug("#  Found Client IP: {}", getClientIp("10.7.3.3", hdrValue));
 
         hdrValue = "MorkAndMindy,BollAndBobby,JohnAndSally";
-        test_ip_match(hdrValue.split(",")[0].trim());
+        log.debug("#  Found Client IP: {}", getClientIp("10.7.3.4", hdrValue));
 
     }
 }
