@@ -573,19 +573,6 @@ public class UrsIdP extends IdProvider{
                 "&redirect_uri=" + returnToUrl;
 
         String contents = edlApi(EDL_API_TOKEN, postData);
-        /*
-        Map<String, String> headers = new HashMap<>();
-        String authHeader = "Basic " + getUrsClientAppAuthCode();
-        headers.put("Authorization", authHeader);
-
-        log.info("URS Token Request URL: {}", url);
-        log.info("URS Token Request POST data: {}", LogUtil.scrubEntry(postData));
-        log.info("URS Token Request Authorization Header: {}", authHeader);
-
-        String contents = Util.submitHttpRequest(url, headers, postData);
-
-        log.info("EDL Token: {}", contents);
-        */
 
         // Parse the json to extract the token.
         JsonParser jparse = new JsonParser();
@@ -625,7 +612,8 @@ public class UrsIdP extends IdProvider{
 
         Util.debugHttpRequest(request,log);
 
-        String returnToUrl = ReqInfo.getRequestUrlPath(request);
+        //String returnToUrl = ReqInfo.getRequestUrlPath(request);
+        String returnToUrl = getEdlRedirectUri(request);
 
         // Check to see if we have a code returned from URS. If not, we must
         // redirect the user to EDL to start the authentication process.

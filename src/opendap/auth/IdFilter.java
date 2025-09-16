@@ -260,7 +260,10 @@ public class IdFilter implements Filter {
     }
 
     HttpSession getSession(HttpServletRequest request){
-        HttpSession session = request.getSession(true);
+        HttpSession session = request.getSession(false);
+        if(session == null){
+            session = request.getSession(true);
+        }
         log.debug("session.isNew(): {}", session.isNew());
 
         if(sessionIsExpired(session)){
@@ -325,9 +328,9 @@ public class IdFilter implements Filter {
             }
             else if (AuthenticationControls.isIntitialized() &&
                     requestURI.equals(AuthenticationControls.getLoginEndpoint())) {
-                // The Landing Page is essentially a user profile page with
-                // only the ability to login. No editing.
-                doLandingPage(hsReq, hsRes);
+                // A user profile page with
+                // only the ability to login/logout. No editing.
+                doUserProfilePage(hsReq, hsRes);
                 return;
             }
             else if (enableGuestProfile && requestURI.equals(guestEndpoint)) {
@@ -471,16 +474,16 @@ public class IdFilter implements Filter {
                 }
             }
 
-            // Cache the  request URL in the session. We do this here because we know by now that the request was
+            // Cache the request URL in the session. We do this here because we know by now that the request was
             // not for a "reserved" endpoint for login/logout etc. and we DO NOT want to cache those locations.
             synchronized(session) {
-                Util.cacheRequestUrlAsNeeded(session,requestUrl, requestURI,contextPath);
+                Util.cacheRequestUrlAsNeeded(session, requestUrl, requestURI, contextPath);
             }
 
             // This call leads to the PEPFilter, wooo!
             filterChain.doFilter(hsReq, hsRes);
 
-            log.debug("END (session: {})",session.getId());
+            log.debug("END (session: {} returnToUrl: {})",session.getId(),session.getAttribute(RETURN_TO_URL));
             ServletLogUtil.logServerAccessEnd(200,logName);
         }
         finally {
@@ -638,7 +641,7 @@ public class IdFilter implements Filter {
      * has not authenticated, then a login link will be displayed.
      *
      */
-	private void doLandingPage(HttpServletRequest request, HttpServletResponse response)
+	private void doUserProfilePage(HttpServletRequest request, HttpServletResponse response)
 	        throws IOException
     {
         log.debug("doLandingPage() - Setting Response Headers...");
