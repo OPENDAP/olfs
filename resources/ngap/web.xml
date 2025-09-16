@@ -342,10 +342,10 @@
 
     <session-config>
         <session-timeout>30</session-timeout>
-        <cookie-config>
+        <!-- cookie-config>
             <http-only>true</http-only>
             <secure>true</secure>
-        </cookie-config>
+        </cookie-config -->
     </session-config>
 
     <!-- Default Error Page Definitions -->
