@@ -683,6 +683,10 @@ public class UrsIdP extends IdProvider{
 
 	}
 
+    /**
+     * Returns the login endpoint for the UrsIdp
+     * @return The login endpoint.
+     */
     @Override
     public String getLoginEndpoint(){
         return PathBuilder.pathConcat(AuthenticationControls.getLoginEndpoint(), authContext);
@@ -694,15 +698,9 @@ public class UrsIdP extends IdProvider{
         return AuthenticationControls.getLogoutEndpoint();
     }
 
+
     @Override
     public void doLogout(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        // EDL Revoke Token:
-        // https://urs.earthdata.nasa.gov/documentation/for_integrators/api_documentation#/oauth/revoke
-        //
-        // curl --request POST \
-        // --url 'https://uat.urs.earthdata.nasa.gov/oauth/revoke?token=hKyV5KDRXXXXlCuq3w' \
-        // -H 'Authorization: Basic appcreds'
-        //
         try {
             HttpSession session = request.getSession(false);
             if (session != null) {
@@ -710,15 +708,32 @@ public class UrsIdP extends IdProvider{
             }
         }
         finally {
+            // The session will be invalidated by the parent class IdProvider.doLogout()
             super.doLogout(request, response);
         }
     }
 
+    /**
+     * Invalidates a user profile by revoking the EDL tokens help within.
+     * @param userProfile The user profile to invalidate.
+     * @throws IOException When the bad things happen.
+     */
     @Override
     public void invalidate(UserProfile userProfile) throws IOException {
         revokeEdlTokens(userProfile);
     }
 
+    /**
+     * EDL API Revoke Token:
+     * https://urs.earthdata.nasa.gov/documentation/for_integrators/api_documentation#/oauth/revoke
+     * <p/>
+     * curl --request POST --url 'https://uat.urs.earthdata.nasa.gov/oauth/revoke?token=hKyV5KDRXXXXlCuq3w' \
+     *    -H 'Authorization: Basic appcreds'
+     * <p/>
+     *
+     * @param up The user profile show tokens should be revoked.
+     * @throws IOException When bad things happens
+     */
     public void revokeEdlTokens(UserProfile up) throws IOException {
 
         if (up != null) {
@@ -736,12 +751,17 @@ public class UrsIdP extends IdProvider{
                 if (contents != null && !contents.equalsIgnoreCase("{}")) {
                     log.error("OUCH! Revocation for RefreshToken may have failed!. Message: {}", contents);
                 }
-
             }
         }
-
     }
 
+    /**
+     *
+     * @param apiPath The EDL path for the API (token, revoke, etc)
+     * @param postData The query string parameters to POST
+     * @return The response document
+     * @throws IOException When the bad things happen.
+     */
     private String edlApi(String apiPath, String postData) throws IOException {
         String url = getUrsUrl() + apiPath;
 
@@ -757,7 +777,6 @@ public class UrsIdP extends IdProvider{
         log.info("EDL Response Body: {}", contents);
 
         return contents;
-
     }
 
 
