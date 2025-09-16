@@ -120,7 +120,7 @@ public abstract class IdProvider {
         String redirectUrl = request.getContextPath();
         HttpSession session = request.getSession(false);
         if( session != null ) {
-            userProfileLogout((UserProfile) session.getAttribute(USER_PROFILE));
+            invalidate((UserProfile) session.getAttribute(USER_PROFILE));
             String href = (String) session.getAttribute(IdFilter.RETURN_TO_URL);
             redirectUrl = href!=null?href:redirectUrl;
             session.invalidate();
@@ -128,7 +128,13 @@ public abstract class IdProvider {
         response.sendRedirect(redirectUrl);
     }
 
-    public void userProfileLogout(UserProfile userProfile) throws IOException {}
+    /**
+     * Used to invalidate any persistent user state during a
+     * logout or transaction invalidation process.
+     * @param userProfile
+     * @throws IOException
+     */
+    public void invalidate(UserProfile userProfile) throws IOException {}
 
 
 }
