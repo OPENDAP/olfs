@@ -80,6 +80,9 @@ public class UrsIdP extends IdProvider{
 
     public static final String REJECT_UNSUPPORTED_AUTHZ_SCHEMES_KEY = "RejectUnsupportedAuthzSchemes";
 
+    public static final String EDL_API_REVOKE = "/oauth/revoke";
+    public static final String EDL_API_TOKEN = "/oauth/token";
+
     private Logger log;
 
     private String ursUrl;
@@ -566,10 +569,11 @@ public class UrsIdP extends IdProvider{
     public EarthDataLoginAccessToken exchangeAuthCodeForEdlToken(String code, String returnToUrl) throws IOException {
         log.info("EDL Code: {}", LogUtil.scrubEntry(code));
 
-        String url = getUrsUrl() + "/oauth/token";
         String postData = "grant_type=authorization_code&code=" + code +
                 "&redirect_uri=" + returnToUrl;
 
+        String contents = edlApi(EDL_API_TOKEN, postData);
+        /*
         Map<String, String> headers = new HashMap<>();
         String authHeader = "Basic " + getUrsClientAppAuthCode();
         headers.put("Authorization", authHeader);
@@ -581,6 +585,7 @@ public class UrsIdP extends IdProvider{
         String contents = Util.submitHttpRequest(url, headers, postData);
 
         log.info("EDL Token: {}", contents);
+        */
 
         // Parse the json to extract the token.
         JsonParser jparse = new JsonParser();
@@ -690,8 +695,61 @@ public class UrsIdP extends IdProvider{
         return AuthenticationControls.getLogoutEndpoint();
     }
 
+    @Override
+    public void doLogout(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        // EDL Revoke Token:
+        // https://urs.earthdata.nasa.gov/documentation/for_integrators/api_documentation#/oauth/revoke
+        //
+        // curl --request POST \
+        // --url 'https://uat.urs.earthdata.nasa.gov/oauth/revoke?token=hKyV5KDRXXXXlCuq3w' \
+        // -H 'Authorization: Basic appcreds'
+        //
+        try {
+            HttpSession session = request.getSession(false);
+            if (session != null) {
+                UserProfile up = (UserProfile) session.getAttribute(USER_PROFILE);
+                if (up != null) {
+                    EarthDataLoginAccessToken edlat = up.getEDLAccessToken();
+                    if (edlat != null) {
 
+                        String postData = "token=" + edlat.getAccessToken();
+                        String contents = edlApi(EDL_API_REVOKE, postData);
+                        if (contents != null && !contents.equalsIgnoreCase("{}")) {
+                            log.error("OUCH! Revocation of AccessToken may have failed!. Message: {}", contents);
+                        }
 
+                        postData = "token=" + edlat.getRefreshToken();
+                        contents = edlApi(EDL_API_REVOKE, postData);
+                        if (contents != null && !contents.equalsIgnoreCase("{}")) {
+                            log.error("OUCH! Revocation for RefreshToken may have failed!. Message: {}", contents);
+                        }
+
+                    }
+                }
+            }
+        }
+        finally {
+            super.doLogout(request, response);
+        }
+    }
+
+    private String edlApi(String apiPath, String postData) throws IOException {
+        String url = getUrsUrl() + apiPath;
+
+        Map<String, String> headers = new HashMap<>();
+        String authHeader = "Basic " + getUrsClientAppAuthCode();
+        headers.put("Authorization", authHeader);
+
+        log.info("EDL API Request URL: {}", url);
+        log.info("EDL API Request POST data: {}", LogUtil.scrubEntry(postData));
+        log.info("EDL API Request Authorization Header: {}", authHeader);
+
+        String contents = Util.submitHttpRequest(url, headers, postData);
+        log.info("EDL Response Body: {}", contents);
+
+        return contents;
+
+    }
 
 
 }
