@@ -715,7 +715,7 @@ public class UrsIdP extends IdProvider{
     }
 
     @Override
-    public void userProfileLogout(UserProfile userProfile) throws IOException {
+    public void invalidate(UserProfile userProfile) throws IOException {
         revokeEdlTokens(userProfile);
     }
 
