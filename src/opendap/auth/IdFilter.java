@@ -416,6 +416,10 @@ public class IdFilter implements Filter {
             //
             UserProfile up = (UserProfile) session.getAttribute(USER_PROFILE);
             if(up != null && !up.validateUserFootPrint(hsReq)){
+                if(IdPManager.hasDefaultProvider()) {
+                    // @TODO Maybe use the IdPManager.getDefaultProvider().doLogout(hsReq,hsRes); here?
+                    IdPManager.getDefaultProvider().invalidate(up);
+                }
                 up = null;
                 session.setAttribute(USER_PROFILE, null);
                 session.invalidate();
