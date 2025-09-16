@@ -37,7 +37,7 @@
         <!-- logout>logout</logout -->
     </EnableAuthenticationControls>
     <MaxSessionLife units="days">7</MaxSessionLife>
-
+    <ShowUserInfoOnProfilePage />
     <!-- EnableGuestProfile / -->
     <!-- EveryOneMustHaveId / -->
 
