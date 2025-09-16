@@ -197,7 +197,7 @@ public class UrsIdP extends IdProvider{
     public void setUrsClientAppAuthCode(String ursClientAppAuthCode) throws ServletException {
         if(ursClientAppAuthCode == null){
             String msg = "BAD CONFIGURATION - URS IdP Module must be configured with a Client Authorization Code. (client_auth_code)";
-            log.error("{}{}", ERR_PREFIX,msg);
+            log.error("{}{}", ERR_PREFIX, msg);
             throw new ServletException(msg);
         }
 
@@ -411,7 +411,7 @@ public class UrsIdP extends IdProvider{
     /**
      * Old Way:
      * curl -X POST -d 'token=<token>&client_id=<‘your application client_id’> https://urs.earthdata.nasa.gov/oauth/tokens/user
-     *
+     * <p>
      * New Way:
      * curl -X POST -d 'token=<token>’ -H ‘Authorization: ‘Basic <base64appcreds>’ https://urs.earthdata.nasa.gov/oauth/tokens/user
      *
@@ -596,20 +596,19 @@ public class UrsIdP extends IdProvider{
     }
 
     /**
-     *
      * Performs the user login operations.
      * This method does not actually generate any output. It performs a series
      * of redirects, depending upon the current state.
-     *
+     * <p>
      * 1) If the user is already logged in, it just redirects them back to the
-     *    home page.
-     *
+     * home page.
+     * <p>
      * 2) If no 'code' query parameter is found, it will redirect the user to URS
-     *    to start the authentication process.
-     *
+     * to start the authentication process.
+     * <p>
      * 3) If a 'code' query parameter is found, it assumes the call is a redirect
-     *    from a successful URS authentication, and will attempt to perform the
-     *    token exchange.
+     * from a successful URS authentication, and will attempt to perform the
+     * token exchange.
      *
      * @param request
      * @param response
@@ -743,7 +742,7 @@ public class UrsIdP extends IdProvider{
 
     }
 
-        private String edlApi(String apiPath, String postData) throws IOException {
+    private String edlApi(String apiPath, String postData) throws IOException {
         String url = getUrsUrl() + apiPath;
 
         Map<String, String> headers = new HashMap<>();
