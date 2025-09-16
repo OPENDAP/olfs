@@ -72,6 +72,8 @@ public class IdFilter implements Filter {
     private static final String CONFIG_PARAMETER_NAME = "config";
     private static final String DEFAULT_CONFIG_FILE_NAME = "user-access.xml";
 
+    private static final String SHOW_USER_INFO_ELEM = "ShowUserInfoOnProfilePage";
+    private static boolean showUserProfileDetails = false;
     private static final String MAX_SESSION_LIFE_ELEM = "MaxSessionLife";
     private static final String UNITS_ATTR = "units";
     private static final long DEFAULT_MAX_SESSION_TIME_SECONDS = 60; // 60 seconds in milliseconds
@@ -212,6 +214,12 @@ public class IdFilter implements Filter {
             e = config.getChild(MAX_SESSION_LIFE_ELEM);
             if(e!=null){
                 maxSessionTimeSeconds = computeMaxSessionTimeSeconds(e.getTextTrim(), e.getAttributeValue(UNITS_ATTR));
+            }
+
+            //    <ShowUserInfoInProfile />
+            e = config.getChild(SHOW_USER_INFO_ELEM);
+            if(e!=null){
+                showUserProfileDetails = true;
             }
 
             e = config.getChild("EnableGuestProfile");
@@ -577,22 +585,14 @@ public class IdFilter implements Filter {
         }
 	}
 
+    private static final String DTS = "<dt><strong>";
+    private static final String SDT = "</strong></dt>";
+    private static final String DTPS = "<dt><pre><strong>";
+    private static final String SPDT = "</strong></pre></dt>";
 
+    private String noProfileContent(String contextPath, HttpSession session){
+        log.debug("Building noProfile String.");
 
-    /**
-     * Displays the application home page.
-     * This method displays a welcome page for users. If the user has authenticated,
-     * then it will display his/her name, and provide a logout link. If the user
-     * has not authenticated, then a login link will be displayed.
-     *
-     */
-	private void doLandingPage(HttpServletRequest request, HttpServletResponse response)
-	        throws IOException
-    {
-        HttpSession session = request.getSession();
-        log.debug("doLandingPage() - Building noProfile String.");
-
-        String dtb = "<dt><b>";
 
         StringBuilder noProfile = new StringBuilder();
 
@@ -612,19 +612,31 @@ public class IdFilter implements Filter {
         if(enableGuestProfile) {
             noProfile.append("<i>Or you may:</i><br />");
             noProfile.append("<ul>");
-            noProfile.append("<li><a href=\"").append(request.getContextPath()).append("/guest\">Use a 'guest' profile.</a> </li>");
+            noProfile.append("<li><a href=\"").append(contextPath).append("/guest\">Use a 'guest' profile.</a> </li>");
             noProfile.append("</ul>");
         }
         if(session!=null){
             String origUrl = (String) session.getAttribute(RETURN_TO_URL);
             noProfile.append("<dl>");
             if(origUrl!=null){
-                noProfile.append(dtb).append("After authenticating you will be returned to:").append("</b></dt><dd><pre><a href='").append(origUrl).append("'>").append(origUrl).append("</a></pre></dd>");
+                noProfile.append(DTS).append("After authenticating you will be returned to:").append(SDT);
+                noProfile.append("<dd><pre><a href='").append(origUrl).append("'>").append(origUrl).append("</a></pre></dd>");
             }
             noProfile.append("</dl>");
         }
+        return noProfile.toString();
+    }
 
-
+    /**
+     * Displays the users profile page.
+     * This method displays a profile page for users. If the user has authenticated,
+     * then it will display his/her name, and provide a logout link. If the user
+     * has not authenticated, then a login link will be displayed.
+     *
+     */
+	private void doLandingPage(HttpServletRequest request, HttpServletResponse response)
+	        throws IOException
+    {
         log.debug("doLandingPage() - Setting Response Headers...");
 
         response.setContentType("text/html");
@@ -641,7 +653,7 @@ public class IdFilter implements Filter {
             OPeNDAPException.setCachedErrorMessage(e.getMessage());
             throw e;
         }
-		out.println("<html><head><title></title></head>");
+		out.println("<html><head><title>Greetings User!</title></head>");
 		out.println("<body><h1>"+AuthenticationControls.getLoginBanner()+"</h1>");
         out.println("<hr/>");
 
@@ -656,45 +668,73 @@ public class IdFilter implements Filter {
 
         //Create the body, depending upon whether the user has authenticated
         // or not.
+        HttpSession session = request.getSession();
         if(session != null){
+            log.debug("session.isNew(): {}", session.isNew());
             UserProfile userProfile = (UserProfile) session.getAttribute(USER_PROFILE);
             if( userProfile != null ){
                 IdProvider userIdP = userProfile.getIdP();
-                String firstName = userProfile.getAttribute("first_name");
-                if(firstName!=null)
-                    firstName = firstName.replaceAll("\"","");
+                String name = userProfile.getUID();
+                if (showUserProfileDetails) {
+                    name = userProfile.getAttribute("first_name");
+                    if(name!=null)
+                        name = name.replaceAll("\"","");
 
-                String lastName =  userProfile.getAttribute("last_name");
-                if(lastName!=null)
-                    lastName = lastName.replaceAll("\"","");
+                    String lastName =  userProfile.getAttribute("last_name");
+                    if(lastName!=null)
+                        name += " " + lastName.replaceAll("\"","");
+                }
 
-    		    out.println("<p>Greetings " + firstName + " " + lastName + ", this is your profile.</p>");
+                if(showUserProfileDetails) {
+                    out.println("<p>Greetings <strong>" + name + "</strong>, this is your profile page.</p>");
+                }
+
     		    out.println("You logged into Hyrax with <em>"+userIdP.getDescription()+"</em>");
-    		    out.println("<p><b><a href=\"" + userIdP.getLogoutEndpoint() + "\"> - - Click Here To Logout - - </a></b></p>");
-                out.println("<h3>"+firstName+"'s Profile</h3>");
+    		    out.println("<pre><b><a href=\"" + userIdP.getLogoutEndpoint() + "\">Click Here To Logout</a></b></pre>");
 
-                String origUrl = (String) session.getAttribute(RETURN_TO_URL);
+                if(showUserProfileDetails) {
+                    out.println("<h3>"+name+"'s Profile</h3>");
 
-                out.println("<dl>");
-                if(origUrl!=null){
-                    out.println(dtb + RETURN_TO_URL +"</b></dt><dd><pre><a href='"+origUrl+"'>"+origUrl+"</a></pre></dd>");
-                }
-                out.println(dtb + USER_PROFILE+"</b></dt><dd><pre>"+userProfile+"</pre></dd>");
-                out.println("</dl>");
+                    String origUrl = (String) session.getAttribute(RETURN_TO_URL);
 
-                out.println("<hr />");
-                out.println("<pre>");
-                out.print("<b>All_Session_Attributes</b>: [ ");
-
-                Enumeration<String> attrNames = session.getAttributeNames();
-                if(attrNames.hasMoreElements()){
-                    while(attrNames.hasMoreElements()){
-                        String attrName = attrNames.nextElement();
-                        out.print("\""+attrName+"\"");
-                        out.print((attrNames.hasMoreElements()?", ":""));
+                    out.println("<dl>");
+                    if(origUrl!=null){
+                        out.println(DTPS + RETURN_TO_URL + SPDT +"<dd><pre><a href='"+origUrl+"'>"+origUrl+"</a></pre></dd>");
                     }
+
+                    out.println(DTPS + "token:"+ SPDT +"<dd><pre>" + userProfile.getEDLAccessToken()+"</pre></dd>");
+
+                    out.println(DTPS + USER_PROFILE + SPDT + "<dd><pre>" + userProfile + "</pre></dd>");
+
+                    out.println("</dl>");
+
+                    out.println("<hr />");
+                    out.println("<pre>");
+                    out.print("<b>session attributes</b>: [ ");
+
+                    Enumeration<String> attrNames = session.getAttributeNames();
+                    if(attrNames.hasMoreElements()){
+                        while(attrNames.hasMoreElements()){
+                            String attrName = attrNames.nextElement();
+                            out.print("\""+attrName+"\"");
+                            out.print((attrNames.hasMoreElements()?", ":""));
+                        }
+                    }
+                    out.println(" ]</pre>");
+
+                    long timeNow = System.currentTimeMillis();
+                    double sessionInUseTime = (timeNow-session.getCreationTime())/1000.0;
+                    out.println("<pre>");
+                    out.println("                     session.isNew():  " + session.isNew());
+                    out.println("                     session.getId():  " + session.getId());
+                    out.println("    session.getMaxInactiveInterval():  " + session.getMaxInactiveInterval() + " seconds.");
+                    out.println("           session.getCreationTime():  " + session.getCreationTime() + " milliseconds since epoch.");
+                    out.println("               maxSessionTimeSeconds:  " + maxSessionTimeSeconds + " seconds.");
+                    out.println("                    sessionInUseTime:  " + sessionInUseTime + " seconds.");
+
+                    out.println("</pre>");
                 }
-                out.println(" ]</pre>");
+
                 out.println("<hr />");
             }
             else if(request.getUserPrincipal() != null){
@@ -702,11 +742,11 @@ public class IdFilter implements Filter {
                 out.println("<p><a href=\"" + request.getContextPath() + "/logout\">logout</a></p>");
             }
             else {
-                out.println(noProfile);
+                out.println(noProfileContent(request.getContextPath(),session));
             }
         }
         else {
-            out.println(noProfile);
+            out.println(noProfileContent(request.getContextPath(), session));
         }
         // Finish up the page
         out.println("</body></html>");

@@ -34,6 +34,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
+import static opendap.auth.IdFilter.USER_PROFILE;
+
 /**
  * Base class for the ID Provider implementations.
  */
@@ -117,8 +119,8 @@ public abstract class IdProvider {
     {
         String redirectUrl = request.getContextPath();
         HttpSession session = request.getSession(false);
-        if( session != null )
-        {
+        if( session != null ) {
+            userProfileLogout((UserProfile) session.getAttribute(USER_PROFILE));
             String href = (String) session.getAttribute(IdFilter.RETURN_TO_URL);
             redirectUrl = href!=null?href:redirectUrl;
             session.invalidate();
@@ -126,4 +128,8 @@ public abstract class IdProvider {
         response.sendRedirect(redirectUrl);
     }
 
+    public void userProfileLogout(UserProfile userProfile) throws IOException {}
+
+
 }
+
