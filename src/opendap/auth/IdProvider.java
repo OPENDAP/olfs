@@ -48,6 +48,7 @@ public abstract class IdProvider {
     protected String serviceContextPath;
 
     private boolean isDefaultProvider;
+    private boolean useReturnToUrlPostLogout;
 
 
     public IdProvider(){
@@ -55,6 +56,7 @@ public abstract class IdProvider {
         description = "Abstract Identification Service Provider";
         isDefaultProvider = false;
         serviceContextPath = null;
+        useReturnToUrlPostLogout = false;
     }
 
     public boolean isDefault(){ return isDefaultProvider; }
@@ -93,6 +95,11 @@ public abstract class IdProvider {
             isDefaultProvider = true;
         }
 
+        e = config.getChild("useReturnToUrlPostLogout");
+        if(e!=null){
+            useReturnToUrlPostLogout = true;
+        }
+
         setServiceContextPath(serviceContextPath);
     }
 
@@ -108,8 +115,7 @@ public abstract class IdProvider {
 
     public abstract boolean doTokenAuthentication(HttpServletRequest request, UserProfile userProfile) throws IOException, Forbidden ;
 
-
-        /**
+     /**
          * Logs a user out.
          * This method simply terminates the local session and redirects the user back
          * to the home page.
@@ -121,8 +127,10 @@ public abstract class IdProvider {
         HttpSession session = request.getSession(false);
         if( session != null ) {
             invalidate((UserProfile) session.getAttribute(USER_PROFILE));
-            // String href = (String) session.getAttribute(IdFilter.RETURN_TO_URL);
-            // redirectUrl = href!=null?href:redirectUrl;
+            if(useReturnToUrlPostLogout) {
+                String href = (String) session.getAttribute(IdFilter.RETURN_TO_URL);
+                redirectUrl = href!=null?href:redirectUrl;
+            }
             session.invalidate();
         }
         response.sendRedirect(redirectUrl);
