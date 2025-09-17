@@ -295,7 +295,7 @@ public class IdFilter implements Filter {
 
             HttpServletRequest request = (HttpServletRequest) sreq;
             RequestCache.open(request);
-            RequestId requestId = ReqInfo.getRequestId(request);
+            RequestId requestId = RequestCache.getRequestId();
 
             HttpServletRequest hsReq = request;
 
