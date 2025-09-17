@@ -165,6 +165,7 @@ public class ApacheIdP extends IdProvider {
      * This method simply terminates the local session and redirects the user back
      * to the home page.
      */
+    @Override
     public void doLogout(HttpServletRequest request, HttpServletResponse response)
 	        throws IOException
     {
