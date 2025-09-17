@@ -96,15 +96,15 @@ public class TomcatRealmIdP extends IdProvider {
 
     @Override
     public String getLoginEndpoint(){
-        String loginEndpoint = PathBuilder.pathConcat(serviceContext,AuthenticationControls.getLoginEndpoint());
-        loginEndpoint = PathBuilder.pathConcat(loginEndpoint, authContext);
+        String loginEndpoint = PathBuilder.pathConcat(getServiceContext(),AuthenticationControls.getLoginEndpoint());
+        loginEndpoint = PathBuilder.pathConcat(loginEndpoint, getAuthContext());
         return loginEndpoint;
     }
 
 
     @Override
     public String getLogoutEndpoint() {
-        String logoutEndpoint = PathBuilder.pathConcat(serviceContext,AuthenticationControls.getLogoutEndpoint());
+        String logoutEndpoint = PathBuilder.pathConcat(getServiceContext(),AuthenticationControls.getLogoutEndpoint());
         return logoutEndpoint;
     }
 }

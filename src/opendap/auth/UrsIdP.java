@@ -677,7 +677,7 @@ public class UrsIdP extends IdProvider{
      */
     @Override
     public String getLoginEndpoint(){
-        return PathBuilder.pathConcat(AuthenticationControls.getLoginEndpoint(), authContext);
+        return PathBuilder.pathConcat(AuthenticationControls.getLoginEndpoint(), getAuthContext());
     }
 
 
