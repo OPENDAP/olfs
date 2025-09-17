@@ -95,7 +95,7 @@ public abstract class IdProvider {
             isDefaultProvider = true;
         }
 
-        e = config.getChild("useReturnToUrlPostLogout");
+        e = config.getChild("UseReturnToUrlPostLogout");
         if(e!=null){
             useReturnToUrlPostLogout = true;
         }
