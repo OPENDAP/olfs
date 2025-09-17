@@ -646,7 +646,7 @@ public class UrsIdP extends IdProvider{
         log.debug("session.getAttribute(RETURN_TO_URL): {} (session-id: {})", redirectUrl, session.getId());
 
         if (redirectUrl == null) {
-            redirectUrl = PathBuilder.normalizePath(serviceContext, true, false);
+            redirectUrl = Util.fullyQualifiedPath(request.getContextPath());
         }
 
         session.setAttribute(IdFilter.RETURN_TO_URL, null);
