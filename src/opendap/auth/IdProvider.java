@@ -142,8 +142,9 @@ public abstract class IdProvider {
      * @param userProfile
      * @throws IOException
      */
-    public void invalidate(UserProfile userProfile) throws IOException {}
-
+    public  void invalidate(UserProfile userProfile) throws IOException {
+        // Nothing to see here folks. Moove along..
+    }
 
 }
 
