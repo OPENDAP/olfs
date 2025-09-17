@@ -45,7 +45,7 @@ public abstract class IdProvider {
     public static final String AUTHORIZATION_HEADER_KEY="authorization";
     protected String authContext;
     private String description;
-    protected String serviceContext;
+    protected String serviceContextPath;
 
     private boolean isDefaultProvider;
 
@@ -54,7 +54,7 @@ public abstract class IdProvider {
         authContext = null;
         description = "Abstract Identification Service Provider";
         isDefaultProvider = false;
-        serviceContext = null;
+        serviceContextPath = null;
     }
 
     public boolean isDefault(){ return isDefaultProvider; }
@@ -65,15 +65,15 @@ public abstract class IdProvider {
     public  String getDescription(){ return description; }
     public  void setDescription(String d){ description = d; }
 
-    public String getServiceContext(){ return serviceContext;}
-    public void setServiceContext(String sc){ serviceContext = sc;}
+    public String getServiceContextPath(){ return serviceContextPath;}
+    public void setServiceContextPath(String sc){ serviceContextPath = sc;}
 
 
     public abstract String getLoginEndpoint();
 
     public abstract String getLogoutEndpoint();
 
-    public void init(Element config, String serviceContext) throws ConfigurationException{
+    public void init(Element config, String serviceContextPath) throws ConfigurationException{
 
         if(config == null){
             throw new ConfigurationException("init(): Configuration element may not be null.");
@@ -93,7 +93,7 @@ public abstract class IdProvider {
             isDefaultProvider = true;
         }
 
-        this.serviceContext = serviceContext;
+        setServiceContextPath(serviceContextPath);
     }
 
     /**
@@ -117,12 +117,12 @@ public abstract class IdProvider {
     public void doLogout(HttpServletRequest request, HttpServletResponse response)
 	        throws IOException
     {
-        String redirectUrl = Util.fullyQualifiedPath(request.getContextPath());
+        String redirectUrl = getServiceContextPath();
         HttpSession session = request.getSession(false);
         if( session != null ) {
             invalidate((UserProfile) session.getAttribute(USER_PROFILE));
-            String href = (String) session.getAttribute(IdFilter.RETURN_TO_URL);
-            redirectUrl = href!=null?href:redirectUrl;
+            // String href = (String) session.getAttribute(IdFilter.RETURN_TO_URL);
+            // redirectUrl = href!=null?href:redirectUrl;
             session.invalidate();
         }
         response.sendRedirect(redirectUrl);

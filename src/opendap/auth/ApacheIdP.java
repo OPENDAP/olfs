@@ -79,8 +79,8 @@ public class ApacheIdP extends IdProvider {
 
 
     @Override
-    public void init(Element config, String serviceContext) throws ConfigurationException {
-        super.init(config,serviceContext);
+    public void init(Element config, String serviceContextPath) throws ConfigurationException {
+        super.init(config, serviceContextPath);
 
         Element e = config.getChild("login");
         if(e!=null){
@@ -169,7 +169,7 @@ public class ApacheIdP extends IdProvider {
     public void doLogout(HttpServletRequest request, HttpServletResponse response)
 	        throws IOException
     {
-        String redirectUrl = Util.fullyQualifiedPath(getServiceContext());
+        String redirectUrl = getServiceContextPath();
         HttpSession session = request.getSession(false);
         if( session != null )
         {

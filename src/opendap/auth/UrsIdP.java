@@ -104,8 +104,8 @@ public class UrsIdP extends IdProvider{
 
 
     @Override
-    public void init(Element config, String serviceContext) throws ConfigurationException {
-        super.init(config, serviceContext);
+    public void init(Element config, String serviceContextPath) throws ConfigurationException {
+        super.init(config, serviceContextPath);
 
         Element e;
 
@@ -646,7 +646,7 @@ public class UrsIdP extends IdProvider{
         log.debug("session.getAttribute(RETURN_TO_URL): {} (session-id: {})", redirectUrl, session.getId());
 
         if (redirectUrl == null) {
-            redirectUrl = Util.fullyQualifiedPath(request.getContextPath());
+            redirectUrl = getServiceContextPath();
         }
 
         session.setAttribute(IdFilter.RETURN_TO_URL, null);

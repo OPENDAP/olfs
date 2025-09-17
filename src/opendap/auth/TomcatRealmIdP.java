@@ -69,7 +69,7 @@ public class TomcatRealmIdP extends IdProvider {
         HttpSession session = request.getSession();
         log.debug("BEGIN (session: {})",session.getId());
         log.debug("session.isNew(): {}", session.isNew());
-        String redirectUrl = Util.fullyQualifiedPath(request.getContextPath());
+        String redirectUrl = getServiceContextPath();
         if(session != null){
             String url = (String) session.getAttribute(IdFilter.RETURN_TO_URL);
             if(url != null) {
@@ -96,7 +96,7 @@ public class TomcatRealmIdP extends IdProvider {
 
     @Override
     public String getLoginEndpoint(){
-        String loginEndpoint = PathBuilder.pathConcat(getServiceContext(),AuthenticationControls.getLoginEndpoint());
+        String loginEndpoint = PathBuilder.pathConcat(getServiceContextPath(),AuthenticationControls.getLoginEndpoint());
         loginEndpoint = PathBuilder.pathConcat(loginEndpoint, getAuthContext());
         return loginEndpoint;
     }
@@ -104,7 +104,7 @@ public class TomcatRealmIdP extends IdProvider {
 
     @Override
     public String getLogoutEndpoint() {
-        String logoutEndpoint = PathBuilder.pathConcat(getServiceContext(),AuthenticationControls.getLogoutEndpoint());
+        String logoutEndpoint = PathBuilder.pathConcat(getServiceContextPath(),AuthenticationControls.getLogoutEndpoint());
         return logoutEndpoint;
     }
 }
