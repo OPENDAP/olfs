@@ -31,6 +31,7 @@ import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
 import opendap.PathBuilder;
+import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestId;
 import opendap.coreServlet.Scrub;
 import opendap.coreServlet.ServletUtil;
@@ -380,7 +381,8 @@ public class ServletLogUtil {
 
         MDC.put(REQUEST_ID_KEY, reqID.logId());
         MDC.put(HTTP_VERB_KEY, httpVerb);
-        MDC.put(CLIENT_HOST_KEY, req.getRemoteHost());
+        String clientIp = ReqInfo.getClientIp(req);
+        MDC.put(CLIENT_HOST_KEY, clientIp);
         MDC.put(SESSION_ID_KEY, (session == null) ? "-" : session.getId());
 
         String uid = opendap.auth.Util.getUID(req);
@@ -400,7 +402,7 @@ public class ServletLogUtil {
 
         if(log.isInfoEnabled()) {
             String startMsg = "REQUEST START - " +
-                    "RemoteHost: '" + LogUtil.scrubEntry(req.getRemoteHost()) + "' " +
+                    "RemoteHost: '" + clientIp + "' " +
                     "RequestedResource: '" + resourceID + "' " +
                     "QueryString: '" + query + "' " +
                     "AccessLog: " + logName;

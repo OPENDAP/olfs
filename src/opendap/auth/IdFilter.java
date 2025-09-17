@@ -72,6 +72,12 @@ public class IdFilter implements Filter {
     private static final String CONFIG_PARAMETER_NAME = "config";
     private static final String DEFAULT_CONFIG_FILE_NAME = "user-access.xml";
 
+    private static final String SHOW_USER_INFO_ELEM = "ShowUserInfoOnProfilePage";
+    private static boolean showUserProfileDetails = false;
+    private static final String MAX_SESSION_LIFE_ELEM = "MaxSessionLife";
+    private static final String UNITS_ATTR = "units";
+    private static final long DEFAULT_MAX_SESSION_TIME_SECONDS = 60; // 60 seconds in milliseconds
+    private double maxSessionTimeSeconds = DEFAULT_MAX_SESSION_TIME_SECONDS;
 
     private String guestEndpoint;
     private boolean enableGuestProfile;
@@ -101,6 +107,78 @@ public class IdFilter implements Filter {
 
     }
 
+    private enum TimeUnits { MILLISECONDS, SECONDS, MINUTES, HOURS, DAYS, WEEKS }
+
+    /**
+     * Lenient conversion of a time units string to an enum value.
+     * @param timeUnitsStr The units string
+     * @return The enum value for the units
+     */
+    TimeUnits stringToTimeUnits(String timeUnitsStr) {
+        if(timeUnitsStr!=null){
+            if(timeUnitsStr.toLowerCase().startsWith("mil")){
+                return TimeUnits.MILLISECONDS;
+            }
+            if(timeUnitsStr.toLowerCase().startsWith("s")){
+                return TimeUnits.SECONDS;
+            }
+            if(timeUnitsStr.toLowerCase().startsWith("min")){
+                return TimeUnits.MINUTES;
+            }
+            if(timeUnitsStr.toLowerCase().startsWith("h")){
+                return TimeUnits.HOURS;
+            }
+            if(timeUnitsStr.toLowerCase().startsWith("d")){
+                return TimeUnits.DAYS;
+            }
+            if(timeUnitsStr.toLowerCase().startsWith("w")){
+                return TimeUnits.WEEKS;
+            }
+        }
+        log.warn("WARNING - Failed to recognize submitted time units. Falling back to default time units of SECONDS");
+        return TimeUnits.SECONDS;
+    }
+
+    /**
+     * Computes a time duration value in seconds from a value and units string.
+     * @param valueStr A numeric time duration value.
+     * @param unitsStr The units of the time duration value.
+     * @return The time in seconds represented by valueStr and unitsStr
+     */
+    double computeMaxSessionTimeSeconds(String valueStr, String unitsStr){
+        double value = Double.parseDouble(valueStr);
+        double valueSeconds;
+        switch (stringToTimeUnits(unitsStr)) {
+            case MILLISECONDS:
+                valueSeconds = value / 1000; // milliseconds to seconds
+                break;
+            case SECONDS:
+                valueSeconds = value;
+                break;
+            case MINUTES:
+                valueSeconds = value * 60; // Minutes to seconds
+                break;
+            case HOURS:
+                valueSeconds = value * 60 * 60; // Hours to seconds
+                break;
+            case DAYS:
+                valueSeconds = value * 60 * 60 * 24; // days to seconds
+                break;
+            case WEEKS:
+                valueSeconds = value * 60 * 60 * 24 * 7; // weeks to seconds.
+                break;
+            default:
+                valueSeconds = value; // default to units in seconds
+                break;
+        }
+        return valueSeconds;
+    }
+
+    /**
+     *
+     * @throws IOException
+     * @throws JDOMException
+     */
     private void init() throws IOException, JDOMException {
 
         initLock.lock();
@@ -131,8 +209,20 @@ public class IdFilter implements Filter {
             Element config;
             config = opendap.xml.Util.getDocumentRoot(configFile);
 
+            Element e;
+            //    <MaxSessionLife units="seconds">15</MaxSessionLife>
+            e = config.getChild(MAX_SESSION_LIFE_ELEM);
+            if(e!=null){
+                maxSessionTimeSeconds = computeMaxSessionTimeSeconds(e.getTextTrim(), e.getAttributeValue(UNITS_ATTR));
+            }
 
-            Element e = config.getChild("EnableGuestProfile");
+            //    <ShowUserInfoInProfile />
+            e = config.getChild(SHOW_USER_INFO_ELEM);
+            if(e!=null){
+                showUserProfileDetails = true;
+            }
+
+            e = config.getChild("EnableGuestProfile");
             if(e!=null){
                 enableGuestProfile = true;
                 guestEndpoint = PathBuilder.pathConcat(context, "guest");
@@ -160,6 +250,30 @@ public class IdFilter implements Filter {
     }
 
 
+    boolean sessionIsExpired(HttpSession session){
+        boolean expired = false;
+        double sessionInUseTime = (System.currentTimeMillis() - session.getCreationTime())/1000.0;
+        if (sessionInUseTime > maxSessionTimeSeconds) {
+            expired = true;
+        }
+        return expired;
+    }
+
+    HttpSession getSession(HttpServletRequest request){
+        HttpSession session = request.getSession(false);
+        if(session == null){
+            session = request.getSession(true);
+        }
+        log.debug("session.isNew(): {}", session.isNew());
+
+        if(sessionIsExpired(session)){
+            log.debug("Invalidating expired session: {}", session.getId());
+            session.invalidate();
+            session = request.getSession(true);
+        }
+        return session;
+    }
+
     public void doFilter(ServletRequest sreq, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
 
         // Ensure initialization has been accomplished
@@ -184,9 +298,12 @@ public class IdFilter implements Filter {
             HttpServletRequest hsReq = request;
 
             ServletLogUtil.logServerAccessStart(request,logName,request.getMethod(), requestId);
-            // Get session, make new as needed.
-            HttpSession session = hsReq.getSession(true);
-            log.debug("BEGIN ({}) (session: {})",requestId, session.getId());
+
+            // Get session, make new as needed, invalidate expired session as needed.
+            HttpSession session = getSession(request);
+            log.debug("BEGIN ({}) (session-id: {})",requestId, session.getId());
+            log.debug("session.isNew(): {}", session.isNew());
+
             Util.debugHttpRequest(request,log);
 
             HttpServletResponse hsRes = (HttpServletResponse) response;
@@ -211,9 +328,9 @@ public class IdFilter implements Filter {
             }
             else if (AuthenticationControls.isIntitialized() &&
                     requestURI.equals(AuthenticationControls.getLoginEndpoint())) {
-                // The Landing Page is essentially a user profile page with
-                // only the ability to login. No editing.
-                doLandingPage(hsReq, hsRes);
+                // A user profile page with
+                // only the ability to login/logout. No editing.
+                doUserProfilePage(hsReq, hsRes);
                 return;
             }
             else if (enableGuestProfile && requestURI.equals(guestEndpoint)) {
@@ -301,6 +418,17 @@ public class IdFilter implements Filter {
             // user and then pass it on to the filter chain.
             //
             UserProfile up = (UserProfile) session.getAttribute(USER_PROFILE);
+            if(up != null && !up.validateUserFootPrint(hsReq)){
+                if(IdPManager.hasDefaultProvider()) {
+                    // @TODO Maybe use the IdPManager.getDefaultProvider().doLogout(hsReq,hsRes); here?
+                    IdPManager.getDefaultProvider().invalidate(up);
+                }
+                up = null;
+                session.setAttribute(USER_PROFILE, null);
+                session.invalidate();
+                session = request.getSession(true);
+            }
+
             if (up != null) {
                 log.debug("Found UserProfile object in Session, this is an authenticated request for user: {}",up.getUID());
                 AuthenticatedHttpRequest authReq = new AuthenticatedHttpRequest(hsReq);
@@ -314,11 +442,12 @@ public class IdFilter implements Filter {
                         "Checking Authorization headers...");
                 if (IdPManager.hasDefaultProvider()) {
                     try {
-                        UserProfile userProfile = new UserProfile();
+                        UserProfile userProfile = new UserProfile(request);
                         boolean retVal;
                         retVal = IdPManager.getDefaultProvider().doTokenAuthentication(request, userProfile);
                         if(retVal){
-                            log.info("Validated Authorization header. uid: {}", userProfile.getUID());
+                            log.info("Validated Authorization header. uid: {}, sessionId: {}", userProfile.getUID(), session.getId());
+
                             // By adding the UserProfile to the session here
                             // it's available for the PEPFilter which is invoked
                             // by the call to:
@@ -345,16 +474,16 @@ public class IdFilter implements Filter {
                 }
             }
 
-            // Cache the  request URL in the session. We do this here because we know by now that the request was
+            // Cache the request URL in the session. We do this here because we know by now that the request was
             // not for a "reserved" endpoint for login/logout etc. and we DO NOT want to cache those locations.
             synchronized(session) {
-                Util.cacheRequestUrlAsNeeded(session,requestUrl, requestURI,contextPath);
+                Util.cacheRequestUrlAsNeeded(session, requestUrl, requestURI, contextPath);
             }
 
             // This call leads to the PEPFilter, wooo!
             filterChain.doFilter(hsReq, hsRes);
 
-            log.debug("END (session: {})",session.getId());
+            log.debug("END (session: {} returnToUrl: {})",session.getId(),session.getAttribute(RETURN_TO_URL));
             ServletLogUtil.logServerAccessEnd(200,logName);
         }
         finally {
@@ -463,22 +592,14 @@ public class IdFilter implements Filter {
         }
 	}
 
+    private static final String DTS = "<dt><strong>";
+    private static final String SDT = "</strong></dt>";
+    private static final String DTPS = "<dt><pre><strong>";
+    private static final String SPDT = "</strong></pre></dt>";
 
+    private String noProfileContent(String contextPath, HttpSession session){
+        log.debug("Building noProfile String.");
 
-    /**
-     * Displays the application home page.
-     * This method displays a welcome page for users. If the user has authenticated,
-     * then it will display his/her name, and provide a logout link. If the user
-     * has not authenticated, then a login link will be displayed.
-     *
-     */
-	private void doLandingPage(HttpServletRequest request, HttpServletResponse response)
-	        throws IOException
-    {
-        HttpSession session = request.getSession();
-        log.debug("doLandingPage() - Building noProfile String.");
-
-        String dtb = "<dt><b>";
 
         StringBuilder noProfile = new StringBuilder();
 
@@ -498,19 +619,31 @@ public class IdFilter implements Filter {
         if(enableGuestProfile) {
             noProfile.append("<i>Or you may:</i><br />");
             noProfile.append("<ul>");
-            noProfile.append("<li><a href=\"").append(request.getContextPath()).append("/guest\">Use a 'guest' profile.</a> </li>");
+            noProfile.append("<li><a href=\"").append(contextPath).append("/guest\">Use a 'guest' profile.</a> </li>");
             noProfile.append("</ul>");
         }
         if(session!=null){
             String origUrl = (String) session.getAttribute(RETURN_TO_URL);
             noProfile.append("<dl>");
             if(origUrl!=null){
-                noProfile.append(dtb).append("After authenticating you will be returned to:").append("</b></dt><dd><pre><a href='").append(origUrl).append("'>").append(origUrl).append("</a></pre></dd>");
+                noProfile.append(DTS).append("After authenticating you will be returned to:").append(SDT);
+                noProfile.append("<dd><pre><a href='").append(origUrl).append("'>").append(origUrl).append("</a></pre></dd>");
             }
             noProfile.append("</dl>");
         }
+        return noProfile.toString();
+    }
 
-
+    /**
+     * Displays the users profile page.
+     * This method displays a profile page for users. If the user has authenticated,
+     * then it will display his/her name, and provide a logout link. If the user
+     * has not authenticated, then a login link will be displayed.
+     *
+     */
+	private void doUserProfilePage(HttpServletRequest request, HttpServletResponse response)
+	        throws IOException
+    {
         log.debug("doLandingPage() - Setting Response Headers...");
 
         response.setContentType("text/html");
@@ -527,7 +660,7 @@ public class IdFilter implements Filter {
             OPeNDAPException.setCachedErrorMessage(e.getMessage());
             throw e;
         }
-		out.println("<html><head><title></title></head>");
+		out.println("<html><head><title>Greetings User!</title></head>");
 		out.println("<body><h1>"+AuthenticationControls.getLoginBanner()+"</h1>");
         out.println("<hr/>");
 
@@ -542,45 +675,73 @@ public class IdFilter implements Filter {
 
         //Create the body, depending upon whether the user has authenticated
         // or not.
+        HttpSession session = request.getSession();
         if(session != null){
+            log.debug("session.isNew(): {}", session.isNew());
             UserProfile userProfile = (UserProfile) session.getAttribute(USER_PROFILE);
             if( userProfile != null ){
                 IdProvider userIdP = userProfile.getIdP();
-                String firstName = userProfile.getAttribute("first_name");
-                if(firstName!=null)
-                    firstName = firstName.replaceAll("\"","");
+                String name = userProfile.getUID();
+                if (showUserProfileDetails) {
+                    name = userProfile.getAttribute("first_name");
+                    if(name!=null)
+                        name = name.replaceAll("\"","");
 
-                String lastName =  userProfile.getAttribute("last_name");
-                if(lastName!=null)
-                    lastName = lastName.replaceAll("\"","");
+                    String lastName =  userProfile.getAttribute("last_name");
+                    if(lastName!=null)
+                        name += " " + lastName.replaceAll("\"","");
+                }
 
-    		    out.println("<p>Greetings " + firstName + " " + lastName + ", this is your profile.</p>");
+                if(showUserProfileDetails) {
+                    out.println("<p>Greetings <strong>" + name + "</strong>, this is your profile page.</p>");
+                }
+
     		    out.println("You logged into Hyrax with <em>"+userIdP.getDescription()+"</em>");
-    		    out.println("<p><b><a href=\"" + userIdP.getLogoutEndpoint() + "\"> - - Click Here To Logout - - </a></b></p>");
-                out.println("<h3>"+firstName+"'s Profile</h3>");
+    		    out.println("<pre><b><a href=\"" + userIdP.getLogoutEndpoint() + "\">Click Here To Logout</a></b></pre>");
 
-                String origUrl = (String) session.getAttribute(RETURN_TO_URL);
+                if(showUserProfileDetails) {
+                    out.println("<h3>"+name+"'s Profile</h3>");
 
-                out.println("<dl>");
-                if(origUrl!=null){
-                    out.println(dtb + RETURN_TO_URL +"</b></dt><dd><pre><a href='"+origUrl+"'>"+origUrl+"</a></pre></dd>");
-                }
-                out.println(dtb + USER_PROFILE+"</b></dt><dd><pre>"+userProfile+"</pre></dd>");
-                out.println("</dl>");
+                    String origUrl = (String) session.getAttribute(RETURN_TO_URL);
 
-                out.println("<hr />");
-                out.println("<pre>");
-                out.print("<b>All_Session_Attributes</b>: [ ");
-
-                Enumeration<String> attrNames = session.getAttributeNames();
-                if(attrNames.hasMoreElements()){
-                    while(attrNames.hasMoreElements()){
-                        String attrName = attrNames.nextElement();
-                        out.print("\""+attrName+"\"");
-                        out.print((attrNames.hasMoreElements()?", ":""));
+                    out.println("<dl>");
+                    if(origUrl!=null){
+                        out.println(DTPS + RETURN_TO_URL + SPDT +"<dd><pre><a href='"+origUrl+"'>"+origUrl+"</a></pre></dd>");
                     }
+
+                    out.println(DTPS + "token:"+ SPDT +"<dd><pre>" + userProfile.getEDLAccessToken()+"</pre></dd>");
+
+                    out.println(DTPS + USER_PROFILE + SPDT + "<dd><pre>" + userProfile + "</pre></dd>");
+
+                    out.println("</dl>");
+
+                    out.println("<hr />");
+                    out.println("<pre>");
+                    out.print("<b>session attributes</b>: [ ");
+
+                    Enumeration<String> attrNames = session.getAttributeNames();
+                    if(attrNames.hasMoreElements()){
+                        while(attrNames.hasMoreElements()){
+                            String attrName = attrNames.nextElement();
+                            out.print("\""+attrName+"\"");
+                            out.print((attrNames.hasMoreElements()?", ":""));
+                        }
+                    }
+                    out.println(" ]</pre>");
+
+                    long timeNow = System.currentTimeMillis();
+                    double sessionInUseTime = (timeNow-session.getCreationTime())/1000.0;
+                    out.println("<pre>");
+                    out.println("                     session.isNew():  " + session.isNew());
+                    out.println("                     session.getId():  " + session.getId());
+                    out.println("    session.getMaxInactiveInterval():  " + session.getMaxInactiveInterval() + " seconds.");
+                    out.println("           session.getCreationTime():  " + session.getCreationTime() + " milliseconds since epoch.");
+                    out.println("               maxSessionTimeSeconds:  " + maxSessionTimeSeconds + " seconds.");
+                    out.println("                    sessionInUseTime:  " + sessionInUseTime + " seconds.");
+
+                    out.println("</pre>");
                 }
-                out.println(" ]</pre>");
+
                 out.println("<hr />");
             }
             else if(request.getUserPrincipal() != null){
@@ -588,11 +749,11 @@ public class IdFilter implements Filter {
                 out.println("<p><a href=\"" + request.getContextPath() + "/logout\">logout</a></p>");
             }
             else {
-                out.println(noProfile);
+                out.println(noProfileContent(request.getContextPath(),session));
             }
         }
         else {
-            out.println(noProfile);
+            out.println(noProfileContent(request.getContextPath(), session));
         }
         // Finish up the page
         out.println("</body></html>");

@@ -134,19 +134,16 @@ public class PEPFilter implements Filter {
                 throw new ServletException(msg,e);
             }
         }
+        HttpSession session = null;
         try {
-
-
-
             HttpServletRequest  hsReq = (HttpServletRequest)  request;
             RequestCache.open(hsReq);
-
             HttpServletResponse hsRes = (HttpServletResponse) response;
 
             // If they are authenticated then we should be able to get the remoteUser() or UserPrinciple
             String userId = null;
             String authContext = null;
-            HttpSession session = hsReq.getSession(false);
+            session = hsReq.getSession(false);
             if(session!=null){
                 UserProfile userProfile = (UserProfile) session.getAttribute(IdFilter.USER_PROFILE);
                 if(userProfile!=null){
