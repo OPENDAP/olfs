@@ -725,7 +725,7 @@ public class UrsIdP extends IdProvider{
     }
 
     /**
-     * Calls EDL and has the token revoked.
+     * Calls EDL and has the passed token revoked.
      * @param token
      * @throws IOException
      */
@@ -752,8 +752,8 @@ public class UrsIdP extends IdProvider{
 
 
     /**
-     *
-     * @param apiPath The EDL path for the API (token, revoke, etc)
+     * Builds, transmits, and returns the response of an EDL API command.
+     * @param apiPath The EDL path for the desired API endpoint (token, revoke, etc)
      * @param postData The query string parameters to POST
      * @return The response document
      * @throws IOException When the bad things happen.
