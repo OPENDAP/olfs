@@ -567,12 +567,8 @@ public class UrsIdP extends IdProvider{
      * @throws IOException
      */
     public EarthDataLoginAccessToken exchangeAuthCodeForEdlToken(String code, String returnToUrl) throws IOException {
-        log.info("EDL Code: {}", LogUtil.scrubEntry(code));
 
-        String postData = "grant_type=authorization_code&code=" + code +
-                "&redirect_uri=" + returnToUrl;
-
-        String contents = edlApi(EDL_API_TOKEN, postData);
+        String contents = edlToken(code, returnToUrl);
 
         // Parse the json to extract the token.
         JsonParser jparse = new JsonParser();
@@ -580,6 +576,12 @@ public class UrsIdP extends IdProvider{
         EarthDataLoginAccessToken edlat = new EarthDataLoginAccessToken(json, getUrsClientAppId());
         log.debug("edlat.expiresIn(): {}",edlat.getExpiresIn());
         return edlat;
+    }
+
+    public String edlToken(String code, String returnToUrl) throws IOException {
+        log.info("EDL Code: {}", LogUtil.scrubEntry(code));
+        String postData = "grant_type=authorization_code&code=" + code + "&redirect_uri=" + returnToUrl;
+        return(edlApi(EDL_API_TOKEN, postData));
     }
 
     /**
@@ -727,22 +729,18 @@ public class UrsIdP extends IdProvider{
         if (up != null) {
             EarthDataLoginAccessToken edlat = up.getEDLAccessToken();
             if (edlat != null) {
-
-                String postData = "token=" + edlat.getAccessToken();
-                String contents = edlApi(EDL_API_REVOKE, postData);
-                if (contents != null && !contents.equalsIgnoreCase("{}")) {
-                    log.error("OUCH! Revocation of AccessToken may have failed!. Message: {}", contents);
-                }
-
-                postData = "token=" + edlat.getRefreshToken();
-                contents = edlApi(EDL_API_REVOKE, postData);
-                if (contents != null && !contents.equalsIgnoreCase("{}")) {
-                    log.error("OUCH! Revocation for RefreshToken may have failed!. Message: {}", contents);
-                }
+                edlRevoke(edlat.getAccessToken());
+                edlRevoke(edlat.getRefreshToken());
             }
         }
     }
-
+    public void edlRevoke(String token) throws IOException {
+        String postData = "token=" + token;
+        String contents = edlApi(EDL_API_REVOKE, postData);
+        if (contents != null && !contents.equalsIgnoreCase("{}")) {
+            log.error("OUCH! Revocation of AccessToken may have failed!. Message: {}", contents);
+        }
+    }
     /**
      *
      * @param apiPath The EDL path for the API (token, revoke, etc)

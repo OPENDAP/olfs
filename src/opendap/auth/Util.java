@@ -228,6 +228,11 @@ public class Util {
     }
 
 
+    /**
+     *
+     * @param p
+     * @return Returns the string p with the assurance that the returned string will begin with a "/" character.
+     */
     public static String fullyQualifiedPath(String p){
         if ( !p.startsWith("/") ) {
             p = "/" + p;
