@@ -511,7 +511,7 @@ public class IdFilter implements Filter {
 
         log.info("doLogout() - BEGIN");
         log.info("doLogout() - Retrieving session...");
-        String redirectUrl  = request.getContextPath();
+        String redirectUrl  = Util.fullyQualifiedPath(request.getContextPath());
         HttpSession session = request.getSession(false);
         if (session != null) {
             log.info("doLogout() - Got session...");
@@ -569,7 +569,7 @@ public class IdFilter implements Filter {
 	private void doGuestLogin(HttpServletRequest request, HttpServletResponse response) throws IOException
     {
         HttpSession session = request.getSession(false);
-        String redirectUrl = request.getContextPath();
+        String redirectUrl = Util.fullyQualifiedPath(request.getContextPath());
         if(session != null) {
             redirectUrl = (String) session.getAttribute(RETURN_TO_URL);
             session.invalidate();

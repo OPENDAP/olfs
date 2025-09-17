@@ -117,7 +117,7 @@ public abstract class IdProvider {
     public void doLogout(HttpServletRequest request, HttpServletResponse response)
 	        throws IOException
     {
-        String redirectUrl = request.getContextPath();
+        String redirectUrl = Util.fullyQualifiedPath(request.getContextPath());
         HttpSession session = request.getSession(false);
         if( session != null ) {
             invalidate((UserProfile) session.getAttribute(USER_PROFILE));

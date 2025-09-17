@@ -147,7 +147,7 @@ public class ApacheIdP extends IdProvider {
             redirectUrl = (String) session.getAttribute(IdFilter.RETURN_TO_URL);
         }
         if(redirectUrl==null){
-            redirectUrl = request.getContextPath();
+            redirectUrl = Util.fullyQualifiedPath(request.getContextPath());
         }
         log.info("doLogin(): redirecting to {}",redirectUrl);
         response.sendRedirect(redirectUrl);
@@ -168,13 +168,13 @@ public class ApacheIdP extends IdProvider {
     public void doLogout(HttpServletRequest request, HttpServletResponse response)
 	        throws IOException
     {
-        String redirectUrl = getServiceContext();
+        String redirectUrl = Util.fullyQualifiedPath(getServiceContext());
         HttpSession session = request.getSession(false);
         if( session != null )
         {
             String returnToUrl =  (String) session.getAttribute(IdFilter.RETURN_TO_URL);
             if(returnToUrl!=null)
-                redirectUrl =returnToUrl;
+                redirectUrl = returnToUrl;
             session.invalidate();
         }
 

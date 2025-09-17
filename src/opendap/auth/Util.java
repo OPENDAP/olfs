@@ -226,4 +226,13 @@ public class Util {
         }
         return uid;
     }
+
+
+    public static String fullyQualifiedPath(String p){
+        if ( !p.startsWith("/") ) {
+            p = "/" + p;
+        }
+        return p;
+    }
+
 }
