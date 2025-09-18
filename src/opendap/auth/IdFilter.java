@@ -313,7 +313,7 @@ public class IdFilter implements Filter {
 
             HttpServletResponse hsRes = (HttpServletResponse) response;
             String requestURI = hsReq.getRequestURI();
-            String contextPath = getServiceContextPath();
+            String contextPath = Util.fullyQualifiedPath(hsReq.getContextPath());
 
             // FIXME The following needs to be replaced with a mechanism that does not require the query
             //  to be added to the request URL in order for the redirect to produce the target request.
@@ -525,7 +525,7 @@ public class IdFilter implements Filter {
 
         log.info("doLogout() - BEGIN");
         log.info("doLogout() - Retrieving session...");
-        String redirectUrl  = getServiceContextPath();
+        String redirectUrl  = Util.fullyQualifiedPath(request.getContextPath());
         HttpSession session = request.getSession(false);
         if (session != null) {
             log.info("doLogout() - Got session...");
@@ -583,7 +583,7 @@ public class IdFilter implements Filter {
 	private void doGuestLogin(HttpServletRequest request, HttpServletResponse response) throws IOException
     {
         HttpSession session = request.getSession(false);
-        String redirectUrl = getServiceContextPath();
+        String redirectUrl = Util.fullyQualifiedPath(request.getContextPath());
         if(session != null) {
             redirectUrl = (String) session.getAttribute(RETURN_TO_URL);
             session.invalidate();
@@ -658,6 +658,7 @@ public class IdFilter implements Filter {
 	private void doUserProfilePage(HttpServletRequest request, HttpServletResponse response)
 	        throws IOException
     {
+        String srvcCntxtPth = Util.fullyQualifiedPath(request.getContextPath());
         log.debug("doLandingPage() - Setting Response Headers...");
 
         response.setContentType("text/html");
@@ -760,14 +761,14 @@ public class IdFilter implements Filter {
             }
             else if(request.getUserPrincipal() != null){
                 out.println("<p>Welcome " + Encode.forHtml(request.getUserPrincipal().getName()) + "</p>");
-                out.println("<p><a href=\"" + getServiceContextPath() + "/logout\">logout</a></p>");
+                out.println("<p><a href=\"" + srvcCntxtPth + "/logout\">logout</a></p>");
             }
             else {
-                out.println( noProfileContent( getServiceContextPath(), session) );
+                out.println( noProfileContent( srvcCntxtPth, session) );
             }
         }
         else {
-            out.println(noProfileContent(getServiceContextPath(), session));
+            out.println(noProfileContent(srvcCntxtPth, session));
         }
         // Finish up the page
         out.println("</body></html>");
