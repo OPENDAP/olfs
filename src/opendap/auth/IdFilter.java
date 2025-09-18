@@ -51,6 +51,8 @@ import java.util.Enumeration;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 
+import static opendap.logging.ServletLogUtil.logEDLProfiling;
+
 
 public class IdFilter implements Filter {
 
@@ -361,6 +363,8 @@ public class IdFilter implements Filter {
                                 session.setAttribute(RETURN_TO_URL, contextPath);
                             }
                         }
+                        long profilingStartTime = System.currentTimeMillis();
+                        boolean loginComplete = false;
                         try {
                             //
                             // Run the login gizwhat. This may involve simply
@@ -373,7 +377,7 @@ public class IdFilter implements Filter {
                             // cookie/token/thingy that lets the doLogin
                             // invocation complete.
                             //
-                            idProvider.doLogin(hsReq, hsRes);
+                            loginComplete = idProvider.doLogin(hsReq, hsRes);
                             //
                             // We return here and don't do the filter chain
                             // because the "doLogin" method will, when
@@ -402,6 +406,8 @@ public class IdFilter implements Filter {
                             ((HttpServletResponse)response).sendError(HttpServletResponse.SC_UNAUTHORIZED,msg);
                             log.debug("END (session: {})",session.getId());
                             return;
+                        } finally {
+                            logEDLProfiling("Handle login operation - Login now concluded? " + loginComplete, profilingStartTime);
                         }
                     }
                 }
@@ -443,8 +449,13 @@ public class IdFilter implements Filter {
                 if (IdPManager.hasDefaultProvider()) {
                     try {
                         UserProfile userProfile = new UserProfile(request);
-                        boolean retVal;
-                        retVal = IdPManager.getDefaultProvider().doTokenAuthentication(request, userProfile);
+                        boolean retVal = false;
+                        long profilingStartTime = System.currentTimeMillis();
+                        try {
+                            retVal = IdPManager.getDefaultProvider().doTokenAuthentication(request, userProfile);
+                        } finally {
+                            logEDLProfiling("Validate token - Is valid? " + retVal, profilingStartTime);
+                        }
                         if(retVal){
                             log.info("Validated Authorization header. uid: {}, sessionId: {}", userProfile.getUID(), session.getId());
 
