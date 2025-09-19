@@ -662,7 +662,7 @@ public class UrsIdP extends IdProvider{
         if (!getUrsClientAppPublicKeys().isEmpty()) {
             uid = getEdlUserIdFromToken(getUrsClientAppPublicKeys(), edlat.getAccessToken());
             if (uid == null) {
-                log.error("{}Unable to validate EDL access token locally; falling back to remote validation", ERR_PREFIX);
+                log.error("{}Unable to get EDL user id from token locally; falling back to remote user id request", ERR_PREFIX);
             } else {
                 userProfile.setUID(uid);
             }
