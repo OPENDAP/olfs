@@ -58,8 +58,8 @@ if (hasProperty('buildScan')) {
 group = 'org.opendap'
 description = 'The OLFs build'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 1.9
+targetCompatibility = 1.9
 
 repositories {
     // For just about everything except...

@@ -800,7 +800,7 @@ public class BES {
             throws IOException, PPTException, JDOMException, BESError {
 
 
-        log.debug("BEGIN.");
+        log.debug("BEGIN (Document, Document)");
         SAXBuilder sb = new SAXBuilder();
         Document doc;
 
@@ -830,7 +830,7 @@ public class BES {
             }
 
         }
-        log.debug("END.");
+        log.debug("END (Document, Document)");
     }
 
 
@@ -849,7 +849,7 @@ public class BES {
     public void besTransaction(Document request, OutputStream os, TransmitCoordinator tc)
             throws IOException, PPTException, BESError {
 
-        log.debug("BEGIN");
+        log.debug("BEGIN (Document, OutputStream, TransmitCoordinator)");
         int attempts = 0;
         boolean besTrouble;
         PPTException pptException;
@@ -933,7 +933,7 @@ public class BES {
             if (pptException != null)
                 throw pptException;
         }
-        log.debug("END");
+        log.debug("END (Document, OutputStream, TransmitCoordinator)");
     }
 
 

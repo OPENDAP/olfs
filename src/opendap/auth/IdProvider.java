@@ -34,6 +34,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 
+import static opendap.auth.IdFilter.USER_PROFILE;
+
 /**
  * Base class for the ID Provider implementations.
  */
@@ -117,8 +119,8 @@ public abstract class IdProvider {
     {
         String redirectUrl = request.getContextPath();
         HttpSession session = request.getSession(false);
-        if( session != null )
-        {
+        if( session != null ) {
+            invalidate((UserProfile) session.getAttribute(USER_PROFILE));
             String href = (String) session.getAttribute(IdFilter.RETURN_TO_URL);
             redirectUrl = href!=null?href:redirectUrl;
             session.invalidate();
@@ -126,4 +128,14 @@ public abstract class IdProvider {
         response.sendRedirect(redirectUrl);
     }
 
+    /**
+     * Used to invalidate any persistent user state during a
+     * logout or transaction invalidation process.
+     * @param userProfile
+     * @throws IOException
+     */
+    public void invalidate(UserProfile userProfile) throws IOException {}
+
+
 }
+

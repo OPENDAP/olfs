@@ -222,7 +222,14 @@
         </layout>
     </appender>
 
-
+    <appender name="CloudWatchEdlProfilingLogAppender" class="com.j256.cloudwatchlogbackappender.CloudWatchAppender">
+        <region>us-west-2</region>
+        <logGroup>hyrax_edl_profiling_log</logGroup>
+        <logStream>hyrax-%instanceId</logStream>
+        <layout>
+            <pattern>{ "request_id": "%X{ID}", "hyrax-timer-name": "%m", "hyrax-type": "timing", "start-time-ms": "%X{profiling_start_time_ms}", "duration-ms": "%X{profiling_duration_ms}" }%n</pattern>
+        </layout>
+    </appender>
 
     <logger name="opendap" level="error">
         <appender-ref ref="ErrorLog"/>
@@ -263,6 +270,9 @@
         <appender-ref ref="CloudWatchResponseLogAppender"/>
     </logger>
 
+    <logger name="CloudWatchEdlProfilingLog" level="info">
+        <appender-ref ref="CloudWatchEdlProfilingLogAppender"/>
+    </logger>
 
     <root level="error">
         <!--

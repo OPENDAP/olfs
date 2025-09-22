@@ -93,6 +93,7 @@ public class ReqInfo {
     private static final String CLOUD_FRONT_FORWARDED_PROTOCOL = "CloudFront-Forwarded-Proto";
     private static final String X_FORWARDED_PROTOCOL = "X-Forwarded-Proto";
     private static final String X_FORWARDED_PORT = "X-Forwarded-Port";
+    private static final String X_FORWARDED_FOR ="X-Forwarded-For";
 
     private static final String JAVAX_SERVLET_FORWARD_REQUEST_URI  = "jakarta.servlet.forward.request_uri";
     private static final String JAVAX_SERVLET_FORWARD_CONTEXT_PATH = "jakarta.servlet.forward.context_path";
@@ -105,7 +106,6 @@ public class ReqInfo {
      * A request header key/name used by a client to transmit  a request id.
      */
     public static final String REQUEST_ID_HEADER_KEY ="a-api-request-uuid";
-
 
     private static Logger log;
     static {
@@ -962,6 +962,72 @@ public class ReqInfo {
         return reqId;
     }
 
+    private static final
+    Pattern IP_ADDR_PATTERN = Pattern.compile("\\b(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\\b");
+    public static String getClientIp(HttpServletRequest req) {
+        return getClientIp(req.getRemoteHost(), req.getHeader(X_FORWARDED_FOR));
+    }
+
+    private static String getClientIp(String remoteHost, String xForwardForHeader){
+        String clientIp;
+        if(xForwardForHeader != null){
+            log.debug("HTTP Header {}: '{}'",X_FORWARDED_FOR,xForwardForHeader);
+            String candidateIp = xForwardForHeader.split(",")[0].trim();
+            log.debug("candidateIp: '{}'",candidateIp);
+            if( IP_ADDR_PATTERN.matcher(candidateIp).matches() ){
+                clientIp = candidateIp;
+            }
+            else {
+                log.error("Failed to locate valid client ip in the {} header: {} " +
+                        "Using request.getRemoteAddr() instead.", X_FORWARDED_FOR,xForwardForHeader);
+                clientIp = remoteHost;
+            }
+        }
+        else {
+            clientIp = remoteHost;
+        }
+        log.debug("Returning clientIp: '{}'",clientIp);
+        return clientIp;
+    }
+
+
+    public static void main(String[] argv){
+        String hdrValue;
+        String hr="-------------------------------------------------------------------\n";
+
+        hdrValue = "192.198.64.33,73.981.12.1";
+        log.debug("#  Found Client IP: {}", getClientIp("10.7.3.1", hdrValue));
+        log.debug(hr);
+
+        hdrValue = "192.198.64.33";
+        log.debug("#  Found Client IP: {}", getClientIp("1.1.1.2", hdrValue));
+        log.debug(hr);
+
+        hdrValue = "192.921.64.33,192.198.64.33";
+        log.debug("#  Found Client IP: {}", getClientIp("10.7.3.3", hdrValue));
+        log.debug(hr);
+
+        hdrValue = "192.40.64.33 ,192.198.64.33";
+        log.debug("#  Found Client IP: {}", getClientIp("10.7.3.4", hdrValue));
+        log.debug(hr);
+
+        hdrValue = "192.41.64.33, 192.198.64.33";
+        log.debug("#  Found Client IP: {}", getClientIp("10.7.3.5", hdrValue));
+
+        log.debug(hr);
+        hdrValue = "192.42.64.33 , 192.198.64.33";
+        log.debug("#  Found Client IP: {}", getClientIp("10.7.3.6", hdrValue));
+        log.debug(hr);
+
+        hdrValue = "MorkAndMindy,BollAndBobby,JohnAndSally";
+        log.debug("#  Found Client IP: {}", getClientIp("10.7.3.7", hdrValue));
+        log.debug(hr);
+
+        hdrValue = null;
+        log.debug("#  Found Client IP: {}", getClientIp("10.7.3.8", hdrValue));
+        log.debug(hr);
+
+    }
 }
 
 

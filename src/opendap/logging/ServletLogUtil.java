@@ -31,6 +31,7 @@ import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
 import opendap.PathBuilder;
+import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestId;
 import opendap.coreServlet.Scrub;
 import opendap.coreServlet.ServletUtil;
@@ -81,10 +82,7 @@ public class ServletLogUtil {
 
     public static final String CLOUDWATCH_REQUEST_LOG = "CloudWatchRequestLog";
     public static final String CLOUDWATCH_RESPONSE_LOG = "CloudWatchResponseLog";
-
-
-
-
+    public static final String CLOUDWATCH_EDL_PROFILING_LOG = "CloudWatchEdlProfilingLog";
 
     private static final String REQUEST_ID_KEY = "ID";
     private static final String HTTP_VERB_KEY = "SOURCE";
@@ -98,7 +96,8 @@ public class ServletLogUtil {
     private static final String RESPONSE_SIZE_KEY = "size";
     private static final String DURATION_KEY = "duration";
     private static final String HTTP_STATUS_KEY = "http_status";
-
+    private static final String PROFILING_START_TIME_MS_KEY = "profiling_start_time_ms";
+    private static final String PROFILING_DURATION_MS_KEY = "profiling_duration_ms";
 
     private static final AtomicBoolean isLogInit = new AtomicBoolean(false);
     private static final ReentrantLock initLock =  new ReentrantLock();
@@ -380,7 +379,8 @@ public class ServletLogUtil {
 
         MDC.put(REQUEST_ID_KEY, reqID.logId());
         MDC.put(HTTP_VERB_KEY, httpVerb);
-        MDC.put(CLIENT_HOST_KEY, req.getRemoteHost());
+        String clientIp = ReqInfo.getClientIp(req);
+        MDC.put(CLIENT_HOST_KEY, clientIp);
         MDC.put(SESSION_ID_KEY, (session == null) ? "-" : session.getId());
 
         String uid = opendap.auth.Util.getUID(req);
@@ -400,7 +400,7 @@ public class ServletLogUtil {
 
         if(log.isInfoEnabled()) {
             String startMsg = "REQUEST START - " +
-                    "RemoteHost: '" + LogUtil.scrubEntry(req.getRemoteHost()) + "' " +
+                    "RemoteHost: '" + clientIp + "' " +
                     "RequestedResource: '" + resourceID + "' " +
                     "QueryString: '" + query + "' " +
                     "AccessLog: " + logName;
@@ -558,6 +558,12 @@ public class ServletLogUtil {
         MDC.remove(RESPONSE_SIZE_KEY);
         MDC.remove(HTTP_STATUS_KEY);
 
+        // -- -- -- -- -- -- -- -- -- -- -- -- -- --
+        //
+        // These were set in logEdlProfiling()
+        //
+        MDC.remove(PROFILING_START_TIME_MS_KEY);
+        MDC.remove(PROFILING_DURATION_MS_KEY);
     }
 
 
@@ -566,9 +572,25 @@ public class ServletLogUtil {
         log.info("Combined OLFS/BES Log Is {}", value ? "ENABLED." : "DISABLED");
     }
 
-    public static void useDualCloudWatchLogs(boolean value) {
+    public static void setUseDualCloudWatchLogs(boolean value) {
         useDualCloudWatchLogs.set(value);
         log.info("CloudWatch Logs Are {}", value ? "ENABLED." : "DISABLED");
     }
 
+    /**
+     * If `useDualCloudWatchLogs` enabled, logs `msg`, `startTimeMs`, and duration between `startTimeMs` and now
+     * to `CLOUDWATCH_PROFILING_LOG`, with both logged times in milliseconds from epoch.
+     *
+     * @param msg Description of event being timed
+     * @param startTimeMs Time event started, in milliseconds from epoch
+     */
+    public static void logEDLProfiling(String msg, long startTimeMs) {
+        if(ServletLogUtil.useDualCloudWatchLogs.get()) {
+            long currentTime = System.currentTimeMillis();
+            MDC.put(PROFILING_START_TIME_MS_KEY, Long.toString(startTimeMs));
+            MDC.put(PROFILING_DURATION_MS_KEY, Long.toString(currentTime - startTimeMs));
+            Logger cwProfilingLog = org.slf4j.LoggerFactory.getLogger(CLOUDWATCH_EDL_PROFILING_LOG);
+            cwProfilingLog.info(msg);
+        }
+    }
 }
