@@ -29,7 +29,7 @@ package opendap.auth;
 import com.google.gson.*;
 import opendap.coreServlet.ReqInfo;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.util.*;
 
