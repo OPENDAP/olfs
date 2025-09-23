@@ -71,7 +71,7 @@ public class TomcatRealmIdP extends IdProvider {
         log.debug("session.isNew(): {}", session.isNew());
         String redirectUrl = request.getContextPath();
         if(session!=null){
-            String url = (String) session.getAttribute(IdFilter.RETURN_TO_URL);
+            String url =Util.stringFromJson( (String) session.getAttribute(IdFilter.RETURN_TO_URL));
             if(url != null) {
                 redirectUrl = url;
             }

@@ -144,7 +144,7 @@ public class ApacheIdP extends IdProvider {
             session.setAttribute(IdFilter.USER_PROFILE, up);
 
             */
-            redirectUrl = (String) session.getAttribute(IdFilter.RETURN_TO_URL);
+            redirectUrl = Util.stringFromJson( (String) session.getAttribute(IdFilter.RETURN_TO_URL));
         }
         if(redirectUrl==null){
             redirectUrl = request.getContextPath();
@@ -172,7 +172,7 @@ public class ApacheIdP extends IdProvider {
         HttpSession session = request.getSession(false);
         if( session != null )
         {
-            String returnToUrl =  (String) session.getAttribute(IdFilter.RETURN_TO_URL);
+            String returnToUrl = Util.stringFromJson( (String) session.getAttribute(IdFilter.RETURN_TO_URL));
             if(returnToUrl!=null)
                 redirectUrl =returnToUrl;
             session.invalidate();

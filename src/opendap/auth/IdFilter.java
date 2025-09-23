@@ -355,13 +355,13 @@ public class IdFilter implements Filter {
                             // Check the RETURN_TO_URL and if it's the login endpoint
                             // return to the root dir of the web application after
                             // authenticating.
-                            String returnToUrl = (String) session.getAttribute(RETURN_TO_URL);
+                            String returnToUrl = Util.stringFromJson( (String) session.getAttribute(IdFilter.RETURN_TO_URL));
                             log.debug("Retrieved RETURN_TO_URL: {} (session: {})",returnToUrl,session.getId());
                             if (returnToUrl != null && returnToUrl.equals(loginEndpoint)) {
                                 String msg = "Setting session RETURN_TO_URL("+RETURN_TO_URL+ ") to: "+contextPath;
                                 msg += " (session: "+session.getId()+")";
                                 log.debug(msg);
-                                session.setAttribute(RETURN_TO_URL, contextPath);
+                                session.setAttribute(RETURN_TO_URL, Util.toJson(contextPath));
                             }
                         }
                         long profilingStartTime = System.currentTimeMillis();
@@ -528,7 +528,7 @@ public class IdFilter implements Filter {
         HttpSession session = request.getSession(false);
         if (session != null) {
             log.info("doLogout() - Got session...");
-            String href = (String) session.getAttribute(RETURN_TO_URL);
+            String href = Util.stringFromJson( (String) session.getAttribute(IdFilter.RETURN_TO_URL));
             redirectUrl = href!=null?href:redirectUrl;
 
             UserProfile up = (UserProfile) session.getAttribute(USER_PROFILE);
@@ -584,12 +584,12 @@ public class IdFilter implements Filter {
         HttpSession session = request.getSession(false);
         String redirectUrl = request.getContextPath();
         if(session != null) {
-            redirectUrl = (String) session.getAttribute(RETURN_TO_URL);
+            redirectUrl = Util.stringFromJson( (String) session.getAttribute(IdFilter.RETURN_TO_URL));
             session.invalidate();
         }
         HttpSession guestSession = request.getSession(true);
         synchronized (guestSession) {
-            guestSession.setAttribute(RETURN_TO_URL, redirectUrl);
+            guestSession.setAttribute(RETURN_TO_URL, Util.toJson(redirectUrl));
             guestSession.setAttribute(USER_PROFILE, new GuestProfile());
         }
 
@@ -636,7 +636,7 @@ public class IdFilter implements Filter {
             noProfile.append("</ul>");
         }
         if(session!=null){
-            String origUrl = (String) session.getAttribute(RETURN_TO_URL);
+            String origUrl = Util.stringFromJson( (String) session.getAttribute(IdFilter.RETURN_TO_URL));
             noProfile.append("<dl>");
             if(origUrl!=null){
                 noProfile.append(DTS).append("After authenticating you will be returned to:").append(SDT);
@@ -715,7 +715,7 @@ public class IdFilter implements Filter {
                 if(showUserProfileDetails) {
                     out.println("<h3>"+name+"'s Profile</h3>");
 
-                    String origUrl = (String) session.getAttribute(RETURN_TO_URL);
+                    String origUrl = Util.stringFromJson( (String) session.getAttribute(IdFilter.RETURN_TO_URL));
 
                     out.println("<dl>");
                     if(origUrl!=null){

@@ -26,6 +26,7 @@
 
 package opendap.auth;
 
+import com.google.gson.Gson;
 import opendap.PathBuilder;
 import opendap.coreServlet.ReqInfo;
 import opendap.io.HyraxStringEncoding;
@@ -193,7 +194,7 @@ public class Util {
             msg += " (session: "+session.getId()+")";
             log.debug(msg);
         }
-        session.setAttribute(IdFilter.RETURN_TO_URL,requestUrl);
+        session.setAttribute(IdFilter.RETURN_TO_URL,Util.toJson(requestUrl));
         log.debug("Sanity check session.getAttribute("+ IdFilter.RETURN_TO_URL+") returns {} (session: {})",session.getAttribute(IdFilter.RETURN_TO_URL), session.getId());
     }
 
@@ -225,5 +226,15 @@ public class Util {
             }
         }
         return uid;
+    }
+
+
+    public static String toJson(Object o){
+        Gson gson = new Gson();
+        return gson.toJson(o);
+    }
+    public static String stringFromJson(String s){
+        Gson gson = new Gson();
+        return gson.fromJson(s, String.class);
     }
 }

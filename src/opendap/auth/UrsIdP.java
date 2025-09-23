@@ -660,7 +660,7 @@ public class UrsIdP extends IdProvider{
         log.info("URS UID: {}", userProfile.getUID());
 
         // Finally, redirect the user back to the original requested resource.
-        String redirectUrl = (String) session.getAttribute(IdFilter.RETURN_TO_URL);
+        String redirectUrl = Util.stringFromJson( (String) session.getAttribute(IdFilter.RETURN_TO_URL));
         log.debug("session.getAttribute(RETURN_TO_URL): {} (session-id: {})", redirectUrl, session.getId());
 
         if (redirectUrl == null) {
@@ -673,7 +673,7 @@ public class UrsIdP extends IdProvider{
         session.invalidate();
 
         session = request.getSession(true);
-        session.setAttribute(IdFilter.RETURN_TO_URL, redirectUrl);
+        session.setAttribute(IdFilter.RETURN_TO_URL, Util.toJson(redirectUrl));
         // Add this instance of UserProfile to the session for retrieval
         // down stream on this request.
         // We set the state of the instance of userProfile below.
