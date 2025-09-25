@@ -145,7 +145,7 @@ public class PEPFilter implements Filter {
             String authContext = null;
             session = hsReq.getSession(false);
             if(session!=null){
-                UserProfile userProfile = (UserProfile) session.getAttribute(IdFilter.USER_PROFILE);
+                UserProfile userProfile = UserProfile.fromJson((String) session.getAttribute(IdFilter.USER_PROFILE));
                 if(userProfile!=null){
                     userId = userProfile.getUID();
                     IdProvider idP = userProfile.getIdP();

@@ -208,7 +208,7 @@ public class Util {
         HttpSession session  = req.getSession(false);
         String uid = null;
         if(session!=null){
-            UserProfile up = (UserProfile) session.getAttribute(USER_PROFILE);
+            UserProfile up = UserProfile.fromJson((String) session.getAttribute(USER_PROFILE));
             if(up!=null){
                 uid = up.getUID();
             }

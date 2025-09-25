@@ -120,7 +120,8 @@ public abstract class IdProvider {
         String redirectUrl = request.getContextPath();
         HttpSession session = request.getSession(false);
         if( session != null ) {
-            invalidate((UserProfile) session.getAttribute(USER_PROFILE));
+            UserProfile up = UserProfile.fromJson((String) session.getAttribute(USER_PROFILE));
+            invalidate(up);
             String href = Util.stringFromJson( (String) session.getAttribute(IdFilter.RETURN_TO_URL));
             redirectUrl = href!=null?href:redirectUrl;
             session.invalidate();

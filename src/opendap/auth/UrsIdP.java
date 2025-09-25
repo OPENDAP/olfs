@@ -674,11 +674,10 @@ public class UrsIdP extends IdProvider{
 
         session = request.getSession(true);
         session.setAttribute(IdFilter.RETURN_TO_URL, Util.toJson(redirectUrl));
-        // Add this instance of UserProfile to the session for retrieval
-        // down stream on this request.
-        // We set the state of the instance of userProfile below.
 
-        session.setAttribute(IdFilter.USER_PROFILE, userProfile);
+        // Add this instance of UserProfile to the session for retrieval
+        // downstream on this request.
+        session.setAttribute(IdFilter.USER_PROFILE, userProfile.toJson(false));
 
         log.info("Authentication Completed. Redirecting client to redirectUrl: {}", redirectUrl);
 
@@ -710,7 +709,8 @@ public class UrsIdP extends IdProvider{
         try {
             HttpSession session = request.getSession(false);
             if (session != null) {
-                revokeEdlTokens((UserProfile) session.getAttribute(USER_PROFILE));
+                UserProfile up = UserProfile.fromJson((String) session.getAttribute(USER_PROFILE));
+                revokeEdlTokens(up);
             }
         }
         finally {

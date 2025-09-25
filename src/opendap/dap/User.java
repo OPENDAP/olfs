@@ -60,7 +60,7 @@ public class User {
 
         HttpSession session = request.getSession(false);
         if(session!=null) {
-            userProfile= (UserProfile) session.getAttribute(IdFilter.USER_PROFILE);
+            userProfile= UserProfile.fromJson((String) session.getAttribute(IdFilter.USER_PROFILE));
             if(userProfile!=null)
                 log.debug(userProfile.toString());
         }

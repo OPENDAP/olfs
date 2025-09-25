@@ -44,7 +44,7 @@ public class UserProfile implements Serializable {
     /* @serial */
     private Date objectCreationTime;
     /* @serial */
-    private String d_jsonStr;
+    private String d_userProfileJsonStr;
     /* @serial */
     private HashSet<String> d_groups;
     /* @serial */
@@ -99,20 +99,20 @@ public class UserProfile implements Serializable {
     }
 
     private JsonObject getProfile(){
-        if(d_profile == null && d_jsonStr != null){
+        if(d_profile == null && d_userProfileJsonStr != null){
             ingestJsonProfileString();
         }
         return d_profile;
     }
 
     public void ingestJsonProfileString(String jsonStr){
-        d_jsonStr = jsonStr;
+        d_userProfileJsonStr = jsonStr;
         ingestJsonProfileString();
     }
 
     private  void ingestJsonProfileString(){
         JsonParser jparse = new JsonParser();
-        d_profile = jparse.parse(d_jsonStr).getAsJsonObject();
+        d_profile = jparse.parse(d_userProfileJsonStr).getAsJsonObject();
         JsonElement uid = d_profile.get("uid");
         d_uid = uid.getAsString();
     }
@@ -312,32 +312,48 @@ public class UserProfile implements Serializable {
 
         String l1i = indent +indent_inc;
         String l2i = l1i +indent_inc;
-        String jsonObjName = getClass().getName().replace(".","_");
-        sb.append(indent).append("\"").append(jsonObjName).append("\" : {\n");
-        sb.append(l1i).append("\"d_uid\": \"").append(d_uid).append("\",\n");
-        sb.append(l1i).append("\"d_clientIp\": \"").append(d_clientIp).append("\",\n");
-        sb.append(l1i).append("\"d_clientUserAgent\": \"").append(d_clientUserAgent).append("\",\n");
-
-        sb.append(l1i).append("\"").append("edl_profile").append("\" : {");
+        String jsonObjName = getClass().getName();
+        sb.append(indent).append(jsonObjName).append(": \n");
+        sb.append(l1i).append("d_uid: ").append(d_uid).append("\n");
+        sb.append(l1i).append("d_clientIp: ").append(d_clientIp).append("\n");
+        sb.append(l1i).append("d_clientUserAgent: ").append(d_clientUserAgent).append("\n");
+        sb.append(l1i).append("d_jsonUserProfileStr: ").append(d_userProfileJsonStr).append("\n");
+        sb.append("\n");
+        sb.append(l1i).append("edl_profile").append(" :\n");
         JsonObject profile = getProfile();
         if(profile != null) {
-            boolean comma = false;
             for (Map.Entry<String, JsonElement> e : profile.entrySet()) {
-                sb.append(comma ? ",\n" : "\n");
-                sb.append(l2i).append("\"").append(e.getKey()).append("\" : ").append(e.getValue());
-                comma = true;
+                sb.append(l2i).append(e.getKey()).append(": ").append(e.getValue()).append("\n");
             }
-            sb.append(indent).append("\n");
         }
-        if(d_edlAccessToken !=null){
-            sb.append(d_edlAccessToken.toString(l2i,indent_inc));
+        if(d_edlAccessToken != null){
+            sb.append("\n");
+            sb.append(d_edlAccessToken.toString(l1i,indent_inc));
         }
-        sb.append(l1i).append("}\n");
-        sb.append(indent).append("}\n");
+        sb.append("\n");
         return sb.toString();
     }
 
+    /**
+     *
+     * @return This object serialized as a json string by gson.
+     */
+    public String toJson(boolean pretty){
+        Gson gson;
+        if(pretty) gson = new GsonBuilder().setPrettyPrinting().create();
+        else gson = new Gson();
+        return gson.toJson(this);
+    }
 
+    /**
+     *
+     * @param jsonStr A string containing the gson json serialization of an instance of the UserProfile class.
+     * @return A UserProfile class built from the passed jsonStr.
+     */
+    public static UserProfile fromJson(String jsonStr){
+        Gson gson = new Gson();
+        return gson.fromJson(jsonStr, UserProfile.class);
+    }
 
     public static void main(String args[]){
         String ursUserProfile = "{\"uid\":\"ndp_opendap\",\"first_name\":\"Nathan\",\"last_name\":\"Potter\",\"registered_date\":\"23 Sep 2014 17:33:09PM\",\"email_address\":\"ndp@opendap.org\",\"country\":\"United States\",\"study_area\":\"Other\",\"user_type\":\"Public User\",\"affiliation\":\"Non-profit\",\"authorized_date\":\"24 Oct 2017 15:01:18PM\",\"allow_auth_app_emails\":true,\"agreed_to_meris_eula\":false,\"agreed_to_sentinel_eula\":false,\"user_groups\":[],\"user_authorized_apps\":2}";

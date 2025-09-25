@@ -424,7 +424,7 @@ public class IdFilter implements Filter {
             // need to a special HttpRequest object to hold our authenticated
             // user and then pass it on to the filter chain.
             //
-            UserProfile up = (UserProfile) session.getAttribute(USER_PROFILE);
+            UserProfile up = UserProfile.fromJson((String) session.getAttribute(USER_PROFILE));
             if(up != null && !up.validateUserFootPrint(hsReq)){
                 if(IdPManager.hasDefaultProvider()) {
                     // @TODO Maybe use the IdPManager.getDefaultProvider().doLogout(hsReq,hsRes); here?
@@ -468,7 +468,7 @@ public class IdFilter implements Filter {
                             // or sessions. Well, there's a session, but for
                             // tokens it only needs to persist for the duration
                             // of the current request
-                            session.setAttribute(USER_PROFILE, userProfile);
+                            session.setAttribute(USER_PROFILE, userProfile.toJson(false));
 
                             // By replacing the HttpServletRequest with our own version
                             // We can inject the uid into
@@ -531,7 +531,7 @@ public class IdFilter implements Filter {
             String href = Util.stringFromJson( (String) session.getAttribute(IdFilter.RETURN_TO_URL));
             redirectUrl = href!=null?href:redirectUrl;
 
-            UserProfile up = (UserProfile) session.getAttribute(USER_PROFILE);
+            UserProfile up = UserProfile.fromJson((String) session.getAttribute(USER_PROFILE));
             if (up != null) {
                 log.info("doLogout() - Logging out user '{}'", up.getUID());
                 IdProvider idProvider = up.getIdP();
@@ -590,7 +590,7 @@ public class IdFilter implements Filter {
         HttpSession guestSession = request.getSession(true);
         synchronized (guestSession) {
             guestSession.setAttribute(RETURN_TO_URL, Util.toJson(redirectUrl));
-            guestSession.setAttribute(USER_PROFILE, new GuestProfile());
+            guestSession.setAttribute(USER_PROFILE, (new GuestProfile()).toJson(false));
         }
 
         //
@@ -691,7 +691,7 @@ public class IdFilter implements Filter {
         HttpSession session = request.getSession();
         if(session != null){
             log.debug("session.isNew(): {}", session.isNew());
-            UserProfile userProfile = (UserProfile) session.getAttribute(USER_PROFILE);
+            UserProfile userProfile = UserProfile.fromJson((String) session.getAttribute(USER_PROFILE));
             if( userProfile != null ){
                 IdProvider userIdP = userProfile.getIdP();
                 String name = userProfile.getUID();
@@ -724,24 +724,19 @@ public class IdFilter implements Filter {
 
                     out.println(DTPS + "token:"+ SPDT +"<dd><pre>" + userProfile.getEDLAccessToken()+"</pre></dd>");
 
-                    out.println(DTPS + USER_PROFILE + SPDT + "<dd><pre>" + userProfile + "</pre></dd>");
+
+                    out.println(DTPS + USER_PROFILE + ".toString()" + SPDT + "<dd><pre>" + userProfile + "</pre></dd>");
+
+                    out.println(DTPS + USER_PROFILE + ".toJson(true)" + SPDT + "<dd><pre>" + userProfile.toJson(true) + "</pre></dd>");
+                    out.println(DTPS + USER_PROFILE + ".toJson(false)" + SPDT + "<dd><pre>" + userProfile.toJson(false) + "</pre></dd>");
 
                     out.println("</dl>");
 
+                    //
+                    // -- -- --  Print Session Info - BEGIN  -- -- -- -- -- -- -- -- -- -- -- --
+                    //
                     out.println("<hr />");
-                    out.println("<pre>");
-                    out.print("<b>session attributes</b>: [ ");
-
-                    Enumeration<String> attrNames = session.getAttributeNames();
-                    if(attrNames.hasMoreElements()){
-                        while(attrNames.hasMoreElements()){
-                            String attrName = attrNames.nextElement();
-                            out.print("\""+attrName+"\"");
-                            out.print((attrNames.hasMoreElements()?", ":""));
-                        }
-                    }
-                    out.println(" ]</pre>");
-
+                    out.println(DTPS + "Session State Information" + SPDT);
                     long timeNow = System.currentTimeMillis();
                     double sessionInUseTime = (timeNow-session.getCreationTime())/1000.0;
                     out.println("<pre>");
@@ -753,8 +748,19 @@ public class IdFilter implements Filter {
                     out.println("                    sessionInUseTime:  " + sessionInUseTime + " seconds.");
 
                     out.println("</pre>");
-                }
+                    out.println(DTPS + "Session Attributes" + SPDT);
 
+                    Enumeration<String> attrNames = session.getAttributeNames();
+                    if(attrNames.hasMoreElements()){
+                        while(attrNames.hasMoreElements()){
+                            String attrName = attrNames.nextElement();
+                            out.print("    " + DTPS + "\"" + attrName + "\": " + SPDT +
+                                    "<dd><pre>" + session.getAttribute(attrName) + "</pre></dd>\n");
+                            out.print((attrNames.hasMoreElements()?"\n":""));
+                        }
+                    }
+                    // -- -- --  Print Session Info - END  -- -- -- -- -- -- -- -- -- -- -- --
+                }
                 out.println("<hr />");
             }
             else if(request.getUserPrincipal() != null){
