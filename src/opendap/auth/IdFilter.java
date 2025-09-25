@@ -605,10 +605,17 @@ public class IdFilter implements Filter {
         }
 	}
 
-    private static final String DTS = "<dt><strong>";
-    private static final String SDT = "</strong></dt>";
-    private static final String DTPS = "<dt><pre><strong>";
-    private static final String SPDT = "</strong></pre></dt>";
+    /**
+     * HTML Short cuts: openers and closers
+     */
+    private static final String oDTS = "<dt><strong>";
+    private static final String cDTS = "</strong></dt>";
+
+    private static final String oDTPS = "<dt><pre><strong>";
+    private static final String cDTPS = "</strong></pre></dt>";
+
+    private static final String oDDPS = "<dd><pre><span style='background-color: #E0E0E0;'>";
+    private static final String cDDPS = "</span></pre></dd>";
 
     private String noProfileContent(String contextPath, HttpSession session){
         log.debug("Building noProfile String.");
@@ -639,7 +646,7 @@ public class IdFilter implements Filter {
             String origUrl = Util.stringFromJson( (String) session.getAttribute(IdFilter.RETURN_TO_URL));
             noProfile.append("<dl>");
             if(origUrl!=null){
-                noProfile.append(DTS).append("After authenticating you will be returned to:").append(SDT);
+                noProfile.append(oDTS).append("After authenticating you will be returned to:").append(cDTS);
                 noProfile.append("<dd><pre><a href='").append(origUrl).append("'>").append(origUrl).append("</a></pre></dd>");
             }
             noProfile.append("</dl>");
@@ -719,16 +726,16 @@ public class IdFilter implements Filter {
 
                     out.println("<dl>");
                     if(origUrl!=null){
-                        out.println(DTPS + RETURN_TO_URL + SPDT +"<dd><pre><a href='"+origUrl+"'>"+origUrl+"</a></pre></dd>");
+                        out.println(oDTPS + RETURN_TO_URL + cDTPS +"<dd><pre><a href='"+origUrl+"'>"+origUrl+"</a></pre></dd>");
                     }
 
-                    out.println(DTPS + "token:"+ SPDT +"<dd><pre>" + userProfile.getEDLAccessToken()+"</pre></dd>");
+                    out.println(oDTPS + "token:"+ cDTPS +"<dd><pre>" + userProfile.getEDLAccessToken()+"</pre></dd>");
 
 
-                    out.println(DTPS + USER_PROFILE + ".toString()" + SPDT + "<dd><pre>" + userProfile + "</pre></dd>");
+                    out.println(oDTPS + USER_PROFILE + ".toString()" + cDTPS + "<dd><pre>" + userProfile + "</pre></dd>");
 
-                    out.println(DTPS + USER_PROFILE + ".toJson(true)" + SPDT + "<dd><pre>" + userProfile.toJson(true) + "</pre></dd>");
-                    out.println(DTPS + USER_PROFILE + ".toJson(false)" + SPDT + "<dd><pre>" + userProfile.toJson(false) + "</pre></dd>");
+                    out.println(oDTPS + USER_PROFILE + ".toJson(</strong>pretty=true<strong>):" + cDTPS + oDDPS + userProfile.toJson(true) + cDDPS);
+                    out.println(oDTPS + USER_PROFILE + ".toJson(</strong>pretty=false<strong>):" + cDTPS + oDDPS + userProfile.toJson(false) + cDDPS);
 
                     out.println("</dl>");
 
@@ -736,7 +743,7 @@ public class IdFilter implements Filter {
                     // -- -- --  Print Session Info - BEGIN  -- -- -- -- -- -- -- -- -- -- -- --
                     //
                     out.println("<hr />");
-                    out.println(DTPS + "Session State Information" + SPDT);
+                    out.println(oDTPS + "Session State Information" + cDTPS);
                     long timeNow = System.currentTimeMillis();
                     double sessionInUseTime = (timeNow-session.getCreationTime())/1000.0;
                     out.println("<pre>");
@@ -748,14 +755,13 @@ public class IdFilter implements Filter {
                     out.println("                    sessionInUseTime:  " + sessionInUseTime + " seconds.");
 
                     out.println("</pre>");
-                    out.println(DTPS + "Session Attributes" + SPDT);
+                    out.println(oDTPS + "Session Attributes" + cDTPS);
 
                     Enumeration<String> attrNames = session.getAttributeNames();
                     if(attrNames.hasMoreElements()){
                         while(attrNames.hasMoreElements()){
                             String attrName = attrNames.nextElement();
-                            out.print("    " + DTPS + "\"" + attrName + "\": " + SPDT +
-                                    "<dd><pre>" + session.getAttribute(attrName) + "</pre></dd>\n");
+                            out.print("    " + oDTPS + "\"" + attrName + "\": " + cDTPS + oDDPS + session.getAttribute(attrName) + cDDPS +"\n");
                             out.print((attrNames.hasMoreElements()?"\n":""));
                         }
                     }
