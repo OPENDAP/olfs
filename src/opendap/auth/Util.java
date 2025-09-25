@@ -229,10 +229,21 @@ public class Util {
     }
 
 
-    public static String toJson(Object o){
+    /**
+     *
+     * @param s The String to jsonify
+     * @return The String s, jsonified.
+     */
+    public static String toJson(String s){
         Gson gson = new Gson();
-        return gson.toJson(o);
+        return gson.toJson(s);
     }
+
+    /**
+     *
+     * @param s The JSON encoded String
+     * @return The String object decoded from the JSON String s.
+     */
     public static String stringFromJson(String s){
         Gson gson = new Gson();
         return gson.fromJson(s, String.class);
