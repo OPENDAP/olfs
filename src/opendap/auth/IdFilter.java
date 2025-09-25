@@ -606,7 +606,7 @@ public class IdFilter implements Filter {
 	}
 
     /**
-     * HTML Short cuts: openers and closers
+     * HTML Shortcuts: openers and closers
      */
     private static final String oDTS = "<dt><strong>";
     private static final String cDTS = "</strong></dt>";
