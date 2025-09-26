@@ -27,7 +27,7 @@ package opendap.http.error;
 
 import opendap.coreServlet.OPeNDAPException;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * The request requires user authentication. The response MUST include a

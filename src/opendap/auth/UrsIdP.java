@@ -52,10 +52,10 @@ import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.security.PublicKey;
 import java.security.interfaces.RSAPublicKey;
@@ -660,7 +660,7 @@ public class UrsIdP extends IdProvider{
         log.info("URS UID: {}", userProfile.getUID());
 
         // Finally, redirect the user back to the original requested resource.
-        String redirectUrl = (String) session.getAttribute(IdFilter.RETURN_TO_URL);
+        String redirectUrl = Util.stringFromJson( (String) session.getAttribute(IdFilter.RETURN_TO_URL));
         log.debug("session.getAttribute(RETURN_TO_URL): {} (session-id: {})", redirectUrl, session.getId());
 
         if (redirectUrl == null) {
@@ -673,12 +673,11 @@ public class UrsIdP extends IdProvider{
         session.invalidate();
 
         session = request.getSession(true);
-        session.setAttribute(IdFilter.RETURN_TO_URL, redirectUrl);
-        // Add this instance of UserProfile to the session for retrieval
-        // down stream on this request.
-        // We set the state of the instance of userProfile below.
+        session.setAttribute(IdFilter.RETURN_TO_URL, Util.toJson(redirectUrl));
 
-        session.setAttribute(IdFilter.USER_PROFILE, userProfile);
+        // Add this instance of UserProfile to the session for retrieval
+        // downstream on this request.
+        session.setAttribute(IdFilter.USER_PROFILE, userProfile.toJson(false));
 
         log.info("Authentication Completed. Redirecting client to redirectUrl: {}", redirectUrl);
 
@@ -710,7 +709,8 @@ public class UrsIdP extends IdProvider{
         try {
             HttpSession session = request.getSession(false);
             if (session != null) {
-                revokeEdlTokens((UserProfile) session.getAttribute(USER_PROFILE));
+                UserProfile up = UserProfile.fromJson((String) session.getAttribute(USER_PROFILE));
+                revokeEdlTokens(up);
             }
         }
         finally {

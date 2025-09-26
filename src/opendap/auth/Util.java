@@ -26,14 +26,15 @@
 
 package opendap.auth;
 
+import com.google.gson.Gson;
 import opendap.PathBuilder;
 import opendap.coreServlet.ReqInfo;
 import opendap.io.HyraxStringEncoding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -193,7 +194,7 @@ public class Util {
             msg += " (session: "+session.getId()+")";
             log.debug(msg);
         }
-        session.setAttribute(IdFilter.RETURN_TO_URL,requestUrl);
+        session.setAttribute(IdFilter.RETURN_TO_URL,Util.toJson(requestUrl));
         log.debug("Sanity check session.getAttribute("+ IdFilter.RETURN_TO_URL+") returns {} (session: {})",session.getAttribute(IdFilter.RETURN_TO_URL), session.getId());
     }
 
@@ -207,7 +208,7 @@ public class Util {
         HttpSession session  = req.getSession(false);
         String uid = null;
         if(session!=null){
-            UserProfile up = (UserProfile) session.getAttribute(USER_PROFILE);
+            UserProfile up = UserProfile.fromJson((String) session.getAttribute(USER_PROFILE));
             if(up!=null){
                 uid = up.getUID();
             }
@@ -225,5 +226,26 @@ public class Util {
             }
         }
         return uid;
+    }
+
+
+    /**
+     *
+     * @param s The String to jsonify
+     * @return The String s, jsonified.
+     */
+    public static String toJson(String s){
+        Gson gson = new Gson();
+        return gson.toJson(s);
+    }
+
+    /**
+     *
+     * @param s The JSON encoded String
+     * @return The String object decoded from the JSON String s.
+     */
+    public static String stringFromJson(String s){
+        Gson gson = new Gson();
+        return gson.fromJson(s, String.class);
     }
 }
