@@ -656,7 +656,21 @@ public class UrsIdP extends IdProvider{
         userProfile.setAuthContext(getAuthContext());
 
         userProfile.setEDLAccessToken(edlat);
-        getEDLUserProfile(userProfile);
+
+        // Get the user id---locally, if possible, via EDL if not
+        String uid = null;
+        if (!getUrsClientAppPublicKeys().isEmpty()) {
+            uid = getEdlUserIdFromToken(getUrsClientAppPublicKeys(), edlat.getAccessToken());
+            if (uid == null) {
+                log.error("{}Unable to get EDL user id from token locally; falling back to remote user id request", ERR_PREFIX);
+            } else {
+                userProfile.setUID(uid);
+            }
+        }
+        if (uid == null) {
+            userProfile.setUID(uid);
+            getEDLUserProfile(userProfile);
+        }
         log.info("URS UID: {}", userProfile.getUID());
 
         // Finally, redirect the user back to the original requested resource.
