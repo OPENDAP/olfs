@@ -35,8 +35,8 @@ import opendap.coreServlet.ReqInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import java.util.UUID;
 
 /**
@@ -60,7 +60,7 @@ public class User {
 
         HttpSession session = request.getSession(false);
         if(session!=null) {
-            userProfile= (UserProfile) session.getAttribute(IdFilter.USER_PROFILE);
+            userProfile= UserProfile.fromJson((String) session.getAttribute(IdFilter.USER_PROFILE));
             if(userProfile!=null)
                 log.debug(userProfile.toString());
         }

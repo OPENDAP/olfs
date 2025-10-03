@@ -33,9 +33,9 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.slf4j.Logger;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -94,7 +94,7 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
      * Loads the configuration file specified in the servlet parameter
      * ConfigFileName.
      *
-     * @throws javax.servlet.ServletException When the file is missing, unreadable, or fails
+     * @throws jakarta.servlet.ServletException When the file is missing, unreadable, or fails
      *                                        to parse (as an XML document).
      */
     private Document loadConfig() throws ServletException {
@@ -304,14 +304,14 @@ public class DispatchServlet extends opendap.coreServlet.DispatchServlet {
      *
      * This override checks to see if we are in secure mode and if not send a forbidden error.
      *
-     * @param req   Same as for javax.servlet.http.HttpServlet.service()
-     * @param resp   Same as for javax.servlet.http.HttpServlet.service()
-     * @throws javax.servlet.ServletException    Same as for javax.servlet.http.HttpServlet.service()
-     * @throws java.io.IOException   Same as for javax.servlet.http.HttpServlet.service()
+     * @param req   Same as for jakarta.servlet.http.HttpServlet.service()
+     * @param resp   Same as for jakarta.servlet.http.HttpServlet.service()
+     * @throws jakarta.servlet.ServletException    Same as for jakarta.servlet.http.HttpServlet.service()
+     * @throws java.io.IOException   Same as for jakarta.servlet.http.HttpServlet.service()
      */
     @Override
-    protected void service(javax.servlet.http.HttpServletRequest req, javax.servlet.http.HttpServletResponse resp)
-            throws javax.servlet.ServletException, java.io.IOException {
+    protected void service(jakarta.servlet.http.HttpServletRequest req, jakarta.servlet.http.HttpServletResponse resp)
+            throws jakarta.servlet.ServletException, java.io.IOException {
 
         if (!req.isSecure()) {
             if(!_devMode) {
