@@ -457,7 +457,14 @@ public class IdFilter implements Filter {
                         try {
                             retVal = IdPManager.getDefaultProvider().doTokenAuthentication(request, userProfile);
                         } finally {
-                            logEDLProfiling("Validate token - Is valid? " + retVal, profilingStartTime);
+                            // We only care about logging token validation if there was ever a token to BE validated.
+                            // If there was no authz_hdr_value, there was never even the hint of a token to be validated,
+                            // and `doTokenAuthentication` will have returned immediately (and returned "false", although
+                            // we don't care about that here).
+                            String authz_hdr_value = request.getHeader(IdProvider.AUTHORIZATION_HEADER_KEY);
+                            if (authz_hdr_value != null) {
+                                logEDLProfiling("Validate token - Is valid? " + retVal, profilingStartTime);
+                            }
                         }
                         if(retVal){
                             log.info("Validated Authorization header. uid: {}, sessionId: {}", userProfile.getUID(), session.getId());
