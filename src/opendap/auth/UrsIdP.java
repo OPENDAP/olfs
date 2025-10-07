@@ -571,7 +571,7 @@ public class UrsIdP extends IdProvider{
      */
     public EarthDataLoginAccessToken exchangeAuthCodeForEdlToken(String code, String returnToUrl) throws IOException {
 
-        String contents = edlToken(code, returnToUrl);
+        String contents = edlGetToken(code, returnToUrl);
 
         // Parse the json to extract the token.
         JsonParser jparse = new JsonParser();
@@ -749,8 +749,8 @@ public class UrsIdP extends IdProvider{
         if (up != null) {
             EarthDataLoginAccessToken edlat = up.getEDLAccessToken();
             if (edlat != null) {
-                edlRevoke(edlat.getAccessToken());
-                edlRevoke(edlat.getRefreshToken());
+                edlRevokeToken(edlat.getAccessToken());
+                edlRevokeToken(edlat.getRefreshToken());
             }
         }
     }
@@ -760,7 +760,7 @@ public class UrsIdP extends IdProvider{
      * @param token
      * @throws IOException
      */
-    public void edlRevoke(String token) throws IOException {
+    public void edlRevokeToken(String token) throws IOException {
         String postData = "token=" + token;
         String contents = edlApi(EDL_API_REVOKE, postData);
         if (contents != null && !contents.equalsIgnoreCase("{}")) {
@@ -775,7 +775,7 @@ public class UrsIdP extends IdProvider{
      * @return The response body of the response from EDL.
      * @throws IOException When the bad things happen.
      */
-    public String edlToken(String code, String returnToUrl) throws IOException {
+    public String edlGetToken(String code, String returnToUrl) throws IOException {
         log.info("EDL Code: {}", LogUtil.scrubEntry(code));
         String postData = "grant_type=authorization_code&code=" + code + "&redirect_uri=" + returnToUrl;
         return(edlApi(EDL_API_TOKEN, postData));
