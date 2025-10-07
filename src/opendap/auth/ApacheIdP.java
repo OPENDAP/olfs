@@ -147,6 +147,7 @@ public class ApacheIdP extends IdProvider {
             redirectUrl = (String) session.getAttribute(IdFilter.RETURN_TO_URL);
         }
         if(redirectUrl==null){
+            // Since the request may come from other deployment contexts we check the request for the context.
             redirectUrl = Util.fullyQualifiedPath(request.getContextPath());
         }
         log.info("doLogin(): redirecting to {}",redirectUrl);

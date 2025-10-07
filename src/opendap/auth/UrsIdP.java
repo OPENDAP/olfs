@@ -581,7 +581,6 @@ public class UrsIdP extends IdProvider{
         return edlat;
     }
 
-
     /**
      * Performs the user login operations.
      * This method does not actually generate any output. It performs a series

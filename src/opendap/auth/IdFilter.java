@@ -313,6 +313,7 @@ public class IdFilter implements Filter {
 
             HttpServletResponse hsRes = (HttpServletResponse) response;
             String requestURI = hsReq.getRequestURI();
+            // Since the request may come from other deployment contexts we check the request for the context.
             String contextPath = Util.fullyQualifiedPath(hsReq.getContextPath());
 
             // FIXME The following needs to be replaced with a mechanism that does not require the query
@@ -532,6 +533,7 @@ public class IdFilter implements Filter {
 
         log.info("doLogout() - BEGIN");
         log.info("doLogout() - Retrieving session...");
+        // Since the request may come from other deployment contexts we check the request for the context.
         String redirectUrl  = Util.fullyQualifiedPath(request.getContextPath());
         HttpSession session = request.getSession(false);
         if (session != null) {
@@ -590,6 +592,7 @@ public class IdFilter implements Filter {
 	private void doGuestLogin(HttpServletRequest request, HttpServletResponse response) throws IOException
     {
         HttpSession session = request.getSession(false);
+        // Since the request may come from other deployment contexts we check the request for the context.
         String redirectUrl = Util.fullyQualifiedPath(request.getContextPath());
         if(session != null) {
             redirectUrl = (String) session.getAttribute(RETURN_TO_URL);
@@ -665,6 +668,7 @@ public class IdFilter implements Filter {
 	private void doUserProfilePage(HttpServletRequest request, HttpServletResponse response)
 	        throws IOException
     {
+        // Since the request may come from other deployment contexts we check the request for the context.
         String srvcCntxtPth = Util.fullyQualifiedPath(request.getContextPath());
         log.debug("doLandingPage() - Setting Response Headers...");
 
