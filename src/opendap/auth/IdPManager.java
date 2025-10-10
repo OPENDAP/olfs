@@ -41,14 +41,12 @@ public class IdPManager {
         log = LoggerFactory.getLogger(IdPManager.class);
     }
 
-    private static IdProvider defaultProvider = null;
-
     private static String serviceContext = null;
+    public static String getServiceContextPath(){ return serviceContext; }
+    public static void setServiceContextPath(String sc){ serviceContext = sc;}
 
-    public static void setServiceContext(String sc){ serviceContext = sc;}
-
+    private static IdProvider defaultProvider = null;
     public static Collection<IdProvider> getProviders(){ return ipdInstances.values(); }
-
     public static IdProvider getProvider(String auth_context){
         return ipdInstances.get(auth_context);
     }
@@ -90,7 +88,7 @@ public class IdPManager {
             log.debug("idpFactory(): Building Identity Provider: " + idpClassName);
             Class<?> classDefinition = Class.forName(idpClassName);
             IdProvider idp = (IdProvider) classDefinition.getDeclaredConstructor().newInstance();
-            idp.init(config, serviceContext);
+            idp.init(config, getServiceContextPath());
             addProvider(idp);
         } catch (Exception e) {
             msg = "Unable to manufacture an instance of "+idpClassName+"  Caught an " + e.getClass().getName() + " exception.  msg:" + e.getMessage();
