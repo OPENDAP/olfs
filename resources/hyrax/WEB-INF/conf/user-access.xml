@@ -49,6 +49,7 @@
         <UrsClientPublicKeys>EDL_CLIENT_PUBLIC_KEYS</UrsClientPublicKeys>
         <UrsUrl>EDL_SSO_ENDPOINT_URL</UrsUrl>
         <!-- RejectUnsupportedAuthzSchemes / -->
+        <!-- UseReturnToUrlPostLogout / -->
     </IdProvider>
 
 
