@@ -105,8 +105,8 @@ public class UrsIdP extends IdProvider{
 
 
     @Override
-    public void init(Element config, String serviceContext) throws ConfigurationException {
-        super.init(config, serviceContext);
+    public void init(Element config, String serviceContextPath) throws ConfigurationException {
+        super.init(config, serviceContextPath);
 
         Element e;
 
@@ -570,12 +570,8 @@ public class UrsIdP extends IdProvider{
      * @throws IOException
      */
     public EarthDataLoginAccessToken exchangeAuthCodeForEdlToken(String code, String returnToUrl) throws IOException {
-        log.info("EDL Code: {}", LogUtil.scrubEntry(code));
 
-        String postData = "grant_type=authorization_code&code=" + code +
-                "&redirect_uri=" + returnToUrl;
-
-        String contents = edlApi(EDL_API_TOKEN, postData);
+        String contents = edlGetToken(code, returnToUrl);
 
         // Parse the json to extract the token.
         JsonParser jparse = new JsonParser();
@@ -678,7 +674,7 @@ public class UrsIdP extends IdProvider{
         log.debug("session.getAttribute(RETURN_TO_URL): {} (session-id: {})", redirectUrl, session.getId());
 
         if (redirectUrl == null) {
-            redirectUrl = PathBuilder.normalizePath(serviceContext, true, false);
+            redirectUrl = getServiceContextPath();
         }
 
         session.setAttribute(IdFilter.RETURN_TO_URL, null);
@@ -708,7 +704,7 @@ public class UrsIdP extends IdProvider{
      */
     @Override
     public String getLoginEndpoint(){
-        return PathBuilder.pathConcat(AuthenticationControls.getLoginEndpoint(), authContext);
+        return PathBuilder.pathConcat(AuthenticationControls.getLoginEndpoint(), getAuthContext());
     }
 
 
@@ -744,13 +740,7 @@ public class UrsIdP extends IdProvider{
     }
 
     /**
-     * EDL API Revoke Token:
-     * https://urs.earthdata.nasa.gov/documentation/for_integrators/api_documentation#/oauth/revoke
-     * <p/>
-     * curl --request POST --url 'https://uat.urs.earthdata.nasa.gov/oauth/revoke?token=hKyV5KDRXXXXlCuq3w' \
-     *    -H 'Authorization: Basic appcreds'
-     * <p/>
-     *
+     * Retrieves the users EarthDataLoginAccessToken and revokes the token parts.
      * @param up The user profile show tokens should be revoked.
      * @throws IOException When bad things happens
      */
@@ -759,25 +749,42 @@ public class UrsIdP extends IdProvider{
         if (up != null) {
             EarthDataLoginAccessToken edlat = up.getEDLAccessToken();
             if (edlat != null) {
-
-                String postData = "token=" + edlat.getAccessToken();
-                String contents = edlApi(EDL_API_REVOKE, postData);
-                if (contents != null && !contents.equalsIgnoreCase("{}")) {
-                    log.error("OUCH! Revocation of AccessToken may have failed!. Message: {}", contents);
-                }
-
-                postData = "token=" + edlat.getRefreshToken();
-                contents = edlApi(EDL_API_REVOKE, postData);
-                if (contents != null && !contents.equalsIgnoreCase("{}")) {
-                    log.error("OUCH! Revocation for RefreshToken may have failed!. Message: {}", contents);
-                }
+                edlRevokeToken(edlat.getAccessToken());
+                edlRevokeToken(edlat.getRefreshToken());
             }
         }
     }
 
     /**
-     *
-     * @param apiPath The EDL path for the API (token, revoke, etc)
+     * Calls EDL and has the passed token revoked.
+     * @param token
+     * @throws IOException
+     */
+    public void edlRevokeToken(String token) throws IOException {
+        String postData = "token=" + token;
+        String contents = edlApi(EDL_API_REVOKE, postData);
+        if (contents != null && !contents.equalsIgnoreCase("{}")) {
+            log.error("OUCH! Revocation of EDL Token may have failed!. Message: {}", contents);
+        }
+    }
+
+    /**
+     * Exchanges the users login code for an EDL token response.
+     * @param code The users login code from EDL
+     * @param returnToUrl The place the user was instructed to return to with the code.
+     * @return The response body of the response from EDL.
+     * @throws IOException When the bad things happen.
+     */
+    public String edlGetToken(String code, String returnToUrl) throws IOException {
+        log.info("EDL Code: {}", LogUtil.scrubEntry(code));
+        String postData = "grant_type=authorization_code&code=" + code + "&redirect_uri=" + returnToUrl;
+        return(edlApi(EDL_API_TOKEN, postData));
+    }
+
+
+    /**
+     * Builds, transmits, and returns the response of an EDL API command.
+     * @param apiPath The EDL path for the desired API endpoint (token, revoke, etc)
      * @param postData The query string parameters to POST
      * @return The response document
      * @throws IOException When the bad things happen.
@@ -798,6 +805,5 @@ public class UrsIdP extends IdProvider{
 
         return contents;
     }
-
 
 }

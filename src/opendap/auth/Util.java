@@ -195,7 +195,7 @@ public class Util {
             log.debug(msg);
         }
         session.setAttribute(IdFilter.RETURN_TO_URL,Util.toJson(requestUrl));
-        log.debug("Sanity check session.getAttribute("+ IdFilter.RETURN_TO_URL+") returns {} (session: {})",session.getAttribute(IdFilter.RETURN_TO_URL), session.getId());
+        log.debug("Sanity check session.getAttribute("+ IdFilter.RETURN_TO_URL+") returns {} (session: {})",session.getAttribute(Util.stringFromJson(IdFilter.RETURN_TO_URL)), session.getId());
     }
 
     /**
@@ -208,7 +208,7 @@ public class Util {
         HttpSession session  = req.getSession(false);
         String uid = null;
         if(session!=null){
-            UserProfile up = UserProfile.fromJson((String) session.getAttribute(USER_PROFILE));
+            UserProfile up = UserProfile.fromJson( (String) session.getAttribute(USER_PROFILE));
             if(up!=null){
                 uid = up.getUID();
             }
@@ -248,4 +248,18 @@ public class Util {
         Gson gson = new Gson();
         return gson.fromJson(s, String.class);
     }
+
+    /**
+     *
+     * @param p
+     * @return Returns the string p with the assurance that the returned string will begin with a "/" character.
+     */
+    public static String fullyQualifiedPath(String p){
+        if ( !p.startsWith("/") ) {
+            p = "/" + p;
+        }
+        return p;
+    }
+
+
 }

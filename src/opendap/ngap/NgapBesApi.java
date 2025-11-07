@@ -65,6 +65,7 @@ import java.util.regex.Pattern;
  */
 public class NgapBesApi extends BesApi implements Cloneable {
 
+    public static final String EDL_CLIENT_APPLICATION_ID_KEY = "edl_client_application_id";
     public static final String EDL_AUTH_TOKEN_CONTEXT = "edl_auth_token";
     public static final String RETURN_AS_DMRPP = "dmrpp";
 
@@ -214,6 +215,7 @@ public class NgapBesApi extends BesApi implements Cloneable {
             EarthDataLoginAccessToken oat = up.getEDLAccessToken();
             if (oat != null) {
                 // Add the new service chaining Authorization header value
+                request.addContent(setContextElement(EDL_CLIENT_APPLICATION_ID_KEY, oat.getEdlClientAppId()));
                 request.addContent(setContextElement(EDL_AUTH_TOKEN_CONTEXT, oat.getAuthorizationHeaderValue()));
             }
         }

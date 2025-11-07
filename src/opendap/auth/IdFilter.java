@@ -83,6 +83,7 @@ public class IdFilter implements Filter {
 
     private String guestEndpoint;
     private boolean enableGuestProfile;
+    private String serviceContextPath;
 
     public IdFilter(){
         isInitialized = false;
@@ -177,6 +178,7 @@ public class IdFilter implements Filter {
         return valueSeconds;
     }
 
+    private String getServiceContextPath(){ return serviceContextPath; }
     /**
      *
      * @throws IOException
@@ -189,12 +191,12 @@ public class IdFilter implements Filter {
             if(isInitialized)
                 return;
 
+            serviceContextPath = Util.fullyQualifiedPath(filterConfig.getServletContext().getContextPath());
+
             counter = new AtomicLong(0);
             ServletLogUtil.initLogging(filterConfig.getServletContext());
             log = LoggerFactory.getLogger(this.getClass());
             log.info("init() - Initializing IdFilter...");
-
-            String context = filterConfig.getServletContext().getContextPath();
 
             String configFileName = filterConfig.getInitParameter(CONFIG_PARAMETER_NAME);
             if(configFileName==null){
@@ -228,15 +230,15 @@ public class IdFilter implements Filter {
             e = config.getChild("EnableGuestProfile");
             if(e!=null){
                 enableGuestProfile = true;
-                guestEndpoint = PathBuilder.pathConcat(context, "guest");
+                guestEndpoint = PathBuilder.pathConcat(getServiceContextPath(), "guest");
             }
             log.info("init() - Guest Profile {}", enableGuestProfile ?"Has Been ENABLED!":"Is DISABLED!");
 
             // Set up authentication controls. If the configuration element is missing that's fine
             // because we know that it will still configure the login/logout endpoint values.
-            AuthenticationControls.init(config.getChild(AuthenticationControls.CONFIG_ELEMENT),context);
+            AuthenticationControls.init(config.getChild(AuthenticationControls.CONFIG_ELEMENT),getServiceContextPath());
 
-            IdPManager.setServiceContext(context);
+            IdPManager.setServiceContextPath(getServiceContextPath());
             // Load ID Providers (Might be several)
             for (Object o : config.getChildren("IdProvider")) {
                 Element idpConfig = (Element) o;
@@ -311,7 +313,8 @@ public class IdFilter implements Filter {
 
             HttpServletResponse hsRes = (HttpServletResponse) response;
             String requestURI = hsReq.getRequestURI();
-            String contextPath = hsReq.getContextPath();
+            // Since the request may come from other deployment contexts we check the request for the context.
+            String contextPath = Util.fullyQualifiedPath(hsReq.getContextPath());
 
             // FIXME The following needs to be replaced with a mechanism that does not require the query
             //  to be added to the request URL in order for the redirect to produce the target request.
@@ -502,7 +505,7 @@ public class IdFilter implements Filter {
             // This call leads to the PEPFilter, wooo!
             filterChain.doFilter(hsReq, hsRes);
 
-            log.debug("END (session: {} returnToUrl: {})",session.getId(),session.getAttribute(RETURN_TO_URL));
+            log.debug("END (session: {} returnToUrl: {})",session.getId(),Util.stringFromJson( (String) session.getAttribute(RETURN_TO_URL)));
             ServletLogUtil.logServerAccessEnd(200,logName);
         }
         finally {
@@ -531,7 +534,8 @@ public class IdFilter implements Filter {
 
         log.info("doLogout() - BEGIN");
         log.info("doLogout() - Retrieving session...");
-        String redirectUrl  = request.getContextPath();
+        // Since the request may come from other deployment contexts we check the request for the context.
+        String redirectUrl  = Util.fullyQualifiedPath(request.getContextPath());
         HttpSession session = request.getSession(false);
         if (session != null) {
             log.info("doLogout() - Got session...");
@@ -589,7 +593,8 @@ public class IdFilter implements Filter {
 	private void doGuestLogin(HttpServletRequest request, HttpServletResponse response) throws IOException
     {
         HttpSession session = request.getSession(false);
-        String redirectUrl = request.getContextPath();
+        // Since the request may come from other deployment contexts we check the request for the context.
+        String redirectUrl = Util.fullyQualifiedPath(request.getContextPath());
         if(session != null) {
             redirectUrl = Util.stringFromJson( (String) session.getAttribute(IdFilter.RETURN_TO_URL));
             session.invalidate();
@@ -671,6 +676,8 @@ public class IdFilter implements Filter {
 	private void doUserProfilePage(HttpServletRequest request, HttpServletResponse response)
 	        throws IOException
     {
+        // Since the request may come from other deployment contexts we check the request for the context.
+        String srvcCntxtPth = Util.fullyQualifiedPath(request.getContextPath());
         log.debug("doLandingPage() - Setting Response Headers...");
 
         response.setContentType("text/html");
@@ -778,14 +785,14 @@ public class IdFilter implements Filter {
             }
             else if(request.getUserPrincipal() != null){
                 out.println("<p>Welcome " + Encode.forHtml(request.getUserPrincipal().getName()) + "</p>");
-                out.println("<p><a href=\"" + request.getContextPath() + "/logout\">logout</a></p>");
+                out.println("<p><a href=\"" + srvcCntxtPth + "/logout\">logout</a></p>");
             }
             else {
-                out.println(noProfileContent(request.getContextPath(),session));
+                out.println( noProfileContent( srvcCntxtPth, session) );
             }
         }
         else {
-            out.println(noProfileContent(request.getContextPath(), session));
+            out.println(noProfileContent(srvcCntxtPth, session));
         }
         // Finish up the page
         out.println("</body></html>");

@@ -167,17 +167,6 @@
         </encoder>
     </appender>
 
-    <appender name="AuthLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <File>${logdir}/auth.log</File>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${logdir}/auth.%d{yyyy-MM-dd}.log</FileNamePattern>
-            <!-- keep 30 days worth of history -->
-            <MaxHistory>30</MaxHistory>
-        </rollingPolicy>
-        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>${FORMAT}</pattern>
-        </encoder>
-    </appender>
 
     <!--
     NGAP Request Required Fields
