@@ -1,7 +1,7 @@
 package opendap.coreServlet;
 
 import jakarta.servlet.ServletResponse;
-import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 
 
