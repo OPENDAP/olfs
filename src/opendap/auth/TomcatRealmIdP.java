@@ -75,7 +75,6 @@ public class TomcatRealmIdP extends IdProvider {
             if(url != null) {
                 redirectUrl = url;
             }
-            session.setAttribute(IdFilter.IDENTITY_PROVIDER,this);
         }
 
         String protocol = request.getScheme();

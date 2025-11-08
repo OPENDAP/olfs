@@ -66,7 +66,6 @@ public class IdFilter implements Filter {
 
     public static final String RETURN_TO_URL      = "return_to_url";
     public static final String USER_PROFILE       = "user_profile";
-    public static final String IDENTITY_PROVIDER  = "identity_provider";
 
     private boolean isInitialized;
     private FilterConfig filterConfig;
