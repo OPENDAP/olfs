@@ -195,7 +195,9 @@ public class Util {
             log.debug(msg);
         }
         session.setAttribute(IdFilter.RETURN_TO_URL,Util.toJson(requestUrl));
-        log.debug("Sanity check session.getAttribute("+ IdFilter.RETURN_TO_URL+") returns {} (session: {})",session.getAttribute(Util.stringFromJson(IdFilter.RETURN_TO_URL)), session.getId());
+        log.debug("Sanity check session.getAttribute("+ IdFilter.RETURN_TO_URL+") returns {} (session: {})",
+                Util.stringFromJson((String) session.getAttribute(IdFilter.RETURN_TO_URL)),
+                session.getId());
     }
 
     /**
