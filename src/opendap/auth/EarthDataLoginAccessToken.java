@@ -171,29 +171,18 @@ public class EarthDataLoginAccessToken implements Serializable {
     public String toString(String indent, String indent_inc){
         StringBuilder sb = new StringBuilder();
         String l1i = indent +indent_inc;
-        sb.append(indent).append("\"").append(this.getClass().getName()).append("\" : {\n");
-        sb.append(l1i).append("\"creationTime\" : \"").append(creationTime).append("\",\n");
-        sb.append(l1i).append("\"").append(ACCESS_TOKEN_KEY).append("\" : \"").append(accessToken).append("\",\n");
-        sb.append(l1i).append("\"").append(ENDPOINT_KEY).append("\" : \"").append(endPoint).append("\",\n");
-        sb.append(l1i).append("\"").append(EXPIRES_IN_KEY).append("\" : \"").append(expiresIn).append("\",\n");
-        sb.append(l1i).append("\"").append(TOKEN_TYPE_KEY).append("\" : \"").append(tokenType).append("\",\n");
-        sb.append(l1i).append("\"").append(REFRESH_TOKEN_KEY).append("\" : \"").append(refreshToken).append("\"\n");
-        sb.append(indent).append("}\n");
+        sb.append(indent).append(this.getClass().getName()).append(": \n");
+        sb.append(l1i).append("creationTime: ").append(creationTime).append("\n");
+        sb.append(l1i).append(ACCESS_TOKEN_KEY).append(": ").append(accessToken).append("\n");
+        sb.append(l1i).append(ENDPOINT_KEY).append(": ").append(endPoint).append("\n");
+        sb.append(l1i).append(EXPIRES_IN_KEY).append(": ").append(expiresIn).append("\n");
+        sb.append(l1i).append(TOKEN_TYPE_KEY).append(": ").append(tokenType).append("\n");
+        sb.append(l1i).append(REFRESH_TOKEN_KEY).append(": ").append(refreshToken).append("\"\n");
         return sb.toString();
-    }
-
-
-
-    public String getEchoTokenValue(){
-        return  getAccessToken() + ":" + getEdlClientAppId();
     }
 
     public String getAuthorizationHeaderValue(){
         return  getTokenType() + " " + getAccessToken();
     }
-
-
-
-
 
 }

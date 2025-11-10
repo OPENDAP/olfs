@@ -29,7 +29,7 @@ import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletException;
+import jakarta.servlet.ServletException;
 import java.util.Vector;
 
 /**
@@ -59,7 +59,7 @@ public class ApplicationRegistry {
      * that defined them from the config document.
      *
      * @return A VEector of JwsHandlers that have been intialized and are ready to use.
-     * @throws javax.servlet.ServletException When things go poorly
+     * @throws jakarta.servlet.ServletException When things go poorly
      */
     private static Vector<JwsHandler> buildJwsHandlers(String resourcesDir, Element webStartConfig) throws ServletException {
 
