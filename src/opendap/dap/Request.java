@@ -29,8 +29,8 @@ package opendap.dap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Created by IntelliJ IDEA.
