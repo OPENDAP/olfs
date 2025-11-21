@@ -21,7 +21,6 @@ buildscript {
 plugins {
     id 'java'
     id 'war'
-    id 'eclipse'
     id 'idea'
     id 'org.sonarqube' version '6.2.0.5505'
 }
@@ -32,6 +31,8 @@ plugins {
 //  jhrg 1/22/24
 sonarqube {
     properties {
+        property "sonar.gradle.skipCompile", "true"
+
         property "sonar.sourceEncoding", "UTF-8"
         property "sonar.projectKey", "opendap-olfs"
         property "sonar.projectName", "olfs"
@@ -39,8 +40,8 @@ sonarqube {
         property "sonar.organization", "opendap"
         property "sonar.inclusions", "src"
         property "sonar.exclusions", "src/opendap/Coverity_Model.java," +
-                                    "retired/**/*.java," +
-                                    "src/opendap/**/*Test.java"
+                "retired/**/*.java," +
+                "src/opendap/**/*Test.java"
         property "sonar.java.binaries", "build"
         property "sonar.java.libraries", "lib/*.jar"
     }
@@ -58,8 +59,10 @@ if (hasProperty('buildScan')) {
 group = 'org.opendap'
 description = 'The OLFs build'
 
-sourceCompatibility = 1.9
-targetCompatibility = 1.9
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_9
+    targetCompatibility = JavaVersion.VERSION_1_9
+}
 
 repositories {
     // For just about everything except...
@@ -304,7 +307,7 @@ dependencies {
 // Substitute the version information before compilation
 compileJava {
     doFirst {
-    	println 'HYRAX_VERSION: ' + project.HYRAX_VERSION
+        println 'HYRAX_VERSION: ' + project.HYRAX_VERSION
     }
 
     dependsOn 'substituteVersionInfo'
@@ -312,32 +315,32 @@ compileJava {
 
 // see https://docs.gradle.org/current/dsl/org.gradle.api.plugins.ExtraPropertiesExtension.html
 project.ext {
-    resources_dir = "${projectDir}/resources"
+    resources_dir = "${projectDir}/resources" as GStringImpl
     // WebInf_resources_dir = "${project.resources_dir}/hyrax/WEB-INF"
     // distribution_resources_dir = "${project.resources_dir}/distribution"
 
     // Build Directories
-    build_dir = "${buildDir}"
-    build_classes = "${project.build_dir}/classes"
-    build_docs = "${project.build_dir}/docs"
-    build_dist = "${project.build_dir}/dist"
-    build_lib = "${project.build_dir}/lib"
-    build_run = "${project.build_dir}/run"
-    build_src = "${project.build_dir}/src"
-    build_resources = "${project.build_dir}/resources"
+    build_dir = "${buildDir}" as GStringImpl
+    build_classes = "${project.build_dir}/classes" as GStringImpl
+    build_docs = "${project.build_dir}/docs" as GStringImpl
+    build_dist = "${project.build_dir}/dist" as GStringImpl
+    build_lib = "${project.build_dir}/lib" as GStringImpl
+    build_run = "${project.build_dir}/run" as GStringImpl
+    build_src = "${project.build_dir}/src" as GStringImpl
+    build_resources = "${project.build_dir}/resources" as GStringImpl
 
-    hyrax_resources_dir = "${project.resources_dir}/hyrax"
-    ngap_resources_dir = "${project.resources_dir}/ngap"
-    robots_resources_dir = "${project.resources_dir}/robots"
-    build_robots_resources = "${project.build_dir}/robots"
-    wcs_resources_dir = "${project.resources_dir}/WCS/2.0"
+    hyrax_resources_dir = "${project.resources_dir}/hyrax" as GStringImpl
+    ngap_resources_dir = "${project.resources_dir}/ngap" as GStringImpl
+    robots_resources_dir = "${project.resources_dir}/robots" as GStringImpl
+    build_robots_resources = "${project.build_dir}/robots" as GStringImpl
+    wcs_resources_dir = "${project.resources_dir}/WCS/2.0" as GStringImpl
 }
 
 clean.doFirst {
     delete "src_gradle"
 }
 
-task init_dir {
+tasks.register('init_dir') {
     description "Create required folders in the build directory."
     doLast {
         mkdir "${project.build_dir}"
@@ -349,7 +352,8 @@ task init_dir {
 // See: https://docs.gradle.org/current/userguide/war_plugin.html
 // We want to make multiple war files (opendap, ROOT, ngap) I think. This answer shows how:
 // given that https://stackoverflow.com/questions/13077694/create-multiple-war-files-with-different-dependencies-in-gradle
-war {
+war
+{
     archiveBaseName = 'opendap'
 
     // Copy/filter the various resource files
@@ -361,7 +365,8 @@ war {
     from layout.buildDirectory.dir("resources")
 }
 
-task buildOpendapWar(type: War, dependsOn: classes){
+tasks.register('buildOpendapWar', War) {
+    dependsOn classes
     archiveBaseName = 'opendap_server'
     destinationDirectory = file("$buildDir/dist")
 
@@ -378,7 +383,8 @@ task buildOpendapWar(type: War, dependsOn: classes){
     from layout.buildDirectory.dir("resources")
 }
 
-task buildNgapWar(type: War, dependsOn: classes){
+tasks.register('buildNgapWar', War) {
+    dependsOn classes
     dependsOn configurations.ngapDep
     archiveBaseName = 'opendap_ngap'
     destinationDirectory = file("$buildDir/dist")
@@ -396,7 +402,8 @@ task buildNgapWar(type: War, dependsOn: classes){
     from layout.buildDirectory.dir("resources")
 }
 
-task buildRobotsWar(type: War, dependsOn: classes){
+tasks.register('buildRobotsWar', War) {
+    dependsOn classes
     archiveBaseName = 'opendap_robots'
     destinationDirectory = file("$buildDir/dist")
 
@@ -404,17 +411,20 @@ task buildRobotsWar(type: War, dependsOn: classes){
     description = 'Build the Opendap Robots war.'
 }
 
-task buildDists(dependsOn: [buildOpendapWar, buildNgapWar]){ //hold for later ", buildRobotsWar"
+/*
+tasks.register('buildDists') {
+    dependsOn[buildOpendapWar, buildNgapWar] //hold for later ", buildRobotsWar"
     group = 'warBuilds'
     description = 'Build the Opendap, Ngap, and Robots war.'
 }
+*/
 
 clean {
     // FIXME: Awful. instead, look for all (.+)\\.java.in files and delete $1.java jhrg 9/16/21
-    delete 'src/opendap/bes/Version.java'
+    // delete 'src/opendap/bes/Version.java' // I had to replace Version.java, we need it. ndp 07/18/24
 }
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
     //options.compilerArgs << '-Xlint:unchecked'
     //options.compilerArgs << '-Xlint:unchecked' << '-Werror' //enable to mark deprecated warnings as errors
     options.deprecation = true
@@ -449,10 +459,11 @@ tasks.withType(JavaCompile) {
 // jhrg 9/15/21
 
 import org.apache.tools.ant.filters.ReplaceTokens
+import org.codehaus.groovy.runtime.GStringImpl
 
-def tokens = [SERVICE_CONTEXT: project.DEPLOYMENT_CONTEXT,
-              HyraxVersion: project.HYRAX_VERSION,
-              OlfsVersion: project.OLFS_VERSION,
+def tokens = [SERVICE_CONTEXT   : project.DEPLOYMENT_CONTEXT,
+              HyraxVersion      : project.HYRAX_VERSION,
+              OlfsVersion       : project.OLFS_VERSION,
               WcsSoftwareVersion: project.WCS_VERSION]
 
 // Not used. jhrg 9/17/21 WCS_SOFTWARE_VERSION: project.WCS_VERSION
@@ -517,7 +528,7 @@ tasks.register('copyWCSResources', Copy) {
 // '.java'.
 //
 // I made this to see if I could and because I wanted to make the files that get
-// tokens substituted explict in the sources. There might be better ways to do this.
+// tokens substituted explicit in the sources. There might be better ways to do this.
 // And handling the substitution this way makes the clean target more complex.
 // jhrg 9/16 21
 tasks.register('substituteVersionInfo', Copy) {
