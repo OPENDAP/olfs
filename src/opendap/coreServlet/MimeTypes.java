@@ -65,7 +65,7 @@ public class MimeTypes {
         typeMap.put("css",   new String[] {"text", "css"});
 
         typeMap.put("js",   new String[] {"text", "javascript"});
-        
+
         // Images
         typeMap.put("jpeg",  new String[] {"image", "jpeg"});
         typeMap.put("jpg",   new String[] {"image", "jpeg"});
