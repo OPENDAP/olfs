@@ -229,50 +229,6 @@ public class BES {
     }
 
 
-    /*********************************************************************
-     * BES LOGGER BEGIN
-     */
-    public static class BesLogger {
-
-        public BesLogger(String name, boolean enabled) {
-            loggerName = name;
-            isEnabled = enabled;
-        }
-
-        public BesLogger(String name, String enabled) {
-            loggerName = name;
-            if (enabled != null && enabled.equalsIgnoreCase("on"))
-                isEnabled = true;
-            else
-                isEnabled = false;
-        }
-
-        boolean isEnabled;
-
-        public boolean getIsEnabled() {
-            return isEnabled;
-        }
-
-        public void setIsEnabled(boolean enabled) {
-            isEnabled = enabled;
-        }
-
-        String loggerName;
-
-        public String getName() {
-            return loggerName;
-        }
-
-        public void setName(String name) {
-            loggerName = name;
-        }
-
-    }
-    /*
-     * BES LOGGER END
-     *********************************************************************/
-
-
     public int getBesClientCount() {
         return clientsMap.size();
     }
