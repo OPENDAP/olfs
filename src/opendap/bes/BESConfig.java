@@ -437,6 +437,12 @@ public class BESConfig  {
         Element port = new Element("port");
         port.setText(String.valueOf(getPort()));
 
+        Element maxResponseSize = new Element(MAX_RESPONSE_SIZE_ELEMENT_OLFS);
+        maxResponseSize.setAttribute(UNITS_ATTRIBUTE_NAME, "b");
+
+        Element maxVariableSize = new Element(MAX_VARIABLE_SIZE_ELEMENT_OLFS);
+        maxVariableSize.setAttribute(UNITS_ATTRIBUTE_NAME, "b");
+
 
         Element clientPool = new Element("ClientPool");
         clientPool.setAttribute("maximum",Integer.toString(_BesMaxClients));
@@ -445,6 +451,8 @@ public class BESConfig  {
         bes.addContent(prefix);
         bes.addContent(host);
         bes.addContent(port);
+        bes.addContent(maxResponseSize);
+        bes.addContent(maxVariableSize);
         bes.addContent(clientPool);
 
         return bes;
