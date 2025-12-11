@@ -225,6 +225,17 @@
     </servlet>
 
     <servlet>
+        <servlet-name>adminInterface</servlet-name>
+        <servlet-class>opendap.hai.DispatchServlet</servlet-class>
+        <!-- init-param>
+            <param-name>DeveloperMode</param-name>
+            <param-value>true</param-value>
+        </init-param -->
+        <!-- Most people don't use the HAI, so don't load it by default -->
+        <!-- load-on-startup>1</load-on-startup -->
+    </servlet>
+
+    <servlet>
         <servlet-name>viewers</servlet-name>
 
         <servlet-class>opendap.viewers.ViewersServlet</servlet-class>
@@ -295,6 +306,10 @@
         <url-pattern>/hyrax/*</url-pattern>
     </servlet-mapping>
 
+    <servlet-mapping>
+        <servlet-name>adminInterface</servlet-name>
+        <url-pattern>/hai/*</url-pattern>
+    </servlet-mapping>
 
     <servlet-mapping>
         <servlet-name>viewers</servlet-name>
