@@ -225,17 +225,6 @@
     </servlet>
 
     <servlet>
-        <servlet-name>adminInterface</servlet-name>
-        <servlet-class>opendap.hai.DispatchServlet</servlet-class>
-        <!-- init-param>
-            <param-name>DeveloperMode</param-name>
-            <param-value>true</param-value>
-        </init-param -->
-        <!-- Most people don't use the HAI, so don't load it by default -->
-        <!-- load-on-startup>1</load-on-startup -->
-    </servlet>
-
-    <servlet>
         <servlet-name>viewers</servlet-name>
 
         <servlet-class>opendap.viewers.ViewersServlet</servlet-class>
@@ -306,10 +295,6 @@
         <url-pattern>/hyrax/*</url-pattern>
     </servlet-mapping>
 
-    <servlet-mapping>
-        <servlet-name>adminInterface</servlet-name>
-        <url-pattern>/hai/*</url-pattern>
-    </servlet-mapping>
 
     <servlet-mapping>
         <servlet-name>viewers</servlet-name>
@@ -409,48 +394,7 @@
         <welcome-file>index.htm</welcome-file>
     </welcome-file-list>
 
-
-
-    <!-- Define a Security Constraint on the Admin command and user interfaces -->
-    <security-constraint>
-        <web-resource-collection>
-            <web-resource-name>Hyrax Admin Interface</web-resource-name>
-            <url-pattern>/hai/*</url-pattern>
-            <url-pattern>/admin/*</url-pattern>
-        </web-resource-collection>
-
-        <auth-constraint>
-            <role-name>manager</role-name>
-        </auth-constraint>
-
-        <user-data-constraint>
-            <!-- this ensures that all efforts to access the admin interface nd resources must use HTTPS -->
-            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
-            <!-- transport-guarantee>NONE</transport-guarantee -->
-        </user-data-constraint>
-    </security-constraint>
-
-    <!-- Define the Login Configuration for this Application -->
-
-    <login-config>
-        <auth-method>FORM</auth-method>
-        <realm-name>Hyrax Administration Pages</realm-name>
-        <form-login-config>
-            <form-login-page>/admin/jsp/login.jsp</form-login-page>
-            <form-error-page>/admin/jsp/login-failed.jsp</form-error-page>
-        </form-login-config>
-    </login-config>
-
-
-    <!-- Security roles referenced by this web application -->
-    <security-role>
-        <description>
-            The role that is required to login to the Hyrax Administration Application
-        </description>
-        <role-name>manager</role-name>
-    </security-role>
-
-
+    
 </web-app>
 
 
