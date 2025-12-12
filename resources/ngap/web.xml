@@ -38,7 +38,12 @@
     <description>OPeNDAP Hyrax Server</description>
     <distributable />
 
-  <!-- The JSP page compiler and execution servlet, which is the mechanism  -->
+    <mime-mapping>
+        <extension>js</extension>
+        <mime-type>application/javascript</mime-type>
+    </mime-mapping>
+
+    <!-- The JSP page compiler and execution servlet, which is the mechanism  -->
   <!-- used by Tomcat to support JSP pages.  Traditionally, this servlet    -->
   <!-- is mapped to the URL pattern "*.jsp".  This servlet supports the     -->
   <!-- following initialization parameters (default values are in square    -->
