@@ -160,7 +160,7 @@ public class Util {
 
     /**
      * Here we make sure that request is really for something that the user would like to return to before we cache
-     * the URL. Pretty much we are trying to el,inate page componets like java script, xsl, images, css, etc.
+     * the URL. Pretty much we are trying to eliminate page components like javascript, xsl, images, css, etc.
      * @param session
      * @param requestUrl
      * @param requestURI
@@ -171,16 +171,19 @@ public class Util {
 
         String docsPath = PathBuilder.pathConcat(contextPath,"docs");
         String xslPath = PathBuilder.pathConcat(contextPath,"xsl");
-        String jsPath = PathBuilder.pathConcat(contextPath,"js");
+        //String jsPath = PathBuilder.pathConcat(contextPath,"js");
         String webStartPath = PathBuilder.pathConcat(contextPath,"WebStart");
 
-        log.debug("requestURI:  {}",requestURI);
-        log.debug("requestUrl:  {}",requestUrl);
-        log.debug("contextPath: {}",contextPath);
+        log.debug("  requestURI:  {}",requestURI);
+        log.debug("  requestUrl:  {}",requestUrl);
+        log.debug(" contextPath: {}",contextPath);
+        log.debug("     xslPath: {}",xslPath);
+        log.debug("webStartPath: {}",webStartPath);
+        // log.debug("      jsPath: {}",jsPath);
 
         if(requestURI.startsWith(docsPath) ||
                 requestURI.startsWith(xslPath) ||
-                requestURI.startsWith(jsPath)  ||
+                //requestURI.startsWith(jsPath)  ||
                 requestURI.startsWith(webStartPath) ||
                 requestURI.equalsIgnoreCase("favicon.ico")
                 ){
