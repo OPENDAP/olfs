@@ -980,8 +980,8 @@ public class ReqInfo {
     Pattern IP_ADDR_PATTERN = Pattern.compile("\\b(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\\b");
 
     public static String getClientIp(HttpServletRequest req) {
-        log.debug(showRequestHeaders(req));
-        log.debug(showCookies(req));
+        log.debug("LOOKATME {}",showRequestHeaders(req));
+        log.debug("LOOKATME {}",showCookies(req));
         return getClientIp(req.getRemoteHost(), req.getHeader(X_FORWARDED_FOR));
     }
 
