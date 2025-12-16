@@ -171,7 +171,7 @@ public class Util {
 
         String docsPath = PathBuilder.pathConcat(contextPath,"docs");
         String xslPath = PathBuilder.pathConcat(contextPath,"xsl");
-        String jsPath = PathBuilder.pathConcat(contextPath,"js");
+        //String jsPath = PathBuilder.pathConcat(contextPath,"js");
         String webStartPath = PathBuilder.pathConcat(contextPath,"WebStart");
 
         log.debug("requestURI:  {}",requestURI);
@@ -180,7 +180,7 @@ public class Util {
 
         if(requestURI.startsWith(docsPath) ||
                 requestURI.startsWith(xslPath) ||
-                requestURI.startsWith(jsPath)  ||
+                //requestURI.startsWith(jsPath)  ||
                 requestURI.startsWith(webStartPath) ||
                 requestURI.equalsIgnoreCase("favicon.ico")
                 ){
