@@ -27,6 +27,7 @@
 
 package opendap.coreServlet;
 
+import ch.qos.logback.classic.Level;
 import opendap.PathBuilder;
 import opendap.bes.BesDapDispatcher;
 import opendap.dap.Request;
@@ -981,25 +982,31 @@ public class ReqInfo {
     }
 
     private static String getClientIp(String remoteHost, String xForwardForHeader){
-        String clientIp;
-        if(xForwardForHeader != null){
-            log.debug("HTTP Header {}: '{}'",X_FORWARDED_FOR,xForwardForHeader);
-            String candidateIp = xForwardForHeader.split(",")[0].trim();
-            log.debug("candidateIp: '{}'",candidateIp);
-            if( IP_ADDR_PATTERN.matcher(candidateIp).matches() ){
-                clientIp = candidateIp;
-            }
-            else {
-                log.error("Failed to locate valid client ip in the {} header: {} " +
-                        "Using request.getRemoteAddr() instead.", X_FORWARDED_FOR,xForwardForHeader);
+        ch.qos.logback.classic.Logger classicLogger =  (ch.qos.logback.classic.Logger) log;
+        Level currentLogLevel = classicLogger.getLevel();
+        classicLogger.setLevel(ch.qos.logback.classic.Level.DEBUG);
+        try {
+            String clientIp;
+            if (xForwardForHeader != null) {
+                log.debug("HTTP Header {}: '{}'", X_FORWARDED_FOR, xForwardForHeader);
+                String candidateIp = xForwardForHeader.split(",")[0].trim();
+                log.debug("candidateIp: '{}'", candidateIp);
+                if (IP_ADDR_PATTERN.matcher(candidateIp).matches()) {
+                    clientIp = candidateIp;
+                } else {
+                    log.error("Failed to locate valid client ip in the {} header: {} " +
+                            "Using request.getRemoteAddr() instead.", X_FORWARDED_FOR, xForwardForHeader);
+                    clientIp = remoteHost;
+                }
+            } else {
                 clientIp = remoteHost;
             }
+            log.debug("Returning clientIp: '{}'", clientIp);
+            return clientIp;
         }
-        else {
-            clientIp = remoteHost;
+        finally {
+            classicLogger.setLevel(currentLogLevel);
         }
-        log.debug("Returning clientIp: '{}'",clientIp);
-        return clientIp;
     }
 
 

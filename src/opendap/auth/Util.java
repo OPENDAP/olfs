@@ -26,6 +26,7 @@
 
 package opendap.auth;
 
+import ch.qos.logback.classic.Level;
 import opendap.PathBuilder;
 import opendap.coreServlet.ReqInfo;
 import opendap.io.HyraxStringEncoding;
@@ -160,41 +161,54 @@ public class Util {
 
     /**
      * Here we make sure that request is really for something that the user would like to return to before we cache
-     * the URL. Pretty much we are trying to el,inate page componets like java script, xsl, images, css, etc.
+     * the URL. Pretty much we are trying to eliminate page components like javascript, xsl, images, css, etc.
      * @param session
      * @param requestUrl
      * @param requestURI
      * @param contextPath
      */
-    static void cacheRequestUrlAsNeeded(HttpSession session, String requestUrl, String requestURI, String contextPath){
+    static void cacheRequestUrlAsNeeded(HttpSession session, String requestUrl, String requestURI, String contextPath) {
         Logger log = LoggerFactory.getLogger("opendap.auth.Util");
 
-        String docsPath = PathBuilder.pathConcat(contextPath,"docs");
-        String xslPath = PathBuilder.pathConcat(contextPath,"xsl");
-        //String jsPath = PathBuilder.pathConcat(contextPath,"js");
-        String webStartPath = PathBuilder.pathConcat(contextPath,"WebStart");
+        ch.qos.logback.classic.Logger classicLogger =  (ch.qos.logback.classic.Logger) log;
+        Level currentLogLevel = classicLogger.getLevel();
+        classicLogger.setLevel(ch.qos.logback.classic.Level.DEBUG);
 
-        log.debug("requestURI:  {}",requestURI);
-        log.debug("requestUrl:  {}",requestUrl);
-        log.debug("contextPath: {}",contextPath);
+        try {
+            String docsPath = PathBuilder.pathConcat(contextPath, "docs");
+            String xslPath = PathBuilder.pathConcat(contextPath, "xsl");
+            String webStartPath = PathBuilder.pathConcat(contextPath, "WebStart");
+            //String jsPath = PathBuilder.pathConcat(contextPath,"js");
 
-        if(requestURI.startsWith(docsPath) ||
-                requestURI.startsWith(xslPath) ||
-                //requestURI.startsWith(jsPath)  ||
-                requestURI.startsWith(webStartPath) ||
-                requestURI.equalsIgnoreCase("favicon.ico")
-                ){
-            log.debug("Not caching request url: {}",requestUrl);
-            return;
+            log.debug("   sessionId: {}", session.getId());
+            log.debug("  requestUrl: {}", requestUrl);
+            log.debug("  requestURI: {}", requestURI);
+            log.debug(" contextPath: {}", contextPath);
+            log.debug("     xslPath: {}", xslPath);
+            log.debug("webStartPath: {}", webStartPath);
+            // log.debug("      jsPath: {}",jsPath);
+
+            if (requestURI.startsWith(docsPath) ||
+                    requestURI.startsWith(xslPath) ||
+                    requestURI.startsWith(webStartPath) ||
+                    //requestURI.startsWith(jsPath)  ||
+                    requestURI.equalsIgnoreCase("favicon.ico")
+            ) {
+                log.debug("Not caching request url: {}", requestUrl);
+                return;
+            }
+            if (log.isDebugEnabled()) {
+                String msg = "Caching request URL as session Attribute with key '" + IdFilter.RETURN_TO_URL + "' ";
+                msg += "and value: " + requestUrl;
+                msg += " (session: " + session.getId() + ")";
+                log.debug(msg);
+            }
+            session.setAttribute(IdFilter.RETURN_TO_URL, requestUrl);
+            log.debug("Sanity check session.getAttribute(" + IdFilter.RETURN_TO_URL + ") returns {} (session: {})", session.getAttribute(IdFilter.RETURN_TO_URL), session.getId());
         }
-        if(log.isDebugEnabled()){
-            String msg ="Caching request URL as session Attribute with key '"+ IdFilter.RETURN_TO_URL+"' ";
-            msg += "and value: " + requestUrl;
-            msg += " (session: "+session.getId()+")";
-            log.debug(msg);
+        finally{
+            classicLogger.setLevel(currentLogLevel);
         }
-        session.setAttribute(IdFilter.RETURN_TO_URL,requestUrl);
-        log.debug("Sanity check session.getAttribute("+ IdFilter.RETURN_TO_URL+") returns {} (session: {})",session.getAttribute(IdFilter.RETURN_TO_URL), session.getId());
     }
 
     /**
