@@ -493,7 +493,6 @@ public class ServletUtil {
         return sb.toString();
     }
 
-
     /**
      * ************************************************************************
      * This is a bit of instrumentation that I kept around to let me look at the
@@ -539,29 +538,13 @@ public class ServletUtil {
             probeMsg.append("    isRequestedSessionIdValid:      ").append(request.isRequestedSessionIdValid()).append("\n");
             probeMsg.append("    isRequestedSessionIdFromURL:    ").append(request.isRequestedSessionIdFromURL()).append("\n");
             probeMsg.append("\n");
-            probeMsg.append("    Cookies:\n");
 
-            Cookie c[] = request.getCookies();
-            if (c == null)
-                probeMsg.append("   None.").append("\n");
-            else {
-                probeMsg.append("\n");
-                for (i = 0; i < c.length; i++)
-                    probeMsg.append("        cookie[").append(i).append("]: ").append(c[i]).append("\n");
-            }
-
+            probeMsg.append(ReqInfo.showCookies(request));
             probeMsg.append("\n");
-            i = 0;
-            e = request.getHeaderNames();
-            probeMsg.append("    Header Names:").append("\n");
-            while (e.hasMoreElements()) {
-                i++;
-                String s = (String) e.nextElement();
-                probeMsg.append("       Header[").append(i).append("]: ").append(s);
-                probeMsg.append(": ").append(request.getHeader(s)).append("\n");
-            }
 
+            probeMsg.append(ReqInfo.showRequestHeaders(request));
             probeMsg.append("\n");
+
             probeMsg.append("ServletRequest Interface:").append("\n");
             probeMsg.append("    getCharacterEncoding:  ").append(request.getCharacterEncoding()).append("\n");
             probeMsg.append("    getContentType:        ").append(request.getContentType()).append("\n");

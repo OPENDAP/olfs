@@ -37,6 +37,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONArray;
 import org.slf4j.Logger;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -977,7 +978,10 @@ public class ReqInfo {
 
     private static final
     Pattern IP_ADDR_PATTERN = Pattern.compile("\\b(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\\b");
+
     public static String getClientIp(HttpServletRequest req) {
+        log.debug(showRequestHeaders(req));
+        log.debug(showCookies(req));
         return getClientIp(req.getRemoteHost(), req.getHeader(X_FORWARDED_FOR));
     }
 
@@ -1049,6 +1053,40 @@ public class ReqInfo {
         log.debug(hr);
 
     }
+
+    public static String showRequestHeaders(HttpServletRequest request){
+        StringBuilder sb = new StringBuilder();
+        int i = 0;
+        Enumeration<String> e = request.getHeaderNames();
+        sb.append("    Header Names:").append("\n");
+        while (e.hasMoreElements()) {
+            i++;
+            String s = (String) e.nextElement();
+            sb.append("       Header[").append(i).append("]: ").append(s);
+            sb.append(": ").append(request.getHeader(s)).append("\n");
+        }
+        return sb.toString();
+    }
+
+    public static String showCookies(HttpServletRequest request){
+        StringBuilder sb = new StringBuilder();
+        Cookie[] c = request.getCookies();
+        sb.append("    Cookies: ");
+        if (c == null)
+            sb.append("   None \n");
+        else {
+            sb.append("\n");
+            for (int i = 0; i < c.length; i++)
+                sb.append("        cookie[").append(i).append("]: ").append(c[i]).append("\n");
+        }
+        return sb.toString();
+    }
+
+
+
 }
+
+
+
 
 
