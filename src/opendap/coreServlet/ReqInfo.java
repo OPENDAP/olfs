@@ -986,6 +986,8 @@ public class ReqInfo {
         Level currentLogLevel = classicLogger.getLevel();
         classicLogger.setLevel(ch.qos.logback.classic.Level.DEBUG);
         try {
+            log.debug("LOOKATME remoteHost: '{}'", remoteHost);
+            log.debug("LOOKATME HTTP Header {}: '{}'", X_FORWARDED_FOR, xForwardForHeader);
             String clientIp;
             if (xForwardForHeader != null) {
                 log.debug("HTTP Header {}: '{}'", X_FORWARDED_FOR, xForwardForHeader);
