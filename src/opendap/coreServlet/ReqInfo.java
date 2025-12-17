@@ -980,39 +980,44 @@ public class ReqInfo {
     Pattern IP_ADDR_PATTERN = Pattern.compile("\\b(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\\b");
 
     public static String getClientIp(HttpServletRequest req) {
-        log.debug("LOOKATME {}",showRequestHeaders(req));
-        log.debug("LOOKATME {}",showCookies(req));
-        return getClientIp(req.getRemoteHost(), req.getHeader(X_FORWARDED_FOR));
-    }
-
-    private static String getClientIp(String remoteHost, String xForwardForHeader){
         ch.qos.logback.classic.Logger classicLogger =  (ch.qos.logback.classic.Logger) log;
         Level currentLogLevel = classicLogger.getLevel();
         classicLogger.setLevel(ch.qos.logback.classic.Level.DEBUG);
+
         try {
+            log.debug("LOOKATME {}", showRequestHeaders(req));
+            log.debug("LOOKATME {}", showCookies(req));
+
+            String remoteHost = req.getRemoteHost();
+            String xForwardForHeader = req.getHeader(X_FORWARDED_FOR);
+
             log.debug("LOOKATME remoteHost: '{}'", remoteHost);
             log.debug("LOOKATME HTTP Header {}: '{}'", X_FORWARDED_FOR, xForwardForHeader);
-            String clientIp;
-            if (xForwardForHeader != null) {
-                log.debug("HTTP Header {}: '{}'", X_FORWARDED_FOR, xForwardForHeader);
-                String candidateIp = xForwardForHeader.split(",")[0].trim();
-                log.debug("candidateIp: '{}'", candidateIp);
-                if (IP_ADDR_PATTERN.matcher(candidateIp).matches()) {
-                    clientIp = candidateIp;
-                } else {
-                    log.error("Failed to locate valid client ip in the {} header: {} " +
-                            "Using request.getRemoteAddr() instead.", X_FORWARDED_FOR, xForwardForHeader);
-                    clientIp = remoteHost;
-                }
-            } else {
-                clientIp = remoteHost;
-            }
-            log.debug("Returning clientIp: '{}'", clientIp);
-            return clientIp;
+            return getClientIp(remoteHost, xForwardForHeader);
         }
         finally {
             classicLogger.setLevel(currentLogLevel);
         }
+    }
+
+    private static String getClientIp(String remoteHost, String xForwardForHeader){
+        String clientIp;
+        if (xForwardForHeader != null) {
+            log.debug("HTTP Header {}: '{}'", X_FORWARDED_FOR, xForwardForHeader);
+            String candidateIp = xForwardForHeader.split(",")[0].trim();
+            log.debug("candidateIp: '{}'", candidateIp);
+            if (IP_ADDR_PATTERN.matcher(candidateIp).matches()) {
+                clientIp = candidateIp;
+            } else {
+                log.error("Failed to locate valid client ip in the {} header: {} " +
+                        "Using request.getRemoteAddr() instead.", X_FORWARDED_FOR, xForwardForHeader);
+                clientIp = remoteHost;
+            }
+        } else {
+            clientIp = remoteHost;
+        }
+        log.debug("Returning clientIp: '{}'", clientIp);
+        return clientIp;
     }
 
 
