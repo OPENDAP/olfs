@@ -985,14 +985,16 @@ public class ReqInfo {
         classicLogger.setLevel(ch.qos.logback.classic.Level.DEBUG);
 
         try {
-            log.debug("LOOKATME {}", showRequestHeaders(req));
-            log.debug("LOOKATME {}", showCookies(req));
-
             String remoteHost = req.getRemoteHost();
             String xForwardForHeader = req.getHeader(X_FORWARDED_FOR);
 
+            log.debug("LOOKATME - req.getRequestURI: {}", req.getRequestURI());
+            log.debug("LOOKATME - req.getRequestURL: {}", req.getRequestURL());
+            log.debug("LOOKATME {}", showRequestHeaders(req));
+            log.debug("LOOKATME {}", showCookies(req));
             log.debug("LOOKATME remoteHost: '{}'", remoteHost);
             log.debug("LOOKATME HTTP Header {}: '{}'", X_FORWARDED_FOR, xForwardForHeader);
+
             return getClientIp(remoteHost, xForwardForHeader);
         }
         finally {
