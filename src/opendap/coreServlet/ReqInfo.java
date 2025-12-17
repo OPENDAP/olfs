@@ -33,12 +33,14 @@ import opendap.bes.BesDapDispatcher;
 import opendap.dap.Request;
 import opendap.dap4.QueryParameters;
 import opendap.io.HyraxStringEncoding;
+import org.apache.catalina.Session;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONArray;
 import org.slf4j.Logger;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URLDecoder;
@@ -980,20 +982,28 @@ public class ReqInfo {
     Pattern IP_ADDR_PATTERN = Pattern.compile("\\b(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\\b");
 
     public static String getClientIp(HttpServletRequest req) {
-        ch.qos.logback.classic.Logger classicLogger =  (ch.qos.logback.classic.Logger) log;
+        ch.qos.logback.classic.Logger classicLogger = (ch.qos.logback.classic.Logger) log;
         Level currentLogLevel = classicLogger.getLevel();
-        classicLogger.setLevel(ch.qos.logback.classic.Level.DEBUG);
+
+        String ua = req.getHeader("User-Agent");
+        if(!ua.contains("HealthChecker") && !ua.contains("Heartbeat")){
+            classicLogger.setLevel(ch.qos.logback.classic.Level.DEBUG);
+        }
 
         try {
             String remoteHost = req.getRemoteHost();
             String xForwardForHeader = req.getHeader(X_FORWARDED_FOR);
-
-            log.debug("LOOKATME - req.getRequestURI: {}", req.getRequestURI());
-            log.debug("LOOKATME - req.getRequestURL: {}", req.getRequestURL());
-            log.debug("LOOKATME {}", showRequestHeaders(req));
-            log.debug("LOOKATME {}", showCookies(req));
-            log.debug("LOOKATME remoteHost: '{}'", remoteHost);
-            log.debug("LOOKATME HTTP Header {}: '{}'", X_FORWARDED_FOR, xForwardForHeader);
+            HttpSession s = req.getSession(false);
+            if(s != null) {
+                log.debug("LOOKATME -           SessionID: {}", s.getId());
+            }
+            log.debug("LOOKATME -           RequestID: {}", RequestCache.getRequestId());
+            log.debug("LOOKATME - req.getRemoteHost(): '{}'", remoteHost);
+            log.debug("LOOKATME -     X-Forwarded-For: '{}'", xForwardForHeader);
+            log.debug("LOOKATME - req.getRequestURI(): {}", req.getRequestURI());
+            log.debug("LOOKATME - req.getRequestURL(): {}", req.getRequestURL());
+            log.debug("LOOKATME - {}", showRequestHeaders(req));
+            log.debug("LOOKATME - {}", showCookies(req));
 
             return getClientIp(remoteHost, xForwardForHeader);
         }
@@ -1065,11 +1075,11 @@ public class ReqInfo {
         StringBuilder sb = new StringBuilder();
         int i = 0;
         Enumeration<String> e = request.getHeaderNames();
-        sb.append("    Header Names:").append("\n");
+        sb.append("  Request Headers:").append("\n");
         while (e.hasMoreElements()) {
             i++;
             String s = (String) e.nextElement();
-            sb.append("       Header[").append(i).append("]: ").append(s);
+            sb.append("    requestHeader[").append(i).append("]: ").append(s);
             sb.append(": ").append(request.getHeader(s)).append("\n");
         }
         return sb.toString();
@@ -1083,8 +1093,10 @@ public class ReqInfo {
             sb.append("   None \n");
         else {
             sb.append("\n");
-            for (int i = 0; i < c.length; i++)
-                sb.append("        cookie[").append(i).append("]: ").append(c[i]).append("\n");
+            for (int i = 0; i < c.length; i++) {
+                sb.append("        cookie[").append(i).append("]: ");
+                sb.append(c[i].getName()).append(" = ").append(c[i].getValue()).append("\n");
+            }
         }
         return sb.toString();
     }
