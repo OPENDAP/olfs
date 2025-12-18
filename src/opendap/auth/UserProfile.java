@@ -28,6 +28,8 @@ package opendap.auth;
 
 import com.google.gson.*;
 import opendap.coreServlet.ReqInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
@@ -41,6 +43,7 @@ public class UserProfile implements Serializable {
 
     private static final String USER_AGENT_KEY = "User-Agent";
 
+    private Logger log;
     /* @serial */
     private Date objectCreationTime;
     /* @serial */
@@ -79,6 +82,7 @@ public class UserProfile implements Serializable {
         d_edlAccessToken = null;
         // edlClientAppId ="";
         d_uid = null;
+        log = LoggerFactory.getLogger(this.getClass());
     }
 
     public UserProfile(HttpServletRequest request) {
@@ -226,11 +230,15 @@ public class UserProfile implements Serializable {
 
         value = ReqInfo.getClientIp(request);
         if( d_clientIp == null || !d_clientIp.equals(value) ) {
+            log.warn("Client IP address mismatch! d_clientIp: {}, " +
+                    "ReqInfo.getClientIp(request): {}",d_clientIp, value);
             return false;
         }
 
         value = request.getHeader(USER_AGENT_KEY);
         if( d_clientUserAgent == null || !d_clientUserAgent.equals(value) ) {
+            log.warn("Client user-agent mismatch! d_clientUserAgent: {}, " +
+                    "request.getHeader(USER_AGENT_KEY): {}",d_clientUserAgent, value);
             return false;
         }
 

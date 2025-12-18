@@ -437,6 +437,7 @@ public class IdFilter implements Filter {
                 session.setAttribute(USER_PROFILE, null);
                 session.invalidate();
                 session = request.getSession(true);
+                log.debug("UserProfile failed to validate against this request. NEW SESSION (session-id: {})",session.getId());
             }
 
             if (up != null) {
