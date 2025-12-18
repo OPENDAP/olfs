@@ -210,19 +210,6 @@ public class BesApi implements Cloneable {
         return BESManager.getCombinedVersionDocument();
     }
 
-    /**
-     * THis is used to retrieve the BES administrator information.
-     * Used as part of the JsonLD content added to every contents.html response.
-     * Called (at least) DirectoryDispatchHandler.xsltDir()
-     *
-     * @param path
-     * @return
-     * @throws BadConfigurationException
-     * @throws JDOMException
-     * @throws IOException
-     * @throws PPTException
-     * @throws BESError
-     */
     public AdminInfo getAdminInfo(String path)
             throws BadConfigurationException, JDOMException, IOException, PPTException, BESError {
         BES bes = getBES(path);
