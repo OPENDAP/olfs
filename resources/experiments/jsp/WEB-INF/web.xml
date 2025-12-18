@@ -284,6 +284,47 @@
         <welcome-file>index.htm</welcome-file>
     </welcome-file-list>
 
+
+
+    <!-- Define a Security Constraint on this Application -->
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Hyrax Admin Interface</web-resource-name>
+            <url-pattern>/hai/*</url-pattern>
+            <url-pattern>/docs/admin/*</url-pattern>
+        </web-resource-collection>
+
+        <auth-constraint>
+            <role-name>manager</role-name>
+        </auth-constraint>
+
+        <user-data-constraint>
+            <!-- this ensures that all efforts to access the admin interface and resources must use HTTPS -->
+            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+        </user-data-constraint>
+    </security-constraint>
+
+    <!-- Define the Login Configuration for this Application -->
+
+    <login-config>
+        <auth-method>FORM</auth-method>
+        <realm-name>Hyrax Administration Pages</realm-name>
+        <form-login-config>
+            <form-login-page>/docs/admin/login.jsp</form-login-page>
+            <form-error-page>/docs/admin/login-failed.jsp</form-error-page>
+        </form-login-config>
+    </login-config>
+
+
+    <!-- Security roles referenced by this web application -->
+    <security-role>
+        <description>
+            The role that is required to login to the Hyrax Administration Application
+        </description>
+        <role-name>manager</role-name>
+    </security-role>
+
+
 </web-app>
 
 

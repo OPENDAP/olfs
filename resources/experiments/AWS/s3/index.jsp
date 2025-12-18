@@ -136,7 +136,11 @@
 <hr size="1" noshade="noshade"/>
 <table width="100%" border="0">
     <tr>
-        <td>Hyrax</td>
+        <td>
+            <div class="small" align="left">
+                <a href="<%= contextPath %>/docs/admin">Hyrax Admin Interface </a>
+            </div>
+        </td>
         <td>
             <div class="small" align="right">
                 Hyrax development sponsored by

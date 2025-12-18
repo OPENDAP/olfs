@@ -71,6 +71,12 @@ public class ServletLogUtil {
     public static final String GATEWAY_ACCESS_LOG_ID = "HyraxGatewayAccess";
     public static final String GATEWAY_ACCESS_LAST_MODIFIED_LOG_ID = "HyraxGatewayLastModifiedAccess";
 
+    public static final String BUILD_DMRPP_ACCESS_LOG_ID = "HyraxBuildDmrppAccess";
+    public static final String BUILD_DMRPP_LAST_MODIFIED_LOG_ID = "HyraxBuildDmrppLastModifiedAccess";
+
+    public static final String ADMIN_ACCESS_LOG_ID = "HyraxAdminAccess";
+    public static final String ADMIN_ACCESS_LAST_MODIFIED_LOG_ID = "HyraxAdminLastModifiedAccess";
+
     public static final String WCS_ACCESS_LOG_ID = "WCSAccess";
     public static final String WCS_LAST_MODIFIED_ACCESS_LOG_ID = "WCSLastModifiedAccess";
 

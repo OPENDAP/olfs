@@ -78,6 +78,13 @@ public class BES {
     private Document serverVersionDocument;
 
     private static final Namespace BES_NS = opendap.namespaces.BES.BES_NS;
+    private static final Namespace BES_ADMIN_NS = opendap.namespaces.BES.BES_ADMIN_NS;
+
+    private static final String BES_ADMIN_COMMAND = "BesAdminCmd";
+    private static final String BES_ADMIN_SET_LOG_CONTEXT = "SetLogContext";
+    private static final String BES_ADMIN_GET_CONFIG = "GetConfig";
+    private static final String BES_ADMIN_SET_CONFIG = "SetConfig";
+    private static final String BES_ADMIN_TAIL_LOG = "TailLog";
 
 
     public BES(BESConfig config) {
@@ -181,8 +188,70 @@ public class BES {
         return emailAddress;
     }
 
+    public List<BesConfigurationModule> getConfigurationModules() throws BesAdminFail {
+
+        ArrayList<BesConfigurationModule> configurationModules = new ArrayList<>();
+
+        String configString = getConfiguration(null);
+
+        ByteArrayInputStream bais = new ByteArrayInputStream(configString.getBytes( HyraxStringEncoding.getCharset()));
+
+        try {
+            Document confDoc = opendap.xml.Util.getDocument(bais);
+
+            Element root = confDoc.getRootElement();
+
+            List moduleConfigs = root.getChildren("BesConfig", BES.BES_ADMIN_NS);
+
+            for (Object o : moduleConfigs) {
+                Element moduleConfigElement = (Element) o;
+
+                BesConfigurationModule bm = new BesConfigurationModule(moduleConfigElement);
+
+                configurationModules.add(bm);
+
+            }
+
+        } catch (JDOMException e) {
+            log.error("Failed to parse BES response. Msg: {}", e.getMessage());
+        } catch (IOException e) {
+            log.error("Failed to ingest BES response. Msg: {}", e.getMessage());
+        }
 
 
+        return configurationModules;
+
+    }
+
+    /**
+     * Checks to see if it's possible to communicate with the BES.
+     * @return  True if communication is with the besdaemon (aka admin port) port. False otherwise.
+     *
+     */
+    public boolean checkBesAdminConnection() {
+
+        boolean besIsOk = true;
+
+        //@todo Make and use a specially designed BES command!
+        try {
+            getConfiguration(null);
+        } catch (BesAdminFail besAdminFail) {
+            log.error(besAdminFail.getMessage());
+            besIsOk = false;
+        }
+
+        return besIsOk;
+
+    }
+
+
+    public int getAdminPort() {
+        return config.getAdminPort();
+    }
+
+    public boolean isAdminPortConfigured() {
+        return config.getAdminPort() > 0;
+    }
 
     public int getPort() {
         return config.getPort();
@@ -226,6 +295,102 @@ public class BES {
      */
     public long getMaxVariableSize() {
         return config.getMaxResponseSize();
+    }
+
+
+    public TreeMap<String, BesLogger> getBesLoggers() throws BesAdminFail {
+        TreeMap<String, BesLogger> besLoggers = new TreeMap<>();
+
+        String getLogContextsCmd = getSimpleBesAdminCommand("GetLogContexts");
+
+        String besResponse = executeBesAdminCommand(getLogContextsCmd);
+        ByteArrayInputStream bais = new ByteArrayInputStream(besResponse.getBytes( HyraxStringEncoding.getCharset()));
+
+        SAXBuilder saxBuilder = new SAXBuilder(false);
+
+        try {
+            Document loggerContextsDoc = saxBuilder.build(bais);
+            List loggers = loggerContextsDoc.getRootElement().getChildren("LogContext", BES_ADMIN_NS);
+
+            Iterator i = loggers.iterator();
+            while (i.hasNext()) {
+                Element logger = (Element) i.next();
+                String name = logger.getAttributeValue("name");
+                String state = logger.getAttributeValue("state");
+                if (name != null && state != null)
+                    besLoggers.put(name, new BesLogger(name, state));
+                else
+                    log.error("BES responded with unrecognized content structure. Response: {}", besResponse);
+            }
+        } catch (JDOMException e) {
+            log.error("Failed to parse BES response! Msg: {}", e.getMessage());
+        } catch (IOException e) {
+            log.error("Failed to read BES response! Msg: {}", e.getMessage());
+        }
+
+
+        return besLoggers;
+    }
+
+    public String getLoggerState(String loggerName) throws BesAdminFail {
+
+        SortedMap<String, BesLogger> besLoggers = getBesLoggers();
+
+        BesLogger logger = besLoggers.get(loggerName);
+
+        if (logger != null && logger.getIsEnabled())
+            return "on";
+
+        return "off";
+
+    }
+
+    public String setLoggerState(String loggerName, String loggerState) throws BesAdminFail {
+
+        String setLoggerStateCmd = getSetBesLoggersStateCommand(loggerName, loggerState);
+
+        String besResponse = executeBesAdminCommand(setLoggerStateCmd);
+        ByteArrayInputStream bais = new ByteArrayInputStream(besResponse.getBytes( HyraxStringEncoding.getCharset()));
+
+        SAXBuilder saxBuilder = new SAXBuilder(false);
+
+        String status = besResponse;
+        try {
+            Document besResponseDoc = saxBuilder.build(bais);
+            Element statusElement = besResponseDoc.getRootElement().getChild("OK", BES_ADMIN_NS);
+            if (statusElement != null)
+                status = new StringBuilder().append("OK: The BES logger '").append(loggerName).append("' has been set to ").append(loggerState).toString();
+
+        } catch (JDOMException e) {
+            log.error("Failed to parse BES response! Msg: {}", e.getMessage());
+        } catch (IOException e) {
+            log.error("Failed to read BES response! Msg: {}", e.getMessage());
+        }
+
+        return status;
+
+    }
+
+
+    /**
+     *
+     * @param loggerName
+     * @param loggerState
+     * @return
+     */
+    public String getSetBesLoggersStateCommand(String loggerName, String loggerState) {
+        Element docRoot = new Element(BES_ADMIN_COMMAND, BES_ADMIN_NS);
+        Element cmd = new Element(BES_ADMIN_SET_LOG_CONTEXT, BES_ADMIN_NS);
+
+        cmd.setAttribute("name", loggerName);
+        cmd.setAttribute("state", loggerState);
+
+        docRoot.addContent(cmd);
+
+        Document besCmdDoc = new Document(docRoot);
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
+        return xmlo.outputString(besCmdDoc);
     }
 
 
@@ -290,6 +455,284 @@ public class BES {
                 " maxClientCommands: " + config.getMaxCommands() +
                 "]";
 
+
+    }
+
+
+    public String executeBesAdminCommand(String besCmd) throws BesAdminFail {
+        StringBuilder sb = new StringBuilder();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+
+        if (!isAdminPortConfigured()) {
+            sb.append("BES Admin Service is not configured! Port number for admin connection has not been set!");
+            return sb.toString();
+        }
+
+
+        OPeNDAPClient admin = null;
+
+        adminLock.lock();
+        try {
+
+            try {
+                log.debug("Getting new admin client...");
+
+                admin = new OPeNDAPClient();
+                log.debug("Starting new admin client. Host: {} Port: {}", getHost(), getAdminPort());
+
+                admin.startClient(getHost(), getAdminPort(), getTimeout());
+                log.debug("BES admin client started, sending command:\n{}", besCmd);
+
+
+                admin.executeCommand(besCmd, baos, baos);
+
+
+                String besResponse;
+                try {
+                    besResponse = baos.toString(StandardCharsets.UTF_8.name());
+                } catch (UnsupportedEncodingException e) {
+                    besResponse = "FAILED to encode BES response as " + StandardCharsets.UTF_8.name();
+                }
+
+                log.debug("BES returned:\n{}", besResponse);
+
+                return besResponse;
+
+            } catch (PPTException e) {
+
+                sb.append("Failed to execute BES command. Message: ")
+                        .append(e.getMessage());
+
+
+                throw new BesAdminFail("Failed to execute BES command. Message: " + e.getMessage(), e);
+
+
+            } finally {
+                if (admin != null) {
+                    try {
+                        admin.shutdownClient(false);
+                    } catch (PPTException e) {
+                        sb.append("FAILED TO SHUTDOWN CLIENT! Msg: ").append(e.getMessage());
+                        admin.killClient();
+                    }
+                }
+            }
+        }
+        finally {
+            adminLock.unlock();
+        }
+
+    }
+
+    public String start() throws BesAdminFail {
+        String cmd = getStartCommand();
+        return executeBesAdminCommand(cmd);
+    }
+
+    public String stopNow() throws BesAdminFail {
+        String cmd = getStopNowCommand();
+        return executeBesAdminCommand(cmd);
+    }
+
+    public String getStartCommand() {
+        return getSimpleBesAdminCommand("Start");
+    }
+
+    public String getStopNowCommand() {
+        return getSimpleBesAdminCommand("StopNow");
+    }
+
+    public String stopNice(long timeOut) throws BesAdminFail {
+        StringBuilder sb = new StringBuilder();
+
+
+        long stopNiceMinTimeOut = 1000;
+        if (timeOut < stopNiceMinTimeOut)
+            timeOut = stopNiceMinTimeOut;
+
+        long stopNiceMaxTimeOut = 30000;
+        if (timeOut > stopNiceMaxTimeOut)
+            timeOut = stopNiceMaxTimeOut;
+
+        String besResponse = null;
+
+
+        String msg = "Attempting to acquire client checkOut lock...";
+        log.info(msg);
+        sb.append(msg).append("\n");
+        clientCheckoutLock.lock();
+        try {
+            Date startTime = new Date();
+
+            boolean done = false;
+            msg = "Attempting to acquire all BES clientsMap...";
+            log.info(msg);
+            sb.append(msg).append("\n");
+
+            while (!done) {
+
+                Collection<OPeNDAPClient> clients = clientsMap.values();
+
+                boolean allClientsAcquired = true;
+                for (OPeNDAPClient client : clients) {
+                    boolean inQue = clientQueue.remove(client);
+                    if (!inQue) {
+                        allClientsAcquired = false;
+                    } else {
+                        msg = "Shutting down client connection '" + client.getID() + "'...";
+                        log.info(msg);
+                        sb.append(msg).append("\n");
+
+                        try {
+
+                            discardClient(client);
+                            msg = "Client connection '" + client.getID() + "'shutdown normally";
+                            log.info(msg);
+                            sb.append(msg).append("\n");
+
+                        } catch (PPTException e) {
+                            msg = "Shutdown FAILED for client connection '" + client.getID() + "'Trying to kill connection.";
+                            log.info(msg);
+                            sb.append(msg).append("\n");
+
+                            client.killClient();
+
+                            msg = "Killed client connection '" + client.getID() + "'.";
+                            log.info(msg);
+                            sb.append(msg).append("\n");
+
+
+                        }
+                        msg = "Removing client connection '" + client.getID() + "' from clientsMap list.";
+                        log.info(msg);
+                        sb.append(msg).append("\n");
+                        clientsMap.remove(client.getID());
+                    }
+                }
+
+                if (!allClientsAcquired) {
+                    Date endTime = new Date();
+
+                    long elapsedTime = endTime.getTime() - startTime.getTime();
+
+                    if (elapsedTime > timeOut) {
+                        done = true;
+                        msg = "Timeout Has Expired. Shutting down BES NOW...";
+                        log.info(msg);
+                        sb.append(msg).append("\n");
+                    } else {
+                        msg = "Did not acquire all clientsMap. Sleeping...";
+                        log.info(msg);
+                        sb.append(msg).append("\n");
+                        Thread.sleep(timeOut / 3);
+                    }
+
+
+                } else {
+                    done = true;
+                    msg = "Stopped all BES client connections.";
+                    log.info(msg);
+                    sb.append(msg).append("\n");
+                }
+            }
+
+            msg = "Stopping BES...";
+            log.info(msg);
+            sb.append(msg).append("\n");
+            besResponse = stopNow();
+
+        }
+        catch (InterruptedException e) {
+            sb.append(e.getMessage());
+            Thread.currentThread().interrupt();
+        }
+        finally {
+            sb.append("Releasing client checkout lock...").append("\n");
+            log.info("{}",sb);
+            clientCheckoutLock.unlock();
+        }
+        return besResponse;
+    }
+
+
+    public String getConfiguration(String moduleName) throws BesAdminFail {
+        String cmd = getGetConfigurationCommand(moduleName);
+        return executeBesAdminCommand(cmd);
+    }
+
+    public String setConfiguration(String moduleName, String configuration) throws BesAdminFail {
+        String cmd = getSetConfigurationCommand(moduleName, configuration);
+        return executeBesAdminCommand(cmd);
+    }
+
+
+    public String getGetConfigurationCommand(String moduleName) {
+        Element docRoot = new Element(BES_ADMIN_COMMAND, BES_ADMIN_NS);
+        Element cmd = new Element(BES_ADMIN_GET_CONFIG, BES_ADMIN_NS);
+
+        if (moduleName != null)
+            cmd.setAttribute("module", moduleName);
+
+        docRoot.addContent(cmd);
+
+        Document besCmdDoc = new Document(docRoot);
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
+        return xmlo.outputString(besCmdDoc);
+    }
+
+
+    public String getSetConfigurationCommand(String moduleName, String configuration) {
+        Element docRoot = new Element(BES_ADMIN_COMMAND, BES_ADMIN_NS);
+        Element cmd = new Element(BES_ADMIN_SET_CONFIG, BES_ADMIN_NS);
+
+        if (moduleName != null)
+            cmd.setAttribute("module", moduleName);
+
+        cmd.setText(configuration);
+
+        docRoot.addContent(cmd);
+
+        Document besCmdDoc = new Document(docRoot);
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
+        return xmlo.outputString(besCmdDoc);
+    }
+
+
+    public String getLog(String lines) throws BesAdminFail {
+        String cmd = getGetLogCommand(lines);
+        return executeBesAdminCommand(cmd);
+    }
+
+    public String getGetLogCommand(String lines) {
+        Element docRoot = new Element(BES_ADMIN_COMMAND, BES_ADMIN_NS);
+        Element cmd = new Element(BES_ADMIN_TAIL_LOG, BES_ADMIN_NS);
+
+        if (lines != null)
+            cmd.setAttribute("lines", lines);
+
+        docRoot.addContent(cmd);
+
+        Document besCmdDoc = new Document(docRoot);
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
+        return xmlo.outputString(besCmdDoc);
+    }
+
+
+    public String getSimpleBesAdminCommand(String besCmd) {
+
+        Element docRoot = new Element(BES_ADMIN_COMMAND, BES_ADMIN_NS);
+        Element cmd = new Element(besCmd, BES_ADMIN_NS);
+
+        docRoot.addContent(cmd);
+
+        Document besCmdDoc = new Document(docRoot);
+        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
+
+        return xmlo.outputString(besCmdDoc);
 
     }
 

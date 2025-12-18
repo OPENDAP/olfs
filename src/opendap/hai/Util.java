@@ -23,33 +23,56 @@
  * // You can contact OPeNDAP, Inc. at PO Box 112, Saunderstown, RI. 02874-0112.
  * /////////////////////////////////////////////////////////////////////////////
  */
-package opendap.namespaces;
+package opendap.hai;
 
-import org.jdom.Namespace;
+import opendap.coreServlet.Scrub;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
  * User: ndp
- * Date: Feb 19, 2009
- * Time: 11:01:23 AM
+ * Date: 5/28/11
+ * Time: 11:09 AM
  * To change this template use File | Settings | File Templates.
  */
-public class BES {
-
-    /**
-     * This class should never be instantiated.
-     */
-    private BES(){ throw new IllegalStateException("opendap.namespaces.BES class"); }
+public class Util {
 
 
-    public static final String BES_NAMESPACE_STRING = "http://xml.opendap.org/ns/bes/1.0#";
-    public static final Namespace BES_NS =  Namespace.getNamespace("bes", BES_NAMESPACE_STRING);
-    
-    public static final String BES_ADMIN_NAMESPACE_STRING = "http://xml.opendap.org/ns/bes/admin/1.0#";
-    public static final Namespace BES_ADMIN_NS =  Namespace.getNamespace("bai", BES_ADMIN_NAMESPACE_STRING);
+    public static HashMap<String, String> processQuery(HttpServletRequest request){
 
-    public static final String DAP_SERVICE_ID = "dap";
-    public static final String SERVICE_REF = "serviceRef";
+        Logger log = LoggerFactory.getLogger("opendap.bes.BesControlApi");
+        HashMap<String, String> kvp = new HashMap<String, String>();
+
+        StringBuilder sb = new StringBuilder();
+        Map<String,String[]> params = request.getParameterMap();
+        if(params != null){
+
+            for(Map.Entry<String,String[]> e: params.entrySet()){
+                String name = e.getKey();
+                String[] values = e.getValue();
+                if(values.length>1){
+                    log.warn("Multiple values found for besctl parameter '{}'. Will use the last one found.", Scrub.urlContent(name));
+                }
+                for(String value: values){
+                    sb.append("'").append(Scrub.simpleQueryString(value)).append("' ");
+                    kvp.put(name,value);
+                }
+                sb.append("\n");
+            }
+
+            log.debug("Parameters:\n{}",sb);
+        }
+
+
+        return kvp;
+
+
+    }
 
 
 }
