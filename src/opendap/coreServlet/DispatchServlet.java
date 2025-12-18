@@ -73,7 +73,6 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class DispatchServlet extends HttpServlet {
 
-
     /**
      * ************************************************************************
      * A thread safe hit counter
