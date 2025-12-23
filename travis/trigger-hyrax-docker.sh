@@ -33,8 +33,8 @@ git checkout master
 
 
 echo "${BES_SNAPSHOT}" > snapshot.time
-echo "${OLFS_SNAPSHOT_TAG} test-deploy" >> snapshot.time
-echo "${HYRAX_SNAPSHOT_TAG} test-deploy" >> snapshot.time
+echo "${OLFS_SNAPSHOT_TAG}" >> snapshot.time
+echo "${HYRAX_SNAPSHOT_TAG}" >> snapshot.time
 
 cat snapshot.time
 
