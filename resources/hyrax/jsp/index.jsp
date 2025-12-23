@@ -83,11 +83,6 @@
         <br />
         <br />
     </li>
-    <li><a href="<%= contextPath %>/admin/index.html"><strong>Hyrax Admin Interface (beta) is here.</strong></a>
-        <span class="medium">(Requires SSL support in Tomcat.
-        See the <a href="http://docs.opendap.org/index.php/Hyrax_-_Administrators_Interface"> HAI instructions</a>
-        for more information.)</span>
-    </li>
 </ul>
 
 <p>&nbsp;</p>

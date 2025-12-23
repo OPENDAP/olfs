@@ -49,9 +49,6 @@ ENVIRONMENTS. THE DEPLOYED VERSION MAY DIFFER FROM THIS STAND-IN
             <!-- Timeout (in seconds) for this BES, defaults to 300 seconds-->
             <timeOut>150</timeOut>
 
-            <!-- The Administration port number for this BES -->
-            <!-- <adminPort>11002</adminPort> -->
-
             <!--
                 The maximum response size, in kilobytes, for non-authenticated users
                 A value of zero means there is no limit.
