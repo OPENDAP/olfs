@@ -16,8 +16,8 @@ git config --global user.email "npotter@opendap.org"
 # This will get the BES and libdap version numbers
 BES_SNAPSHOT=$(cat ./bes-snapshot)
 
-OLFS_SNAPSHOT_TAG="olfs-${OLFS_BUILD_VERSION} "$(date "+%FT%T%z")
-HYRAX_SNAPSHOT_TAG="hyrax-${HYRAX_BUILD_VERSION} "$(date "+%FT%T%z")
+OLFS_SNAPSHOT_TAG="olfs-${OLFS_BUILD_VERSION} "$(date "+%FT%T%z")" ${TEST_DEPLOY_TAG}"
+HYRAX_SNAPSHOT_TAG="hyrax-${HYRAX_BUILD_VERSION} "$(date "+%FT%T%z")" ${TEST_DEPLOY_TAG}"
 
 echo "# New OLFS Web Archive snapshot has been pushed."
 echo "# Tagging olfs with version: ${OLFS_BUILD_VERSION}"
