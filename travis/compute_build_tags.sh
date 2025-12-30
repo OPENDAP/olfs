@@ -22,6 +22,13 @@ export HYRAX_BUILD_VERSION="${HYRAX_VERSION}-${HYRAX_BUILD_NUMBER}"
 echo "#       HYRAX_BUILD_VERSION: ${HYRAX_BUILD_VERSION}" >&2
 echo "#" >&2
 
+test_deploy=""
+if [[ "$TRAVIS_BRANCH" == *"-test-deploy" ]]
+then
+    HYRAX_BUILD_VERSION="$HYRAX_BUILD_VERSION-test-deploy"
+    OLFS_BUILD_VERSION="$OLFS_BUILD_VERSION-test-deploy"
+fi
+
 
 export BES_SNAPSHOT_FILE=${BES_SNAPSHOT_FILE:-"./bes-snapshot"}
 if test -f "${BES_SNAPSHOT_FILE}"
