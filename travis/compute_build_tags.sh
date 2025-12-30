@@ -37,6 +37,7 @@ then
         TEST_DEPLOY_TAG="$td_tag_value"
     fi
 fi
+echo "#" >&2
 echo "# TEST_DEPLOY_TAG: '${TEST_DEPLOY_TAG}'" >&2
 echo "#" >&2
 
