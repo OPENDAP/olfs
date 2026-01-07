@@ -923,7 +923,6 @@
 
             <zipfileset dir="${build.hyrax.resources}" prefix="">
                 <include name="**/*"/>
-                <exclude name="admin/" />
                 <exclude name="WEB-INF/conf/olfs.xml"/>
                 <exclude name="WEB-INF/conf/logback.xml"/>
                 <exclude name="WEB-INF/web.xml"/>
