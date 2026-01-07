@@ -267,6 +267,7 @@ public class IdFilter implements Filter {
     HttpSession getSession(HttpServletRequest request){
         HttpSession session = request.getSession(false);
         if(session == null){
+            log.debug("No current session for this client/request making new...");
             session = request.getSession(true);
         }
         log.debug("session.isNew(): {}", session.isNew());
