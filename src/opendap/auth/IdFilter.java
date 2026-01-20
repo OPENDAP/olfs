@@ -619,14 +619,14 @@ public class IdFilter implements Filter {
     /**
      * HTML Shortcuts: openers and closers
      */
-    private static final String oDTS = "<dt><strong>";
-    private static final String cDTS = "</strong></dt>";
+    private static final String DTSo = "<dt><strong>";
+    private static final String DTSc = "</strong></dt>";
 
-    private static final String oDTPS = "<dt><pre><strong>";
-    private static final String cDTPS = "</strong></pre></dt>";
+    private static final String DTPSo = "<dt><pre><strong>";
+    private static final String DTPSc = "</strong></pre></dt>";
 
-    private static final String oDDPS = "<dd><pre><span style='background-color: #E0E0E0;'>";
-    private static final String cDDPS = "</span></pre></dd>";
+    private static final String DDPSo = "<dd><pre><span style='background-color: #E0E0E0;'>";
+    private static final String DDPSc = "</span></pre></dd>";
 
     private String noProfileContent(String contextPath, HttpSession session){
         log.debug("Building noProfile String.");
@@ -657,7 +657,7 @@ public class IdFilter implements Filter {
             String origUrl = Util.stringFromJson( (String) session.getAttribute(RETURN_TO_URL));
             noProfile.append("<dl>");
             if(origUrl!=null){
-                noProfile.append(oDTS).append("After authenticating you will be returned to:").append(cDTS);
+                noProfile.append(DTSo).append("After authenticating you will be returned to:").append(DTSc);
                 noProfile.append("<dd><pre><a href='").append(origUrl).append("'>").append(origUrl).append("</a></pre></dd>");
             }
             noProfile.append("</dl>");
@@ -739,16 +739,16 @@ public class IdFilter implements Filter {
 
                     out.println("<dl>");
                     if(origUrl!=null){
-                        out.println(oDTPS + RETURN_TO_URL + cDTPS +"<dd><pre><a href='"+origUrl+"'>"+origUrl+"</a></pre></dd>");
+                        out.println(DTPSo + RETURN_TO_URL + DTPSc +"<dd><pre><a href='"+origUrl+"'>"+origUrl+"</a></pre></dd>");
                     }
 
-                    out.println(oDTPS + "token:"+ cDTPS +"<dd><pre>" + userProfile.getEDLAccessToken()+"</pre></dd>");
+                    out.println(DTPSo + "token:"+ DTPSc +"<dd><pre>" + userProfile.getEDLAccessToken()+"</pre></dd>");
 
 
-                    out.println(oDTPS + USER_PROFILE + ".toString()" + cDTPS + "<dd><pre>" + userProfile + "</pre></dd>");
+                    out.println(DTPSo + USER_PROFILE + ".toString()" + DTPSc + "<dd><pre>" + userProfile + "</pre></dd>");
 
-                    out.println(oDTPS + USER_PROFILE + ".toJson(</strong>pretty=true<strong>):" + cDTPS + oDDPS + userProfile.toJson(true) + cDDPS);
-                    out.println(oDTPS + USER_PROFILE + ".toJson(</strong>pretty=false<strong>):" + cDTPS + oDDPS + userProfile.toJson(false) + cDDPS);
+                    out.println(DTPSo + USER_PROFILE + ".toJson(</strong>pretty=true<strong>):" + DTPSc + DDPSo + userProfile.toJson(true) + DDPSc);
+                    out.println(DTPSo + USER_PROFILE + ".toJson(</strong>pretty=false<strong>):" + DTPSc + DDPSo + userProfile.toJson(false) + DDPSc);
 
                     out.println("</dl>");
 
@@ -756,7 +756,7 @@ public class IdFilter implements Filter {
                     // -- -- --  Print Session Info - BEGIN  -- -- -- -- -- -- -- -- -- -- -- --
                     //
                     out.println("<hr />");
-                    out.println(oDTPS + "Session State Information" + cDTPS);
+                    out.println(DTPSo + "Session State Information" + DTPSc);
                     long timeNow = System.currentTimeMillis();
                     double sessionInUseTime = (timeNow-session.getCreationTime())/1000.0;
                     out.println("<pre>");
@@ -768,13 +768,13 @@ public class IdFilter implements Filter {
                     out.println("                    sessionInUseTime:  " + sessionInUseTime + " seconds.");
 
                     out.println("</pre>");
-                    out.println(oDTPS + "Session Attributes" + cDTPS);
+                    out.println(DTPSo + "Session Attributes" + DTPSc);
 
                     Enumeration<String> attrNames = session.getAttributeNames();
                     if(attrNames.hasMoreElements()){
                         while(attrNames.hasMoreElements()){
                             String attrName = attrNames.nextElement();
-                            out.print("    " + oDTPS + "\"" + attrName + "\": " + cDTPS + oDDPS + session.getAttribute(attrName) + cDDPS +"\n");
+                            out.print("    " + DTPSo + "\"" + attrName + "\": " + DTPSc + DDPSo + session.getAttribute(attrName) + DDPSc +"\n");
                             out.print((attrNames.hasMoreElements()?"\n":""));
                         }
                     }
