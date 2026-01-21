@@ -16,8 +16,8 @@ services:
 branches:
   only:
     - master
-    - tomcat-11
     - /^(.*-test-deploy)$/
+#    - tomcat-11
 
 notifications:
   email:
