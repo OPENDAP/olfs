@@ -47,4 +47,4 @@ loggy "Pushing changes for branch: '$TARGET_BRANCH'"
 git push
 check_status $?
 
-loggy "The branch '$MAIN_BRANCH' has been merged to the branch '$TARGET_BRANCH'  and the result has been pushed."
+loggy "The branch '$MAIN_BRANCH' has been merged to the branch '$TARGET_BRANCH' and the result has been pushed."
