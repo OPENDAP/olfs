@@ -1,11 +1,15 @@
 #!/bin/bash
-HR="###########################################################################"
+HR="-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --"
 ###########################################################################
 # loggy()
+#
 function loggy(){
   echo  "$@" | awk '{ print "# "$0;}'  >&2
 }
 
+###########################################################################
+# check_status()
+#
 function check_status() {
   local status=$1
   local cmd=$2
@@ -17,10 +21,18 @@ function check_status() {
   fi
 }
 
+###########################################################################
+# main()
+#
+
 loggy "$HR"
 loggy
 loggy "Updating tracking branch..."
 loggy
+
+git config --global user.name "The-Robot-Travis"
+git config --global user.email "npotter@opendap.org"
+
 MAIN_BRANCH="${1:-"master"}"
 #MAIN_BRANCH="t1"
 loggy "MAIN_BRANCH: '$MAIN_BRANCH'"
