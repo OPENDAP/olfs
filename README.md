@@ -154,6 +154,5 @@ TODOs / Open items
 - Provide a Docker-based quickstart if available (hyrax-docker is referenced in CI, but container details belong in that repo).
 - Expand testing section with integration test instructions if/when maintained tests are added back to active build.
 
-
-This is gonna hurt even less
+This is gonna hurt
 
