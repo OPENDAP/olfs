@@ -12,11 +12,11 @@ function loggy(){
 #
 function check_status() {
   local status=$1
-  local cmd=$2
+  local cmd="$2"
   if [[ $status -eq 0 ]]; then
       loggy "SUCCESS!"
   else
-      loggy "FAILURE! status: $status"
+      loggy "FAILURE! The '$cmd' command exited with status: $status"
       exit $status
   fi
 }
@@ -43,20 +43,20 @@ loggy "TARGET_BRANCH: '$TRACKING_BRANCH'"
 
 loggy "Checking current branch..."
 current_branch="$(git branch --show-current)"
-check_status $?
+check_status $? "git branch"
 loggy "The current branch is: '$current_branch'"
 loggy
 
 loggy "Checking out branch: '$TRACKING_BRANCH'"
 git checkout "$TRACKING_BRANCH"
-check_status $?
+check_status $? "git checkout"
 
 loggy "Merging branch '$MAIN_BRANCH' into branch: '$TRACKING_BRANCH'"
 git merge --verbose --no-edit "$MAIN_BRANCH"
-check_status $?
+check_status $? "git merge"
 
 loggy "Pushing changes for branch: '$TRACKING_BRANCH'"
 git push
-check_status $?
+check_status $? "git push"
 
 loggy "The branch '$MAIN_BRANCH' has been merged to the branch '$TRACKING_BRANCH' and the result has been pushed."
