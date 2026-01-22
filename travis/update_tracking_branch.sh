@@ -41,13 +41,17 @@ TRACKING_BRANCH="${2:-"tomcat-11"}"
 #TRACKING_BRANCH="t2"
 loggy "TARGET_BRANCH: '$TRACKING_BRANCH'"
 
-loggy "Retrieving branches"
-git fetch
-check_status $? "git fetch"
+loggy "Fetching branches..."
+git fetch origin
+check_status $? "git fetch origin"
 
-#loggy "Checking out branch: '$MAIN_BRANCH'"
-#git checkout "$MAIN_BRANCH""
-#check_status $? "git checkout"
+loggy "Branches..."
+git branch -v -a
+check_status $? "git branch -v -a"
+
+loggy "Checking out branch: '$MAIN_BRANCH'"
+git checkout "$MAIN_BRANCH"
+check_status $? "git checkout $MAIN_BRANCH"
 
 current_branch="$(git branch --show-current)"
 check_status $? "git branch"
