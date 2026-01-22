@@ -42,12 +42,12 @@ TRACKING_BRANCH="${2:-"tomcat-11"}"
 loggy "TARGET_BRANCH: '$TRACKING_BRANCH'"
 
 loggy "Checking out origin/$TRACKING_BRANCH"
-git checkout "origin/$TRACKING_BRANCH"
-check_status $? "git checkout origin/$TRACKING_BRANCH"
+git checkout origin "$TRACKING_BRANCH"
+check_status $? "git checkout origin $TRACKING_BRANCH"
 
 loggy "Listing Branches..."
-git branch -a
-check_status $? "git branch -a"
+git branch -a -r
+check_status $? "git branch -a -r"
 
 loggy "Checking out branch: '$MAIN_BRANCH'"
 git checkout "$MAIN_BRANCH"
