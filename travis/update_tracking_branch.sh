@@ -69,7 +69,8 @@ loggy "The current branch is now: '$current_branch'"
 
 loggy
 loggy "Checking out branch: '$TRACKING_BRANCH'"
-git checkout "$TRACKING_BRANCH"
+# git checkout "$TRACKING_BRANCH"
+git checkout -B "$TRACKING_BRANCH" "origin/$TRACKING_BRANCH"
 check_status $? "git checkout $TRACKING_BRANCH"
 
 loggy
