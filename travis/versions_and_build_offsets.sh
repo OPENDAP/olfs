@@ -1,4 +1,4 @@
-#!bin/bash
+#!/bin/bash
 #
 # When the release numbers are edited for a release, update these
 # to the current Travis number so that the 'build number' in
