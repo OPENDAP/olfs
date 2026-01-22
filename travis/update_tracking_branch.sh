@@ -61,7 +61,7 @@ loggy
 
 loggy "Checking out branch: '$TRACKING_BRANCH'"
 git checkout "$TRACKING_BRANCH"
-check_status $? "git checkout"
+check_status $? "git checkout $TRACKING_BRANCH"
 
 loggy "Merging branch '$MAIN_BRANCH' into branch: '$TRACKING_BRANCH'"
 git merge --verbose --no-edit "$MAIN_BRANCH"
