@@ -78,6 +78,9 @@ stages:
   - name: disabled
     if: branch = disabled
 
+git:
+  depth: false
+
 # caching for gradle
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
