@@ -53,6 +53,10 @@ loggy "Checking out branch: '$MAIN_BRANCH'"
 git checkout "$MAIN_BRANCH"
 check_status $? "git checkout $MAIN_BRANCH"
 
+loggy "Checking git status..."
+git status
+check_status $? "git status"
+
 loggy "Checking current branch..."
 current_branch="$(git branch --show-current)"
 check_status $? "git branch --show-current"
