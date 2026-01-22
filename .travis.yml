@@ -66,17 +66,17 @@ install:
   - npm install -g snyk-gradle-plugin
 
 stages:
-  - name: build
-  - name: test
-  - name: scan
-  - name: snappah
-    if: type != pull_request OR branch =~ ^(.*-test-deploy)$
-  - name: hyrax-docker-trigger
-    if: type != pull_request OR branch =~ ^(.*-test-deploy)$
+#  - name: build
+#  - name: test
+#  - name: scan
+#  - name: snappah
+#    if: type != pull_request OR branch =~ ^(.*-test-deploy)$
+#  - name: hyrax-docker-trigger
+#    if: type != pull_request OR branch =~ ^(.*-test-deploy)$
   - name: update-tracking-branch
-    if: type != pull_request
-  - name: disabled
-    if: branch = disabled
+#    if: type != pull_request
+#  - name: disabled
+#    if: branch = disabled
 
 # caching for gradle
 before_cache:
