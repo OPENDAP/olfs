@@ -55,7 +55,7 @@ check_status $? "git checkout $MAIN_BRANCH"
 
 loggy "Checking current branch..."
 current_branch="$(git branch --show-current)"
-check_status $? "git branch"
+check_status $? "git branch --show-current"
 loggy "The current branch is now: '$current_branch'"
 loggy
 
@@ -65,10 +65,13 @@ check_status $? "git checkout $TRACKING_BRANCH"
 
 loggy "Merging branch '$MAIN_BRANCH' into branch: '$TRACKING_BRANCH'"
 git merge --verbose --no-edit "$MAIN_BRANCH"
-check_status $? "git merge"
+check_status $? "git merge --verbose --no-edit $MAIN_BRANCH"
 
 loggy "Pushing changes for branch: '$TRACKING_BRANCH'"
 git push
 check_status $? "git push"
 
 loggy "The branch '$MAIN_BRANCH' has been merged to the branch '$TRACKING_BRANCH' and the result has been pushed."
+
+loggy
+loggy "$HR"
