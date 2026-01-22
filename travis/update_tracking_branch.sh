@@ -14,7 +14,7 @@ function check_status() {
   local status=$1
   local cmd="$2"
   if [[ $status -eq 0 ]]; then
-      loggy "SUCCESS!"
+      loggy "The command '$cmd' SUCCEEDED!"
   else
       loggy "FAILURE! The '$cmd' command exited with status: $status"
       exit $status
