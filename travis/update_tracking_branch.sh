@@ -41,9 +41,9 @@ TRACKING_BRANCH="${2:-"tomcat-11"}"
 #TRACKING_BRANCH="t2"
 loggy "TARGET_BRANCH: '$TRACKING_BRANCH'"
 
-loggy "Fetching $TRACKING_BRANCH"
-git fetch origin "$TRACKING_BRANCH"
-check_status $? "git fetch origin $TRACKING_BRANCH"
+loggy "Switching to $TRACKING_BRANCH"
+git switch "$TRACKING_BRANCH"
+check_status $? "git switch $TRACKING_BRANCH"
 
 loggy "Listing Branches..."
 git branch -a
