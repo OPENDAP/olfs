@@ -41,40 +41,48 @@ TRACKING_BRANCH="${2:-"tomcat-11"}"
 #TRACKING_BRANCH="t2"
 loggy "TARGET_BRANCH: '$TRACKING_BRANCH'"
 
+loggy
 loggy "Fetching branches"
 git fetch --all
 check_status $? "git fetch --all"
 
+loggy
 loggy "Listing Branches..."
 git branch -a -r
 check_status $? "git branch -a -r"
 
+loggy
 loggy "Checking out branch: '$MAIN_BRANCH'"
 git checkout "$MAIN_BRANCH"
 check_status $? "git checkout $MAIN_BRANCH"
 
+loggy
 loggy "Checking git status..."
 git status
 check_status $? "git status"
 
+loggy
 loggy "Checking current branch..."
 current_branch="$(git branch --show-current)"
 check_status $? "git branch --show-current"
 loggy "The current branch is now: '$current_branch'"
-loggy
 
+loggy
 loggy "Checking out branch: '$TRACKING_BRANCH'"
 git checkout "$TRACKING_BRANCH"
 check_status $? "git checkout $TRACKING_BRANCH"
 
+loggy
 loggy "Merging branch '$MAIN_BRANCH' into branch: '$TRACKING_BRANCH'"
 git merge --verbose --no-edit "$MAIN_BRANCH"
 check_status $? "git merge --verbose --no-edit $MAIN_BRANCH"
 
+loggy
 loggy "Pushing changes for branch: '$TRACKING_BRANCH'"
 git push
 check_status $? "git push"
 
+loggy
 loggy "The branch '$MAIN_BRANCH' has been merged to the branch '$TRACKING_BRANCH' and the result has been pushed."
 
 loggy
