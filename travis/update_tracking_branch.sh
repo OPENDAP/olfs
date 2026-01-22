@@ -45,6 +45,10 @@ loggy "Fetching branches..."
 git fetch --all
 check_status $? "git fetch --all"
 
+loggy "Listing Branches..."
+git branch -a
+check_status $? "git branch -a"
+
 loggy "Checking out branch: '$MAIN_BRANCH'"
 git checkout "$MAIN_BRANCH"
 check_status $? "git checkout $MAIN_BRANCH"
