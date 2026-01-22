@@ -80,7 +80,7 @@ check_status $? "git merge --verbose --no-edit $MAIN_BRANCH"
 
 loggy
 loggy "Pushing changes for branch: '$TRACKING_BRANCH'"
-git push
+git push "https://${GIT_UID}:${GIT_PSWD}@github.com/OPENDAP/olfs.git" --all
 check_status $? "git push"
 
 loggy
