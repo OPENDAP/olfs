@@ -66,7 +66,17 @@ install:
   - npm install -g snyk-gradle-plugin
 
 stages:
+  - name: build
+  - name: test
+  - name: scan
+  - name: snappah
+    if: type != pull_request OR branch =~ ^(.*-test-deploy)$
+  - name: hyrax-docker-trigger
+    if: type != pull_request OR branch =~ ^(.*-test-deploy)$
   - name: update-tracking-branch
+    if: type != pull_request
+  - name: disabled
+    if: branch = disabled
 
 git:
   depth: false
@@ -83,6 +93,134 @@ cache:
 
 jobs:
   include:
+
+    - stage: build
+      name: "jdk17"
+      jdk: openjdk17
+      script:
+        - export STAGE=build
+        - ant -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build show server
+
+    - stage: build
+      name: "gradle (jdk17)"
+      jdk: openjdk17
+      script:
+        - export STAGE=build
+        - gradle --version
+        - gradle tasks
+        - gradle war
+      before_install:
+        - wget http://services.gradle.org/distributions/gradle-8.14.3-bin.zip
+        - unzip -qq gradle-8.14.3-bin.zip
+        - export GRADLE_HOME=$PWD/gradle-8.14.3
+        - export PATH=$GRADLE_HOME/bin:$PATH
+        - gradle -v
+
+    - stage: scan
+      name: "synk (jdk17)"
+      jdk: openjdk17
+      script:
+        - export STAGE=scan
+        - echo $STAGE
+        - ./run-snyk.sh
+
+    - stage: scan
+      name: "gradle sonarscan (jdk17)"
+      jdk: openjdk17
+      addons: sonarcloud
+      script:
+        - export STAGE=scan
+        - | 
+          # multiline build instructions incoming!
+          if test -z "$TRAVIS_PULL_REQUEST_BRANCH"; then 
+            # If no travis pull request branch was found, this is not a pull request!
+            travis_wait 30 gradle sonar -Dsonar.token=$SONAR_LOGIN -Dsonar.qualitygate.timeout=1800 -Dsonar.qualitygate.wait=true
+          else
+            # If that variable *was* found, we need to pass in the three variables that let sonar know this is a pull request
+            # https://docs.sonarsource.com/sonarqube-server/latest/analyzing-source-code/pull-request-analysis/setting-up-the-pull-request-analysis/#setup-pull-request-parameters
+            # Because Travis's `TRAVIS_BRANCH` is the name of the target branch **when Travis is triggered by a pull request**, that is the pullrequest.base
+            travis_wait 30 gradle sonar -Dsonar.token=$SONAR_LOGIN -Dsonar.qualitygate.timeout=1800 -Dsonar.qualitygate.wait=true -Dsonar.pullrequest.key="$TRAVIS_PULL_REQUEST" -Dsonar.pullrequest.branch="$TRAVIS_PULL_REQUEST_BRANCH" -Dsonar.pullrequest.base="$TRAVIS_BRANCH"
+          fi
+        - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=opendap-olfs | grep "QUALITY GATE PASS"
+      before_install:
+        - wget http://services.gradle.org/distributions/gradle-8.14.3-bin.zip
+        - unzip -qq gradle-8.14.3-bin.zip
+        - export GRADLE_HOME=$PWD/gradle-8.14.3
+        - export PATH=$GRADLE_HOME/bin:$PATH
+        - gradle -v
+
+    - stage: snappah
+      name: "olfs-snapshot (jdk17)"
+      jdk: openjdk17
+      script:
+        - export STAGE=snappah
+        - echo "STAGE is ${STAGE}"
+        - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
+        - source ./travis/compute_build_tags.sh
+        - ant -DHYRAX_VERSION="${HYRAX_BUILD_VERSION}" -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DOLFS_DIST_BASE=olfs-snapshot DISTRO
+        - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
+        - echo "Built Distribution Bundles:"
+        - ls -l ./build/dist/*.tgz
+        - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
+        - ls -l ${TRAVIS_BUILD_DIR}/package/
+
+    - stage: snappah
+      name: "olfs-build-number (jdk17)"
+      jdk: openjdk17
+      script:
+        - export STAGE=snappah
+        - echo "STAGE is ${STAGE}"
+        - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
+        - source ./travis/compute_build_tags.sh
+        - ant -DHYRAX_VERSION="${HYRAX_BUILD_VERSION}" -DOLFS_VERSION="${OLFS_BUILD_VERSION}" DISTRO
+        - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
+        - echo "Built Distribution Bundles:"
+        - ls -l ./build/dist/*.tgz
+        - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
+        - ls -l ${TRAVIS_BUILD_DIR}/package/
+
+    - stage: snappah
+      name: "ngap-snapshot (jdk17)"
+      jdk: openjdk17
+      script:
+        - export STAGE=snappah
+        - echo "STAGE is ${STAGE}"
+        - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
+        - source ./travis/compute_build_tags.sh
+        - ant -DHYRAX_VERSION="${HYRAX_BUILD_VERSION}" -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DNGAP_DIST_BASE=ngap-snapshot ngap-dist
+        - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
+        - echo "Build Bundles:"
+        - ls -l ./build/dist/*.tgz
+        - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
+        - ls -l ${TRAVIS_BUILD_DIR}/package/
+
+    - stage: snappah
+      name: "ngap-build-number (jdk17)"
+      jdk: openjdk17
+      script:
+        - export STAGE=snappah
+        - echo "STAGE is ${STAGE}"
+        - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
+        - source ./travis/compute_build_tags.sh
+        - ant -DHYRAX_VERSION="${HYRAX_BUILD_VERSION}" -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DNGAP_DIST_BASE="ngap-${OLFS_BUILD_VERSION}" ngap-dist
+        - echo "Build Bundles:"
+        - ls -l ./build/dist/*.tgz
+        - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
+        - echo "Checking ${TRAVIS_BUILD_DIR}/package/"
+        - ls -l ${TRAVIS_BUILD_DIR}/package/
+
+    # The hyrax-docker-trigger stage grabs the hyrax-docker project, sets the current
+    # snapshot time and pushes the result to GitHub. This push triggers TravisCI
+    # to build the Docker containers for all the Hyrax snapshot products.
+    # I moved this into its own stage instead of after_deploy so that it would
+    # reliably run once after everything else worked. -ndp 3/10/21
+    - stage: hyrax-docker-trigger
+      name: "Triggering hyrax-docker snapshot build"
+      script:
+        - export STAGE=hyrax-docker
+        - echo $STAGE
+        - source ./travis/compute_build_tags.sh
+        - ./travis/trigger-hyrax-docker.sh
 
     - stage: update-tracking-branch
       name: "Update Tracking Branch(es)"
