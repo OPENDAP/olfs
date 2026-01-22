@@ -42,8 +42,8 @@ TRACKING_BRANCH="${2:-"tomcat-11"}"
 loggy "TARGET_BRANCH: '$TRACKING_BRANCH'"
 
 loggy "Fetching branches..."
-git fetch --all origin
-check_status $? "git fetch origin"
+git fetch --all
+check_status $? "git fetch --all"
 
 loggy "Checking out branch: '$MAIN_BRANCH'"
 git checkout "$MAIN_BRANCH"
