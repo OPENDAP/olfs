@@ -41,10 +41,17 @@ TRACKING_BRANCH="${2:-"tomcat-11"}"
 #TRACKING_BRANCH="t2"
 loggy "TARGET_BRANCH: '$TRACKING_BRANCH'"
 
-loggy "Checking current branch..."
-current_branch="$(git branch --show-current)"
+loggy "Retrieving branchs"
+git fetch
+check_status $? "git fetch"
+
+#loggy "Checking out branch: '$MAIN_BRANCH'"
+#git checkout "$MAIN_BRANCH""
+#check_status $? "git checkout"
+
+current_branch="$(git branch --current-branch)"
 check_status $? "git branch"
-loggy "The current branch is: '$current_branch'"
+loggy "The current branch is now: '$current_branch'"
 loggy
 
 loggy "Checking out branch: '$TRACKING_BRANCH'"
