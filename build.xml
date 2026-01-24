@@ -60,14 +60,17 @@
          These properties should be set from the command
          line when running the DISTRO build target.
     -->
-    <property name="HYRAX_VERSION"       value="Not.A.Release"/>
-    <property name="OLFS_VERSION"        value="Not.A.Release"/>
-    <property name="NGAP_VERSION"        value="${HYRAX_VERSION}"/>
-    <property name="WCS_VERSION"         value="${HYRAX_VERSION}"/>
+    <property name="HYRAX_VERSION"  value="Not.A.Release"/>
+    <property name="OLFS_VERSION"   value="Not.A.Release"/>
+    <property name="NGAP_VERSION"   value="${HYRAX_VERSION}"/>
+    <property name="WCS_VERSION"    value="${HYRAX_VERSION}"/>
+    <property name="TARGET_OS"      value="" />
 
-    <property name="OLFS_DIST_BASE"        value="olfs-${OLFS_VERSION}"/>
-    <property name="NGAP_DIST_BASE"        value="ngap-${HYRAX_VERSION}"/>
-    <property name="WEBAPP_DIST"           value="${OLFS_DIST_BASE}-webapp"/>
+
+    <property name="OLFS_DIST_BASE"    value="olfs-${OLFS_VERSION}${TARGET_OS}"/>
+    <property name="OLFS_WEBAPP_DIST"  value="${OLFS_DIST_BASE}-webapp"/>
+    <property name="NGAP_DIST_BASE"    value="ngap-${OLFS_VERSION}${TARGET_OS}"/>
+    <property name="NGAP_WEBAPP_DIST"  value="${NGAP_DIST_BASE}-webapp"/>
 
     <property name="SRC_DIST" value="${OLFS_DIST_BASE}-src"/>
     <property name="DOC_DIST" value="${OLFS_DIST_BASE}-doc"/>
@@ -143,57 +146,78 @@
         <echo level="info" message="##########################################################"/>
         <echo level="info" message="# Build Settings"/>
         <echo level="info" message="#"/>
-        <echo level="info" message="                  Project Name: ${ant.project.name}"/>
-        <echo level="info" message="                  Project File: ${ant.file}"/>
-        <echo level="info" message="                 Hyrax Version: ${HYRAX_VERSION}"/>
-        <echo level="info" message="                  OLFS Version: ${OLFS_VERSION}"/>
-        <echo level="info" message="                  NGAP Version: ${NGAP_VERSION}"/>
-        <echo level="info" message="                   WCS Version: ${WCS_VERSION}"/>
-        <echo level="info" message="            Deployment Context: ${DEPLOYMENT_CONTEXT}"/>
-        <echo level="info" message="       NGAP Deployment Context: ${NGAP_DEPLOYMENT_CONTEXT}"/>
-        <echo level="info" message=""/>
-        <echo level="info" message="Project Directories:"/>
-        <echo level="info" message="                src.dir: ${src.dir}"/>
-        <echo level="info" message="                doc.dir: ${doc.dir}"/>
-        <echo level="info" message="                lib.dir: ${lib.dir}"/>
-        <echo level="info" message="          resources.dir: ${resources.dir}"/>
-        <echo level="info" message=""/>
-        <echo level="info" message="Build Directories:"/>
-        <echo level="info" message="              build.dir: ${build.dir}"/>
-        <echo level="info" message="          build.classes: ${build.classes}"/>
-        <echo level="info" message="              build.doc: ${build.docs}"/>
-        <echo level="info" message="        build.resources: ${build.hyrax.resources}"/>
-        <echo level="info" message=""/>
-        <echo level="info" message="Ant Properties:"/>
-        <echo level="info" message="               ant.file: ${ant.file}"/>
-        <echo level="info" message="               ant.home: ${ant.home}"/>
-        <echo level="info" message="       ant.java.version: ${ant.java.version}"/>
-        <echo level="info" message="       ant.project.name: ${ant.project.name}"/>
-        <echo level="info" message="            ant.version: ${ant.version}"/>
-        <echo level="info" message="                basedir: ${basedir}"/>
-        <echo level="info" message="              user.name: ${user.name}"/>
-        <echo level="info" message="              user.home: ${user.home}"/>
-        <echo level="info" message="              java.home: ${java.home}"/>
-        <echo level="info" message="           java.version: ${java.version}"/>
-        <echo level="info" message=""/>
-        <echo level="info" message="Distribution Targets: "/>
-        <echo level="info" message="            WEBAPP_DIST: ${WEBAPP_DIST}"/>
-        <echo level="info" message="               SRC_DIST: ${SRC_DIST}"/>
-        <echo level="info" message="               DOC_DIST: ${DOC_DIST}"/>
-        <echo level="info" message="               OLFS_LIB: ${OLFS_LIB}"/>
-        <echo level="info" message=""/>
-        <echo level="info" message="----------------------------------------------------------"/>
-        <echo level="info" message="       Operating System: ${os.name}"/>
-        <echo level="info" message="            Arcitecture: ${os.arch}"/>
-        <echo level="info" message="                Version: ${os.version}"/>
-        <echo level="info" message="       sun.java.command: ${sun.java.command}"/>
-        <echo level="info" message="               ANT_OPTS: ${ANT_OPTS}"/>
-        <echo level="info" message="Calling echoproperties task"/>
-        <echoproperties  />
-        <echo level="info" message=""/>
+        <echo level="info" message="#    Project Name: ${ant.project.name}"/>
+        <echo level="info" message="#    Project File: ${ant.file}"/>
+        <echo level="info" message="#"/>
+        <echo level="info" message="#----------------------------------------------------------"/>
+        <echo level="info" message="# Versions and Contexts:"/>
+        <echo level="info" message="#               Hyrax Version: ${HYRAX_VERSION}"/>
+        <echo level="info" message="#                OLFS Version: ${OLFS_VERSION}"/>
+        <echo level="info" message="#                NGAP Version: ${NGAP_VERSION}"/>
+        <echo level="info" message="#                 WCS Version: ${WCS_VERSION}"/>
+        <echo level="info" message="#          Deployment Context: ${DEPLOYMENT_CONTEXT}"/>
+        <echo level="info" message="#     NGAP Deployment Context: ${NGAP_DEPLOYMENT_CONTEXT}"/>
+        <echo level="info" message="#"/>
+        <echo level="info" message="#----------------------------------------------------------"/>
+        <echo level="info" message="# Project Directories:"/>
+        <echo level="info" message="#           src.dir: ${src.dir}"/>
+        <echo level="info" message="#           doc.dir: ${doc.dir}"/>
+        <echo level="info" message="#           lib.dir: ${lib.dir}"/>
+        <echo level="info" message="#     resources.dir: ${resources.dir}"/>
+        <echo level="info" message="#"/>
+        <echo level="info" message="#----------------------------------------------------------"/>
+        <echo level="info" message="# Build Directories:"/>
+        <echo level="info" message="#           build.dir: ${build.dir}"/>
+        <echo level="info" message="#       build.classes: ${build.classes}"/>
+        <echo level="info" message="#           build.doc: ${build.docs}"/>
+        <echo level="info" message="#     build.resources: ${build.hyrax.resources}"/>
+        <echo level="info" message="#"/>
+        <echo level="info" message="#----------------------------------------------------------"/>
+        <echo level="info" message="# Ant Situation:"/>
+        <echo level="info" message="#             ant.file: ${ant.file}"/>
+        <echo level="info" message="#             ant.home: ${ant.home}"/>
+        <echo level="info" message="#     ant.java.version: ${ant.java.version}"/>
+        <echo level="info" message="#     ant.project.name: ${ant.project.name}"/>
+        <echo level="info" message="#          ant.version: ${ant.version}"/>
+        <echo level="info" message="#              basedir: ${basedir}"/>
+        <echo level="info" message="#            user.name: ${user.name}"/>
+        <echo level="info" message="#            user.home: ${user.home}"/>
+        <echo level="info" message="#            java.home: ${java.home}"/>
+        <echo level="info" message="#         java.version: ${java.version}"/>
+        <echo level="info" message="#"/>
+        <echo level="info" message="#----------------------------------------------------------"/>
+        <echo level="info" message="# Distribution Targets: "/>
+        <echo level="info" message="#             SRC_DIST: ${SRC_DIST}"/>
+        <echo level="info" message="#             DOC_DIST: ${DOC_DIST}"/>
+        <echo level="info" message="#             OLFS_LIB: ${OLFS_LIB}"/>
+        <echo level="info" message="#       OLFS_DIST_BASE: ${OLFS_DIST_BASE}"/>
+        <echo level="info" message="#     OLFS_WEBAPP_DIST: ${OLFS_WEBAPP_DIST}"/>
+        <echo level="info" message="#       NGAP_DIST_BASE: ${NGAP_DIST_BASE}"/>
+        <echo level="info" message="#     NGAP_WEBAPP_DIST: ${NGAP_WEBAPP_DIST}"/>
+
+        <echo level="info" message="#"/>
+        <echo level="info" message="#----------------------------------------------------------"/>
+        <echo level="info" message="# System:"/>
+        <echo level="info" message="#     Operating System: ${os.name}"/>
+        <echo level="info" message="#          Arcitecture: ${os.arch}"/>
+        <echo level="info" message="#              Version: ${os.version}"/>
+        <echo level="info" message="#     sun.java.command: ${sun.java.command}"/>
+        <echo level="info" message="#             ANT_OPTS: ${ANT_OPTS}"/>
         <echo level="info" message="##########################################################"/>
 
     </target>
+
+
+    <target name="showAntProperties" description="Show build settings.">
+        <echo level="info" message="##########################################################"/>
+        <echo level="info" message="# ANT Properties"/>
+        <echo level="info" message="# Calling the ANT echoproperties task"/>
+        <echoproperties  />
+        <echo level="info" message="#"/>
+        <echo level="info" message="##########################################################"/>
+    </target>
+
+    <target name="showAll" description="Show Me." depends="show,showAntProperties" />
 
 
     <!-- ################################################################# -->
@@ -593,10 +617,10 @@
         <copy file="README.md"
               tofile="${build.dist}/README"/>
 
-        <tar destfile="${build.dist}/${WEBAPP_DIST}.tgz"
+        <tar destfile="${build.dist}/${OLFS_WEBAPP_DIST}.tgz"
              compression="gzip"
         >
-            <zipfileset dir="${build.dist}" prefix="${WEBAPP_DIST}">
+            <zipfileset dir="${build.dist}" prefix="${OLFS_WEBAPP_DIST}">
                 <include name="opendap.war"/>
                 <include name="README"/>
             </zipfileset>
@@ -828,9 +852,9 @@
         <copy file="README.md"
               tofile="${build.dist}/README"/>
 
-        <tar destfile="${build.dist}/robots-${WEBAPP_DIST}.tgz"
+        <tar destfile="${build.dist}/robots-${OLFS_WEBAPP_DIST}.tgz"
              compression="gzip">
-            <zipfileset dir="${build.dist}" prefix="robots-${WEBAPP_DIST}">
+            <zipfileset dir="${build.dist}" prefix="robots-${OLFS_WEBAPP_DIST}">
                 <include name="opendap.war"/>
                 <include name="ROOT.war"/>
                 <include name="README"/>
@@ -963,8 +987,8 @@
             depends="ngap"
             description="Packages the NGAP war file (${NGAP_DEPLOYMENT_CONTEXT}.war) into a gzipped tar file with a release related name.">
 
-        <tar destfile="${build.dist}/${NGAP_DIST_BASE}-webapp.tgz" compression="gzip">
-            <zipfileset dir="${build.dist}" prefix="${NGAP_DIST_BASE}-webapp">
+        <tar destfile="${build.dist}/${NGAP_WEBAPP_DIST}.tgz" compression="gzip">
+            <zipfileset dir="${build.dist}" prefix="${NGAP_WEBAPP_DIST}">
                 <include name="${NGAP_DEPLOYMENT_CONTEXT}.war"/>
             </zipfileset>
         </tar>
