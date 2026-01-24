@@ -222,6 +222,9 @@ jobs:
         - source ./travis/compute_build_tags.sh
         - ./travis/trigger-hyrax-docker.sh
 
+    # This job, part of the update-tracking-branch stage, runs a shell script
+    # that checks out the first branch $1 into branch $2 and if successful
+    # pushes the results to $2
     - stage: update-tracking-branch
       name: "Update Tracking Branch(es)"
       script:
