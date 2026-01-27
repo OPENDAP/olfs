@@ -31,6 +31,10 @@ then
 fi
 
 loggy "TARGET_OS: $TARGET_OS"
+
+BUILD_RECIPE_FILE="$TARGET_OS-build-recipe"
+loggy "BUILD_RECIPE_FILE: $BUILD_RECIPE_FILE"
+
 loggy "OLFS_BUILD_VERSION: $OLFS_BUILD_VERSION"
 
 OLFS_SNAPSHOT_TAG="olfs-${OLFS_BUILD_VERSION} "$(date "+%FT%T%z")"$test_deploy"
@@ -55,10 +59,10 @@ cd hyrax-docker
 loggy "Checking out branch: $TARGET_OS"
 git checkout "$TARGET_OS"
 
-echo "TARGET_OS: $TARGET_OS" > snapshot.time
-echo "${BES_SNAPSHOT}"       >> snapshot.time
-echo "${OLFS_SNAPSHOT_TAG}"  >> snapshot.time
-echo "${HYRAX_SNAPSHOT_TAG}" >> snapshot.time
+echo "TARGET_OS: $TARGET_OS" >  "$BUILD_RECIPE_FILE"
+echo "${BES_SNAPSHOT}"       >> "$BUILD_RECIPE_FILE"
+echo "${OLFS_SNAPSHOT_TAG}"  >> "$BUILD_RECIPE_FILE"
+echo "${HYRAX_SNAPSHOT_TAG}" >> "$BUILD_RECIPE_FILE"
 
 loggy "Updated snapshot.time file:"
 loggy "$(cat snapshot.time)"
