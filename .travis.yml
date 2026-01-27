@@ -17,7 +17,7 @@ branches:
   only:
     - master
     - /^(.*-test-deploy)$/
-    - tomcat-11
+    - el9
 
 notifications:
   email:
@@ -72,11 +72,11 @@ stages:
   - name: test
   - name: scan
   - name: snappah
-    if: type != pull_request OR branch =~ ^(.*-test-deploy)$ OR branch = tomcat-11
+    if: type != pull_request OR branch =~ ^(.*-test-deploy)$ OR branch = el9
   - name: hyrax-docker-trigger
     if: type != pull_request OR branch =~ ^(.*-test-deploy)$
   - name: update-tracking-branch
-    if: type != pull_request
+    if: type != pull_request AND branch != el9
   - name: disabled
     if: branch = disabled
 
