@@ -72,11 +72,11 @@ stages:
   - name: test
   - name: scan
   - name: snappah
-    if: type != pull_request OR branch =~ ^(.*-test-deploy)$ OR branch = $TARGET_OS
+    if: type != pull_request OR branch =~ ^(.*-test-deploy)$ OR branch = el9
   - name: hyrax-docker-trigger
-    if: type != pull_request OR branch =~ ^(.*-test-deploy)$ OR branch = $TARGET_OS
+    if: type != pull_request OR branch =~ ^(.*-test-deploy)$ OR branch = el9
   - name: update-tracking-branch
-    if: type != pull_request AND branch != $TARGET_OS
+    if: type != pull_request AND branch != el9
   - name: disabled
     if: branch = disabled
 
