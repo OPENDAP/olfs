@@ -30,14 +30,14 @@ then
   test_deploy=" test-deploy"
 fi
 
-
-loggy"OLFS_BUILD_VERSION: $OLFS_BUILD_VERSION"
+loggy "TARGET_OS: $TARGET_OS"
+loggy "OLFS_BUILD_VERSION: $OLFS_BUILD_VERSION"
 
 OLFS_SNAPSHOT_TAG="olfs-${OLFS_BUILD_VERSION} "$(date "+%FT%T%z")"$test_deploy"
-loggy" OLFS_SNAPSHOT_TAG: $OLFS_SNAPSHOT_TAG"
+loggy " OLFS_SNAPSHOT_TAG: $OLFS_SNAPSHOT_TAG"
 
 HYRAX_SNAPSHOT_TAG="hyrax-${HYRAX_BUILD_VERSION} "$(date "+%FT%T%z")"$test_deploy"
-loggy"HYRAX_SNAPSHOT_TAG: $HYRAX_SNAPSHOT_TAG"
+loggy "HYRAX_SNAPSHOT_TAG: $HYRAX_SNAPSHOT_TAG"
 loggy ""
 
 loggy "Tagging olfs with: ${OLFS_BUILD_VERSION}"
@@ -52,8 +52,8 @@ loggy "Cloning hyrax-docker"
 git clone https://github.com/opendap/hyrax-docker
 
 cd hyrax-docker
-loggy "Checking out master branch..."
-git checkout master
+loggy "Checking out branch: $TARGET_OS"
+git checkout "$TARGET_OS"
 
 echo "TARGET_OS: $TARGET_OS" > snapshot.time
 echo "${BES_SNAPSHOT}"       >> snapshot.time
