@@ -64,16 +64,17 @@ echo "${BES_SNAPSHOT}"       >> "$BUILD_RECIPE_FILE"
 echo "${OLFS_SNAPSHOT_TAG}"  >> "$BUILD_RECIPE_FILE"
 echo "${HYRAX_SNAPSHOT_TAG}" >> "$BUILD_RECIPE_FILE"
 
-loggy "Updated snapshot.time file:"
-loggy "$(cat snapshot.time)"
+loggy "Updated $BUILD_RECIPE_FILE file:"
+loggy "$(cat "$BUILD_RECIPE_FILE")"
 
 
 # Bounding the commit message with the " character allows use to include
 # new line stuff for easy commit message readability later.
-loggy "Commiting snapshot.time file:"
+loggy "Commiting $BUILD_RECIPE_FILE file:"
 git commit -am \
 "OLFS: Triggering hyrax-docker image production.
 Build Version Matrix:
+TARGET_OS: $TARGET_OS
 ${BES_SNAPSHOT}
 ${OLFS_SNAPSHOT_TAG}
 ${HYRAX_SNAPSHOT_TAG}
