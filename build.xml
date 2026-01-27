@@ -64,12 +64,12 @@
     <property name="OLFS_VERSION"   value="Not.A.Release"/>
     <property name="NGAP_VERSION"   value="${HYRAX_VERSION}"/>
     <property name="WCS_VERSION"    value="${HYRAX_VERSION}"/>
-    <property name="TARGET_OS"      value="" />
+    <property name="TARGET_OS"      value="el9" />
 
 
-    <property name="OLFS_DIST_BASE"    value="olfs-${OLFS_VERSION}${TARGET_OS}"/>
+    <property name="OLFS_DIST_BASE"    value="olfs-${OLFS_VERSION}-${TARGET_OS}"/>
     <property name="OLFS_WEBAPP_DIST"  value="${OLFS_DIST_BASE}-webapp"/>
-    <property name="NGAP_DIST_BASE"    value="ngap-${OLFS_VERSION}${TARGET_OS}"/>
+    <property name="NGAP_DIST_BASE"    value="ngap-${OLFS_VERSION}-${TARGET_OS}"/>
     <property name="NGAP_WEBAPP_DIST"  value="${NGAP_DIST_BASE}-webapp"/>
 
     <property name="SRC_DIST" value="${OLFS_DIST_BASE}-src"/>
