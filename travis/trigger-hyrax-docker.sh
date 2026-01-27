@@ -7,6 +7,8 @@ function loggy(){
   echo  "$@" | awk '{ print "# "$0;}'  >&2
 }
 
+
+TARGET_OS="${TARGET_OS:-"el9"}"
 #
 # Given that the BES has just pushed a new set of packages, built with the libdap
 # RPMs, grab those and use them to make a new set of Docker containers. The
