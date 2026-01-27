@@ -17,7 +17,7 @@ branches:
   only:
     - master
     - /^(.*-test-deploy)$/
-    - el9
+#    - el9
 
 notifications:
   email:
@@ -101,7 +101,7 @@ jobs:
       jdk: openjdk17
       script:
         - export STAGE=build
-        - ant -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build -DTARGET_OS="$TARGET_OS"show server
+        - ant -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build -DTARGET_OS="$TARGET_OS" show server
 
     - stage: build
       name: "gradle (jdk17)"
