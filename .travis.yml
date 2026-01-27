@@ -189,7 +189,7 @@ jobs:
         - echo "STAGE is ${STAGE}"
         - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
         - source ./travis/compute_build_tags.sh
-        - ant -DHYRAX_VERSION="${HYRAX_BUILD_VERSION}" -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DNGAP_DIST_BASE=ngap-snapshot -DTARGET_OS="$TARGET_OS" show ngap-dist
+        - ant -DHYRAX_VERSION="${HYRAX_BUILD_VERSION}" -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DTARGET_OS="$TARGET_OS" show ngap-dist
         - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
         - echo "Build Bundles:"
         - ls -l ./build/dist/*.tgz
