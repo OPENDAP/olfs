@@ -32,7 +32,8 @@ then
   test_deploy=" test-deploy"
 fi
 
-loggy "           TARGET_OS: $TARGET_OS"
+loggy "TARGET_OS: $TARGET_OS"
+loggy "TOMCAT_MAJOR_VERSION: $TOMCAT_MAJOR_VERSION"
 
 BUILD_RECIPE_FILE="$TARGET_OS-build-recipe"
 loggy "   BUILD_RECIPE_FILE: $BUILD_RECIPE_FILE"
@@ -62,6 +63,7 @@ loggy "Checking out branch: $TARGET_OS"
 git checkout "$TARGET_OS"
 
 echo "TARGET_OS: $TARGET_OS" >  "$BUILD_RECIPE_FILE"
+echo "TOMCAT_MAJOR_VERSION: $TOMCAT_MAJOR_VERSION" >> "$BUILD_RECIPE_FILE"
 echo "${BES_SNAPSHOT}"       >> "$BUILD_RECIPE_FILE"
 echo "${OLFS_SNAPSHOT_TAG}"  >> "$BUILD_RECIPE_FILE"
 echo "${HYRAX_SNAPSHOT_TAG}" >> "$BUILD_RECIPE_FILE"
