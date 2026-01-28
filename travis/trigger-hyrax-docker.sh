@@ -79,20 +79,21 @@ git commit -am \
 "OLFS: Triggering hyrax-docker image production.
 Build Version Matrix:
 TARGET_OS: $TARGET_OS
+TOMCAT_MAJOR_VERSION: $TOMCAT_MAJOR_VERSION
 ${BES_SNAPSHOT}
 ${OLFS_SNAPSHOT_TAG}
 ${HYRAX_SNAPSHOT_TAG}
 ";
 git status;
 
-export hyrax_tag="hyrax-${HYRAX_BUILD_VERSION}"
-loggy "Tagging hyrax-docker with: ${hyrax_tag}"
+export hyrax_tag="hyrax-${HYRAX_BUILD_VERSION}-${TARGET_OS}"
+loggy "Tagging hyrax-docker with: '${hyrax_tag}'"
 git tag -m "${hyrax_tag}" -a "${hyrax_tag}"
 
 
-loggy "Pushing to changes hyrax-docker:master:"
+loggy "Pushing changes to hyrax-docker, branch $TARGET_OS:"
 git push "https://${GIT_UID}:${GIT_PSWD}@github.com/OPENDAP/hyrax-docker.git" --all
-loggy "Pushing to tags hyrax-docker:master:"
+loggy "Pushing tags to hyrax-docker, branch $TARGET_OS:"
 git push "https://${GIT_UID}:${GIT_PSWD}@github.com/OPENDAP/hyrax-docker.git" "${hyrax_tag}"
 
 loggy "done"
