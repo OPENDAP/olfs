@@ -45,17 +45,10 @@ public class Version  {
 
 
     /**
-     * Returns a String containing the OLFS version.
-     * @return The version of OLFS.
-     */
-    public static String getOLFSVersionString() {
-        return (olfsVersion);
-    }
-
-    /**
      * Returns a String containing the Hyrax version.
      * @return The version of Hyrax.
-     */    public static String getHyraxVersionString() {
+     */
+    public static String getHyraxVersionString() {
         return (hyraxVersion);
     }
 
@@ -80,22 +73,12 @@ public class Version  {
         return (hyrax);
     }
 
-    /**
-     *  Produce the ServerUUID value used by the top level of Hyrax.
-     * @return The UUID.
-     */
-    public static String getServerUUID(){
-        return "e93c3d09-a5d9-49a0-a912-a0ca16430b91";
-    }
-
-
 
     /**
      *
      * @param request The client request for which to return the verison.
      * @return A string containing the value of the XDODS-Server MIME header as
      * ascertained by querying the BES.
-     * @throws Exception If these is a problem getting the version document.
      */
     public static String getXDODSServerVersion(HttpServletRequest request) {
         String relativeUrl = ReqInfo.getLocalUrl(request);
@@ -109,7 +92,11 @@ public class Version  {
      * @param request The client request for which to return the verison.
      * @return A String containing the value of the XOPeNDAP-Server MIME header ascertained by querying
      *         the BES and conforming to the DAP4 specification.
-     * @throws Exception If these is a problem getting the version document.
+     * @throws JDOMException If the BES response cannot be parsed.
+     * @throws BadConfigurationException If the configuration doc has incorrect/missing/unexpected content.
+     * @throws PPTException If there is a problem communicating with the BES.
+     * @throws BESError If there is a problem communicating with the BES.
+     * @throws IOException If there is a problem communicating with the BES.
      */
     public static String getXOPeNDAPServerVersion(HttpServletRequest request)
             throws JDOMException, BadConfigurationException, PPTException, BESError, IOException {
@@ -139,7 +126,6 @@ public class Version  {
      * @param request The client request.
      * @return A String containing the XDAP MIME header value that describes
      * the DAP specifcation that the server response conforms to.
-     * @throws Exception If these is a problem getting the version document.
      */
     public static String getXDAPVersion(HttpServletRequest request) {
         String responseDAP = null;
@@ -174,7 +160,6 @@ public class Version  {
      *
      * @param request Client request to serviced
      * @param response The response in which to set the headers.
-     * @throws Exception If these is a problem getting the version document.
      */
     public static void setOpendapMimeHeaders(HttpServletRequest request, HttpServletResponse response)
             throws JDOMException, BadConfigurationException, PPTException, IOException, BESError {
