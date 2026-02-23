@@ -65,9 +65,12 @@ echo "TOMCAT_MAJOR_VERSION: $TOMCAT_MAJOR_VERSION" >> "$BUILD_RECIPE_FILE"
 echo "${BES_SNAPSHOT}"       >> "$BUILD_RECIPE_FILE"
 echo "${OLFS_SNAPSHOT_TAG}"  >> "$BUILD_RECIPE_FILE"
 echo "${HYRAX_SNAPSHOT_TAG}" >> "$BUILD_RECIPE_FILE"
-
 loggy "Updated $BUILD_RECIPE_FILE file:"
 loggy "$(cat "$BUILD_RECIPE_FILE")"
+
+cp "$BUILD_RECIPE_FILE" "$TRAVIS_BUILD_RECIPE_FILE"
+loggy "Updated $TRAVIS_BUILD_RECIPE_FILE file:"
+loggy "$(cat "$TRAVIS_BUILD_RECIPE_FILE")"
 
 
 # Bounding the commit message with the " character allows use to include
