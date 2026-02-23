@@ -33,21 +33,23 @@ then
 fi
 
 loggy "TARGET_OS: $TARGET_OS"
-loggy "TOMCAT_MAJOR_VERSION: $TOMCAT_MAJOR_VERSION"
+loggy "     TOMCAT_MAJOR_VERSION: $TOMCAT_MAJOR_VERSION"
 
 BUILD_RECIPE_FILE="$TARGET_OS-build-recipe"
-loggy "   BUILD_RECIPE_FILE: $BUILD_RECIPE_FILE"
+loggy "        BUILD_RECIPE_FILE: $BUILD_RECIPE_FILE"
 
-loggy "  OLFS_BUILD_VERSION: $OLFS_BUILD_VERSION"
+TRAVIS_BUILD_RECIPE_FILE="travis-build-recipe"
+loggy " TRAVIS_BUILD_RECIPE_FILE: $TRAVIS_BUILD_RECIPE_FILE"
 
-OLFS_SNAPSHOT_TAG="olfs-${OLFS_BUILD_VERSION} "$(date "+%FT%T%z")"$test_deploy"
-loggy "   OLFS_SNAPSHOT_TAG: $OLFS_SNAPSHOT_TAG"
+loggy "       OLFS_BUILD_VERSION: $OLFS_BUILD_VERSION"
+OLFS_SNAPSHOT_TAG="olfs-${OLFS_BUILD_VERSION} $(date "+%FT%T%z")$test_deploy"
+loggy "        OLFS_SNAPSHOT_TAG: $OLFS_SNAPSHOT_TAG"
 
-HYRAX_SNAPSHOT_TAG="hyrax-${HYRAX_BUILD_VERSION} "$(date "+%FT%T%z")"$test_deploy"
-loggy "  HYRAX_SNAPSHOT_TAG: $HYRAX_SNAPSHOT_TAG"
+HYRAX_SNAPSHOT_TAG="hyrax-${HYRAX_BUILD_VERSION} $(date "+%FT%T%z")$test_deploy"
+loggy "       HYRAX_SNAPSHOT_TAG: $HYRAX_SNAPSHOT_TAG"
 loggy ""
 
-loggy "   Tagging olfs with: ${OLFS_BUILD_VERSION}"
+loggy "        Tagging olfs with: ${OLFS_BUILD_VERSION}"
 git tag -m "olfs-${OLFS_BUILD_VERSION}" -a "${OLFS_BUILD_VERSION}"
 
 loggy "Pushing tags to origin..."
@@ -67,22 +69,24 @@ echo "TOMCAT_MAJOR_VERSION: $TOMCAT_MAJOR_VERSION" >> "$BUILD_RECIPE_FILE"
 echo "${BES_SNAPSHOT}"       >> "$BUILD_RECIPE_FILE"
 echo "${OLFS_SNAPSHOT_TAG}"  >> "$BUILD_RECIPE_FILE"
 echo "${HYRAX_SNAPSHOT_TAG}" >> "$BUILD_RECIPE_FILE"
-
 loggy "Updated $BUILD_RECIPE_FILE file:"
 loggy "$(cat "$BUILD_RECIPE_FILE")"
+cp "$BUILD_RECIPE_FILE" "$TRAVIS_BUILD_RECIPE_FILE"
+loggy "Updated $TRAVIS_BUILD_RECIPE_FILE file:"
+loggy "$(cat "$TRAVIS_BUILD_RECIPE_FILE")"
 
 
 # Bounding the commit message with the " character allows use to include
 # new line stuff for easy commit message readability later.
-loggy "Commiting $BUILD_RECIPE_FILE file:"
+loggy "Commiting recipe files:"
 git commit -am \
 "OLFS: Triggering hyrax-docker image production.
 Build Version Matrix:
 TARGET_OS: $TARGET_OS
 TOMCAT_MAJOR_VERSION: $TOMCAT_MAJOR_VERSION
-${BES_SNAPSHOT}
-${OLFS_SNAPSHOT_TAG}
-${HYRAX_SNAPSHOT_TAG}
+$BES_SNAPSHOT
+$OLFS_SNAPSHOT_TAG
+$HYRAX_SNAPSHOT_TAG
 ";
 git status;
 
