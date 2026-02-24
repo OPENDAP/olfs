@@ -75,6 +75,9 @@ cp "$BUILD_RECIPE_FILE" "$TRAVIS_BUILD_RECIPE_FILE"
 loggy "Updated $TRAVIS_BUILD_RECIPE_FILE file:"
 loggy "$(cat "$TRAVIS_BUILD_RECIPE_FILE")"
 
+cp "$BUILD_RECIPE_FILE" "$TRAVIS_BUILD_RECIPE_FILE"
+loggy "Updated $TRAVIS_BUILD_RECIPE_FILE file:"
+loggy "$(cat "$TRAVIS_BUILD_RECIPE_FILE")"
 
 # Bounding the commit message with the " character allows use to include
 # new line stuff for easy commit message readability later.
@@ -93,7 +96,6 @@ git status;
 export hyrax_tag="hyrax-${HYRAX_BUILD_VERSION}-${TARGET_OS}"
 loggy "Tagging hyrax-docker with: '${hyrax_tag}'"
 git tag -m "${hyrax_tag}" -a "${hyrax_tag}"
-
 
 loggy "Pushing changes to hyrax-docker, branch $TARGET_OS:"
 git push "https://${GIT_UID}:${GIT_PSWD}@github.com/OPENDAP/hyrax-docker.git" --all
