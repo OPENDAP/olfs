@@ -59,10 +59,10 @@ loggy "New OLFS has been pushed and tagged. Triggering the Docker build..."
 
 loggy "Cloning hyrax-docker"
 git clone https://github.com/opendap/hyrax-docker
-
 cd hyrax-docker
 git checkout master
 
+loggy "Writing $BUILD_RECIPE_FILE"
 echo "TARGET_OS: $TARGET_OS" >  "$BUILD_RECIPE_FILE"
 echo "TOMCAT_MAJOR_VERSION: $TOMCAT_MAJOR_VERSION" >> "$BUILD_RECIPE_FILE"
 echo "${BES_SNAPSHOT}"       >> "$BUILD_RECIPE_FILE"
@@ -71,6 +71,7 @@ echo "${HYRAX_SNAPSHOT_TAG}" >> "$BUILD_RECIPE_FILE"
 loggy "Updated $BUILD_RECIPE_FILE file:"
 loggy "$(cat "$BUILD_RECIPE_FILE")"
 
+loggy "Writing $TRAVIS_BUILD_RECIPE_FILE"
 cp "$BUILD_RECIPE_FILE" "$TRAVIS_BUILD_RECIPE_FILE"
 loggy "Updated $TRAVIS_BUILD_RECIPE_FILE file:"
 loggy "$(cat "$TRAVIS_BUILD_RECIPE_FILE")"
