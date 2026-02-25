@@ -60,8 +60,8 @@ loggy "New OLFS has been pushed and tagged. Triggering the Docker build..."
 loggy "Cloning hyrax-docker"
 git clone https://github.com/opendap/hyrax-docker
 cd hyrax-docker
-loggy "Checking out branch: $TARGET_OS"
-git checkout "$TARGET_OS"
+loggy "Checking out branch: master"
+git checkout "master"
 
 loggy "Writing $BUILD_RECIPE_FILE"
 echo "TARGET_OS: $TARGET_OS" >  "$BUILD_RECIPE_FILE"
