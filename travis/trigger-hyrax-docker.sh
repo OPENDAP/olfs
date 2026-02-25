@@ -84,7 +84,7 @@ loggy "$(cat "$TRAVIS_BUILD_RECIPE_FILE")"
 # new line stuff for easy commit message readability later.
 loggy "Commiting recipe files:"
 git commit -am \
-"OLFS: Triggering hyrax-docker image production.
+"OLFS: Triggering hyrax-docker image production for $TARGET_OS.
 Build Version Matrix:
 TARGET_OS: $TARGET_OS
 TOMCAT_MAJOR_VERSION: $TOMCAT_MAJOR_VERSION
