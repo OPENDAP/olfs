@@ -234,9 +234,8 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
             // Get the service definitions (if any) used by the inherited metadata?
             Element inheritedServicesElement = InheritedMetadataManager.getInheritedServices(threddsCatalogID);
             d_log.debug("handleRequest() - Collecting inherited services.");
-            Iterator i;
-            i = inheritedServicesElement.getDescendants(new ElementFilter("service",THREDDS.NS));
-            HashMap<String, Element> inheritedServices = new HashMap<>();
+            Iterator i = inheritedServicesElement.getDescendants(new ElementFilter("service",THREDDS.NS));
+            HashMap<String, Element> inheritedServices = new HashMap<String, Element>();
             Element service;
             while(i.hasNext()){
                 service = (Element)i.next();

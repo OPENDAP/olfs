@@ -49,31 +49,35 @@ public class Util {
     /**
      * ************************************************************************
      *
-     * @param pw  The PrintWriter to which the system properties should be
      * written.
      */
-    public static void printSystemProperties(PrintWriter pw) {
-        pw.println("<html>");
-        pw.println("<title>System Properties</title>");
-        pw.println("<hr>");
-        pw.println("<body><h2>System Properties</h2>");
-        pw.println("<h3>Date: " + new Date() + "</h3>");
+    public static String htmlSystemProperties() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<html>\n");
+        sb.append("<title>System Properties</title>\n");
+        sb.append("<hr />\n");
+        sb.append("<body><h2>System Properties</h2>\n");
+        sb.append("<h3>Date: ").append(new Date()).append("</h3>\n");
 
         Properties sysp = System.getProperties();
         Enumeration<?> e = sysp.propertyNames();
 
-        pw.println("<ul>");
+        sb.append("<ul>\n");
         while (e.hasMoreElements()) {
             String name = (String) e.nextElement();
-
             String value = System.getProperty(name);
-
-            pw.println("<li>" + name + ": " + value + "</li>");
+            sb.append("<li>" + name + ": " + value + "</li>\n");
         }
-        pw.println("</ul>");
-
-        pw.flush();
-
+        sb.append("</ul>\n");
+        sb.append("<hr />\n");
+        sb.append("<h3>Runtime Info:</h3>\n");
+        sb.append("<pre>\n");
+        sb.append(getMemoryReport());
+        sb.append("<hr />\n");
+        sb.append("</pre>\n");
+        sb.append("</body>\n");
+        sb.append("</html>\n");
+        return sb.toString();
     }
 
 
@@ -88,16 +92,10 @@ public class Util {
      *                 object.
      */
     public static void sendSystemProperties(HttpServletResponse response, PrintWriter pw) {
-                response.setContentType("text/html");
+        response.setContentType("text/html");
         response.setHeader("Content-Description", "dods_status");
         response.setStatus(HttpServletResponse.SC_OK);
-
-        printSystemProperties(pw);
-        pw.println("<h3>Runtime Info:</h3>");
-        printMemoryReport(pw);
-        pw.println("<hr>");
-        pw.println("</body>");
-        pw.println("</html>");
+        pw.println(htmlSystemProperties());
     }
 
 
@@ -130,42 +128,11 @@ public class Util {
      *                 object.
      */
     public static void sendSystemProperties(HttpServletResponse response, PrintStream ps) {
-
-
         response.setContentType("text/html");
         response.setHeader("Content-Description", "dods_status");
-
-        ps.println("<html>");
-        ps.println("<title>System Properties</title>");
-        ps.println("<hr>");
-        ps.println("<body><h2>System Properties</h2>");
-        ps.println("<h3>Date: " + new Date() + "</h3>");
-
-        Properties sysp = System.getProperties();
-        Enumeration<?> e = sysp.propertyNames();
-
-        ps.println("<ul>");
-        while (e.hasMoreElements()) {
-            String name = (String) e.nextElement();
-
-            String value = System.getProperty(name);
-
-            ps.println("<li>" + name + ": " + value + "</li>");
-        }
-        ps.println("</ul>");
-
-        ps.println("<h3>Runtime Info:</h3>");
-        Runtime rt = Runtime.getRuntime();
-        ps.println("JVM Max Memory:   " + (rt.maxMemory() / 1024.0) / 1000 + " MB (JVM Maximum Allowable Heap)<br>");
-        ps.println("JVM Total Memory: " + (rt.totalMemory() / 1024.0) / 1000 + " MB (JVM Heap size)<br>");
-        ps.println("JVM Free Memory:  " + (rt.freeMemory() / 1024.0) / 1000 + " MB (Unused part of heap)<br>");
-        ps.println("JVM Used Memory:  " + ((rt.totalMemory() - rt.freeMemory()) / 1024.0) / 1000 + " MB (Currently active memory)<br>");
-
-        ps.println("<hr>");
-        ps.println("</body>");
-        ps.println("</html>");
-        ps.flush();
         response.setStatus(HttpServletResponse.SC_OK);
+        ps.println(htmlSystemProperties());
+        ps.flush();
 
     }
 
