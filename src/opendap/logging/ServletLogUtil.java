@@ -71,8 +71,8 @@ public class ServletLogUtil {
     public static final String GATEWAY_ACCESS_LOG_ID = "HyraxGatewayAccess";
     public static final String GATEWAY_ACCESS_LAST_MODIFIED_LOG_ID = "HyraxGatewayLastModifiedAccess";
 
-    public static final String WCS_ACCESS_LOG_ID = "WCSAccess";
-    public static final String WCS_LAST_MODIFIED_ACCESS_LOG_ID = "WCSLastModifiedAccess";
+    //public static final String WCS_ACCESS_LOG_ID = "WCSAccess";
+    //public static final String WCS_LAST_MODIFIED_ACCESS_LOG_ID = "WCSLastModifiedAccess";
 
     public static final String CLOUDWATCH_REQUEST_LOG = "CloudWatchRequestLog";
     public static final String CLOUDWATCH_RESPONSE_LOG = "CloudWatchResponseLog";

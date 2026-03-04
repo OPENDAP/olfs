@@ -63,7 +63,6 @@
     <property name="HYRAX_VERSION"  value="Not.A.Release"/>
     <property name="OLFS_VERSION"   value="Not.A.Release"/>
     <property name="NGAP_VERSION"   value="${HYRAX_VERSION}"/>
-    <property name="WCS_VERSION"    value="${HYRAX_VERSION}"/>
     <property name="TARGET_OS"      value="" />
 
 
@@ -154,7 +153,6 @@
         <echo level="info" message="#               Hyrax Version: ${HYRAX_VERSION}"/>
         <echo level="info" message="#                OLFS Version: ${OLFS_VERSION}"/>
         <echo level="info" message="#                NGAP Version: ${NGAP_VERSION}"/>
-        <echo level="info" message="#                 WCS Version: ${WCS_VERSION}"/>
         <echo level="info" message="#          Deployment Context: ${DEPLOYMENT_CONTEXT}"/>
         <echo level="info" message="#     NGAP Deployment Context: ${NGAP_DEPLOYMENT_CONTEXT}"/>
         <echo level="info" message="#"/>
@@ -252,7 +250,6 @@
     <property name="robotsResources.dir" location="${resources.dir}/robots"/>
     <property name="build.robots.resources" location="${build.dir}/robots"/>
 
-    <property name="wcs.resources.dir" location="${resources.dir}/WCS/2.0"/>
 
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       Libraries
@@ -312,7 +309,7 @@
 
     <property name="joda-time.lib" value="joda-time-2.12.7.jar"/>
 
-    <!-- WCS Libs -->
+    <!-- WCS Libs
     <property name="ogc-wcs.lib" value="wcs-v_2_0-2.6.1.jar"/>
     <property name="ogc-gml.lib" value="gml-v_3_2_1-2.6.1.jar"/>
     <property name="ogc-swe.lib" value="sweCommon-v_2_0-2.6.1.jar"/>
@@ -327,7 +324,7 @@
     <property name="javax.activation.lib" value="activation-1.1.1.jar"/>
 
     <property name="xlink.lib" value="xlink-v_1_0-1.4.0.jar"/>
-
+-->
     <!-- Cloudwatch logback appender -->
     <property name="cloudwathch-logback-appender.lib" value="cloudwatch-logback-appender-3.11.jar"/>
 
@@ -379,7 +376,7 @@
 
         <include name="${urlRewrite.lib}"/>
 
-        <!--    WCS-2.0 Libs   -->
+        <!--    WCS-2.0 Libs
         <include name="${ogc-wcs.lib}"/>
         <include name="${ogc-gml.lib}"/>
         <include name="${ogc-swe.lib}"/>
@@ -393,6 +390,7 @@
         <include name="${javax.annotation-api.lib}"/>
         <include name="${javax.activation.lib}"/>
         <include name="${xlink.lib}"/>
+        -->
     </fileset>
     <!--
         These are the library jars used by Hyrax.
@@ -434,7 +432,7 @@
         <filter token="HyraxVersion" value="${HYRAX_VERSION}"/>
         <filter token="OlfsVersion" value="${OLFS_VERSION}"/>
         <filter token="SERVICE_CONTEXT" value="${DEPLOYMENT_CONTEXT}"/>
-        <filter token="WCS_SOFTWARE_VERSION" value="${WCS_VERSION}"/>
+        <!-- filter token="WCS_SOFTWARE_VERSION" value="${WCS_VERSION}"/ -->
 
         <tstamp/>
         <echo level="info" message="time: ${TSTAMP}"/>
@@ -483,7 +481,7 @@
         <echo level="info" message="          HYRAX_VERSION: ${HYRAX_VERSION}"/>
         <echo level="info" message="           NGAP_VERSION: ${NGAP_VERSION}"/>
         <echo level="info" message="           OLFS_VERSION: ${OLFS_VERSION}"/>
-        <echo level="info" message="            WCS_VERSION: ${WCS_VERSION}"/>
+        <!-- echo level="info" message="            WCS_VERSION: ${WCS_VERSION}"/ -->
         <echo level="info" message="     DEPLOYMENT_CONTEXT: ${DEPLOYMENT_CONTEXT}"/>
         <echo level="info" message="NGAP_DEPLOYMENT_CONTEXT: ${NGAP_DEPLOYMENT_CONTEXT}"/>
         <echo level="info" message=""/>
@@ -497,15 +495,16 @@
 
                 <exclude name="opendap/cmr/**"/>
 
-                <!-- Exclude WCS 1.1.2 and semantics code  -->
+                <!-- Exclude WCS 1.1.2 and semantics code
                 <exclude name="opendap/wcs/v1_1_2/**"/>
                 <exclude name="opendap/semantics/**"/>
+                 -->
 
                 <!-- Exclude prototype Amazon Web Services code from production -->
-                <exclude name="opendap/aws/**"/>
+                <!-- exclude name="opendap/aws/**"/ -->
 
                 <!-- Exclude async test code -->
-                <exclude name="opendap/async/**"/>
+                <!-- exclude name="opendap/async/**"/ -->
 
             </fileset>
         </copy>
@@ -515,14 +514,14 @@
             <!-- Copy and filter all of the hyrax resources   -->
             <fileset dir="${hyraxResources.dir}"/>
             <!-- get the WCS stuff but don't stomp on Hyrax things -->
-            <fileset dir="${wcs.resources.dir}">
+            <!-- fileset dir="${wcs.resources.dir}">
                 <include name="xsl/**"/>
                 <include name="WEB-INF/**"/>
                 <exclude name="WEB-INF/web.xml"/>
                 <exclude name="WEB-INF/urlrewrite.xml"/>
                 <exclude name="WEB-INF/logback.xml"/>
                 <exclude name="WEB-INF/logback-test.xml"/>
-            </fileset>
+            </fileset -->
         </copy>
 
         <copy todir="${build.robots.resources}" filtering="true">

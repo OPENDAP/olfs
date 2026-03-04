@@ -405,24 +405,24 @@
 
 
                 <!-- Exclude the WCS and semantics code  -->
-                <exclude name="opendap/wcs/**"/>
+                <!-- exclude name="opendap/wcs/**"/ -->
 
                 <!-- Exclude prototype Amazon Web Services code from production -->
-                <exclude name="opendap/aws/**"/>
+                <!-- exclude name="opendap/aws/**"/ -->
 
                 <!-- Exclude async test code -->
-                <exclude name="opendap/async/**"/>
+                <!-- exclude name="opendap/async/**"/ -->
 
 
                 <!-- Exclude Hyrax (for the most part)   -->
                 <exclude name="opendap/gateway/**"/>
                 <exclude name="opendap/nciso/**"/>
                 <exclude name="opendap/ncml/**"/>
-                <exclude name="opendap/semantics/**"/>
+                <!-- exclude name="opendap/semantics/**"/ -->
                 <exclude name="opendap/services/**"/>
                 <exclude name="opendap/threddsHandler/**"/>
                 <exclude name="opendap/viewers/**"/>
-                <exclude name="opendap/wcs/**"/>
+                <!-- exclude name="opendap/wcs/**"/-->
                 <exclude name="opendap/webstart/**"/>
 
 

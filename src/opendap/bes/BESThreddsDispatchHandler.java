@@ -36,7 +36,7 @@ import opendap.services.ServicesRegistry;
 import opendap.services.WebServiceHandler;
 import opendap.threddsHandler.InheritedMetadataManager;
 import opendap.viewers.NcWmsService;
-import opendap.viewers.WcsService;
+// import opendap.viewers.WcsService;
 import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -197,7 +197,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
         }
         d_log.debug("handleRequest() - ncWMS service base: {}",base);
 
-
+/*
         // Add WCS Services - We know there may be more than one...
         Vector<WebServiceHandler> wcsServices = ServicesRegistry.getWebServicesLike(WcsService.ID);
         if(!wcsServices.isEmpty()) {
@@ -225,7 +225,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
                 showNodeToThreddsCatalog.setParameter(wcsServicesElement);
             }
         }
-
+*/
         if(d_allowDirectDataSourceAccess)
             showNodeToThreddsCatalog.setParameter("allowDirectDataSourceAccess","true");
 
