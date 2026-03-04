@@ -121,7 +121,6 @@ project.ext {
     ngap_resources_dir = "${project.resources_dir}/ngap"
     robots_resources_dir = "${project.resources_dir}/robots"
     build_robots_resources = "${project.build_dir}/robots"
-    //wcs_resources_dir = "${project.resources_dir}/WCS/2.0"
 }
 
 clean.doFirst {
@@ -151,18 +150,6 @@ task copyResources(type: Copy) {
         exclude "src.distribution.readme"
         into("docs")
     }
-    /*
-    from("resources/WCS/2.0") {
-        include "**"
-        include "xsl/**"
-        include "WEB-INF/**"
-        exclude "unused"
-        exclude "WEB-INF/web.xml"
-        exclude "WEB-INF/urlrewrite.xml"
-        exclude "WEB-INF/logback.xml"
-        exclude "WEB-INF/logback-test.xml"
-    }
-    */
 
     into("src_gradle/main/webapp")
 }
@@ -173,19 +160,6 @@ task copySources(type: Copy) {
         // include all the java files
         include "opendap/**"
         include "org/opendap/**"
-        //exclude "opendap/cmr/**"
-        // Exclude the experimental code
-        //exclude "opendap/experiments/**"
-        // Exclude the Metacat code
-        //exclude "opendap/metacat/**"
-        // Exclude WCS 1.1.2 and semantics code
-        //exclude "opendap/wcs/v1_1_2/**"
-        //exclude "opendap/semantics/**"
-        // Exclude prototype Amazon Web Services code from production
-        //exclude "opendap/aws/**"
-        //exclude "opendap/noaa_s3/**"
-        // Exclude async test code
-        //exclude "opendap/async/**"
     }
     into("src_gradle/main/java")
 }

@@ -47,9 +47,8 @@ import java.util.regex.Pattern;
 public class Util {
 
     /**
-     * ************************************************************************
      *
-     * written.
+     * @return The SystemProperties information encoded as HTML.
      */
     public static String htmlSystemProperties() {
         StringBuilder sb = new StringBuilder();
@@ -66,7 +65,7 @@ public class Util {
         while (e.hasMoreElements()) {
             String name = (String) e.nextElement();
             String value = System.getProperty(name);
-            sb.append("<li>" + name + ": " + value + "</li>\n");
+            sb.append("<li>").append(name).append(": ").append(value).append("</li>\n");
         }
         sb.append("</ul>\n");
         sb.append("<hr />\n");
@@ -96,6 +95,7 @@ public class Util {
         response.setHeader("Content-Description", "dods_status");
         response.setStatus(HttpServletResponse.SC_OK);
         pw.println(htmlSystemProperties());
+        pw.flush();
     }
 
 
@@ -133,7 +133,6 @@ public class Util {
         response.setStatus(HttpServletResponse.SC_OK);
         ps.println(htmlSystemProperties());
         ps.flush();
-
     }
 
 
