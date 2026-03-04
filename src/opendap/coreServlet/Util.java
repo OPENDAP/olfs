@@ -29,9 +29,7 @@ package opendap.coreServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.net.URI;
@@ -88,7 +86,6 @@ public class Util {
      *                 object.
      * @param pw       The server's <code> HttpServletResponse</code> response
      *                 object.
-     * @throws IOException When things go poorly.
      */
     public static void sendSystemProperties(HttpServletResponse response, PrintWriter pw) {
                 response.setContentType("text/html");
@@ -145,7 +142,7 @@ public class Util {
         ps.println("<h3>Date: " + new Date() + "</h3>");
 
         Properties sysp = System.getProperties();
-        Enumeration e = sysp.propertyNames();
+        Enumeration<?> e = sysp.propertyNames();
 
         ps.println("<ul>");
         while (e.hasMoreElements()) {
@@ -276,10 +273,7 @@ public class Util {
             suffixMatched = suffixMatcher.find();
             LoggerFactory.getLogger(Util.class).debug("{}", Util.checkRegex(suffixMatcher, suffixMatched));
         }
-        if(suffixMatched){
-            return true;
-        }
-        return false;
+        return suffixMatched;
     }
 
 
