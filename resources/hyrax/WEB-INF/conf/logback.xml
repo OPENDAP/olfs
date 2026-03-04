@@ -192,10 +192,6 @@
         <appender-ref ref="HyraxAccessLog"/>
     </logger>
 
-    <logger name="WCSLastModifiedAccess" level="info">
-        <appender-ref ref="HyraxAccessLog"/>
-    </logger>
-
 -->
     <!-- logger name="BesCommandLog" level="info">
         <appender-ref ref="BESCommandLogAppender"/>
