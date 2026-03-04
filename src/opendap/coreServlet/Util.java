@@ -29,10 +29,6 @@ package opendap.coreServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -52,8 +48,6 @@ import java.util.regex.Pattern;
  */
 public class Util {
 
-    public static final String WHITE_SPACE_REGEX_STRING = "\\s+";
-
     /**
      * ************************************************************************
      *
@@ -61,10 +55,7 @@ public class Util {
      * written.
      * @throws IOException When things go poorly.
      */
-    public static void printSystemProperties(PrintWriter pw)
-            throws Exception {
-
-
+    public static void printSystemProperties(PrintWriter pw) {
         pw.println("<html>");
         pw.println("<title>System Properties</title>");
         pw.println("<hr>");
@@ -72,7 +63,7 @@ public class Util {
         pw.println("<h3>Date: " + new Date() + "</h3>");
 
         Properties sysp = System.getProperties();
-        Enumeration e = sysp.propertyNames();
+        Enumeration<?> e = sysp.propertyNames();
 
         pw.println("<ul>");
         while (e.hasMoreElements()) {
@@ -153,12 +144,8 @@ public class Util {
      *                 object.
      * @param ps       The server's <code> HttpServletResponse</code> response
      *                 object.
-     * @throws IOException When things go poorly.
      */
-    public static void sendSystemProperties(HttpServletRequest request,
-                                     HttpServletResponse response,
-                                     PrintStream ps)
-            throws Exception {
+    public static void sendSystemProperties(HttpServletResponse response, PrintStream ps) {
 
 
         response.setContentType("text/html");

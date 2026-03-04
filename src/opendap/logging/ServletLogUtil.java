@@ -71,9 +71,6 @@ public class ServletLogUtil {
     public static final String GATEWAY_ACCESS_LOG_ID = "HyraxGatewayAccess";
     public static final String GATEWAY_ACCESS_LAST_MODIFIED_LOG_ID = "HyraxGatewayLastModifiedAccess";
 
-    //public static final String WCS_ACCESS_LOG_ID = "WCSAccess";
-    //public static final String WCS_LAST_MODIFIED_ACCESS_LOG_ID = "WCSLastModifiedAccess";
-
     public static final String CLOUDWATCH_REQUEST_LOG = "CloudWatchRequestLog";
     public static final String CLOUDWATCH_RESPONSE_LOG = "CloudWatchResponseLog";
     public static final String CLOUDWATCH_EDL_PROFILING_LOG = "CloudWatchEdlProfilingLog";
@@ -329,11 +326,11 @@ public class ServletLogUtil {
     public static void logServerShutdown(String source) {
         // Setup context.
         synchronized (ServletLogUtil.class) {
-            MDC.put("ID", "Server Startup");
+            MDC.put("ID", "ServerShutdown");
             MDC.put("SOURCE", source);
         }
-        MDC.put("startTime", System.currentTimeMillis() + "");
-        log.info("Logging started.");
+        MDC.put("stopTime", System.currentTimeMillis() + "");
+        log.info("Logging Stopped.");
     }
 
 
@@ -520,7 +517,7 @@ public class ServletLogUtil {
 
     /**
      * This method cleans up the MDC so nothing is left "set" for the next request handled by the current thread.
-     * From the LogBack manual ( https://logback.qos.ch/manual/mdc.html ):
+     * From the LogBack manual ( <a href="https://logback.qos.ch/manual/mdc.html">MDC</a> ):
      * "Normally, a put() operation should be balanced by the corresponding remove() operation. Otherwise, the
      *  MDC will contain stale values for certain keys."
      * Of note is the fact that they do not recommend using MDC.clear() to do this. I think because MDC.clear() wipes

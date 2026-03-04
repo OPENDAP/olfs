@@ -33,10 +33,8 @@ import opendap.dap.Request;
 import opendap.namespaces.THREDDS;
 import opendap.services.Service;
 import opendap.services.ServicesRegistry;
-import opendap.services.WebServiceHandler;
 import opendap.threddsHandler.InheritedMetadataManager;
 import opendap.viewers.NcWmsService;
-// import opendap.viewers.WcsService;
 import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -64,7 +62,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
     private String d_systemPath;
 
 
-    private org.slf4j.Logger d_log;
+    private final org.slf4j.Logger d_log;
     //private Pattern matchPattern =  Pattern.compile(".*.catalog.xml");
 
     private boolean d_initialized;
@@ -142,7 +140,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
      * @param request The request to be handled.
      * @param response The response object into which the response information
      * will be placed.
-     * @throws Exception
+     * @throws Exception When the bad things happen.
      */
     public void handleRequest(HttpServletRequest request,
                               HttpServletResponse response)
@@ -184,11 +182,10 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
         String base = null;
         String dsId;
-        String matchRegex;
 
         // Add WMS if we have it
         Service s = ServicesRegistry.getWebServiceById(NcWmsService.ID);
-        if(s!=null && s instanceof NcWmsService){
+        if(s instanceof NcWmsService){
             NcWmsService nws = (NcWmsService) s;
             base  = nws.getBase();
             dsId = nws.getDynamicServiceId();
@@ -197,35 +194,6 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
         }
         d_log.debug("handleRequest() - ncWMS service base: {}",base);
 
-/*
-        // Add WCS Services - We know there may be more than one...
-        Vector<WebServiceHandler> wcsServices = ServicesRegistry.getWebServicesLike(WcsService.ID);
-        if(!wcsServices.isEmpty()) {
-
-            Element wcsServicesElement = new Element("WcsServices");
-            for(WebServiceHandler wsh : wcsServices){
-                if (wsh instanceof WcsService) {
-                    WcsService wcs = (WcsService) wsh;
-                    base = wcs.getBase();
-                    while(base.endsWith("/")&&base.length()>1)
-                        base = base.substring(0,base.length()-1);
-                    dsId = wcs.getDynamicServiceId();
-                    matchRegex =  wcs.getMatchRegexString();
-                    Element wcsService = new Element("Wcs");
-                    wcsService.setAttribute("name",wsh.getServiceId());
-                    wcsService.setAttribute("base",base);
-                    wcsService.setAttribute("dynamicServiceId",dsId);
-                    wcsService.setAttribute("matchRegex",matchRegex);
-                    wcsServicesElement.addContent(wcsService);
-                }
-                d_log.debug("handleRequest() - WCS service base: {}", base);
-
-            }
-            if(wcsServicesElement.getContentSize()>0){
-                showNodeToThreddsCatalog.setParameter(wcsServicesElement);
-            }
-        }
-*/
         if(d_allowDirectDataSourceAccess)
             showNodeToThreddsCatalog.setParameter("allowDirectDataSourceAccess","true");
 
@@ -267,7 +235,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
             Element inheritedServicesElement = InheritedMetadataManager.getInheritedServices(threddsCatalogID);
             d_log.debug("handleRequest() - Collecting inherited services.");
             Iterator i = inheritedServicesElement.getDescendants(new ElementFilter("service",THREDDS.NS));
-            HashMap<String, Element> inheritedServices = new HashMap<String, Element>();
+            HashMap<String, Element> inheritedServices = new HashMap<>();
             Element service;
             while(i.hasNext()){
                 service = (Element)i.next();
@@ -277,7 +245,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
             if(!inheritedServices.isEmpty()){
                 d_log.debug("handleRequest() - Collecting existing services.");
                 i = threddsCatalog.getDescendants(new ElementFilter("service",THREDDS.NS));
-                HashMap<String, Element> existingServices = new HashMap<String, Element>();
+                HashMap<String, Element> existingServices = new HashMap<>();
                 while(i.hasNext()) {
                     service = (Element) i.next();
                     existingServices.put(service.getAttributeValue("name"), service);
@@ -307,10 +275,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
                 }
                 @SuppressWarnings("unchecked") //suppressed the 'unchecked' warning being thrown here, SBL 9.13.21
                 Collection<Element> servicesToAdd = (Collection<Element>) inheritedServicesElement.getChildren("service",THREDDS.NS);
-                Vector<Element> services = new Vector<Element>();
-                for(Element e : servicesToAdd){
-                    services.add(e);
-                }
+                Vector<Element> services = new Vector<>(servicesToAdd);
                 for(Element e : services){
                     e.detach();
                 }
