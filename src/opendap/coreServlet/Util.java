@@ -53,7 +53,6 @@ public class Util {
      *
      * @param pw  The PrintWriter to which the system properties should be
      * written.
-     * @throws IOException When things go poorly.
      */
     public static void printSystemProperties(PrintWriter pw) {
         pw.println("<html>");
@@ -85,21 +84,14 @@ public class Util {
      * Default handler for OPeNDAP status requests; not publically availableInChunk,
      * used only for debugging
      *
-     * @param request  The client's <code> HttpServletRequest</code> request
-     *                 object.
      * @param response The server's <code> HttpServletResponse</code> response
      *                 object.
      * @param pw       The server's <code> HttpServletResponse</code> response
      *                 object.
      * @throws IOException When things go poorly.
      */
-    public static void sendSystemProperties(HttpServletRequest request,
-                                            HttpServletResponse response,
-                                            PrintWriter pw)
-            throws Exception {
-
-
-        response.setContentType("text/html");
+    public static void sendSystemProperties(HttpServletResponse response, PrintWriter pw) {
+                response.setContentType("text/html");
         response.setHeader("Content-Description", "dods_status");
         response.setStatus(HttpServletResponse.SC_OK);
 
@@ -109,9 +101,6 @@ public class Util {
         pw.println("<hr>");
         pw.println("</body>");
         pw.println("</html>");
-
-
-
     }
 
 
@@ -138,8 +127,6 @@ public class Util {
      * Default handler for OPeNDAP status requests; not publically availableInChunk,
      * used only for debugging
      *
-     * @param request  The client's <code> HttpServletRequest</code> request
-     *                 object.
      * @param response The server's <code> HttpServletResponse</code> response
      *                 object.
      * @param ps       The server's <code> HttpServletResponse</code> response
