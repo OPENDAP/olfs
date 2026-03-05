@@ -170,8 +170,6 @@ sourceSets {
             // Copy/filter the various resource files
             dependsOn 'copyHyraxResources'
             dependsOn 'copyDocResources'
-            dependsOn 'copyWCSResources'
-
             // Use the file in build/resources to populate the war file's resources
             from layout.buildDirectory.dir("resources")
         }
@@ -426,13 +424,7 @@ tasks.withType(JavaCompile) {
 // ./src/opendap/bes/Version.java
 // ./resources/osx/Info.plist
 //
-// WCS_SOFTWARE_VERSION:
-// Does not appear in any source file.
 //
-// WcsSoftwareVersion
-// capabilities.xsl
-// coverageDescription.xsl
-// jhrg 9/15/21
 
 import org.apache.tools.ant.filters.ReplaceTokens
 
@@ -440,7 +432,6 @@ def tokens = [SERVICE_CONTEXT: project.DEPLOYMENT_CONTEXT,
               HyraxVersion: project.HYRAX_VERSION,
               OlfsVersion: project.OLFS_VERSION ]
 
-// Not used. jhrg 9/17/21 WCS_SOFTWARE_VERSION: project.WCS_VERSION
 
 // This task copies resources from 'resources/hyrax' to $buildDir/resources
 // and, along the way, substitutes various tokes in the files.
