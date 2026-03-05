@@ -178,64 +178,13 @@
 
     <logger name="opendap.w10n" level="all" />
 
-
-    <logger name="opendap.wcs.v2_0" level="all"/>
-
-
-
     <!--
     <logger name="opendap.ppt.NewPPTClient" level="all" />
-
-
-    <logger name="opendap.wcs.v2_0.http" level="all">
-        <appender-ref ref="stdout"/>
-    </logger>
-    <logger name="opendap.WcsCatalog" level="all"/>
-
-    <logger name="opendap.wcs" level="all">
-        <appender-ref ref="stdout"/>
-    </logger>
-
-    <logger name="opendap.wcs.gatewayClient" level="all"/>
-    <logger name="opendap.wcs.v1_1_2" level="all"/>
-    <logger name="opendap.WcsCatalog" level="all"/>
-
-    <logger name="opendap.wcs" level="all">
-        <appender-ref ref="stdout"/>
-    </logger>
-
-    <logger name="opendap.wcs.gatewayClient" level="all"/>
-    <logger name="opendap.wcs.v1_1_2" level="all"/>
-
-    <logger name="opendap.semantics" level="debug">
-        <appender-ref ref="stdout"/>
-        <appender-ref ref="DebugLog"/>
-    </logger>
-
-    <logger name="org.openrdf" level="info">
-        <appender-ref ref="stdout"/>
-    </logger>
 
     <logger name="org.xml" level="info">
         <appender-ref ref="stdout"/>
     </logger>
 
-
-
-    <logger name="opendap.semantics">
-        <level value="DEBUG"/>
-        <appender-ref ref="stdout"/>
-    </logger>
-
-    <logger name="org.openrdf">
-        <level value="INFO"/>
-        <appender-ref ref="stdout"/>
-    </logger>
-
-    <logger name="org.xml">
-        <level value="INFO"/>
-        <appender-ref ref="stdout"/>
-    </logger>
     -->
 
 
@@ -281,12 +230,6 @@
         <appender-ref ref="HyraxAccessLog"/>
     </logger>
 
-    <logger name="WCSAccess" level="info">
-        <appender-ref ref="HyraxAccessLog"/>
-    </logger>
-    <logger name="WCSLastModifiedAccess" level="info">
-        <appender-ref ref="HyraxAccessLog"/>
-    </logger>
 
 
     <logger name="BesCommandLog" level="info">

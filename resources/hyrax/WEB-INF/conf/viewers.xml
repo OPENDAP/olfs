@@ -62,15 +62,6 @@
     </WebServiceHandle>
     -->
 
-    <!--
-    <WebServiceHandler className="opendap.viewers.WcsService" serviceId="WCS-COADS" >
-        <ApplicationName>COADS Climatology WCS Service/</ApplicationName>
-        <ServiceEndpoint>http://localhost:8080/opendap/wcs/</ServiceEndpoint>
-        <MatchRegex>^.*coads.*\.nc$</MatchRegex>
-        <DynamicServiceId>coads</DynamicServiceId>
-    </WebServiceHandler>
-    -->
-
 
 </ViewersConfig>
 

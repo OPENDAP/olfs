@@ -87,8 +87,6 @@ ext {
     HYRAX_VERSION = project.hasProperty('HYRAX_VERSION') ? project.property('HYRAX_VERSION') : 'Not.A.Release'
     OLFS_VERSION = project.hasProperty('OLFS_VERSION') ? project.property('OLFS_VERSION') : 'Not.A.Release'
 
-    WCS_VERSION = project.OLFS_VERSION
-
     // TODO Fix these strings. Maybe add a task to print them all. jhrg 9/17/21
     OLFS_DIST_BASE = 'olfs-' + project.OLFS_VERSION // olfs-${OLFS_VERSION}'
     WEBAPP_DIST = project.OLFS_DIST_BASE + '-webapp' //'${OLFS_DIST_BASE}-webapp'
@@ -106,7 +104,6 @@ tasks.register('showInfo') {
     println 'NGAP_DEPLOYMENT_CONTEXT: ' + project.NGAP_DEPLOYMENT_CONTEXT
     println 'HYRAX_VERSION: ' + project.HYRAX_VERSION
     println 'OLFS_VERSION: ' + project.OLFS_VERSION
-    println 'WCS_VERSION: ' + project.OLFS_VERSION
 
     println 'OLFS_DIST_BASE: ' + project.OLFS_DIST_BASE
     println 'WEBAPP_DIST: ' + project.WEBAPP_DIST
@@ -173,8 +170,6 @@ sourceSets {
             // Copy/filter the various resource files
             dependsOn 'copyHyraxResources'
             dependsOn 'copyDocResources'
-            dependsOn 'copyWCSResources'
-
             // Use the file in build/resources to populate the war file's resources
             from layout.buildDirectory.dir("resources")
         }
@@ -248,13 +243,6 @@ dependencies {
 
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.3'
     implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
-
-    /// WCS libs
-    implementation group: 'org.jvnet.ogc', name: 'wcs-v_2_0', version: '2.6.1'
-    implementation group: 'org.jvnet.ogc', name: 'gml-v_3_2_1', version: '2.6.1'
-    implementation group: 'org.jvnet.ogc', name: 'sweCommon-v_2_0', version: '2.6.1'
-    implementation group: 'org.jvnet.ogc', name: 'gmlcov-v_1_0', version: '2.6.1'
-    implementation group: 'org.jvnet.ogc', name: 'ows-v_2_0', version: '2.6.1'
 
 
     // implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
@@ -330,7 +318,6 @@ project.ext {
     ngap_resources_dir = "${project.resources_dir}/ngap"
     robots_resources_dir = "${project.resources_dir}/robots"
     build_robots_resources = "${project.build_dir}/robots"
-    wcs_resources_dir = "${project.resources_dir}/WCS/2.0"
 }
 
 clean.doFirst {
@@ -355,7 +342,6 @@ war {
     // Copy/filter the various resource files
     dependsOn 'copyHyraxResources'
     dependsOn 'copyDocResources'
-    dependsOn 'copyWCSResources'
 
     // Use the files in build/resources to populate the war file's resources
     from layout.buildDirectory.dir("resources")
@@ -372,7 +358,6 @@ task buildOpendapWar(type: War, dependsOn: classes){
     dependsOn 'copyHyraxResources'
     dependsOn 'copyDocResources'
     dependsOn 'copyNgapResources'
-    dependsOn 'copyWCSResources'
 
     // Use the file in build/resources to populate the war file's resources
     from layout.buildDirectory.dir("resources")
@@ -390,7 +375,6 @@ task buildNgapWar(type: War, dependsOn: classes){
     dependsOn 'copyHyraxResources'
     dependsOn 'copyDocResources'
     dependsOn 'copyNgapResources'
-    dependsOn 'copyWCSResources'
 
     // Use the file in build/resources to populate the war file's resources
     from layout.buildDirectory.dir("resources")
@@ -440,22 +424,14 @@ tasks.withType(JavaCompile) {
 // ./src/opendap/bes/Version.java
 // ./resources/osx/Info.plist
 //
-// WCS_SOFTWARE_VERSION:
-// Does not appear in any source file.
 //
-// WcsSoftwareVersion
-// capabilities.xsl
-// coverageDescription.xsl
-// jhrg 9/15/21
 
 import org.apache.tools.ant.filters.ReplaceTokens
 
 def tokens = [SERVICE_CONTEXT: project.DEPLOYMENT_CONTEXT,
               HyraxVersion: project.HYRAX_VERSION,
-              OlfsVersion: project.OLFS_VERSION,
-              WcsSoftwareVersion: project.WCS_VERSION]
+              OlfsVersion: project.OLFS_VERSION ]
 
-// Not used. jhrg 9/17/21 WCS_SOFTWARE_VERSION: project.WCS_VERSION
 
 // This task copies resources from 'resources/hyrax' to $buildDir/resources
 // and, along the way, substitutes various tokes in the files.
@@ -492,25 +468,6 @@ tasks.register('copyNgapResources', Copy) {
     shouldRunAfter 'copyDocResources'
 }
 
-// Copy the resources for the WCS code
-tasks.register('copyWCSResources', Copy) {
-    group = 'Filtering'
-    description = 'Copy and filter the resources in resources/WCS/2.0.'
-
-    from layout.projectDirectory.dir("resources/WCS/2.0")
-    into layout.buildDirectory.dir("resources/")
-
-    include 'xsl/**'
-    include 'WEB-INF/**'
-
-    exclude 'WEB-INF/web.xml'
-    exclude 'WEB-INF/urlrewrite.xml'
-    exclude 'WEB-INF/logback.xml'
-    exclude 'WEB-INF/logback-test.xml'
-
-    filter(ReplaceTokens, tokens: tokens)
-    shouldRunAfter 'copyHyraxResources'
-}
 
 // This task looks for anything in 'src/' that ends in .java.in, substitutes the
 // tokens in it and places the result into a file with the same basename ending in
