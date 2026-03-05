@@ -48,40 +48,37 @@ import java.util.regex.Pattern;
  */
 public class Util {
 
-    public static final String WHITE_SPACE_REGEX_STRING = "\\s+";
-
     /**
-     * ************************************************************************
      *
-     * @param pw  The PrintWriter to which the system properties should be
-     * written.
-     * @throws IOException When things go poorly.
+     * @return The SystemProperties information encoded as HTML.
      */
-    public static void printSystemProperties(PrintWriter pw)
-            throws Exception {
-
-
-        pw.println("<html>");
-        pw.println("<title>System Properties</title>");
-        pw.println("<hr>");
-        pw.println("<body><h2>System Properties</h2>");
-        pw.println("<h3>Date: " + new Date() + "</h3>");
+    public static String htmlSystemProperties() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<html>\n");
+        sb.append("<title>System Properties</title>\n");
+        sb.append("<hr />\n");
+        sb.append("<body><h2>System Properties</h2>\n");
+        sb.append("<h3>Date: ").append(new Date()).append("</h3>\n");
 
         Properties sysp = System.getProperties();
-        Enumeration e = sysp.propertyNames();
+        Enumeration<?> e = sysp.propertyNames();
 
-        pw.println("<ul>");
+        sb.append("<ul>\n");
         while (e.hasMoreElements()) {
             String name = (String) e.nextElement();
-
             String value = System.getProperty(name);
-
-            pw.println("<li>" + name + ": " + value + "</li>");
+            sb.append("<li>").append(name).append(": ").append(value).append("</li>\n");
         }
-        pw.println("</ul>");
-
-        pw.flush();
-
+        sb.append("</ul>\n");
+        sb.append("<hr />\n");
+        sb.append("<h3>Runtime Info:</h3>\n");
+        sb.append("<pre>\n");
+        sb.append(getMemoryReport());
+        sb.append("<hr />\n");
+        sb.append("</pre>\n");
+        sb.append("</body>\n");
+        sb.append("</html>\n");
+        return sb.toString();
     }
 
 
@@ -90,33 +87,17 @@ public class Util {
      * Default handler for OPeNDAP status requests; not publically availableInChunk,
      * used only for debugging
      *
-     * @param request  The client's <code> HttpServletRequest</code> request
-     *                 object.
      * @param response The server's <code> HttpServletResponse</code> response
      *                 object.
      * @param pw       The server's <code> HttpServletResponse</code> response
      *                 object.
-     * @throws IOException When things go poorly.
      */
-    public static void sendSystemProperties(HttpServletRequest request,
-                                            HttpServletResponse response,
-                                            PrintWriter pw)
-            throws Exception {
-
-
+    public static void sendSystemProperties(HttpServletResponse response, PrintWriter pw) {
         response.setContentType("text/html");
         response.setHeader("Content-Description", "dods_status");
         response.setStatus(HttpServletResponse.SC_OK);
-
-        printSystemProperties(pw);
-        pw.println("<h3>Runtime Info:</h3>");
-        printMemoryReport(pw);
-        pw.println("<hr>");
-        pw.println("</body>");
-        pw.println("</html>");
-
-
-
+        pw.println(htmlSystemProperties());
+        pw.flush();
     }
 
 
@@ -143,55 +124,17 @@ public class Util {
      * Default handler for OPeNDAP status requests; not publically availableInChunk,
      * used only for debugging
      *
-     * @param request  The client's <code> HttpServletRequest</code> request
-     *                 object.
      * @param response The server's <code> HttpServletResponse</code> response
      *                 object.
      * @param ps       The server's <code> HttpServletResponse</code> response
      *                 object.
-     * @throws IOException When things go poorly.
      */
-    public static void sendSystemProperties(HttpServletRequest request,
-                                     HttpServletResponse response,
-                                     PrintStream ps)
-            throws Exception {
-
-
+    public static void sendSystemProperties(HttpServletResponse response, PrintStream ps) {
         response.setContentType("text/html");
         response.setHeader("Content-Description", "dods_status");
-
-        ps.println("<html>");
-        ps.println("<title>System Properties</title>");
-        ps.println("<hr>");
-        ps.println("<body><h2>System Properties</h2>");
-        ps.println("<h3>Date: " + new Date() + "</h3>");
-
-        Properties sysp = System.getProperties();
-        Enumeration e = sysp.propertyNames();
-
-        ps.println("<ul>");
-        while (e.hasMoreElements()) {
-            String name = (String) e.nextElement();
-
-            String value = System.getProperty(name);
-
-            ps.println("<li>" + name + ": " + value + "</li>");
-        }
-        ps.println("</ul>");
-
-        ps.println("<h3>Runtime Info:</h3>");
-        Runtime rt = Runtime.getRuntime();
-        ps.println("JVM Max Memory:   " + (rt.maxMemory() / 1024.0) / 1000 + " MB (JVM Maximum Allowable Heap)<br>");
-        ps.println("JVM Total Memory: " + (rt.totalMemory() / 1024.0) / 1000 + " MB (JVM Heap size)<br>");
-        ps.println("JVM Free Memory:  " + (rt.freeMemory() / 1024.0) / 1000 + " MB (Unused part of heap)<br>");
-        ps.println("JVM Used Memory:  " + ((rt.totalMemory() - rt.freeMemory()) / 1024.0) / 1000 + " MB (Currently active memory)<br>");
-
-        ps.println("<hr>");
-        ps.println("</body>");
-        ps.println("</html>");
-        ps.flush();
         response.setStatus(HttpServletResponse.SC_OK);
-
+        ps.println(htmlSystemProperties());
+        ps.flush();
     }
 
 
@@ -298,10 +241,7 @@ public class Util {
             suffixMatched = suffixMatcher.find();
             LoggerFactory.getLogger(Util.class).debug("{}", Util.checkRegex(suffixMatcher, suffixMatched));
         }
-        if(suffixMatched){
-            return true;
-        }
-        return false;
+        return suffixMatched;
     }
 
 

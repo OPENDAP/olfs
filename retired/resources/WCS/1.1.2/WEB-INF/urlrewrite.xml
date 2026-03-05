@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ /////////////////////////////////////////////////////////////////////////////
   ~ // This file is part of the "Hyrax Data Server" project.
@@ -35,43 +35,14 @@
     </rule>
 
     <rule>
-        <!-- This routes requests for "/" and "/index.html"
-             to the NGAP Landing Page -->
-        <from>^\/(index\.html)?$</from>
-        <to last="true">/docs/ngap/ngap.html</to>
-    </rule>
-    <rule>
-        <from>^\/?favicon\.ico$</from>
-        <to last="true">/docs/images/favicon.ico</to>
-    </rule>
-    <rule>
-        <from>^\/nasa-meatball-new\.svg$</from>
-        <to last="true">/docs/ngap/nasa-meatball-new.svg</to>
-    </rule>
-    <rule>
-        <from>^\/nasa-outline-new\.svg$</from>
-        <to last="true">/docs/ngap/nasa-outline-new.svg</to>
-    </rule>
-
-
-    <rule>
-        <from>^/(pdpService|error|docs|jsp|viewers|xsl|hyrax|w10n|servlet_gateway|js|aggregation|siteMap)(/.*)?$</from>
+        <from>^/(docs|xsl|rdf|error|wcs)(/.*)?$</from>
         <set name="doRedirect">0</set>
     </rule>
 
-    <!--
-    The following rule shunts requests to the ngap
-    service endpoint if they are not explicitly for the hyrax or some other itemized endpoint.
-    -->
     <rule>
         <condition type="attribute" name="doRedirect" operator="equal">1</condition>
-        <from>^\/(.*)$</from>
-        <to last="true">/hyrax/ngap/$1</to>
-    </rule>
-
-    <rule>
-        <from>^/(.*)help/?$</from>
-        <to last="true">/jsp/help.jsp</to>
+        <from>^/(.*)$</from>
+        <to last="true">/wcs/$1</to>
     </rule>
 
 

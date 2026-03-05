@@ -30,6 +30,7 @@
 
 
 
+
     <!-- property name="FORMAT" value="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n" / -->
     <property name="FORMAT" value="%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z} [thread:%t] [%r][%X{ID}] [%X{SOURCE}]   %-5p - %c - %m%n" />
 
@@ -41,10 +42,6 @@
           <pattern>${FORMAT}</pattern>
         </encoder>
 
-    </appender>
-
-    <appender name="HAI_DEBUG_LOGGER" class="ch.qos.logback.core.read.CyclicBufferAppender">
-        <MaxSize>512</MaxSize>
     </appender>
 
 
@@ -101,89 +98,99 @@
 
 
 
+
+
     <logger name="opendap" level="error">
         <appender-ref ref="ErrorLog"/>
     </logger>
-
-    <logger name="org.jdom" level="all">
-        <appender-ref ref="stdout"/>
-    </logger>
-
-
-
+    
+    
+    
     <logger name="opendap.coreServlet" level="error">
         <appender-ref ref="stdout"/>
     </logger>
-
-    <logger name="opendap.hai" level="all">
-        <appender-ref ref="stdout"/>
-    </logger>
-
-    <logger name="opendap.dap.Request"         level="all"/>
-
-    <logger name="opendap.hai"         level="all"/>
-
-
+    
+    <logger name="opendap.coreServlet.DocServlet"         level="all"/>
     <logger name="opendap.coreServlet.ReqInfo"            level="info"/>
     <logger name="opendap.coreServlet.OPeNDAPException"   level="all"/>
     <logger name="opendap.coreServlet.DispatchServlet"    level="all"/>
     <logger name="opendap.coreServlet.Scrub"              level="all"/>
-    <logger name="opendap.coreServlet.RequestCache"       level="error"/>
+    <logger name="opendap.coreServlet.RequestCache"       level="all"/>
     <logger name="opendap.coreServlet.BotFilter"         level="all"/>
-
-
-
-
+    
+    
+    
+    
     <logger name="opendap.bes" level="error">
         <appender-ref ref="stdout"/>
     </logger>
 
-    <logger name="opendap.bes.BesApi" level="error"/>
-    <logger name="opendap.bes.dap2Responders.Ascii"   level="all"/>
 
     <logger name="opendap.bes.BESManager"               level="all"/>
     <logger name="opendap.bes.BesXmlAPI"                level="all"/>
     <logger name="opendap.bes.BES"                      level="all"/>
-    <logger name="opendap.bes.BESConfig"                level="all"/>
+    <logger name="opendap.bes.BESCrawlableDataset"      level="all"/>
     <logger name="opendap.bes.DapDispatchHandler"       level="all"/>
     <logger name="opendap.bes.DirectoryDispatchHandler" level="all"/>
-    <logger name="opendap.bes.BESThreddsDispatchHandler"   level="all"/>
+    <logger name="opendap.bes.ThreddsDispatchHandler"   level="all"/>
+    <logger name="opendap.bes.tdh2"                     level="all"/>
+    
 
 
-    <logger name="opendap.gateway" level="all">
-                 <appender-ref ref="stdout"/>
+    <logger name="opendap.threddsHandler"         level="all"/>
+
+
+
+
+    
+    <logger name="opendap.WcsCatalog" level="all"/>
+    
+    <logger name="opendap.wcs" level="all">
+        <appender-ref ref="stdout"/>
     </logger>
 
-    <logger name="opendap.webstart" level="all">
-                 <appender-ref ref="stdout"/>
-    </logger>
-    <logger name="opendap.ncml" level="all">
-                 <appender-ref ref="stdout"/>
-    </logger>
+    <logger name="opendap.wcs.gatewayClient" level="all"/>
+    <logger name="opendap.wcs.v1_1_2" level="all"/>
 
+    
+    
+    
+    
 
-    <logger name="opendap.threddsHandler" level="all">
-             <appender-ref ref="stdout"/>
-    </logger>
-
-    <logger name="org.apache.jasper" level="all">
-             <appender-ref ref="stdout"/>
+    <logger name="opendap.semantics" level="debug">
+        <appender-ref ref="stdout"/>
+        <appender-ref ref="DebugLog"/>
     </logger>
 
+    <logger name="org.openrdf" level="info">
+        <appender-ref ref="stdout"/>
+    </logger>
 
+    <logger name="org.xml" level="info">
+        <appender-ref ref="stdout"/>
+    </logger>
 
 
 
 <!--
+    <logger name="opendap.semantics">
+        <level value="DEBUG"/>
+        <appender-ref ref="stdout"/>
+    </logger>
 
-    <logger name="org.xml" level="info">
+    <logger name="org.openrdf">
+        <level value="INFO"/>
+        <appender-ref ref="stdout"/>
+    </logger>
+
+    <logger name="org.xml">
+        <level value="INFO"/>
         <appender-ref ref="stdout"/>
     </logger>
 -->
 
     <root level="error">
         <appender-ref ref="ErrorLog"/>
-        <appender-ref ref="HAI_DEBUG_LOGGER"/>
     </root>
 
 </configuration>
