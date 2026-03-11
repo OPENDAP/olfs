@@ -39,6 +39,7 @@ import opendap.dap.User;
 import opendap.dap4.QueryParameters;
 import opendap.http.mediaTypes.TextHtml;
 import opendap.logging.ServletLogUtil;
+import opendap.version.HyraxVersion;
 import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.transform.JDOMSource;
@@ -158,7 +159,7 @@ public class IsoRubricDMR extends Dap4Responder {
             Transformer transformer = new Transformer(xsltDocName);
 
             transformer.setParameter("docsService", oreq.getDocsServiceLocalID());
-            transformer.setParameter("HyraxVersion", Version.getHyraxVersionString());
+            transformer.setParameter("HyraxVersion", HyraxVersion.getVersionString());
 
             DataOutputStream os = new DataOutputStream(response.getOutputStream());
 
