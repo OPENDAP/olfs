@@ -42,12 +42,8 @@ loggy " TRAVIS_BUILD_RECIPE_FILE: $TRAVIS_BUILD_RECIPE_FILE"
 
 loggy "OLFS_BUILD_VERSION: $OLFS_BUILD_VERSION"
 
-OLFS_SNAPSHOT_TAG="olfs-${OLFS_BUILD_VERSION} "$(date "+%FT%T%z")"$test_deploy"
+OLFS_SNAPSHOT_TAG="olfs-${OLFS_BUILD_VERSION} $(date "+%FT%T%z")$test_deploy"
 loggy " OLFS_SNAPSHOT_TAG: $OLFS_SNAPSHOT_TAG"
-
-#HYRAX_SNAPSHOT_TAG="hyrax-${HYRAX_BUILD_VERSION} "$(date "+%FT%T%z")"$test_deploy"
-#loggy "HYRAX_SNAPSHOT_TAG: $HYRAX_SNAPSHOT_TAG"
-#loggy ""
 
 loggy "Tagging olfs with: ${OLFS_BUILD_VERSION}"
 git tag -m "olfs-${OLFS_BUILD_VERSION}" -a "${OLFS_BUILD_VERSION}"
@@ -97,8 +93,6 @@ git status;
 
 loggy "Pushing to changes hyrax-docker:master:"
 git push "https://${GIT_UID}:${GIT_PSWD}@github.com/OPENDAP/hyrax-docker.git" --all
-loggy "Pushing to tags hyrax-docker:master:"
-git push "https://${GIT_UID}:${GIT_PSWD}@github.com/OPENDAP/hyrax-docker.git" "${hyrax_tag}"
 
 loggy "done"
 loggy "$HR"
