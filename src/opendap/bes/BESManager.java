@@ -31,8 +31,6 @@ import opendap.bes.caching.BesNodeCache;
 import opendap.coreServlet.Scrub;
 import opendap.coreServlet.ServletUtil;
 import opendap.ppt.PPTException;
-import opendap.version.HyraxVersion;
-import opendap.version.OlfsVersion;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -316,18 +314,15 @@ public class BESManager {
 
     public static Document getCombinedVersionDocument() throws JDOMException, IOException, PPTException, BadConfigurationException, BESError {
 
+
+
         Document doc = new Document();
         doc.setRootElement(new Element("HyraxCombinedVersion"));
 
         // Add a version element for Hyrax (which is a combination of many things)
-        Element e = new Element("Hyrax");
-        e.setAttribute("version", HyraxVersion.getVersionString());
-        doc.getRootElement().addContent(e);
-
+        doc.getRootElement().addContent(opendap.bes.Version.getHyraxVersionElement());
         // Add a version element for this, the OLFS server
-        e = new Element("OLFS");
-        e.setAttribute("version", OlfsVersion.getVersionString());
-        doc.getRootElement().addContent(e);
+        doc.getRootElement().addContent(opendap.bes.Version.getOLFSVersionElement());
 
 
         //doc.getRootElement().addNamespaceDeclaration();  // Maybe someday?

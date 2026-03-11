@@ -43,7 +43,6 @@ import opendap.http.mediaTypes.*;
 import opendap.logging.ServletLogUtil;
 import opendap.namespaces.BES;
 import opendap.ppt.PPTException;
-import opendap.version.HyraxVersion;
 import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -562,7 +561,7 @@ public class W10nResponder {
 
         ArrayList<Object> w10n = new ArrayList<>();
         w10n.add(getW10nAttribute("spec","draft-20091228"));
-        w10n.add(getW10nAttribute("application", "Hyrax-"+ HyraxVersion.getVersionString()));
+        w10n.add(getW10nAttribute("application", "Hyrax-"+Version.getHyraxVersionString()));
         w10n.add(getW10nAttribute("type", type));
         w10n.add(getW10nAttribute("path", path));
         w10n.add(getW10nAttribute("identifier", id));

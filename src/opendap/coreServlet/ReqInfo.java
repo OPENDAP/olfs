@@ -32,7 +32,6 @@ import opendap.bes.BesDapDispatcher;
 import opendap.dap.Request;
 import opendap.dap4.QueryParameters;
 import opendap.io.HyraxStringEncoding;
-import opendap.version.HyraxVersion;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONArray;
 import org.slf4j.Logger;
@@ -697,7 +696,7 @@ public class ReqInfo {
         cf_history_entry.append(" ");
 
         // Add the Hyrax Version
-        cf_history_entry.append("hyrax-").append(HyraxVersion.getVersionString());
+        cf_history_entry.append("hyrax-").append(opendap.bes.Version.getHyraxVersionString());
         cf_history_entry.append(" ");
 
         // Add the complete request URL
@@ -723,7 +722,7 @@ public class ReqInfo {
         String timestamp = sdf.format(now);
         String schema = "https://harmony.earthdata.nasa.gov/schemas/history/0.1.0/history-0.1.0.json";
         String program = "hyrax";
-        String version = HyraxVersion.getVersionString();
+        String version = opendap.bes.Version.getHyraxVersionString();
 
         JSONArray parameters = new JSONArray();
 

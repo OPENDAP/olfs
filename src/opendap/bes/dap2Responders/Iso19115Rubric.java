@@ -38,7 +38,6 @@ import opendap.dap.Request;
 import opendap.dap.User;
 import opendap.http.mediaTypes.TextHtml;
 import opendap.logging.ServletLogUtil;
-import opendap.version.HyraxVersion;
 import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.transform.JDOMSource;
@@ -149,7 +148,7 @@ public class Iso19115Rubric extends Dap4Responder {
 
 
             transformer.setParameter("docsService", oreq.getDocsServiceLocalID());
-            transformer.setParameter("HyraxVersion", HyraxVersion.getVersionString());
+            transformer.setParameter("HyraxVersion", Version.getHyraxVersionString());
 
             DataOutputStream os = new DataOutputStream(response.getOutputStream());
 

@@ -40,7 +40,6 @@ import opendap.http.mediaTypes.DSR;
 import opendap.logging.ServletLogUtil;
 import opendap.namespaces.DAP;
 import opendap.namespaces.XML;
-import opendap.version.HyraxVersion;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.ProcessingInstruction;
@@ -190,7 +189,7 @@ public class NormativeDSR extends Dap4Responder {
 
         Element serverVersion = new Element("ServerSoftwareVersion",DAP.DAPv40_DatasetServices_NS);
 
-        String version = "Hyrax-" + HyraxVersion.getVersionString();
+        String version = "Hyrax-"+opendap.bes.Version.getHyraxVersionString();
         serverVersion.setText(version);
         return serverVersion;
 

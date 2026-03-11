@@ -33,7 +33,6 @@ import opendap.coreServlet.*;
 import opendap.dap.Request;
 import opendap.dap.User;
 import opendap.http.mediaTypes.TextXml;
-import opendap.version.HyraxVersion;
 import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -248,7 +247,7 @@ public class RubricDispatchHandler implements opendap.coreServlet.DispatchHandle
             // See the source code for opendap.xml.Transformer for more.
             Transformer transformer = new Transformer(xsltDocName);
             transformer.setParameter("docsService", oreq.getDocsServiceLocalID());
-            transformer.setParameter("HyraxVersion", HyraxVersion.getVersionString());
+            transformer.setParameter("HyraxVersion", Version.getHyraxVersionString());
 
             // Transform the BES  showCatalog response into a HTML page for the browser
             transformer.transform(new JDOMSource(ddx), os);
