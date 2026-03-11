@@ -1,12 +1,6 @@
 package opendap.version;
 
 public class OlfsVersion {
-    private static final String olfsVersion  = "@OlfsVersion@";
-
-    /**
-     * Returns a String containing the OLFS version.
-     * @return The version of OLFS.
-     */
-    public static String getVersionString() { return olfsVersion; }
-
+    private static final String OLFS_VERSION = "@OlfsVersion@";
+    public static String getVersionString() { return OLFS_VERSION; }
 }
