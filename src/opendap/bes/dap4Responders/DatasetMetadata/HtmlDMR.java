@@ -43,6 +43,7 @@ import opendap.dap4.QueryParameters;
 import opendap.http.mediaTypes.TextHtml;
 import opendap.logging.ServletLogUtil;
 import opendap.namespaces.DAP;
+import opendap.version.HyraxVersion;
 import opendap.xml.Transformer;
 import org.jdom.Attribute;
 import org.jdom.Document;
@@ -167,7 +168,7 @@ public class HtmlDMR extends Dap4Responder {
             // transformer.setParameter("serviceContext", request.getServletContext().getContextPath()); // This is ServletAPI-3.0
             transformer.setParameter("serviceContext", request.getContextPath()); // This is ServletAPI-2.5 (Tomcat 6 stopped here)
             transformer.setParameter("docsService", oreq.getDocsServiceLocalID());
-            transformer.setParameter("HyraxVersion", Version.getHyraxVersionString());
+            transformer.setParameter("HyraxVersion", HyraxVersion.getVersionString());
             transformer.setParameter("JsonLD", getDatasetJsonLD(collectionUrl,dmr));
             transformer.setParameter("supportLink", mailtoHrefAttributeValue);
             transformer.setParameter("enforceSelection", Boolean.toString(enforceRequiredUserSelection()));
