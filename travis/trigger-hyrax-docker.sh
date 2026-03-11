@@ -90,9 +90,9 @@ ${HYRAX_SNAPSHOT_TAG}
 ";
 git status;
 
-#export hyrax_tag="hyrax-${HYRAX_BUILD_VERSION}"
-#loggy "Tagging hyrax-docker with: ${hyrax_tag}"
-#git tag -m "${hyrax_tag}" -a "${hyrax_tag}"
+export hyrax_tag="hyrax-${HYRAX_BUILD_VERSION}"
+loggy "Tagging hyrax-docker with: ${hyrax_tag}"
+git tag -m "${hyrax_tag}" -a "${hyrax_tag}"
 
 
 loggy "Pushing to changes hyrax-docker:master:"
