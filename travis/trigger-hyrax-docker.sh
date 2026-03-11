@@ -45,9 +45,9 @@ loggy "OLFS_BUILD_VERSION: $OLFS_BUILD_VERSION"
 OLFS_SNAPSHOT_TAG="olfs-${OLFS_BUILD_VERSION} "$(date "+%FT%T%z")"$test_deploy"
 loggy " OLFS_SNAPSHOT_TAG: $OLFS_SNAPSHOT_TAG"
 
-HYRAX_SNAPSHOT_TAG="hyrax-${HYRAX_BUILD_VERSION} "$(date "+%FT%T%z")"$test_deploy"
-loggy "HYRAX_SNAPSHOT_TAG: $HYRAX_SNAPSHOT_TAG"
-loggy ""
+#HYRAX_SNAPSHOT_TAG="hyrax-${HYRAX_BUILD_VERSION} "$(date "+%FT%T%z")"$test_deploy"
+#loggy "HYRAX_SNAPSHOT_TAG: $HYRAX_SNAPSHOT_TAG"
+#loggy ""
 
 loggy "Tagging olfs with: ${OLFS_BUILD_VERSION}"
 git tag -m "olfs-${OLFS_BUILD_VERSION}" -a "${OLFS_BUILD_VERSION}"
@@ -90,9 +90,9 @@ ${HYRAX_SNAPSHOT_TAG}
 ";
 git status;
 
-export hyrax_tag="hyrax-${HYRAX_BUILD_VERSION}"
-loggy "Tagging hyrax-docker with: ${hyrax_tag}"
-git tag -m "${hyrax_tag}" -a "${hyrax_tag}"
+#export hyrax_tag="hyrax-${HYRAX_BUILD_VERSION}"
+#loggy "Tagging hyrax-docker with: ${hyrax_tag}"
+#git tag -m "${hyrax_tag}" -a "${hyrax_tag}"
 
 
 loggy "Pushing to changes hyrax-docker:master:"
