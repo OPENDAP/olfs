@@ -63,7 +63,6 @@ echo "TARGET_OS: $TARGET_OS" >  "$BUILD_RECIPE_FILE"
 echo "TOMCAT_MAJOR_VERSION: $TOMCAT_MAJOR_VERSION" >> "$BUILD_RECIPE_FILE"
 echo "${BES_SNAPSHOT}"       >> "$BUILD_RECIPE_FILE"
 echo "${OLFS_SNAPSHOT_TAG}"  >> "$BUILD_RECIPE_FILE"
-echo "${HYRAX_SNAPSHOT_TAG}" >> "$BUILD_RECIPE_FILE"
 loggy "Updated $BUILD_RECIPE_FILE file:"
 loggy "$(cat "$BUILD_RECIPE_FILE")"
 
@@ -82,13 +81,12 @@ Build Version Matrix:
 TARGET_OS: $TARGET_OS
 ${BES_SNAPSHOT}
 ${OLFS_SNAPSHOT_TAG}
-${HYRAX_SNAPSHOT_TAG}
 ";
 git status;
 
-#export hyrax_tag="hyrax-${HYRAX_BUILD_VERSION}"
-#loggy "Tagging hyrax-docker with: ${hyrax_tag}"
-#git tag -m "${hyrax_tag}" -a "${hyrax_tag}"
+export olfs_tag="olfs-${OLFS_BUILD_VERSION}"
+loggy "Tagging hyrax-docker with: ${olfs_tag}"
+git tag -m "${olfs_tag}" -a "${olfs_tag}"
 
 
 loggy "Pushing to changes hyrax-docker:master:"
