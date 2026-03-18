@@ -45,10 +45,6 @@ loggy "       OLFS_BUILD_VERSION: $OLFS_BUILD_VERSION"
 OLFS_SNAPSHOT_TAG="olfs-${OLFS_BUILD_VERSION} $(date "+%FT%T%z")$test_deploy"
 loggy "        OLFS_SNAPSHOT_TAG: $OLFS_SNAPSHOT_TAG"
 
-HYRAX_SNAPSHOT_TAG="hyrax-${HYRAX_BUILD_VERSION} $(date "+%FT%T%z")$test_deploy"
-loggy "       HYRAX_SNAPSHOT_TAG: $HYRAX_SNAPSHOT_TAG"
-loggy ""
-
 loggy "        Tagging olfs with: ${OLFS_BUILD_VERSION}"
 git tag -m "olfs-${OLFS_BUILD_VERSION}" -a "${OLFS_BUILD_VERSION}"
 
@@ -68,7 +64,6 @@ echo "TARGET_OS: $TARGET_OS" >  "$BUILD_RECIPE_FILE"
 echo "TOMCAT_MAJOR_VERSION: $TOMCAT_MAJOR_VERSION" >> "$BUILD_RECIPE_FILE"
 echo "${BES_SNAPSHOT}"       >> "$BUILD_RECIPE_FILE"
 echo "${OLFS_SNAPSHOT_TAG}"  >> "$BUILD_RECIPE_FILE"
-echo "${HYRAX_SNAPSHOT_TAG}" >> "$BUILD_RECIPE_FILE"
 loggy "Updated $BUILD_RECIPE_FILE file:"
 loggy "$(cat "$BUILD_RECIPE_FILE")"
 cp "$BUILD_RECIPE_FILE" "$TRAVIS_BUILD_RECIPE_FILE"
@@ -90,18 +85,15 @@ TARGET_OS: $TARGET_OS
 TOMCAT_MAJOR_VERSION: $TOMCAT_MAJOR_VERSION
 $BES_SNAPSHOT
 $OLFS_SNAPSHOT_TAG
-$HYRAX_SNAPSHOT_TAG
 ";
 git status;
 
-export hyrax_tag="hyrax-${HYRAX_BUILD_VERSION}-${TARGET_OS}"
-loggy "Tagging hyrax-docker with: '${hyrax_tag}'"
-git tag -m "${hyrax_tag}" -a "${hyrax_tag}"
+export olfs_tag="olfs-${OLFS_BUILD_VERSION}"
+loggy "Tagging hyrax-docker with: ${olfs_tag}"
+git tag -m "${olfs_tag}" -a "${olfs_tag}"
 
 loggy "Pushing changes to hyrax-docker, branch $TARGET_OS:"
 git push "https://${GIT_UID}:${GIT_PSWD}@github.com/OPENDAP/hyrax-docker.git" --all
-loggy "Pushing tags to hyrax-docker, branch $TARGET_OS:"
-git push "https://${GIT_UID}:${GIT_PSWD}@github.com/OPENDAP/hyrax-docker.git" "${hyrax_tag}"
 
 loggy "done"
 loggy "$HR"
