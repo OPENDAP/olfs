@@ -160,7 +160,7 @@ jobs:
         - echo "STAGE is ${STAGE}"
         - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
         - source ./travis/compute_build_tags.sh
-        - ant -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DOLFS_DIST_BASE=olfs-snapshot show DISTRO
+        - ant -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DOLFS_DIST_BASE=olfs-snapshot -DTARGET_OS="$TARGET_OS" show DISTRO
         - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
         - echo "Built Distribution Bundles:"
         - ls -l ./build/dist/*.tgz
@@ -175,7 +175,7 @@ jobs:
         - echo "STAGE is ${STAGE}"
         - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
         - source ./travis/compute_build_tags.sh
-        - ant -DOLFS_VERSION="${OLFS_BUILD_VERSION}" show DISTRO
+        - ant -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DTARGET_OS="$TARGET_OS" show DISTRO
         - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
         - echo "Built Distribution Bundles:"
         - ls -l ./build/dist/*.tgz
@@ -205,7 +205,7 @@ jobs:
         - echo "STAGE is ${STAGE}"
         - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
         - source ./travis/compute_build_tags.sh
-        - ant -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DNGAP_DIST_BASE="ngap-${OLFS_BUILD_VERSION}" show ngap-dist
+        - ant -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DNGAP_DIST_BASE="ngap-${OLFS_BUILD_VERSION}" -DTARGET_OS="$TARGET_OS" show ngap-dist
         - echo "Build Bundles:"
         - ls -l ./build/dist/*.tgz
         - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
