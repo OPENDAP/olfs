@@ -205,7 +205,7 @@ jobs:
         - echo "STAGE is ${STAGE}"
         - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
         - source ./travis/compute_build_tags.sh
-        - ant -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DNGAP_DIST_BASE="ngap-${OLFS_BUILD_VERSION}" -DTARGET_OS="$TARGET_OS" show ngap-dist
+        - ant -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DTARGET_OS="$TARGET_OS" show ngap-dist
         - echo "Build Bundles:"
         - ls -l ./build/dist/*.tgz
         - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
