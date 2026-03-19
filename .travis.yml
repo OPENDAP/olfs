@@ -131,7 +131,7 @@ jobs:
       jdk: openjdk17
       addons:
         sonarcloud:
-          organization: "opendap-olfs"  # Replace with your actual SonarCloud org key
+          organization: "opendap"  # Replace with your actual SonarCloud org key
           token: "$SONAR_TOKEN"               # Optional: if you want the addon to handle the token
       script:
         - export STAGE=scan
@@ -144,7 +144,7 @@ jobs:
             # If that variable *was* found, we need to pass in the three variables that let sonar know this is a pull request
             # https://docs.sonarsource.com/sonarqube-server/latest/analyzing-source-code/pull-request-analysis/setting-up-the-pull-request-analysis/#setup-pull-request-parameters
             # Because Travis's `TRAVIS_BRANCH` is the name of the target branch **when Travis is triggered by a pull request**, that is the pullrequest.base
-            travis_wait 30 gradle --debug sonar -Dsonar.token=$SONAR_TOKEN -Dsonar.qualitygate.timeout=1800 -Dsonar.qualitygate.wait=true -Dsonar.pullrequest.key="$TRAVIS_PULL_REQUEST" -Dsonar.pullrequest.branch="$TRAVIS_PULL_REQUEST_BRANCH" -Dsonar.pullrequest.base="$TRAVIS_BRANCH"
+            travis_wait 30 gradle --info sonar -Dsonar.token=$SONAR_TOKEN -Dsonar.qualitygate.timeout=1800 -Dsonar.qualitygate.wait=true -Dsonar.pullrequest.key="$TRAVIS_PULL_REQUEST" -Dsonar.pullrequest.branch="$TRAVIS_PULL_REQUEST_BRANCH" -Dsonar.pullrequest.base="$TRAVIS_BRANCH"
           fi
         - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=opendap-olfs | grep "QUALITY GATE PASS"
       before_install:
