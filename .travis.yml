@@ -129,7 +129,10 @@ jobs:
     - stage: scan
       name: "gradle sonarscan (jdk17)"
       jdk: openjdk17
-      addons: sonarcloud
+      addons:
+        sonarcloud:
+          organization: "OPENDAP"  # Replace with your actual SonarCloud org key
+          token: "$SONAR_TOKEN"               # Optional: if you want the addon to handle the token
       script:
         - export STAGE=scan
         - | 
@@ -241,7 +244,7 @@ deploy:
     access_key_id: $AWS_ACCESS_KEY_ID
     secret_access_key: $AWS_SECRET_ACCESS_KEY
     bucket: opendap.travis.build
-    skip_cleanup: true
+    cleanup: false
     local_dir: $TRAVIS_BUILD_DIR/package
     on:
       all_branches: true
