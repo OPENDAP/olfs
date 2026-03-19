@@ -212,9 +212,9 @@ dependencies {
     implementation group: 'com.auth0', name: 'java-jwt', version: '4.5.0'
     implementation group: 'com.auth0', name: 'jwks-rsa', version: '0.22.1'
 
-    //implementation group: 'jackson', name: 'jackson-core', version: '2.17.0'
-    //implementation group: 'jackson', name: 'jackson-databind', version: '2.17.0'
-    //implementation group: 'jackson', name: 'jackson-annotations', version: '2.17.0'
+    implementation group: 'jackson', name: 'jackson-core', version: '2.17.0'
+    implementation group: 'jackson', name: 'jackson-databind', version: '2.17.0'
+    implementation group: 'jackson', name: 'jackson-annotations', version: '2.17.0'
 
     implementation group: 'joda-time', name: 'joda-time', version: '2.12.7'
 
