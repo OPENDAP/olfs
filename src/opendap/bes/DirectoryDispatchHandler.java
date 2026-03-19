@@ -30,6 +30,7 @@ import opendap.PathBuilder;
 import opendap.auth.AuthenticationControls;
 import opendap.coreServlet.*;
 import opendap.dap.Request;
+import opendap.version.HyraxVersion;
 import opendap.viewers.ViewersServlet;
 import opendap.xml.Transformer;
 import org.jdom.Document;
@@ -53,7 +54,7 @@ import java.util.Date;
  */
 public class DirectoryDispatchHandler implements DispatchHandler {
 
-    private Logger log;
+    private final Logger log;
     private boolean initialized;
 
     private HttpServlet dispatchServlet;
@@ -255,6 +256,7 @@ public class DirectoryDispatchHandler implements DispatchHandler {
         String mailtoHrefAttributeValue = OPeNDAPException.getSupportMailtoLink(request,200,"n/a",supportEmail);
 
         Transformer transformer = new Transformer(xsltDoc);
+        transformer.setParameter("HyraxVersion", HyraxVersion.getVersionString());
         transformer.setParameter("dapService",oreq.getServiceLocalId());
         transformer.setParameter("docsService",oreq.getDocsServiceLocalID());
         transformer.setParameter("viewersService", ViewersServlet.getServiceId());
