@@ -28,6 +28,7 @@ package opendap.gateway;
 import opendap.PathBuilder;
 import opendap.coreServlet.ResourceInfo;
 import opendap.coreServlet.HttpResponder;
+import opendap.version.HyraxVersion;
 import org.slf4j.Logger;
 
 import jakarta.servlet.ServletOutputStream;
@@ -96,6 +97,8 @@ public class GatewayForm extends HttpResponder {
 
         form = form.replaceAll("<CONTEXT_PATH />",contextPath);
         form = form.replaceAll("<SERVLET_NAME />","/docs");
+        form = form.replaceAll("@HyraxVersion@", HyraxVersion.getVersionString());
+        form = form.replaceAll("Not.A.Release", HyraxVersion.getVersionString());
 
 
         log.debug("respondToHttpGetRequest(): Sending Gateway Page ");

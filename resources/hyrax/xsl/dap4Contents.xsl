@@ -31,6 +31,7 @@
 >
     <xsl:import href="version.xsl" />
 
+    <xsl:param name="HyraxVersion"/>
     <xsl:param name="dapService" />
     <xsl:param name="docsService" />
     <xsl:param name="viewersService" />
