@@ -29,8 +29,8 @@ import opendap.services.Service;
 import org.jdom.Document;
 import org.jdom.Element;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
 
 /**
  * Created with IntelliJ IDEA.

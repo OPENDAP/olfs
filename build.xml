@@ -63,12 +63,12 @@
     <property name="HYRAX_VERSION"  value="Not.A.Release"/>
     <property name="OLFS_VERSION"   value="Not.A.Release"/>
     <property name="NGAP_VERSION"   value="${HYRAX_VERSION}"/>
-    <property name="TARGET_OS"      value="" />
+    <property name="TARGET_OS"      value="el9" />
 
 
-    <property name="OLFS_DIST_BASE"    value="olfs-${OLFS_VERSION}${TARGET_OS}"/>
+    <property name="OLFS_DIST_BASE"    value="olfs-${OLFS_VERSION}-${TARGET_OS}"/>
     <property name="OLFS_WEBAPP_DIST"  value="${OLFS_DIST_BASE}-webapp"/>
-    <property name="NGAP_DIST_BASE"    value="ngap-${OLFS_VERSION}${TARGET_OS}"/>
+    <property name="NGAP_DIST_BASE"    value="ngap-${OLFS_VERSION}-${TARGET_OS}"/>
     <property name="NGAP_WEBAPP_DIST"  value="${NGAP_DIST_BASE}-webapp"/>
 
     <property name="SRC_DIST" value="${OLFS_DIST_BASE}-src"/>
@@ -254,13 +254,16 @@
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       Libraries
     -->
-    <property name="json.lib" value="gson-2.8.9.jar"/>
+    <!-- property name="json.lib" value="gson-2.8.9.jar"/ -->
+    <property name="json.lib" value="gson-2.13.1.jar"/>
+
+    <property name="sjson.lib" value="json-simple-1.1.1.jar"/>
 
 
     <property name="junit.lib" value="junit-4.13.2.jar"/>
     <property name="hamcrest-all.lib" value="hamcrest-all-1.3.jar"/>
     <property name="jdom.lib" value="jdom-1.1.1.jar"/>
-    <property name="urlRewrite.lib" value="urlrewrite-3.2.0.jar"/>
+    <property name="urlRewrite.lib" value="urlrewritefilter-5.1.3.jar"/>
 
 
     <property name="slf4j.lib" value="slf4j-api-2.0.16.jar"/> <!-- updated version 01/23/25 - ndp -->
@@ -288,10 +291,9 @@
     <property name="saxon-s9api.lib" value="saxon-9.1.0.5-s9api.jar"/>
     <property name="saxon.lib" value="saxon-9.1.0.5.jar"/>
 
-    <property name="catalina.lib" value="catalina-6.0.53.jar"/>
-    <property name="servlet-api.lib" value="servlet-api-3.0.jar"/>
+    <property name="catalina.lib" value="catalina-11.0.7.jar"/>
+    <property name="servlet-api.lib" value="jakarta-servlet-api-6.1.jar"/>
 
-    <property name="sjson.lib" value="json-simple-1.1.1.jar"/>
 
     <property name="owasp-encoder.lib" value="encoder-1.2.2.jar"/>
     <property name="owasp-encoder-jsp.lib" value="encoder-jsp-1.2.2.jar"/>
@@ -874,12 +876,13 @@
             <fileset dir="${ngapResources.dir}/lib">
 
                 <!-- We exclude these because they get placed into
-                $CATALINA_HOM/lib when the Docker containers are built.-->
+                $CATALINA_HOME/lib when the Docker containers are built.-->
                 <exclude name="elasticache-java-cluster-client-1.1.2.jar"/>
                 <exclude name="memcached-session-manager-2.3.2.jar"/>
                 <exclude name="memcached-session-manager-tc9-2.3.2.jar"/>
-                <exclude name="redisson-all-3.22.0.jar"/>
-                <exclude name="redisson-tomcat-9-3.22.0.jar"/>
+                <exclude name="redisson-all-3.50.0.jar"/>
+                <exclude name="redisson-tomcat-11-3.50.0.jar"/>
+                <exclude name="fst-2.57.jar"/>
 
             </fileset>
 

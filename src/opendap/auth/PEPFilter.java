@@ -35,10 +35,10 @@ import org.jdom.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.*;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
 
@@ -145,7 +145,7 @@ public class PEPFilter implements Filter {
             String authContext = null;
             session = hsReq.getSession(false);
             if(session!=null){
-                UserProfile userProfile = (UserProfile) session.getAttribute(IdFilter.USER_PROFILE);
+                UserProfile userProfile = UserProfile.fromJson((String) session.getAttribute(IdFilter.USER_PROFILE));
                 if(userProfile!=null){
                     userId = userProfile.getUID();
                     IdProvider idP = userProfile.getIdP();
