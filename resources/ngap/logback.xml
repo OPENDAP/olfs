@@ -119,9 +119,9 @@
     </appender>
 
     <appender name="EdlLogAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <File>${logdir}/EDLTimer.log</File>
+        <File>${logdir}/EDL.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${logdir}/EDLTimer.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <FileNamePattern>${logdir}/EDL.%d{yyyy-MM-dd}.log</FileNamePattern>
             <!-- keep 30 days worth of history -->
             <MaxHistory>30</MaxHistory>
         </rollingPolicy>
@@ -216,7 +216,7 @@
         <appender-ref ref="ErrorLog"/>
     </logger>
 
-    <logger name="opendap.auth.UrsIdP" level="info">
+    <logger name="opendap.auth.UrsIdP" level="debug">
         <appender-ref ref="EdlLogAppender"/>
     </logger>
 
