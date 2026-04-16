@@ -400,7 +400,7 @@ public class DispatchServlet extends HttpServlet {
 
             try {
 
-                response.setHeader("Server", "hyrax-"+HyraxVersion.getVersionString());
+                response.setHeader("Server", "Hyrax/"+HyraxVersion.getVersionString());
 
                 if (LicenseManager.isExpired(request)) {
                     LicenseManager.sendLicenseExpiredPage(request, response);
