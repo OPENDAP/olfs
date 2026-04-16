@@ -34,6 +34,7 @@ import opendap.logging.ServletLogUtil;
 import opendap.logging.Procedure;
 import opendap.logging.Timer;
 import opendap.ngap.NgapDapDispatcher;
+import opendap.version.HyraxVersion;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.slf4j.Logger;
@@ -163,7 +164,7 @@ public class DispatchServlet extends HttpServlet {
             initAuthenticationControls();
 
             try {
-                loadHyraxServiceHandlers(httpGetDispatchHandlers, httpPostDispatchHandlers, enablePost, config);
+                loadHyraxServiceHandlers(enablePost, config);
             } catch (Exception e) {
                 throw new ServletException(e);
             }
@@ -219,28 +220,28 @@ public class DispatchServlet extends HttpServlet {
      * - request interface.
      * -->
      * <!--
-     *     UseDAP2ResourceUrlResponse
-     *     When enabled, the server will provide a DAP2-style response
-     *     to requests for a dataset resource URL, meaning that the response
-     *     will be either source data file or an HTTP 403 Forbidden error, as
-     *     defined by the state of the AllowDirectDataSourceAccess feature.
+     * UseDAP2ResourceUrlResponse
+     * When enabled, the server will provide a DAP2-style response
+     * to requests for a dataset resource URL, meaning that the response
+     * will be either source data file or an HTTP 403 Forbidden error, as
+     * defined by the state of the AllowDirectDataSourceAccess feature.
      * <br/>
-     *     If UseDAP2ResourceUrlResponse is not enabled (not present in the
-     *     configuration, or commented out) the server will default to returning
-     *     the DAP4 Dataset Services Response (DSR) when a dataset resource URL
-     *     is requested.
+     * If UseDAP2ResourceUrlResponse is not enabled (not present in the
+     * configuration, or commented out) the server will default to returning
+     * the DAP4 Dataset Services Response (DSR) when a dataset resource URL
+     * is requested.
      * <br/>
-     *     See Dap4 specification for more:
-     *     https://docs.opendap.org/index.php?title=OPULS_Development#DAP4_Specification
+     * See Dap4 specification for more:
+     * https://docs.opendap.org/index.php?title=OPULS_Development#DAP4_Specification
      * -->
      * <UseDAP2ResourceUrlResponse />
      * <br/>
      * <!--
-     *     DataRequestForm
+     * DataRequestForm
      * <br/>
-     *     Defines the DAP data model version for the DAta Request Form linked to
-     *     from the "blue-bar" catalog.html pages generated from  either the
-     *     DDX (for DAP2) or the DMR (for DAP4).
+     * Defines the DAP data model version for the DAta Request Form linked to
+     * from the "blue-bar" catalog.html pages generated from  either the
+     * DDX (for DAP2) or the DMR (for DAP4).
      * <br/>
      * <DataRequestForm type="dap4" />
      * <br/>
@@ -250,37 +251,31 @@ public class DispatchServlet extends HttpServlet {
      * <Handler className="opendap.bes.BESThreddsDispatchHandler"/>
      * <Handler className="opendap.bes.FileDispatchHandler" />
      *
-     * @param httpGetHandlers The list of GET handlers for the OLFS to use.
-     * @param httpPostHandlers The list of POST handlers for the OLFS to use.
      * @param enablePost If the value is TRU then the POST handling will be enabled.
-     * @param config The configuration Element to use when configuring the service.
+     * @param config     The configuration Element to use when configuring the service.
      * @throws Exception When the bad things happen
      */
-    private void loadHyraxServiceHandlers(
-            List<DispatchHandler> httpGetHandlers,
-            List<DispatchHandler> httpPostHandlers,
-            boolean enablePost, Element config) throws Exception {
+    private void loadHyraxServiceHandlers(boolean enablePost, Element config) throws Exception {
 
         if (config == null)
             throw new ServletException("Bad configuration! The configuration element was NULL");
 
         Element noDynamicNavigation = config.getChild("NoDynamicNavigation");
-
-        httpGetHandlers.add(new opendap.bes.VersionDispatchHandler());
-        httpGetHandlers.add(new opendap.ncml.NcmlDatasetDispatcher());
-        httpGetHandlers.add(new opendap.threddsHandler.StaticCatalogDispatch());
-        httpGetHandlers.add(new opendap.gateway.DispatchHandler());
+        httpGetDispatchHandlers.add(new opendap.bes.VersionDispatchHandler());
+        httpGetDispatchHandlers.add(new opendap.ncml.NcmlDatasetDispatcher());
+        httpGetDispatchHandlers.add(new opendap.threddsHandler.StaticCatalogDispatch());
+        httpGetDispatchHandlers.add(new opendap.gateway.DispatchHandler());
 
         // The NgapDispatchHandler needs to come before BesDapDispatcher
-        httpGetHandlers.add(new NgapDapDispatcher());
-        httpGetHandlers.add(new opendap.bes.BesDapDispatcher());
+        httpGetDispatchHandlers.add(new NgapDapDispatcher());
+        httpGetDispatchHandlers.add(new opendap.bes.BesDapDispatcher());
 
         if (enablePost) {
             // The NgapDispatchHandler does POST, and needs to come before BesDapDispatcher
-            httpPostHandlers.add(new NgapDapDispatcher());
+            httpPostDispatchHandlers.add(new NgapDapDispatcher());
 
             // The BesDapDispatcher does POST
-            httpPostHandlers.add( new opendap.bes.BesDapDispatcher());
+            httpPostDispatchHandlers.add( new opendap.bes.BesDapDispatcher());
         }
 
         if(noDynamicNavigation!=null) {
@@ -290,16 +285,16 @@ public class DispatchServlet extends HttpServlet {
         }
         else {
             // Load the dynamic catalog reponse handlers.
-            httpGetHandlers.add(new opendap.bes.DirectoryDispatchHandler());
-            httpGetHandlers.add(new opendap.bes.BESThreddsDispatchHandler());
+            httpGetDispatchHandlers.add(new opendap.bes.DirectoryDispatchHandler());
+            httpGetDispatchHandlers.add(new opendap.bes.BESThreddsDispatchHandler());
         }
 
-        httpGetHandlers.add(new opendap.bes.FileDispatchHandler());
+        httpGetDispatchHandlers.add(new opendap.bes.FileDispatchHandler());
 
-        for (DispatchHandler dh : httpGetHandlers) {
+        for (DispatchHandler dh : httpGetDispatchHandlers) {
             dh.init(this, config);
         }
-        for (DispatchHandler dh : httpPostHandlers) {
+        for (DispatchHandler dh : httpPostDispatchHandlers) {
             dh.init(this, config);
         }
     }
@@ -404,6 +399,8 @@ public class DispatchServlet extends HttpServlet {
             RequestId reqId = RequestCache.getRequestId();
 
             try {
+
+                response.setHeader("Server", "hyrax-"+HyraxVersion.getVersionString());
 
                 if (LicenseManager.isExpired(request)) {
                     LicenseManager.sendLicenseExpiredPage(request, response);
