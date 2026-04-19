@@ -83,14 +83,6 @@
     </appender>
     <!-- ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## -->
 
-    <!--
-    This appender, HAI_DEBUG_LOGGER, is used by the Hyrax Admin interface
-    and it must defined and added to the root logger in order to catch all the stuff,
-    and in order for the Java software to be able to locate it at run time.
-    -->
-    <appender name="HAI_DEBUG_LOGGER" class="ch.qos.logback.core.read.CyclicBufferAppender">
-        <MaxSize>512</MaxSize>
-    </appender>
 
     <appender name="ErrorLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>${logdir}/HyraxErrors.log</File>
@@ -172,17 +164,6 @@
         </encoder>
     </appender>
 
-    <appender name="AuthLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <File>${logdir}/auth.log</File>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${logdir}/auth.%d{yyyy-MM-dd}.log</FileNamePattern>
-            <!-- keep 30 days worth of history -->
-            <MaxHistory>30</MaxHistory>
-        </rollingPolicy>
-        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>${FORMAT}</pattern>
-        </encoder>
-    </appender>
 
     <!--
     NGAP Request Required Fields
@@ -227,6 +208,15 @@
         </layout>
     </appender>
 
+    <appender name="CloudWatchEdlProfilingLogAppender" class="com.j256.cloudwatchlogbackappender.CloudWatchAppender">
+        <region>us-west-2</region>
+        <logGroup>hyrax_edl_profiling_log</logGroup>
+        <logStream>hyrax-%instanceId</logStream>
+        <layout>
+            <pattern>{ "request_id": "%X{ID}", "hyrax-timer-name": "%m", "hyrax-type": "timing", "start-time-ms": "%X{profiling_start_time_ms}", "duration-ms": "%X{profiling_duration_ms}" }%n</pattern>
+        </layout>
+    </appender>
+
     <logger name="opendap" level="error">
         <appender-ref ref="ErrorLog"/>
         <!-- appender-ref ref="JsonLog"/ -->
@@ -237,10 +227,6 @@
     </logger>
 
     <logger name="DocsAccess" level="info">
-        <appender-ref ref="HyraxAccessLog"/>
-    </logger>
-
-    <logger name="WCSAccess" level="info">
         <appender-ref ref="HyraxAccessLog"/>
     </logger>
 
@@ -260,14 +246,9 @@
         <appender-ref ref="CloudWatchResponseLogAppender"/>
     </logger>
 
+    <logger name="CloudWatchEdlProfilingLog" level="info">
+        <appender-ref ref="CloudWatchEdlProfilingLogAppender"/>
+    </logger>
 
-    <root level="error">
-        <!--
-            This appender, HAI_DEBUG_LOGGER, is used by the Hyrax Admin interface,
-            and it must appear here in the root level in order to catch all the stuff,
-            adn in order for the Java software to be able to locate it at run time.
-        -->
-        <appender-ref ref="HAI_DEBUG_LOGGER"/>
-    </root>
 
 </configuration>

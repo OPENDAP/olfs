@@ -15,10 +15,11 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<web-app xmlns="http://java.sun.com/xml/ns/javaee"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
-    version="2.5">
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+                             http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0">
 
   <!-- ======================== Introduction ============================== -->
   <!-- This document defines default values for *all* web applications      -->
@@ -207,18 +208,6 @@
 
     </servlet>
 
-    <!-- - - - - - - - - WCS Servlet - - - - - - - - - -->
-    <servlet>
-        <servlet-name>wcs</servlet-name>
-        <servlet-class>opendap.wcs.v2_0.http.Servlet</servlet-class>
-        <init-param>
-            <param-name>WCSConfigFileName</param-name>
-            <param-value>wcs_service.xml</param-value>
-        </init-param>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-    <!-- - - - - - - - - - - - - - - - - - - - - - - - -->
-
 
     <servlet>
         <servlet-name>w10n</servlet-name>
@@ -230,17 +219,6 @@
         <servlet-name>aggregation</servlet-name>
         <servlet-class>opendap.aggregation.AggregationServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
-    </servlet>
-
-    <servlet>
-        <servlet-name>adminInterface</servlet-name>
-        <servlet-class>opendap.hai.DispatchServlet</servlet-class>
-        <!-- init-param>
-            <param-name>DeveloperMode</param-name>
-            <param-value>true</param-value>
-        </init-param -->
-        <!-- Most people don't use the HAI, so don't load it by default -->
-        <!-- load-on-startup>1</load-on-startup -->
     </servlet>
 
     <servlet>
@@ -315,11 +293,6 @@
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>adminInterface</servlet-name>
-        <url-pattern>/hai/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
         <servlet-name>viewers</servlet-name>
         <url-pattern>/viewers/*</url-pattern>
     </servlet-mapping>
@@ -339,10 +312,6 @@
         <url-pattern>/w10n/*</url-pattern>
     </servlet-mapping>
     
-    <servlet-mapping>
-        <servlet-name>wcs</servlet-name>
-        <url-pattern>/wcs/*</url-pattern>
-    </servlet-mapping>
 
     <!-- ==================== Default Session Configuration ================= -->
   <!-- You can set the default session timeout (in minutes) for all newly   -->
@@ -412,47 +381,6 @@
         <welcome-file>index.html</welcome-file>
         <welcome-file>index.htm</welcome-file>
     </welcome-file-list>
-
-
-
-    <!-- Define a Security Constraint on the Admin command and user interfaces -->
-    <security-constraint>
-        <web-resource-collection>
-            <web-resource-name>Hyrax Admin Interface</web-resource-name>
-            <url-pattern>/hai/*</url-pattern>
-            <url-pattern>/admin/*</url-pattern>
-        </web-resource-collection>
-
-        <auth-constraint>
-            <role-name>manager</role-name>
-        </auth-constraint>
-
-        <user-data-constraint>
-            <!-- this ensures that all efforts to access the admin interface nd resources must use HTTPS -->
-            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
-            <!-- transport-guarantee>NONE</transport-guarantee -->
-        </user-data-constraint>
-    </security-constraint>
-
-    <!-- Define the Login Configuration for this Application -->
-
-    <login-config>
-        <auth-method>FORM</auth-method>
-        <realm-name>Hyrax Administration Pages</realm-name>
-        <form-login-config>
-            <form-login-page>/admin/jsp/login.jsp</form-login-page>
-            <form-error-page>/admin/jsp/login-failed.jsp</form-error-page>
-        </form-login-config>
-    </login-config>
-
-
-    <!-- Security roles referenced by this web application -->
-    <security-role>
-        <description>
-            The role that is required to login to the Hyrax Administration Application
-        </description>
-        <role-name>manager</role-name>
-    </security-role>
 
 
 </web-app>

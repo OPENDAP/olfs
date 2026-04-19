@@ -190,10 +190,6 @@
         <appender-ref ref="HyraxAccessLog"/>
     </logger>
 
-    <logger name="WCSAccess" level="info">
-        <appender-ref ref="HyraxAccessLog"/>
-    </logger>
-
 <!--
     <logger name="HyraxLastModifiedAccess" level="info">
         <appender-ref ref="HyraxAccessLog"/>
@@ -230,22 +226,9 @@
         <appender-ref ref="HyraxAccessLog"/>
     </logger>
 
-    <logger name="WCSLastModifiedAccess" level="info">
-        <appender-ref ref="HyraxAccessLog"/>
-    </logger>
-
 -->
     <!-- logger name="BesCommandLog" level="info">
         <appender-ref ref="BESCommandLogAppender"/>
     </logger -->
-
-    <root level="error">
-        <!--
-            This appender, HAI_DEBUG_LOGGER, is used by the Hyrax Admin interface
-            and it must appear here in the root level in order to catch all the stuff,
-            adn in order for the Java software to be able to locate it at run time.
-        -->
-        <appender-ref ref="HAI_DEBUG_LOGGER"/>
-    </root>
 
 </configuration>

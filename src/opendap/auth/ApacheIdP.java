@@ -79,8 +79,8 @@ public class ApacheIdP extends IdProvider {
 
 
     @Override
-    public void init(Element config, String serviceContext) throws ConfigurationException {
-        super.init(config,serviceContext);
+    public void init(Element config, String serviceContextPath) throws ConfigurationException {
+        super.init(config, serviceContextPath);
 
         Element e = config.getChild("login");
         if(e!=null){
@@ -108,8 +108,10 @@ public class ApacheIdP extends IdProvider {
         /**
          * Redirect the user back to their original requested resource.
          */
-        HttpSession session = request.getSession(false);
-        String redirectUrl = null;
+        HttpSession session = request.getSession();
+        log.debug("BEGIN (session: {})", session.getId());
+        log.debug("session.isNew(): {}", session.isNew());
+        String redirectUrl;
 
         String uid = Util.getUID(request);
         if (uid==null) {
@@ -145,7 +147,8 @@ public class ApacheIdP extends IdProvider {
             redirectUrl = (String) session.getAttribute(IdFilter.RETURN_TO_URL);
         }
         if(redirectUrl==null){
-            redirectUrl = request.getContextPath();
+            // Since the request may come from other deployment contexts we check the request for the context.
+            redirectUrl = Util.fullyQualifiedPath(request.getContextPath());
         }
         log.info("doLogin(): redirecting to {}",redirectUrl);
         response.sendRedirect(redirectUrl);
@@ -163,16 +166,17 @@ public class ApacheIdP extends IdProvider {
      * This method simply terminates the local session and redirects the user back
      * to the home page.
      */
+    @Override
     public void doLogout(HttpServletRequest request, HttpServletResponse response)
 	        throws IOException
     {
-        String redirectUrl = getServiceContext();
+        String redirectUrl = getServiceContextPath();
         HttpSession session = request.getSession(false);
         if( session != null )
         {
             String returnToUrl =  (String) session.getAttribute(IdFilter.RETURN_TO_URL);
             if(returnToUrl!=null)
-                redirectUrl =returnToUrl;
+                redirectUrl = returnToUrl;
             session.invalidate();
         }
 

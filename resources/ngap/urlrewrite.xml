@@ -55,14 +55,13 @@
 
 
     <rule>
-        <from>^/(wcs|admin|pdpService|hai|error|docs|jsp|viewers|xsl|hyrax|w10n|servlet_gateway|js|aggregation|siteMap)(/.*)?$</from>
+        <from>^/(pdpService|error|docs|jsp|viewers|xsl|hyrax|w10n|servlet_gateway|js|aggregation|siteMap)(/.*)?$</from>
         <set name="doRedirect">0</set>
     </rule>
 
     <!--
     The following rule shunts requests to the ngap
-    service endpoint if they are not explicitly for the hyrax, wcs
-    or some other service endpoint.
+    service endpoint if they are not explicitly for the hyrax or some other itemized endpoint.
     -->
     <rule>
         <condition type="attribute" name="doRedirect" operator="equal">1</condition>

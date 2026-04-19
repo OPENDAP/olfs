@@ -40,62 +40,13 @@ import java.util.TreeSet;
  * Contains the Version and UUID information for Hyrax Server.
  */
 public class Version  {
-    private static final String olfsVersion  = "@OlfsVersion@";
-    private static final String hyraxVersion = "@HyraxVersion@";
-
-
-    /**
-     * Returns a String containing the OLFS version.
-     * @return The version of OLFS.
-     */
-    public static String getOLFSVersionString() {
-        return (olfsVersion);
-    }
-
-    /**
-     * Returns a String containing the Hyrax version.
-     * @return The version of Hyrax.
-     */    public static String getHyraxVersionString() {
-        return (hyraxVersion);
-    }
-
-
-    /**
-     * Returns a JDOM ELement containing the OLFS version.
-     * @return The version of OLFS.
-     */
-    public static Element getOLFSVersionElement() {
-        Element olfs = new Element("OLFS");
-        olfs.setAttribute("version",olfsVersion);
-        return (olfs);
-    }
-
-    /**
-     * Returns a JDOM ELement containing the Hyrax version.
-     * @return The version of Hyrax.
-     */
-    public static Element getHyraxVersionElement() {
-        Element hyrax = new Element("Hyrax");
-        hyrax.setAttribute("version",hyraxVersion);
-        return (hyrax);
-    }
-
-    /**
-     *  Produce the ServerUUID value used by the top level of Hyrax.
-     * @return The UUID.
-     */
-    public static String getServerUUID(){
-        return "e93c3d09-a5d9-49a0-a912-a0ca16430b91";
-    }
-
-
 
     /**
      *
      * @param request The client request for which to return the verison.
      * @return A string containing the value of the XDODS-Server MIME header as
      * ascertained by querying the BES.
-     * @throws Exception If these is a problem getting the version document.
+     * @throws Exception If there is a problem getting the version document.
      */
     public static String getXDODSServerVersion(HttpServletRequest request) {
         String relativeUrl = ReqInfo.getLocalUrl(request);

@@ -33,6 +33,8 @@ addons:
 
 env:
   global:
+    - TARGET_OS="el8"
+    - TOMCAT_MAJOR_VERSION="9"
     # SONAR_LOGIN, made using "travis encrypt --org -r OPENDAP/olfs SONAR_LOGIN=335df..."
     - secure: "GW672d33rdWG40v8ve25p909qnejhqWGzoX7+IEflv9hMZ+8vDWArtFaxuILhu/QeJlLJgMCrNyWdhgpSuyEJS8/EQlOUXWZfZaSPBVriayd7OKLY5D35PKODFPXbZpJ1GOheMz3roQkg+IjQzgey/zOGu4KQB9FjtcqllFvy38="
     # AWS_ACCESS_KEY_ID for the user 'travis-olfs'
@@ -73,8 +75,13 @@ stages:
     if: type != pull_request OR branch =~ ^(.*-test-deploy)$
   - name: hyrax-docker-trigger
     if: type != pull_request OR branch =~ ^(.*-test-deploy)$
+  - name: update-tracking-branch
+    if: type != pull_request
   - name: disabled
     if: branch = disabled
+
+git:
+  depth: false
 
 # caching for gradle
 before_cache:
@@ -104,25 +111,12 @@ jobs:
         - gradle --version
         - gradle tasks
         - gradle war
-
-    - stage: disabled
-      name: "jdk11"
-      jdk: openjdk11
-      script:
-        - export STAGE=test
-        - ant show check
-
-    # I think doesn't work because the sonarscan/sonarqube 'ant task' s no longer supported. jhrg 1/22/24
-    - stage: disabled
-      name: "sonarscan (jdk17)"
-      jdk: openjdk17
-      addons: sonarcloud
-      script:
-        - export STAGE=scan
-        - export ANT_OPTS="-Xms256m -Xmx8g"
-        - ant -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build show server
-        - travis_wait 45 ant -Dsonar.token=$SONAR_LOGIN -Dsonar.qualitygate.timeout=2700 -Dsonar.qualitygate.wait=true show sonar
-        - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=opendap-olfs | grep "QUALITY GATE PASS"
+      before_install:
+        - wget http://services.gradle.org/distributions/gradle-8.14.3-bin.zip
+        - unzip -qq gradle-8.14.3-bin.zip
+        - export GRADLE_HOME=$PWD/gradle-8.14.3
+        - export PATH=$GRADLE_HOME/bin:$PATH
+        - gradle -v
 
     - stage: scan
       name: "synk (jdk17)"
@@ -135,21 +129,30 @@ jobs:
     - stage: scan
       name: "gradle sonarscan (jdk17)"
       jdk: openjdk17
-      addons: sonarcloud
+      addons:
+        sonarcloud:
+          organization: "opendap"  # Replace with your actual SonarCloud org key
+          token: "$SONAR_TOKEN"               # Optional: if you want the addon to handle the token
       script:
         - export STAGE=scan
         - | 
           # multiline build instructions incoming!
           if test -z "$TRAVIS_PULL_REQUEST_BRANCH"; then 
             # If no travis pull request branch was found, this is not a pull request!
-            travis_wait 30 gradle sonar -Dsonar.token=$SONAR_LOGIN -Dsonar.qualitygate.timeout=1800 -Dsonar.qualitygate.wait=true
+            travis_wait 30 gradle sonar -Dsonar.token="$SONAR_TOKEN" -Dsonar.qualitygate.timeout=1800 -Dsonar.qualitygate.wait=true
           else
             # If that variable *was* found, we need to pass in the three variables that let sonar know this is a pull request
             # https://docs.sonarsource.com/sonarqube-server/latest/analyzing-source-code/pull-request-analysis/setting-up-the-pull-request-analysis/#setup-pull-request-parameters
             # Because Travis's `TRAVIS_BRANCH` is the name of the target branch **when Travis is triggered by a pull request**, that is the pullrequest.base
-            travis_wait 30 gradle sonar -Dsonar.token=$SONAR_LOGIN -Dsonar.qualitygate.timeout=1800 -Dsonar.qualitygate.wait=true -Dsonar.pullrequest.key="$TRAVIS_PULL_REQUEST" -Dsonar.pullrequest.branch="$TRAVIS_PULL_REQUEST_BRANCH" -Dsonar.pullrequest.base="$TRAVIS_BRANCH"
+            travis_wait 30 gradle --info sonar -Dsonar.token=$SONAR_TOKEN -Dsonar.qualitygate.timeout=1800 -Dsonar.qualitygate.wait=true -Dsonar.pullrequest.key="$TRAVIS_PULL_REQUEST" -Dsonar.pullrequest.branch="$TRAVIS_PULL_REQUEST_BRANCH" -Dsonar.pullrequest.base="$TRAVIS_BRANCH"
           fi
         - curl -s https://sonarcloud.io/api/project_badges/quality_gate?project=opendap-olfs | grep "QUALITY GATE PASS"
+      before_install:
+        - wget http://services.gradle.org/distributions/gradle-8.14.3-bin.zip
+        - unzip -qq gradle-8.14.3-bin.zip
+        - export GRADLE_HOME=$PWD/gradle-8.14.3
+        - export PATH=$GRADLE_HOME/bin:$PATH
+        - gradle -v
 
     - stage: snappah
       name: "olfs-snapshot (jdk17)"
@@ -159,7 +162,7 @@ jobs:
         - echo "STAGE is ${STAGE}"
         - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
         - source ./travis/compute_build_tags.sh
-        - ant -DHYRAX_VERSION="${HYRAX_BUILD_VERSION}" -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DOLFS_DIST_BASE=olfs-snapshot DISTRO
+        - ant -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DOLFS_DIST_BASE=olfs-snapshot show DISTRO
         - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
         - echo "Built Distribution Bundles:"
         - ls -l ./build/dist/*.tgz
@@ -174,7 +177,7 @@ jobs:
         - echo "STAGE is ${STAGE}"
         - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
         - source ./travis/compute_build_tags.sh
-        - ant -DHYRAX_VERSION="${HYRAX_BUILD_VERSION}" -DOLFS_VERSION="${OLFS_BUILD_VERSION}" DISTRO
+        - ant -DOLFS_VERSION="${OLFS_BUILD_VERSION}" show DISTRO
         - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
         - echo "Built Distribution Bundles:"
         - ls -l ./build/dist/*.tgz
@@ -189,7 +192,7 @@ jobs:
         - echo "STAGE is ${STAGE}"
         - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
         - source ./travis/compute_build_tags.sh
-        - ant -DHYRAX_VERSION="${HYRAX_BUILD_VERSION}" -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DNGAP_DIST_BASE=ngap-snapshot ngap-dist
+        - ant -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DNGAP_DIST_BASE=ngap-snapshot show ngap-dist
         - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
         - echo "Build Bundles:"
         - ls -l ./build/dist/*.tgz
@@ -204,7 +207,7 @@ jobs:
         - echo "STAGE is ${STAGE}"
         - test -d $TRAVIS_BUILD_DIR/package || mkdir $TRAVIS_BUILD_DIR/package
         - source ./travis/compute_build_tags.sh
-        - ant -DHYRAX_VERSION="${HYRAX_BUILD_VERSION}" -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DNGAP_DIST_BASE="ngap-${OLFS_BUILD_VERSION}" ngap-dist
+        - ant -DOLFS_VERSION="${OLFS_BUILD_VERSION}" -DNGAP_DIST_BASE="ngap-${OLFS_BUILD_VERSION}" show ngap-dist
         - echo "Build Bundles:"
         - ls -l ./build/dist/*.tgz
         - cp ./build/dist/*.tgz $TRAVIS_BUILD_DIR/package/;
@@ -224,6 +227,16 @@ jobs:
         - source ./travis/compute_build_tags.sh
         - ./travis/trigger-hyrax-docker.sh
 
+    # This job, part of the update-tracking-branch stage, runs a shell script
+    # that checks out the first branch $1 into branch $2 and if successful
+    # pushes the results to $2
+    - stage: update-tracking-branch
+      name: "Update Tracking Branch(es)"
+      script:
+        - export STAGE=update-tracking-branch
+        - ./travis/update_tracking_branch.sh  "master" "el9"
+
+
 # The "deploy" section copies the snapshot build product to our S3 bucket
 deploy:
   - provider: s3
@@ -231,7 +244,7 @@ deploy:
     access_key_id: $AWS_ACCESS_KEY_ID
     secret_access_key: $AWS_SECRET_ACCESS_KEY
     bucket: opendap.travis.build
-    skip_cleanup: true
+    cleanup: false
     local_dir: $TRAVIS_BUILD_DIR/package
     on:
       all_branches: true

@@ -80,14 +80,6 @@
     <!-- ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## -->
 
 
-    <!--
-       This appender, HAI_DEBUG_LOGGER, is used by the Hyrax Admin interface
-       and it must defined and added to the root logger in order to catch all the stuff,
-       and in order for the Java software to be able to locate it at run time.
-   -->
-    <appender name="HAI_DEBUG_LOGGER" class="ch.qos.logback.core.read.CyclicBufferAppender">
-        <MaxSize>512</MaxSize>
-    </appender>
 
     <appender name="ErrorLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>${logdir}/HyraxErrors.log</File>
@@ -103,25 +95,6 @@
             <pattern>${FORMAT}</pattern>
         </encoder>
     </appender>
-
-    <conversionRule conversionWord="json_msg"
-                    converterClass="opendap.logging.LogMessageToJsonConverter" />
-
-    <appender name="JsonLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <File>${logdir}/olfs-log.json</File>
-        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-            <FileNamePattern>${logdir}/olfs-log.%i.zip</FileNamePattern>
-            <MinIndex>1</MinIndex>
-            <MaxIndex>3</MaxIndex>
-        </rollingPolicy>
-        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-            <MaxFileSize>5MB</MaxFileSize>
-        </triggeringPolicy>
-        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>{ "date": "%d{yyyy-MM-dd'T'HH:mm:ss.SSS Z}", "thread": "%t", "request_id": "%X{ID}", "user_ip": "%X{host}", "user_agent": "%X{UserAgent}", "user_id": "%X{userid}", "http_verb": "%X{SOURCE}", "resource_id": "%X{resourceID}", "query_string": "%X{query}", "rel_time": "%r", "response_size": "%X{size}", "duration": "%X{duration}", "log_level": "%-5p", "logger_id": "%c.%M", "message": %json_msg }%n</pattern>
-        </encoder>
-    </appender>
-
 
     <appender name="HyraxAccessLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>${logdir}/HyraxAccess.log</File>
@@ -231,64 +204,13 @@
 
     <logger name="opendap.w10n" level="all" />
 
-
-    <logger name="opendap.wcs.v2_0" level="all"/>
-
-
-
     <!--
     <logger name="opendap.ppt.NewPPTClient" level="all" />
-
-
-    <logger name="opendap.wcs.v2_0.http" level="all">
-        <appender-ref ref="stdout"/>
-    </logger>
-    <logger name="opendap.WcsCatalog" level="all"/>
-
-    <logger name="opendap.wcs" level="all">
-        <appender-ref ref="stdout"/>
-    </logger>
-
-    <logger name="opendap.wcs.gatewayClient" level="all"/>
-    <logger name="opendap.wcs.v1_1_2" level="all"/>
-    <logger name="opendap.WcsCatalog" level="all"/>
-
-    <logger name="opendap.wcs" level="all">
-        <appender-ref ref="stdout"/>
-    </logger>
-
-    <logger name="opendap.wcs.gatewayClient" level="all"/>
-    <logger name="opendap.wcs.v1_1_2" level="all"/>
-
-    <logger name="opendap.semantics" level="debug">
-        <appender-ref ref="stdout"/>
-        <appender-ref ref="DebugLog"/>
-    </logger>
-
-    <logger name="org.openrdf" level="info">
-        <appender-ref ref="stdout"/>
-    </logger>
 
     <logger name="org.xml" level="info">
         <appender-ref ref="stdout"/>
     </logger>
 
-
-
-    <logger name="opendap.semantics">
-        <level value="DEBUG"/>
-        <appender-ref ref="stdout"/>
-    </logger>
-
-    <logger name="org.openrdf">
-        <level value="INFO"/>
-        <appender-ref ref="stdout"/>
-    </logger>
-
-    <logger name="org.xml">
-        <level value="INFO"/>
-        <appender-ref ref="stdout"/>
-    </logger>
     -->
 
 
@@ -334,28 +256,11 @@
         <appender-ref ref="HyraxAccessLog"/>
     </logger>
 
-    <logger name="WCSAccess" level="info">
-        <appender-ref ref="HyraxAccessLog"/>
-    </logger>
-    <logger name="WCSLastModifiedAccess" level="info">
-        <appender-ref ref="HyraxAccessLog"/>
-    </logger>
 
 
     <logger name="BesCommandLog" level="info">
         <appender-ref ref="BESCommandLogAppender"/>
         <appender-ref ref="stdout"/>
     </logger>
-
-
-
-    <root level="error">
-        <!--
-            This appender, HAI_DEBUG_LOGGER, is used by the Hyrax Admin interface
-            and it must appear here in the root level in order to catch all the stuff,
-            adn in order for the Java software to be able to locate it at run time.
-        -->
-        <appender-ref ref="HAI_DEBUG_LOGGER"/>
-    </root>
 
 </configuration>

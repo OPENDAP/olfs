@@ -60,14 +60,16 @@
          These properties should be set from the command
          line when running the DISTRO build target.
     -->
-    <property name="HYRAX_VERSION"       value="Not.A.Release"/>
-    <property name="OLFS_VERSION"        value="Not.A.Release"/>
-    <property name="NGAP_VERSION"        value="${HYRAX_VERSION}"/>
-    <property name="WCS_VERSION"         value="${HYRAX_VERSION}"/>
+    <property name="HYRAX_VERSION"  value="Not.A.Release"/>
+    <property name="OLFS_VERSION"   value="Not.A.Release"/>
+    <property name="NGAP_VERSION"   value="${HYRAX_VERSION}"/>
+    <property name="TARGET_OS"      value="" />
 
-    <property name="OLFS_DIST_BASE"        value="olfs-${OLFS_VERSION}"/>
-    <property name="NGAP_DIST_BASE"        value="ngap-${HYRAX_VERSION}"/>
-    <property name="WEBAPP_DIST"           value="${OLFS_DIST_BASE}-webapp"/>
+
+    <property name="OLFS_DIST_BASE"    value="olfs-${OLFS_VERSION}${TARGET_OS}"/>
+    <property name="OLFS_WEBAPP_DIST"  value="${OLFS_DIST_BASE}-webapp"/>
+    <property name="NGAP_DIST_BASE"    value="ngap-${OLFS_VERSION}${TARGET_OS}"/>
+    <property name="NGAP_WEBAPP_DIST"  value="${NGAP_DIST_BASE}-webapp"/>
 
     <property name="SRC_DIST" value="${OLFS_DIST_BASE}-src"/>
     <property name="DOC_DIST" value="${OLFS_DIST_BASE}-doc"/>
@@ -143,57 +145,77 @@
         <echo level="info" message="##########################################################"/>
         <echo level="info" message="# Build Settings"/>
         <echo level="info" message="#"/>
-        <echo level="info" message="                  Project Name: ${ant.project.name}"/>
-        <echo level="info" message="                  Project File: ${ant.file}"/>
-        <echo level="info" message="                 Hyrax Version: ${HYRAX_VERSION}"/>
-        <echo level="info" message="                  OLFS Version: ${OLFS_VERSION}"/>
-        <echo level="info" message="                  NGAP Version: ${NGAP_VERSION}"/>
-        <echo level="info" message="                   WCS Version: ${WCS_VERSION}"/>
-        <echo level="info" message="            Deployment Context: ${DEPLOYMENT_CONTEXT}"/>
-        <echo level="info" message="       NGAP Deployment Context: ${NGAP_DEPLOYMENT_CONTEXT}"/>
-        <echo level="info" message=""/>
-        <echo level="info" message="Project Directories:"/>
-        <echo level="info" message="                src.dir: ${src.dir}"/>
-        <echo level="info" message="                doc.dir: ${doc.dir}"/>
-        <echo level="info" message="                lib.dir: ${lib.dir}"/>
-        <echo level="info" message="          resources.dir: ${resources.dir}"/>
-        <echo level="info" message=""/>
-        <echo level="info" message="Build Directories:"/>
-        <echo level="info" message="              build.dir: ${build.dir}"/>
-        <echo level="info" message="          build.classes: ${build.classes}"/>
-        <echo level="info" message="              build.doc: ${build.docs}"/>
-        <echo level="info" message="        build.resources: ${build.hyrax.resources}"/>
-        <echo level="info" message=""/>
-        <echo level="info" message="Ant Properties:"/>
-        <echo level="info" message="               ant.file: ${ant.file}"/>
-        <echo level="info" message="               ant.home: ${ant.home}"/>
-        <echo level="info" message="       ant.java.version: ${ant.java.version}"/>
-        <echo level="info" message="       ant.project.name: ${ant.project.name}"/>
-        <echo level="info" message="            ant.version: ${ant.version}"/>
-        <echo level="info" message="                basedir: ${basedir}"/>
-        <echo level="info" message="              user.name: ${user.name}"/>
-        <echo level="info" message="              user.home: ${user.home}"/>
-        <echo level="info" message="              java.home: ${java.home}"/>
-        <echo level="info" message="           java.version: ${java.version}"/>
-        <echo level="info" message=""/>
-        <echo level="info" message="Distribution Targets: "/>
-        <echo level="info" message="            WEBAPP_DIST: ${WEBAPP_DIST}"/>
-        <echo level="info" message="               SRC_DIST: ${SRC_DIST}"/>
-        <echo level="info" message="               DOC_DIST: ${DOC_DIST}"/>
-        <echo level="info" message="               OLFS_LIB: ${OLFS_LIB}"/>
-        <echo level="info" message=""/>
-        <echo level="info" message="----------------------------------------------------------"/>
-        <echo level="info" message="       Operating System: ${os.name}"/>
-        <echo level="info" message="            Arcitecture: ${os.arch}"/>
-        <echo level="info" message="                Version: ${os.version}"/>
-        <echo level="info" message="       sun.java.command: ${sun.java.command}"/>
-        <echo level="info" message="               ANT_OPTS: ${ANT_OPTS}"/>
-        <echo level="info" message="Calling echoproperties task"/>
-        <echoproperties  />
-        <echo level="info" message=""/>
+        <echo level="info" message="#    Project Name: ${ant.project.name}"/>
+        <echo level="info" message="#    Project File: ${ant.file}"/>
+        <echo level="info" message="#"/>
+        <echo level="info" message="#----------------------------------------------------------"/>
+        <echo level="info" message="# Versions and Contexts:"/>
+        <echo level="info" message="#               Hyrax Version: ${HYRAX_VERSION}"/>
+        <echo level="info" message="#                OLFS Version: ${OLFS_VERSION}"/>
+        <echo level="info" message="#                NGAP Version: ${NGAP_VERSION}"/>
+        <echo level="info" message="#          Deployment Context: ${DEPLOYMENT_CONTEXT}"/>
+        <echo level="info" message="#     NGAP Deployment Context: ${NGAP_DEPLOYMENT_CONTEXT}"/>
+        <echo level="info" message="#"/>
+        <echo level="info" message="#----------------------------------------------------------"/>
+        <echo level="info" message="# Project Directories:"/>
+        <echo level="info" message="#           src.dir: ${src.dir}"/>
+        <echo level="info" message="#           doc.dir: ${doc.dir}"/>
+        <echo level="info" message="#           lib.dir: ${lib.dir}"/>
+        <echo level="info" message="#     resources.dir: ${resources.dir}"/>
+        <echo level="info" message="#"/>
+        <echo level="info" message="#----------------------------------------------------------"/>
+        <echo level="info" message="# Build Directories:"/>
+        <echo level="info" message="#           build.dir: ${build.dir}"/>
+        <echo level="info" message="#       build.classes: ${build.classes}"/>
+        <echo level="info" message="#           build.doc: ${build.docs}"/>
+        <echo level="info" message="#     build.resources: ${build.hyrax.resources}"/>
+        <echo level="info" message="#"/>
+        <echo level="info" message="#----------------------------------------------------------"/>
+        <echo level="info" message="# Ant Situation:"/>
+        <echo level="info" message="#             ant.file: ${ant.file}"/>
+        <echo level="info" message="#             ant.home: ${ant.home}"/>
+        <echo level="info" message="#     ant.java.version: ${ant.java.version}"/>
+        <echo level="info" message="#     ant.project.name: ${ant.project.name}"/>
+        <echo level="info" message="#          ant.version: ${ant.version}"/>
+        <echo level="info" message="#              basedir: ${basedir}"/>
+        <echo level="info" message="#            user.name: ${user.name}"/>
+        <echo level="info" message="#            user.home: ${user.home}"/>
+        <echo level="info" message="#            java.home: ${java.home}"/>
+        <echo level="info" message="#         java.version: ${java.version}"/>
+        <echo level="info" message="#"/>
+        <echo level="info" message="#----------------------------------------------------------"/>
+        <echo level="info" message="# Distribution Targets: "/>
+        <echo level="info" message="#             SRC_DIST: ${SRC_DIST}"/>
+        <echo level="info" message="#             DOC_DIST: ${DOC_DIST}"/>
+        <echo level="info" message="#             OLFS_LIB: ${OLFS_LIB}"/>
+        <echo level="info" message="#       OLFS_DIST_BASE: ${OLFS_DIST_BASE}"/>
+        <echo level="info" message="#     OLFS_WEBAPP_DIST: ${OLFS_WEBAPP_DIST}"/>
+        <echo level="info" message="#       NGAP_DIST_BASE: ${NGAP_DIST_BASE}"/>
+        <echo level="info" message="#     NGAP_WEBAPP_DIST: ${NGAP_WEBAPP_DIST}"/>
+
+        <echo level="info" message="#"/>
+        <echo level="info" message="#----------------------------------------------------------"/>
+        <echo level="info" message="# System:"/>
+        <echo level="info" message="#     Operating System: ${os.name}"/>
+        <echo level="info" message="#          Arcitecture: ${os.arch}"/>
+        <echo level="info" message="#              Version: ${os.version}"/>
+        <echo level="info" message="#     sun.java.command: ${sun.java.command}"/>
+        <echo level="info" message="#             ANT_OPTS: ${ANT_OPTS}"/>
         <echo level="info" message="##########################################################"/>
 
     </target>
+
+
+    <target name="showAntProperties" description="Show build settings.">
+        <echo level="info" message="##########################################################"/>
+        <echo level="info" message="# ANT Properties"/>
+        <echo level="info" message="# Calling the ANT echoproperties task"/>
+        <echoproperties  />
+        <echo level="info" message="#"/>
+        <echo level="info" message="##########################################################"/>
+    </target>
+
+    <target name="showAll" description="Show Me." depends="show,showAntProperties" />
 
 
     <!-- ################################################################# -->
@@ -228,7 +250,6 @@
     <property name="robotsResources.dir" location="${resources.dir}/robots"/>
     <property name="build.robots.resources" location="${build.dir}/robots"/>
 
-    <property name="wcs.resources.dir" location="${resources.dir}/WCS/2.0"/>
 
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       Libraries
@@ -288,13 +309,6 @@
 
     <property name="joda-time.lib" value="joda-time-2.12.7.jar"/>
 
-    <!-- WCS Libs -->
-    <property name="ogc-wcs.lib" value="wcs-v_2_0-2.6.1.jar"/>
-    <property name="ogc-gml.lib" value="gml-v_3_2_1-2.6.1.jar"/>
-    <property name="ogc-swe.lib" value="sweCommon-v_2_0-2.6.1.jar"/>
-    <property name="ogc-gmlcov.lib" value="gmlcov-v_1_0-2.6.1.jar"/>
-    <property name="ogc-ows.lib" value="ows-v_2_0-2.6.1.jar"/>
-    <property name="ogc-jaxb.lib" value="jaxb2-basics-runtime-0.11.0.jar"/>
     <property name="jaxb-api.lib" value="jaxb-api-2.3.1.jar"/>
     <property name="jaxb-core.lib" value="jaxb-core-2.3.0-b170127.1453.jar"/>
     <property name="jaxb-impl.lib" value="jaxb-impl-2.3.0-b170127.1453.jar"/>
@@ -305,7 +319,7 @@
     <property name="xlink.lib" value="xlink-v_1_0-1.4.0.jar"/>
 
     <!-- Cloudwatch logback appender -->
-    <property name="cloudwathch-logback-appender.lib" value="cloudwatch-logback-appender-3.11.jar"/>
+    <property name="cloudwatch-logback-appender.lib" value="cloudwatch-logback-appender-3.11.jar"/>
 
     <!--
         These are the library jars used by Hyrax.
@@ -355,13 +369,6 @@
 
         <include name="${urlRewrite.lib}"/>
 
-        <!--    WCS-2.0 Libs   -->
-        <include name="${ogc-wcs.lib}"/>
-        <include name="${ogc-gml.lib}"/>
-        <include name="${ogc-swe.lib}"/>
-        <include name="${ogc-gmlcov.lib}"/>
-        <include name="${ogc-ows.lib}"/>
-        <include name="${ogc-jaxb.lib}"/>
         <include name="${jaxb-api.lib}"/>
         <include name="${jaxb-core.lib}"/>
         <include name="${jaxb-impl.lib}"/>
@@ -410,7 +417,6 @@
         <filter token="HyraxVersion" value="${HYRAX_VERSION}"/>
         <filter token="OlfsVersion" value="${OLFS_VERSION}"/>
         <filter token="SERVICE_CONTEXT" value="${DEPLOYMENT_CONTEXT}"/>
-        <filter token="WCS_SOFTWARE_VERSION" value="${WCS_VERSION}"/>
 
         <tstamp/>
         <echo level="info" message="time: ${TSTAMP}"/>
@@ -439,11 +445,6 @@
             <test name="opendap.bes.dap4Responders.Dap4ResponderTest"/>
             <test name="opendap.coreServlet.RequestIdTest"/>
 
-            <!--
-            <test name="opendap.dap4.DatasetTest" />
-            <test name="opendap.wcs.v2_0.DynamicCoverageDescriptionTest" />
-            -->
-
         </junit>
     </target>
 
@@ -459,7 +460,6 @@
         <echo level="info" message="          HYRAX_VERSION: ${HYRAX_VERSION}"/>
         <echo level="info" message="           NGAP_VERSION: ${NGAP_VERSION}"/>
         <echo level="info" message="           OLFS_VERSION: ${OLFS_VERSION}"/>
-        <echo level="info" message="            WCS_VERSION: ${WCS_VERSION}"/>
         <echo level="info" message="     DEPLOYMENT_CONTEXT: ${DEPLOYMENT_CONTEXT}"/>
         <echo level="info" message="NGAP_DEPLOYMENT_CONTEXT: ${NGAP_DEPLOYMENT_CONTEXT}"/>
         <echo level="info" message=""/>
@@ -471,18 +471,6 @@
                 <include name="opendap/**"/>
                 <include name="org/opendap/**"/>
 
-                <exclude name="opendap/cmr/**"/>
-
-                <!-- Exclude WCS 1.1.2 and semantics code  -->
-                <exclude name="opendap/wcs/v1_1_2/**"/>
-                <exclude name="opendap/semantics/**"/>
-
-                <!-- Exclude prototype Amazon Web Services code from production -->
-                <exclude name="opendap/aws/**"/>
-
-                <!-- Exclude async test code -->
-                <exclude name="opendap/async/**"/>
-
             </fileset>
         </copy>
 
@@ -490,15 +478,6 @@
         <copy todir="${build.hyrax.resources}" filtering="true">
             <!-- Copy and filter all of the hyrax resources   -->
             <fileset dir="${hyraxResources.dir}"/>
-            <!-- get the WCS stuff but don't stomp on Hyrax things -->
-            <fileset dir="${wcs.resources.dir}">
-                <include name="xsl/**"/>
-                <include name="WEB-INF/**"/>
-                <exclude name="WEB-INF/web.xml"/>
-                <exclude name="WEB-INF/urlrewrite.xml"/>
-                <exclude name="WEB-INF/logback.xml"/>
-                <exclude name="WEB-INF/logback-test.xml"/>
-            </fileset>
         </copy>
 
         <copy todir="${build.robots.resources}" filtering="true">
@@ -591,10 +570,10 @@
         <copy file="README.md"
               tofile="${build.dist}/README"/>
 
-        <tar destfile="${build.dist}/${WEBAPP_DIST}.tgz"
+        <tar destfile="${build.dist}/${OLFS_WEBAPP_DIST}.tgz"
              compression="gzip"
         >
-            <zipfileset dir="${build.dist}" prefix="${WEBAPP_DIST}">
+            <zipfileset dir="${build.dist}" prefix="${OLFS_WEBAPP_DIST}">
                 <include name="opendap.war"/>
                 <include name="README"/>
             </zipfileset>
@@ -826,9 +805,9 @@
         <copy file="README.md"
               tofile="${build.dist}/README"/>
 
-        <tar destfile="${build.dist}/robots-${WEBAPP_DIST}.tgz"
+        <tar destfile="${build.dist}/robots-${OLFS_WEBAPP_DIST}.tgz"
              compression="gzip">
-            <zipfileset dir="${build.dist}" prefix="robots-${WEBAPP_DIST}">
+            <zipfileset dir="${build.dist}" prefix="robots-${OLFS_WEBAPP_DIST}">
                 <include name="opendap.war"/>
                 <include name="ROOT.war"/>
                 <include name="README"/>
@@ -960,8 +939,8 @@
             depends="ngap"
             description="Packages the NGAP war file (${NGAP_DEPLOYMENT_CONTEXT}.war) into a gzipped tar file with a release related name.">
 
-        <tar destfile="${build.dist}/${NGAP_DIST_BASE}-webapp.tgz" compression="gzip">
-            <zipfileset dir="${build.dist}" prefix="${NGAP_DIST_BASE}-webapp">
+        <tar destfile="${build.dist}/${NGAP_WEBAPP_DIST}.tgz" compression="gzip">
+            <zipfileset dir="${build.dist}" prefix="${NGAP_WEBAPP_DIST}">
                 <include name="${NGAP_DEPLOYMENT_CONTEXT}.war"/>
             </zipfileset>
         </tar>

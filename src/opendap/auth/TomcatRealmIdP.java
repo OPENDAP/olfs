@@ -45,7 +45,7 @@ public class TomcatRealmIdP extends IdProvider {
     public static final String DEFAULT_AUTHENICATION_CONTEXT ="realm";
 
 
-    private Logger log;
+    private final Logger log;
 
 
     public TomcatRealmIdP(){
@@ -65,10 +65,12 @@ public class TomcatRealmIdP extends IdProvider {
      */
     @Override
     public boolean doLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        //Redirect the user back to the their original requested resource.
+        //Redirect the user back to their original requested resource.
         HttpSession session = request.getSession();
-        String redirectUrl = request.getContextPath();
-        if(session!=null){
+        log.debug("BEGIN (session: {})",session.getId());
+        log.debug("session.isNew(): {}", session.isNew());
+        String redirectUrl = getServiceContextPath();
+        if(session != null){
             String url = (String) session.getAttribute(IdFilter.RETURN_TO_URL);
             if(url != null) {
                 redirectUrl = url;
@@ -94,15 +96,15 @@ public class TomcatRealmIdP extends IdProvider {
 
     @Override
     public String getLoginEndpoint(){
-        String loginEndpoint = PathBuilder.pathConcat(serviceContext,AuthenticationControls.getLoginEndpoint());
-        loginEndpoint = PathBuilder.pathConcat(loginEndpoint, authContext);
+        String loginEndpoint = PathBuilder.pathConcat(getServiceContextPath(),AuthenticationControls.getLoginEndpoint());
+        loginEndpoint = PathBuilder.pathConcat(loginEndpoint, getAuthContext());
         return loginEndpoint;
     }
 
 
     @Override
     public String getLogoutEndpoint() {
-        String logoutEndpoint = PathBuilder.pathConcat(serviceContext,AuthenticationControls.getLogoutEndpoint());
+        String logoutEndpoint = PathBuilder.pathConcat(getServiceContextPath(),AuthenticationControls.getLogoutEndpoint());
         return logoutEndpoint;
     }
 }

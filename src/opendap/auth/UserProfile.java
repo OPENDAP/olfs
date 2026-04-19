@@ -27,8 +27,10 @@
 package opendap.auth;
 
 import com.google.gson.*;
+import opendap.coreServlet.ReqInfo;
 
-import java.io.Serializable;
+import javax.servlet.http.HttpServletRequest;
+import java.io.*;
 import java.util.*;
 
 
@@ -36,6 +38,8 @@ import java.util.*;
  * Created by ndp on 9/25/14.
  */
 public class UserProfile implements Serializable {
+
+    private static final String USER_AGENT_KEY = "User-Agent";
 
     /* @serial */
     private Date objectCreationTime;
@@ -58,17 +62,28 @@ public class UserProfile implements Serializable {
 
     // private String edlClientAppId;
 
+    /* @serial */
+    private String d_clientIp;
+    /* @serial */
+    private String d_clientUserAgent;
 
     public UserProfile() {
         objectCreationTime = new Date();
         d_groups = new HashSet<>();
         d_roles = new HashSet<>();
 
+        d_clientIp = null;
+        d_clientUserAgent = null;
         d_profile = null;
         d_authContext = null;
         d_edlAccessToken = null;
         // edlClientAppId ="";
         d_uid = null;
+    }
+
+    public UserProfile(HttpServletRequest request) {
+        this();
+        setUserFootPrint(request);
     }
 
     /**
@@ -84,17 +99,21 @@ public class UserProfile implements Serializable {
     }
 
     private JsonObject getProfile(){
-        if(d_profile==null && d_jsonStr !=null){
-            JsonParser jparse = new JsonParser();
-            d_profile = jparse.parse(d_jsonStr).getAsJsonObject();
+        if(d_profile == null && d_jsonStr != null){
+            ingestJsonProfileString();
         }
         return d_profile;
     }
 
-    void ingestJsonProfileString(String jsonStr){
-        this.d_jsonStr = jsonStr;
-        JsonObject profile = getProfile();
-        JsonElement uid=profile.get("uid");
+    public void ingestJsonProfileString(String jsonStr){
+        d_jsonStr = jsonStr;
+        ingestJsonProfileString();
+    }
+
+    private  void ingestJsonProfileString(){
+        JsonParser jparse = new JsonParser();
+        d_profile = jparse.parse(d_jsonStr).getAsJsonObject();
+        JsonElement uid = d_profile.get("uid");
         d_uid = uid.getAsString();
     }
 
@@ -116,7 +135,7 @@ public class UserProfile implements Serializable {
 
     public String getAttribute(String attrName){
         JsonObject profile = getProfile();
-        if(profile !=null) {
+        if(profile != null) {
             JsonElement val = profile.get(attrName);
             if (val == null)
                 return null;
@@ -185,6 +204,37 @@ public class UserProfile implements Serializable {
 
     public HashSet<String> getRoles(){
         return new HashSet<String>(d_roles);
+    }
+
+
+    /**
+     * Collects user specific information from the request for later examination.
+     * @param request The request to exam,ine.
+     */
+    private void setUserFootPrint(HttpServletRequest request) {
+        d_clientIp =  ReqInfo.getClientIp(request);
+        d_clientUserAgent = request.getHeader(USER_AGENT_KEY);
+    }
+
+    /**
+     *
+     * @param request The request to validate.
+     * @return True if the request matches the existing client footprint, false otherwise
+     */
+    boolean validateUserFootPrint(HttpServletRequest request) {
+        String value;
+
+        value = ReqInfo.getClientIp(request);
+        if( d_clientIp == null || !d_clientIp.equals(value) ) {
+            return false;
+        }
+
+        value = request.getHeader(USER_AGENT_KEY);
+        if( d_clientUserAgent == null || !d_clientUserAgent.equals(value) ) {
+            return false;
+        }
+
+        return true;
     }
 
 
@@ -261,22 +311,28 @@ public class UserProfile implements Serializable {
         StringBuilder sb = new StringBuilder();
 
         String l1i = indent +indent_inc;
+        String l2i = l1i +indent_inc;
+        String jsonObjName = getClass().getName().replace(".","_");
+        sb.append(indent).append("\"").append(jsonObjName).append("\" : {\n");
+        sb.append(l1i).append("\"d_uid\": \"").append(d_uid).append("\",\n");
+        sb.append(l1i).append("\"d_clientIp\": \"").append(d_clientIp).append("\",\n");
+        sb.append(l1i).append("\"d_clientUserAgent\": \"").append(d_clientUserAgent).append("\",\n");
 
-        sb.append(indent).append("\"").append(getClass().getName()).append("\" : {");
-
+        sb.append(l1i).append("\"").append("edl_profile").append("\" : {");
         JsonObject profile = getProfile();
         if(profile != null) {
             boolean comma = false;
             for (Map.Entry<String, JsonElement> e : profile.entrySet()) {
                 sb.append(comma ? ",\n" : "\n");
-                sb.append(l1i).append("\"").append(e.getKey()).append("\" : ").append(e.getValue());
+                sb.append(l2i).append("\"").append(e.getKey()).append("\" : ").append(e.getValue());
                 comma = true;
             }
             sb.append(indent).append("\n");
         }
         if(d_edlAccessToken !=null){
-            sb.append(d_edlAccessToken.toString(l1i,indent_inc));
+            sb.append(d_edlAccessToken.toString(l2i,indent_inc));
         }
+        sb.append(l1i).append("}\n");
         sb.append(indent).append("}\n");
         return sb.toString();
     }
@@ -284,7 +340,7 @@ public class UserProfile implements Serializable {
 
 
     public static void main(String args[]){
-        String ursUserProfile = "{\"d_uid\":\"ndp_opendap\",\"first_name\":\"Nathan\",\"last_name\":\"Potter\",\"registered_date\":\"23 Sep 2014 17:33:09PM\",\"email_address\":\"ndp@opendap.org\",\"country\":\"United States\",\"study_area\":\"Other\",\"user_type\":\"Public User\",\"affiliation\":\"Non-profit\",\"authorized_date\":\"24 Oct 2017 15:01:18PM\",\"allow_auth_app_emails\":true,\"agreed_to_meris_eula\":false,\"agreed_to_sentinel_eula\":false,\"user_groups\":[],\"user_authorized_apps\":2}";
+        String ursUserProfile = "{\"uid\":\"ndp_opendap\",\"first_name\":\"Nathan\",\"last_name\":\"Potter\",\"registered_date\":\"23 Sep 2014 17:33:09PM\",\"email_address\":\"ndp@opendap.org\",\"country\":\"United States\",\"study_area\":\"Other\",\"user_type\":\"Public User\",\"affiliation\":\"Non-profit\",\"authorized_date\":\"24 Oct 2017 15:01:18PM\",\"allow_auth_app_emails\":true,\"agreed_to_meris_eula\":false,\"agreed_to_sentinel_eula\":false,\"user_groups\":[],\"user_authorized_apps\":2}";
 
         UserProfile up = new UserProfile(ursUserProfile);
         up.setEDLAccessToken(new EarthDataLoginAccessToken());

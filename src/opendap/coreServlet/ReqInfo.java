@@ -32,6 +32,7 @@ import opendap.bes.BesDapDispatcher;
 import opendap.dap.Request;
 import opendap.dap4.QueryParameters;
 import opendap.io.HyraxStringEncoding;
+import opendap.version.HyraxVersion;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONArray;
 import org.slf4j.Logger;
@@ -93,6 +94,7 @@ public class ReqInfo {
     private static final String CLOUD_FRONT_FORWARDED_PROTOCOL = "CloudFront-Forwarded-Proto";
     private static final String X_FORWARDED_PROTOCOL = "X-Forwarded-Proto";
     private static final String X_FORWARDED_PORT = "X-Forwarded-Port";
+    private static final String X_FORWARDED_FOR ="X-Forwarded-For";
 
     private static final String JAVAX_SERVLET_FORWARD_REQUEST_URI  = "javax.servlet.forward.request_uri";
     private static final String JAVAX_SERVLET_FORWARD_CONTEXT_PATH = "javax.servlet.forward.context_path";
@@ -104,8 +106,7 @@ public class ReqInfo {
     /**
      * A request header key/name used by a client to transmit  a request id.
      */
-    public static final String REQUEST_ID_HEADER_KEY ="a-api-request-uuid";
-
+    public static final String CLIENT_REQUEST_ID_KEY ="a-api-request-uuid";
 
     private static Logger log;
     static {
@@ -696,7 +697,7 @@ public class ReqInfo {
         cf_history_entry.append(" ");
 
         // Add the Hyrax Version
-        cf_history_entry.append("hyrax-").append(opendap.bes.Version.getHyraxVersionString());
+        cf_history_entry.append("hyrax-").append(HyraxVersion.getVersionString());
         cf_history_entry.append(" ");
 
         // Add the complete request URL
@@ -722,7 +723,7 @@ public class ReqInfo {
         String timestamp = sdf.format(now);
         String schema = "https://harmony.earthdata.nasa.gov/schemas/history/0.1.0/history-0.1.0.json";
         String program = "hyrax";
-        String version = opendap.bes.Version.getHyraxVersionString();
+        String version = HyraxVersion.getVersionString();
 
         JSONArray parameters = new JSONArray();
 
@@ -944,7 +945,17 @@ public class ReqInfo {
         RequestId reqId;
 
         // Add additional req.getHeader() calls for different keys as needed.
-        String request_id_header = req.getHeader(REQUEST_ID_HEADER_KEY);
+        String request_id_header = req.getHeader(CLIENT_REQUEST_ID_KEY);
+        if(request_id_header != null) {
+            log.debug("Using client request id from request header. {}: {}",CLIENT_REQUEST_ID_KEY, request_id_header);
+        }
+        else { // Not in request headers. Checking query string
+            request_id_header = req.getParameter(CLIENT_REQUEST_ID_KEY);
+            if(request_id_header != null) {
+                log.debug("Using client request id from query string. {}={}",CLIENT_REQUEST_ID_KEY, request_id_header);
+            }
+        }
+
         if(request_id_header != null) {
             // TODO Determine the allowed characters and associated format
             //  for the REQUEST_UUID_KEY and use that to implement a closely
@@ -958,10 +969,78 @@ public class ReqInfo {
             // so make a homegrown request_id and send it on.
             // The no parameter constructor mints a fresh uuid
             reqId = new RequestId();
+            log.debug("Created unique request id: {}", reqId.id());
+
         }
         return reqId;
     }
 
+    private static final
+    Pattern IP_ADDR_PATTERN = Pattern.compile("\\b(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\\b");
+    public static String getClientIp(HttpServletRequest req) {
+        return getClientIp(req.getRemoteHost(), req.getHeader(X_FORWARDED_FOR));
+    }
+
+    private static String getClientIp(String remoteHost, String xForwardForHeader){
+        String clientIp;
+        if(xForwardForHeader != null){
+            log.debug("HTTP Header {}: '{}'",X_FORWARDED_FOR,xForwardForHeader);
+            String candidateIp = xForwardForHeader.split(",")[0].trim();
+            log.debug("candidateIp: '{}'",candidateIp);
+            if( IP_ADDR_PATTERN.matcher(candidateIp).matches() ){
+                clientIp = candidateIp;
+            }
+            else {
+                log.error("Failed to locate valid client ip in the {} header: {} " +
+                        "Using request.getRemoteAddr() instead.", X_FORWARDED_FOR,xForwardForHeader);
+                clientIp = remoteHost;
+            }
+        }
+        else {
+            clientIp = remoteHost;
+        }
+        log.debug("Returning clientIp: '{}'",clientIp);
+        return clientIp;
+    }
+
+
+    public static void main(String[] argv){
+        String hdrValue;
+        String hr="-------------------------------------------------------------------\n";
+
+        hdrValue = "192.198.64.33,73.981.12.1";
+        log.debug("#  Found Client IP: {}", getClientIp("10.7.3.1", hdrValue));
+        log.debug(hr);
+
+        hdrValue = "192.198.64.33";
+        log.debug("#  Found Client IP: {}", getClientIp("1.1.1.2", hdrValue));
+        log.debug(hr);
+
+        hdrValue = "192.921.64.33,192.198.64.33";
+        log.debug("#  Found Client IP: {}", getClientIp("10.7.3.3", hdrValue));
+        log.debug(hr);
+
+        hdrValue = "192.40.64.33 ,192.198.64.33";
+        log.debug("#  Found Client IP: {}", getClientIp("10.7.3.4", hdrValue));
+        log.debug(hr);
+
+        hdrValue = "192.41.64.33, 192.198.64.33";
+        log.debug("#  Found Client IP: {}", getClientIp("10.7.3.5", hdrValue));
+
+        log.debug(hr);
+        hdrValue = "192.42.64.33 , 192.198.64.33";
+        log.debug("#  Found Client IP: {}", getClientIp("10.7.3.6", hdrValue));
+        log.debug(hr);
+
+        hdrValue = "MorkAndMindy,BollAndBobby,JohnAndSally";
+        log.debug("#  Found Client IP: {}", getClientIp("10.7.3.7", hdrValue));
+        log.debug(hr);
+
+        hdrValue = null;
+        log.debug("#  Found Client IP: {}", getClientIp("10.7.3.8", hdrValue));
+        log.debug(hr);
+
+    }
 }
 
 

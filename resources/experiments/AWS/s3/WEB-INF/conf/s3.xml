@@ -43,7 +43,6 @@
             <host>localhost</host>
             <port>10022</port>
             <!-- <timeOut>300</timeOut> -->
-            <!-- <adminPort>11002</adminPort> -->
             <maxResponseSize>0</maxResponseSize>
             <ClientPool maximum="200" maxCmds="2000" />
         </BES>

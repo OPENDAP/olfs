@@ -49,7 +49,6 @@ public class BESConfig  {
 
     private  String  _BesHost;
     private  int     _BesPort;
-    private  int     _BesAdminPort;
     private  int     _BesMaxClients;
     private  int     _BesMaxCommands;
     private  long     _BesMaxResponseSize;
@@ -73,7 +72,6 @@ public class BESConfig  {
 
         _BesHost = "HostNameIsNotSet!";
         _BesPort = -1;
-        _BesAdminPort = -1;
         _BesMaxClients = 200;
         _BesMaxCommands = 2000;
         _BesPrefix = "/";
@@ -104,7 +102,6 @@ public class BESConfig  {
 
         copy._BesHost            = _BesHost;
         copy._BesPort            = _BesPort;
-        copy._BesAdminPort       = _BesAdminPort;
         copy._BesMaxVariableSize = _BesMaxResponseSize;
         copy._BesMaxResponseSize = _BesMaxVariableSize;
         copy._BesMaxClients      = _BesMaxClients;
@@ -206,14 +203,6 @@ public class BESConfig  {
 
         }
         setPort(port.getTextTrim());
-
-
-
-        Element adminPort = besConfig.getChild("adminPort");
-        if( adminPort!=null ){
-            setAdminPort(adminPort.getTextTrim());
-            log.info("BES '{}' adminPort set to {}",getPrefix(), getAdminPort());
-        }
 
 
 
@@ -448,17 +437,6 @@ public class BESConfig  {
         Element port = new Element("port");
         port.setText(String.valueOf(getPort()));
 
-        Element adminPort = new Element("adminPort");
-        adminPort.setText(String.valueOf(getAdminPort()));
-
-        Element maxResponseSize = new Element(MAX_RESPONSE_SIZE_ELEMENT_OLFS);
-        maxResponseSize.setAttribute(UNITS_ATTRIBUTE_NAME, "b");
-        adminPort.setText(String.valueOf(getMaxResponseSize()));
-
-        Element maxVariableSize = new Element(MAX_VARIABLE_SIZE_ELEMENT_OLFS);
-        maxVariableSize.setAttribute(UNITS_ATTRIBUTE_NAME, "b");
-        adminPort.setText(String.valueOf(getMaxVariableSize()));
-
 
         Element clientPool = new Element("ClientPool");
         clientPool.setAttribute("maximum",Integer.toString(_BesMaxClients));
@@ -467,9 +445,6 @@ public class BESConfig  {
         bes.addContent(prefix);
         bes.addContent(host);
         bes.addContent(port);
-        bes.addContent(adminPort);
-        bes.addContent(maxResponseSize);
-        bes.addContent(maxVariableSize);
         bes.addContent(clientPool);
 
         return bes;
@@ -486,10 +461,6 @@ public class BESConfig  {
     public void setPort(String port){setPort(Integer.parseInt(port)); }
     public void setPort(int port){ _BesPort = port; }
     public int getPort() { return _BesPort; }
-
-    public void setAdminPort(String port){ setAdminPort(Integer.parseInt(port)); }
-    public void setAdminPort(int port){ _BesAdminPort = port; }
-    public int getAdminPort() { return _BesAdminPort; }
 
     public void setMaxResponseSize(String maxResponseSize, String units)
             throws BadConfigurationException {
@@ -558,7 +529,6 @@ public class BESConfig  {
         s += "        Host:       " + getHost() + "\n";
         s += "        Port:       " + getPort() + "\n";
         s += "        Timeout:    " + getTimeOut() + " ms\n";
-        s += "        adminPort:  " + getAdminPort() + "\n";
         s += "        MaxClients: " + getMaxClients() + "\n";
         s += "        MaxCommands/client: " + getMaxCommands() + "\n";
 
@@ -733,24 +703,6 @@ public class BESConfig  {
             else
                 done = true;
         }
-
-
-
-        done = false;
-        while(!done){
-            System.out.print("\nEnter the admin port number for the BES host "+bc.getHost()+"   ");
-            System.out.print("[" + bc.getAdminPort() + "]: ");
-            k = kybrd.readLine();
-            if (k!=null && !k.equals("")){
-                bc.setAdminPort(k);
-                done = true;
-            }
-            else if(bc.getAdminPort()==-1)
-                System.out.println("You must enter a port number.\n\n");
-            else
-                done = true;
-        }
-
 
 
         done = false;

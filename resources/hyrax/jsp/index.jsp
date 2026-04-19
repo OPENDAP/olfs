@@ -35,7 +35,8 @@
 </head>
 
 <body>
-<a href="http://www.opendap.org"><img src="<%= contextPath %>/docs/images/logo.svg"/></a>
+<a href="https://www.opendap.org"><img class="banner_logo_img" alt="OPeNDAP Logo" src="<%= contextPath %>/docs/images/logo.svg"/></a>
+
 
 <h1 align="left">Hyrax</h1>
 <hr size="1" noshade="noshade"/>
@@ -81,11 +82,6 @@
         <a href="<%= contextPath %>/hyrax/catalog.xml"><strong>Top Level THREDDS catalog.xml is here. </strong></a>
         <br />
         <br />
-    </li>
-    <li><a href="<%= contextPath %>/admin/index.html"><strong>Hyrax Admin Interface (beta) is here.</strong></a>
-        <span class="medium">(Requires SSL support in Tomcat.
-        See the <a href="http://docs.opendap.org/index.php/Hyrax_-_Administrators_Interface"> HAI instructions</a>
-        for more information.)</span>
     </li>
 </ul>
 
