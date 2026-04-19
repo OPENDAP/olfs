@@ -30,7 +30,6 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
-import com.google.gson.Gson;
 import opendap.PathBuilder;
 import opendap.coreServlet.ReqInfo;
 import opendap.coreServlet.RequestId;
@@ -47,24 +46,9 @@ import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.security.Principal;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static opendap.auth.IdFilter.USER_PROFILE;
-
-class json_log_entry{
-    String client_ip;
-    String user_id;
-    String user_agent;
-    String session_id;
-    long start_time;
-    String request_id;
-    String http_verb;
-    String resource_id;
-    String query_string;
-    String dap4_function;
-}
 
 /**
  * User: ndp
@@ -468,29 +452,6 @@ public class ServletLogUtil {
         }
 
         return alb.toString();
-    }
-
-    public static String getBesLogEntryJson(){
-
-        json_log_entry jlog_entry = new json_log_entry();
-        if(useCombinedLog.get()) {
-            jlog_entry.client_ip = MDC.get(CLIENT_HOST_KEY);
-            jlog_entry.user_agent = MDC.get(USER_AGENT_KEY);
-            jlog_entry.user_id = MDC.get(USER_ID_KEY);
-            jlog_entry.session_id = MDC.get(SESSION_ID_KEY);
-            jlog_entry.start_time = System.currentTimeMillis();
-            jlog_entry.request_id = MDC.get(REQUEST_ID_KEY);
-            jlog_entry.http_verb = MDC.get(HTTP_VERB_KEY);
-            jlog_entry.resource_id = MDC.get(RESOURCE_ID_KEY);
-
-            String ce = MDC.get(QUERY_STRING_KEY);
-            if(ce == null || ce.isEmpty()) {
-                ce = "-";
-            }
-            jlog_entry.query_string = ce;
-        }
-        Gson gson = new Gson();
-        return gson.toJson(jlog_entry);
     }
 
 
