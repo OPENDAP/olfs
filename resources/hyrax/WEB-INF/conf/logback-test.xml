@@ -202,8 +202,6 @@
 
     <logger name="opendap.aggregation" level="all" />
 
-    <logger name="opendap.w10n" level="all" />
-
     <!--
     <logger name="opendap.ppt.NewPPTClient" level="all" />
 
