@@ -141,7 +141,7 @@
     <logger name="opendap" level="error">
         <appender-ref ref="ErrorLog"/>
         <appender-ref ref="stdout"/>
-        <!-- appender-ref ref="JsonLog"/ -->
+        <appender-ref ref="JsonLog"/>
     </logger>
 
     <logger name="opendap.io" level="info" />
