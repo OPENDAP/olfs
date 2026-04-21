@@ -179,14 +179,6 @@
              <appender-ref ref="stdout"/>
     </logger>
 
-    <logger name="opendap.w10n" level="all">
-        <appender-ref ref="stdout"/>
-    </logger>
-
-
-    <logger name="opendap.w10n" level="all">
-        <appender-ref ref="stdout"/>
-    </logger>
 
 
 

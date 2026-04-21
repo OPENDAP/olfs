@@ -209,13 +209,6 @@
     </servlet>
 
 
-    <!-- Drop w10n API
-    <servlet>
-        <servlet-name>w10n</servlet-name>
-        <servlet-class>opendap.w10n.W10nServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-    -->
     <servlet>
         <servlet-name>aggregation</servlet-name>
         <servlet-class>opendap.aggregation.AggregationServlet</servlet-class>
@@ -296,15 +289,7 @@
         <servlet-name>aggregation</servlet-name>
         <url-pattern>/aggregation/*</url-pattern>
     </servlet-mapping>
-
-    <!-- Drop w10n API
-    <servlet-mapping>
-        <servlet-name>w10n</servlet-name>
-        <url-pattern>/w10n/*</url-pattern>
-    </servlet-mapping>
-    -->
-
-    <!-- ==================== Default Session Configuration ================= -->
+  <!-- ==================== Default Session Configuration ================= -->
   <!-- You can set the default session timeout (in minutes) for all newly   -->
   <!-- created sessions by modifying the value below.                       -->
 

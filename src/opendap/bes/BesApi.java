@@ -97,11 +97,6 @@ public class BesApi implements Cloneable {
     public static final String JSON       = "json";
     public static final String COVJSON   = "covjson";
     public static final String IJSON      = "ijson";
-    public static final String W10N       = "w10n";
-    public static final String W10N_META      = "w10nMeta";
-    public static final String W10N_CALLBACK  = "w10nCallback";
-    public static final String W10N_FLATTEN   = "w10nFlatten";
-    public static final String W10N_TRAVERSE   = "w10nTraverse";
     public static final String SHOW_BES_KEY    = "showBesKey";
     public static final String VALUE           = "value";
     public static final String BES_SUPPORT_EMAIL_KEY = "SupportEmail";
@@ -842,45 +837,6 @@ public class BesApi implements Cloneable {
      * Writes the NetCDF file out response for the dataSource to the passed
      * stream.
      *
-     * @param dataSource The requested DataSource
-     * @param os         The Stream to which to write the response.
-     * @throws BadConfigurationException .
-     * @throws BESError                  .
-     * @throws IOException               .
-     * @throws PPTException              .
-     */
-    public void writePathInfoResponse(String dataSource,
-                                         OutputStream os,
-                                      TransmitCoordinator tc)
-            throws BadConfigurationException, BESError, IOException, PPTException {
-
-        besTransaction(
-            dataSource,
-            getShowPathInfoRequestDocument(dataSource),
-            os, tc);
-    }
-
-    public void getPathInfoDocument(String dataSource, Document response)
-            throws PPTException,
-            BadConfigurationException,
-            IOException,
-            JDOMException, BESError {
-
-        ByteArrayOutputStream pathInfoDocString = new ByteArrayOutputStream();
-        ByteArrayOutputStreamTransmitCoordinator baostc = new ByteArrayOutputStreamTransmitCoordinator(pathInfoDocString);
-        writePathInfoResponse(dataSource,pathInfoDocString, baostc);
-
-        SAXBuilder sb = new SAXBuilder();
-        Document pathInfoResponseDoc = sb.build(new ByteArrayInputStream(pathInfoDocString.toByteArray()));
-        response.detachRootElement();
-        response.setRootElement(pathInfoResponseDoc.detachRootElement());
-    }
-
-
-    /**
-     * Writes the NetCDF file out response for the dataSource to the passed
-     * stream.
-     *
      * @param user The User profile and tokens that may be required to complete
      *            downstream transactions.
      * @param dataSource The requested DataSource
@@ -1169,70 +1125,6 @@ public class BesApi implements Cloneable {
                 os, tc);
     }
 
-
-    /**
-     * Writes the w10n Json response for the dataSource to the passed
-     * stream.
-     *
-     * @param user The User profile and tokens that may be required to complete
-     *            downstream transactions.
-     * @param dataSource The requested DataSource
-     * @param constraintExpression The constraintElement expression to be applied to
-     *                             the request..
-     * @param os         The Stream to which to write the response.
-     * @throws BadConfigurationException .
-     * @throws BESError                  .
-     * @throws IOException               .
-     * @throws PPTException              .
-     */
-    public void writeDap2DataAsW10nJson(User user,
-                                        String dataSource,
-                                       String constraintExpression,
-                                       String w10nMeta,
-                                       String w10nCallback,
-                                       boolean w10nFlatten,
-                                       OutputStream os,
-                                        TransmitCoordinator tc)
-            throws BadConfigurationException, BESError, IOException, PPTException {
-
-         besTransaction(
-                dataSource,
-                getDap2DataAsW10nJsonRequest(user, dataSource, constraintExpression, w10nMeta, w10nCallback, w10nFlatten),
-                os, tc);
-    }
-
-
-    /**
-     * Writes the NetCDF file out response for the dataSource to the passed
-     * stream.
-     *
-     * @param user The User profile and tokens that may be required to complete
-     *            downstream transactions.
-     * @param dataSource The requested DataSource
-     * @param constraintExpression The constraintElement expression to be applied to
-     *                             the request..
-     * @param os         The Stream to which to write the response.
-     * @throws BadConfigurationException .
-     * @throws BESError                  .
-     * @throws IOException               .
-     * @throws PPTException              .
-     */
-    public void writeDap2MetadataAsW10nJson(User user,
-                                            String dataSource,
-                                           String constraintExpression,
-                                           String w10nMeta,
-                                           String w10nCallback,
-                                           boolean w10nFlatten,
-                                           boolean w10nTraverse,
-                                           OutputStream os,
-                                            TransmitCoordinator tc)
-            throws BadConfigurationException, BESError, IOException, PPTException {
-
-         besTransaction(
-                dataSource,
-                getDap2MetadataAsW10nJsonRequest(user, dataSource, constraintExpression, w10nMeta, w10nCallback, w10nFlatten, w10nTraverse),
-                os, tc);
-    }
 
 
     /**
@@ -2060,83 +1952,6 @@ public class BesApi implements Cloneable {
      * @param user The User profile and tokens that may be required to complete
      *            downstream transactions.
      * @param dataSource The data set whose DDS is being requested
-     * @param ce The constraint expression to apply.
-     * @return The DDS request document.
-     * @throws BadConfigurationException When no BES can be found to
-     * service the request.
-     */
-    public Document getDap2DataAsW10nJsonRequest(User user,
-                                                 String dataSource,
-                                           String ce,
-                                           String w10nMeta,
-                                           String w10nCallback,
-                                           boolean w10nFlatten)
-            throws BadConfigurationException {
-
-        Document requestDoc =  getDap2RequestDocument(user, DAP2_DATA, dataSource, ce, null, null, W10N, XML_ERRORS);
-
-
-        if(w10nMeta!=null)
-            requestDoc.getRootElement().addContent(1,setContextElement(W10N_META,w10nMeta));
-
-        if(w10nCallback!=null)
-            requestDoc.getRootElement().addContent(1,setContextElement(W10N_CALLBACK,w10nCallback));
-
-        if(w10nFlatten)
-            requestDoc.getRootElement().addContent(1,setContextElement(W10N_FLATTEN,"true"));
-
-        return requestDoc;
-
-    }
-    /**
-     *  Returns the JSON encoded DAP2 Metadata response (DDX) for the passed dataSource
-     *  using the passed constraint expression.
-     * @param user The User profile and tokens that may be required to complete
-     *            downstream transactions.
-     * @param dataSource The data set whose DDS is being requested
-     * @param ce The DAP2 query string parameters associated wih the request.
-     * @return The DDS request document.
-     * @throws BadConfigurationException When no BES can be found to
-     * service the request.
-     */
-    public Document getDap2MetadataAsW10nJsonRequest(User user,
-                                                     String dataSource,
-                                                 String ce,
-                                                 String w10nMeta,
-                                                 String w10nCallback,
-                                                 boolean w10nFlatten,
-                                                 boolean w10nTraverse
-    )
-            throws BadConfigurationException {
-
-        Document requestDoc = getDap2RequestDocument(user, DDX, dataSource, ce, null, null, W10N, XML_ERRORS);
-
-
-        if(w10nMeta!=null)
-            requestDoc.getRootElement().addContent(1,setContextElement(W10N_META,w10nMeta));
-
-        if(w10nCallback!=null)
-            requestDoc.getRootElement().addContent(1,setContextElement(W10N_CALLBACK,w10nCallback));
-
-        if(w10nFlatten)
-            requestDoc.getRootElement().addContent(1,setContextElement(W10N_FLATTEN,"true"));
-
-        if(w10nTraverse)
-            requestDoc.getRootElement().addContent(1,setContextElement(W10N_TRAVERSE,"true"));
-
-        return requestDoc;
-
-
-    }
-
-
-
-    /**
-     *  Returns the XML data response for the passed dataSource
-     *  using the passed constraint expression.
-     * @param user The User profile and tokens that may be required to complete
-     *            downstream transactions.
-     * @param dataSource The data set whose DDS is being requested
      * @param qp The DAP4 query string parameters associated wih the request.
      * @return The DDS request document.
      * @throws BadConfigurationException When no BES can be found to
@@ -2547,39 +2362,6 @@ public class BesApi implements Cloneable {
         if(leafSuffix!=null)
             spi.setAttribute("leafSuffix", leafSuffix);
 
-        return spi;
-    }
-
-
-
-    public  Document getShowPathInfoRequestDocument(String dataSource)
-            throws BadConfigurationException {
-
-
-        String besDataSource = getBES(dataSource).trimPrefix(dataSource);
-
-
-        Element request = new Element("request", BES_NS);
-        RequestId rid = RequestCache.getRequestId();
-        request.setAttribute(REQUEST_ID_KEY, rid.id());
-        request.setAttribute(REQUEST_UUID_KEY, rid.uuid().toString());
-
-        request.addContent(setContextElement(EXPLICIT_CONTAINERS_CONTEXT,"no"));
-        request.addContent(setContextElement(ERRORS_CONTEXT,XML_ERRORS));
-
-        request.addContent(showPathInfoRequestElement(besDataSource));
-
-        XMLOutputter xmlo = new XMLOutputter(Format.getPrettyFormat());
-        log.debug("getShowPathInfoRequestDocument() - Document\n {}",xmlo.outputString(request));
-
-        return new Document(request);
-
-    }
-
-
-    public Element showPathInfoRequestElement(String resource) {
-        Element spi = new Element("showW10nPathInfo",BES_NS);
-        spi.setAttribute("node", resource);
         return spi;
     }
 
