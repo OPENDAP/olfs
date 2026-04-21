@@ -276,7 +276,7 @@ public class BesDapDispatcher implements DispatchHandler {
         Dap4Responder jp2 = new GmlJpeg2000(_systemPath, besApi, _addFileoutTypeSuffixToDownloadFilename);
         _responders.add(jp2);
 
-        // DAP2 w10n JSON Response
+        // DAP2 JSON Response
         Dap4Responder json = new Json(_systemPath, besApi, _addFileoutTypeSuffixToDownloadFilename);
         _responders.add(json);
 
