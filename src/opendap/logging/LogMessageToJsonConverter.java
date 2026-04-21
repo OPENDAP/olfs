@@ -14,8 +14,7 @@ public class LogMessageToJsonConverter extends ClassicConverter {
     @Override
     public String convert(ILoggingEvent event) {
         Gson gson = new Gson();
-        String jsonStr = gson.toJson(event.getFormattedMessage(), String.class);
-        return jsonStr;
-     }
+        return gson.toJson(event.getFormattedMessage(), String.class);
+    }
 }
 
