@@ -208,6 +208,12 @@
     NGAP Response Required Fields. See: https://wiki.earthdata.nasa.gov/pages/viewpage.action?pageId=248026243
     "required": [
         "request_id",
+        "user_id",
+        "user_ip",
+        "rangeEndDateTime",
+        "collectionId",
+        "query_string",
+        "parameter",
         "job_ids",
         "http_response_code",
         "time_completed", (2022-05-04T09:13:20Z)
@@ -220,7 +226,7 @@
         <logGroup>hyrax_response_log</logGroup>
         <logStream>hyrax-%instanceId</logStream>
         <layout>
-            <pattern>{ "request_id": "%X{ID}", "job_ids": ["N/A"], "http_response_code": %X{http_status}, "time_completed": "%d{yyyy-MM-dd'T'HH:mm:ssZ}", "total_time": %X{duration}, "output_size": %X{size} }%n</pattern>
+            <pattern>{ "request_id": "%X{ID}", "user_id": "%X{userid}", "user_ip": "%X{host}", "rangeBeginDateTime": "", "rangeEndDateTime": "", "collectionId": "%X{resourceID}", "query_string": "%X{query}", "parameters": { "service_name": "hyrax", "service_provider": "OPeNDAP", "service_id": "hyrax_prod" }, "job_ids": ["N/A"], "http_response_code": %X{http_status}, "time_completed": "%d{yyyy-MM-dd'T'HH:mm:ssZ}", "total_time": %X{duration}, "output_size": %X{size} }%n</pattern>
         </layout>
     </appender>
 
