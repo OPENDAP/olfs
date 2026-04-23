@@ -298,7 +298,7 @@ located identified in the arguments. Run this target with no arguments to see th
 Use -DARGS=&quot;...&quot; to specify command line options."
              depends="compile ">
 
-        <java classname="opendap.dap4.DmrppJoinExistingAggregator"
+        <java classname="opendap.dap4.dmrpp.DmrppJoinExistingAggregator"
               fork="true"
               maxmemory="4096m"
               dir="${build.run}" >
