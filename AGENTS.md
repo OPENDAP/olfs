@@ -2,6 +2,16 @@
 
 Guidance for automated coding agents working in this repository.
 
+## Interactions
+
+- Do not make up data
+- Talk to me directly
+- Be concise and to the point
+- Be critical of my requests and your own work
+- For all documents you write, use markdown and store them in the AI-docs directory
+- For all work, write a log explaining your reasoning unless explicitly told otherwise
+- For a plan, write the plane to a markdown document unless explicitly told otherwise
+
 ## Scope
 
 This repository is the Java servlet front end for Hyrax, commonly called the OLFS. It also contains related services and webapps, including WCS, W10n, aggregation, viewers, docs, sitemap/robots, gateway, NGAP, authentication/authorization, and PDP service code.
