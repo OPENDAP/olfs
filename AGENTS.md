@@ -8,6 +8,14 @@ This repository is the Java servlet front end for Hyrax, commonly called the OLF
 
 Do not inspect or modify `retired/` unless the user explicitly asks. Some code and resources outside `retired/`, especially under `resources/experiments` and older WCS resource folders, may still be unused or historical. Verify that a class/resource is wired into the active build or deployment descriptor before treating it as production behavior.
 
+## Hyrax Server Documentation
+
+The OLFS is the frontend to the Hyrax data server. The configuration guide for  Hyrax can be found online at [The Hyrax Data Server Installation and Configuration Guide](https://opendap.github.io/hyrax_guide/Master_Hyrax_Guide.html). 
+
+Other guides that describe how the server is used for data access can be found at:
+- [User Guide](https://opendap.github.io/documentation/UserGuideComprehensive.html)
+- [Quick start Guide](https://opendap.github.io/documentation/QuickStart.html)
+
 ## Build Authority
 
 Use Ant as the production build authority.
