@@ -10,6 +10,7 @@ Guidance for automated coding agents working in this repository.
 - Be critical of my requests and your own work
 - For all documents you write, use markdown and store them in the AI-docs directory
 - For all work, write a log explaining your reasoning unless explicitly told otherwise
+- In the work log, start each new set of entries with a date/time stamp
 - For a plan, write the plane to a markdown document unless explicitly told otherwise
 
 ## Scope
