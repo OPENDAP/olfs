@@ -222,3 +222,154 @@ This phase intentionally did not implement:
 - distribution bundles
 - Ant-style `check` / `test`
 - Sonar classpath/source-set reconciliation
+
+## Phase 5 Implementation
+
+Date: 2026-04-26
+
+### Goal
+
+Implement Ant-parity WAR assembly tasks for:
+
+- Hyrax / OLFS (`server`, `opendap`, `war`)
+- robots / sitemap (`robots`)
+- combined Hyrax + robots (`hyrax-robots`, `hyraxRobots`)
+- NGAP (`ngap`)
+
+### Files Changed
+
+- `build.gradle`
+
+### Commands Run
+
+```bash
+sed -n '720,980p' build.xml
+find resources/robots -maxdepth 3 -type f | sort
+find build/resources -maxdepth 3 -type f | sort
+find build/ngap -maxdepth 3 -type f | sort
+find build/robots -maxdepth 3 -type f | sort
+rg -n "robots.base|robots.jsp|urlrewrite.xml|logback.xml|logback-test.xml" resources/hyrax resources/robots build.xml
+JAVA_HOME=/Library/Java/JavaVirtualMachines/openjdk.jdk/Contents/Home GRADLE_USER_HOME=/tmp/olfs-gradle-home ./gradlew server robots ngap hyrax-robots --no-daemon -PHYRAX_VERSION=CI-Build -POLFS_VERSION=CI-Build
+jar tf build/dist/opendap.war | rg "^(WEB-INF/web.xml|WEB-INF/lib/|WEB-INF/conf/olfs.xml|docs/|xsl/capabilities.xsl|WEB-INF/urlrewrite.xml)$"
+jar tf build/dist/ROOT.war | rg "^(WEB-INF/web.xml|WEB-INF/conf/olfs.xml|robots.txt|robots.jsp|WEB-INF/lib/|docs/)"
+jar tf build/dist/ngap.war | rg "^(WEB-INF/web.xml|WEB-INF/conf/olfs.xml|WEB-INF/conf/logback.xml|WEB-INF/urlrewrite.xml|WEB-INF/lib/|docs/ngap/)"
+mkdir -p /tmp/phase5-gradle-wars
+cp build/dist/opendap.war build/dist/ROOT.war build/dist/ngap.war /tmp/phase5-gradle-wars/
+ant -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build clean server robots ngap
+JAVA_HOME=/Library/Java/JavaVirtualMachines/openjdk.jdk/Contents/Home GRADLE_USER_HOME=/tmp/olfs-gradle-home ./gradlew server robots ngap hyrax-robots --no-daemon -PHYRAX_VERSION=CI-Build -POLFS_VERSION=CI-Build
+jar tf /tmp/phase5-gradle-wars/ROOT.war | rg "^(robots.txt|robots.jsp|WEB-INF/conf/olfs.xml)$"
+jar tf build/dist/ngap.war | rg "^(WEB-INF/web.xml|WEB-INF/conf/olfs.xml|WEB-INF/conf/logback.xml|WEB-INF/urlrewrite.xml|docs/ngap/.*png|WEB-INF/lib/(elasticache|memcached|redisson-all|redisson-tomcat))"
+jar tf build/dist/opendap.war | rg "^(WEB-INF/web.xml|WEB-INF/conf/olfs.xml|WEB-INF/urlrewrite.xml|docs/index.html)$"
+```
+
+### Reasoning Notes
+
+I configured the built-in Gradle `war` task as the Ant-parity Hyrax WAR and made `server` depend on it. That keeps the standard Gradle `war` path useful while still providing the Ant-compatible entry point.
+
+The Phase 5 changes added:
+
+- `war` -> writes `build/dist/opendap.war`
+- `server` -> lifecycle alias for `war`
+- `opendap` -> alias for `server`
+- `robots` -> writes `build/dist/ROOT.war`
+- `hyrax-robots` and `hyraxRobots` -> build both WARs
+- `ngap` -> writes `build/dist/ngap.war`
+
+Each task uses the staged resource trees from Phase 3 and the explicit library sets from Phase 4.
+
+Key packaging decisions:
+
+- Hyrax WAR:
+  - web descriptor from `build/resources/WEB-INF/web.xml`
+  - includes `hyraxLibs`
+  - includes all staged Hyrax resources except `WEB-INF/web.xml`
+  - includes docs under `docs/`
+
+- robots WAR:
+  - web descriptor from `build/robots/WEB-INF/web.xml`
+  - includes `hyraxLibs`
+  - includes `build/resources/WEB-INF/conf/olfs.xml`
+  - packages `robots.jsp` as `robots.txt`
+  - excludes `robots.jsp`
+  - includes docs under `docs/`
+
+- NGAP WAR:
+  - web descriptor from `build/ngap/web.xml`
+  - includes `ngapWarLibs`
+  - includes staged Hyrax resources except the Ant-excluded Hyrax config/descriptor files
+  - adds NGAP `urlrewrite.xml`, `logback.xml`, and `olfs.xml` in their Ant locations
+  - includes docs under `docs/`
+  - includes NGAP landing assets under `docs/ngap`
+
+Two implementation issues surfaced and were fixed:
+
+1. Generated-tree ownership:
+   - `Copy` tasks were leaving stale files in `build/` across phase transitions.
+   - I changed the stage-owner tasks to `Sync` so generated trees behave like real build outputs.
+
+2. NGAP duplicate landing PNGs:
+   - Ant’s NGAP packaging logic effectively feeds the landing PNGs from both `build/ngap/landing` and `resources/ngap/landing`.
+   - Gradle fails on duplicates unless told otherwise.
+   - I set `duplicatesStrategy = DuplicatesStrategy.EXCLUDE` for the `ngap` WAR task so the final WAR keeps one copy and the build remains stable.
+
+### Validation Results
+
+Gradle validation succeeded:
+
+- `./gradlew server robots ngap hyrax-robots -PHYRAX_VERSION=CI-Build -POLFS_VERSION=CI-Build`
+
+Artifacts produced:
+
+- `build/dist/opendap.war`
+- `build/dist/ROOT.war`
+- `build/dist/ngap.war`
+
+Key content checks passed:
+
+- `opendap.war` contains:
+  - `WEB-INF/web.xml`
+  - `WEB-INF/conf/olfs.xml`
+  - `WEB-INF/urlrewrite.xml`
+  - `docs/index.html`
+
+- `ROOT.war` contains:
+  - `WEB-INF/conf/olfs.xml`
+  - `robots.txt`
+  - no `robots.jsp`
+
+- `ngap.war` contains:
+  - `WEB-INF/web.xml`
+  - `WEB-INF/urlrewrite.xml`
+  - `WEB-INF/conf/logback.xml`
+  - `WEB-INF/conf/olfs.xml`
+  - landing PNGs under `docs/ngap/`
+
+- `ngap.war` does not contain the container-managed excluded jars:
+  - `elasticache-java-cluster-client-1.1.2.jar`
+  - `memcached-session-manager-2.3.2.jar`
+  - `memcached-session-manager-tc9-2.3.2.jar`
+  - `redisson-all-3.22.0.jar`
+  - `redisson-tomcat-9-3.22.0.jar`
+
+### Ant Comparison Note
+
+I attempted the matching Ant comparison build:
+
+```bash
+ant -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build clean server robots ngap
+```
+
+It failed before WAR creation in this local environment because Ant ran under the machine’s old JDK 8 and could not load the current `logback-classic-1.5.16.jar`:
+
+- class file version `55.0`
+- runtime expected `52.0`
+
+So the Ant-vs-Gradle artifact comparison could not be completed end-to-end on this machine during Phase 5. The Gradle WAR content checks above did complete successfully.
+
+### Known Remaining Gaps
+
+This phase intentionally did not implement:
+
+- distribution bundles and helper artifacts
+- Ant-style `check` / `test`
+- Sonar classpath/source-set reconciliation

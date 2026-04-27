@@ -97,6 +97,10 @@ def ngapContainerExcludedLibNames = [
 def hyraxLibFiles = files(hyraxLibNames.collect { "lib/${it}" })
 def providedTomcatLibFiles = files(providedTomcatLibNames.collect { "lib/${it}" })
 def ngapAdditionalLibFiles = fileTree(dir: 'resources/ngap/lib', include: ['*.jar'], exclude: ngapContainerExcludedLibNames)
+def distDir = layout.buildDirectory.dir('dist')
+def hyraxDocsTree = fileTree('doc') {
+    exclude 'src.distribution.readme'
+}
 
 def stagedSourceDir = layout.buildDirectory.dir('src')
 def stagedHyraxResourcesDir = layout.buildDirectory.dir('resources')
@@ -271,7 +275,7 @@ tasks.register('verifyDependencyLayout') {
     }
 }
 
-tasks.register('stageSourceTree', Copy) {
+tasks.register('stageSourceTree', Sync) {
     group = 'build setup'
     description = 'Stage and filter Java sources into build/src.'
 
@@ -291,7 +295,7 @@ tasks.register('stageSourceTree', Copy) {
     filter(ReplaceTokens, tokens: filterTokens)
 }
 
-tasks.register('stageHyraxResources', Copy) {
+tasks.register('stageHyraxResources', Sync) {
     group = 'build setup'
     description = 'Stage and filter Hyrax resources into build/resources.'
 
@@ -320,7 +324,7 @@ tasks.register('mergeWcsResources', Copy) {
     dependsOn tasks.named('stageHyraxResources')
 }
 
-tasks.register('stageRobotsResources', Copy) {
+tasks.register('stageRobotsResources', Sync) {
     group = 'build setup'
     description = 'Stage and filter robots resources into build/robots.'
 
@@ -330,12 +334,12 @@ tasks.register('stageRobotsResources', Copy) {
     filter(ReplaceTokens, tokens: filterTokens)
 }
 
-tasks.register('stageNgapResources', Copy) {
+tasks.register('stageNgapResources', Sync) {
     group = 'build setup'
     description = 'Stage and filter NGAP resources into build/ngap.'
 
     from('resources/ngap') {
-        exclude '*.png'
+        exclude '**/*.png'
         exclude 'lib/**'
     }
     into stagedNgapResourcesDir
@@ -357,4 +361,127 @@ tasks.register('PreProcessSourceCode') {
 
 tasks.named('compileJava') {
     dependsOn tasks.named('PreProcessSourceCode')
+}
+
+tasks.named('war', War) {
+    group = 'build'
+    description = 'Build the Ant-parity Hyrax WAR in build/dist.'
+
+    dependsOn tasks.named('PreProcessSourceCode')
+    archiveFileName = "${DEPLOYMENT_CONTEXT}.war"
+    destinationDirectory = distDir.get().asFile
+    webXml = file("${stagedHyraxResourcesDir.get().asFile}/WEB-INF/web.xml")
+    classpath(configurations.hyraxLibs)
+
+    from(stagedHyraxResourcesDir) {
+        exclude 'WEB-INF/web.xml'
+    }
+
+    from(hyraxDocsTree) {
+        into 'docs'
+    }
+}
+
+tasks.register('server') {
+    group = 'build'
+    description = 'Build the Ant-parity Hyrax server WAR.'
+    dependsOn tasks.named('war')
+}
+
+tasks.register('opendap') {
+    group = 'build'
+    description = 'Alias for server.'
+    dependsOn tasks.named('server')
+}
+
+tasks.register('robots', War) {
+    group = 'build'
+    description = 'Build the Ant-parity robots/sitemap WAR in build/dist.'
+
+    dependsOn tasks.named('PreProcessSourceCode')
+    archiveFileName = 'ROOT.war'
+    destinationDirectory = distDir.get().asFile
+    webXml = file("${stagedRobotsResourcesDir.get().asFile}/WEB-INF/web.xml")
+    classpath(configurations.hyraxLibs)
+
+    from(file("${stagedHyraxResourcesDir.get().asFile}/WEB-INF/conf/olfs.xml")) {
+        into 'WEB-INF/conf'
+    }
+
+    from(stagedRobotsResourcesDir) {
+        exclude 'WEB-INF/web.xml'
+        exclude 'robots.jsp'
+    }
+
+    from(file("${stagedRobotsResourcesDir.get().asFile}/robots.jsp")) {
+        rename { 'robots.txt' }
+    }
+
+    from(hyraxDocsTree) {
+        into 'docs'
+    }
+
+    webInf {
+        from(file("${stagedRobotsResourcesDir.get().asFile}/WEB-INF")) {
+            include 'logback-test.xml'
+            include 'logback.xml'
+            include 'urlrewrite.xml'
+        }
+    }
+}
+
+tasks.register('hyrax-robots') {
+    group = 'build'
+    description = 'Build both the Hyrax and robots WARs.'
+    dependsOn tasks.named('server'), tasks.named('robots')
+}
+
+tasks.register('hyraxRobots') {
+    group = 'build'
+    description = 'Alias for hyrax-robots.'
+    dependsOn tasks.named('hyrax-robots')
+}
+
+tasks.register('ngap', War) {
+    group = 'build'
+    description = 'Build the Ant-parity NGAP WAR in build/dist.'
+
+    dependsOn tasks.named('PreProcessSourceCode')
+    archiveFileName = "${NGAP_DEPLOYMENT_CONTEXT}.war"
+    destinationDirectory = distDir.get().asFile
+    webXml = file("${stagedNgapResourcesDir.get().asFile}/web.xml")
+    classpath(configurations.ngapWarLibs)
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    from(stagedHyraxResourcesDir) {
+        exclude 'WEB-INF/conf/olfs.xml'
+        exclude 'WEB-INF/conf/logback.xml'
+        exclude 'WEB-INF/web.xml'
+        exclude 'WEB-INF/urlrewrite.xml'
+    }
+
+    from(file("${stagedNgapResourcesDir.get().asFile}/urlrewrite.xml")) {
+        into 'WEB-INF'
+    }
+
+    from(file("${stagedNgapResourcesDir.get().asFile}/logback.xml")) {
+        into 'WEB-INF/conf'
+    }
+
+    from(file("${stagedNgapResourcesDir.get().asFile}/olfs.xml")) {
+        into 'WEB-INF/conf'
+    }
+
+    from(hyraxDocsTree) {
+        into 'docs'
+    }
+
+    from(file("${stagedNgapResourcesDir.get().asFile}/landing")) {
+        into 'docs/ngap'
+    }
+
+    from('resources/ngap/landing') {
+        include '*.png'
+        into 'docs/ngap'
+    }
 }
