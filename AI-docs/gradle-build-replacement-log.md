@@ -137,3 +137,88 @@ This phase intentionally did not implement:
 - README updates
 
 Those belong to Phases 4 through 7.
+
+## Phase 4 Implementation
+
+Date: 2026-04-26
+
+### Goal
+
+Implement explicit Ant-parity dependency and classpath sets for:
+
+- Hyrax production WAR/runtime jars
+- Tomcat-provided compile-only jars
+- NGAP WAR library assembly inputs
+
+### Files Changed
+
+- `build.gradle`
+
+### Commands Run
+
+```bash
+rg -n "<property name=\".*\\.lib\"|<fileset id=\"hyrax-libs\"|olfs.compile.classpath|catalina.lib|servlet-api.lib|xalan|xerces|cloudwatch|commons-httpclient|gson|jackson|redisson|memcached|elasticache" build.xml
+sed -n '240,390p' build.xml
+ls lib | sort
+JAVA_HOME=/Library/Java/JavaVirtualMachines/openjdk.jdk/Contents/Home GRADLE_USER_HOME=/tmp/olfs-gradle-home ./gradlew showInfo --no-daemon
+JAVA_HOME=/Library/Java/JavaVirtualMachines/openjdk.jdk/Contents/Home GRADLE_USER_HOME=/tmp/olfs-gradle-home ./gradlew showDependencySets verifyDependencyLayout --no-daemon
+JAVA_HOME=/Library/Java/JavaVirtualMachines/openjdk.jdk/Contents/Home GRADLE_USER_HOME=/tmp/olfs-gradle-home ./gradlew compileJava -PHYRAX_VERSION=CI-Build -POLFS_VERSION=CI-Build --no-daemon
+```
+
+### Reasoning Notes
+
+Phase 3 still used a broad `fileTree(dir: 'lib', include: ['*.jar'])` minus Tomcat jars. That was too permissive and would have produced the wrong library surface for WAR packaging in Phase 5.
+
+I replaced that with explicit Ant-aligned dependency lists:
+
+- `hyraxLibNames`: the exact jars declared by Ant's `hyrax-libs` fileset
+- `providedTomcatLibNames`: `catalina-6.0.53.jar` and `servlet-api-3.0.jar`
+- `ngapContainerExcludedLibNames`: the NGAP jars Ant intentionally keeps out of the WAR because the containers place them in Tomcat's shared `lib`
+
+I then mapped those into three explicit Gradle configurations:
+
+- `hyraxLibs`
+- `providedTomcatLibs`
+- `ngapWarLibs`
+
+Compilation now uses:
+
+- `implementation(hyraxLibFiles)`
+- `compileOnly(providedTomcatLibFiles)`
+
+This is closer to Ant's `olfs.compile.classpath`, which is `build.classes + providedTomcatLibs + hyrax-libs`.
+
+For NGAP, `ngapWarLibs` is defined as:
+
+- all Hyrax jars
+- plus `resources/ngap/lib/*.jar`
+- minus the container-managed exclusions
+
+That preserves Ant behavior even where it includes duplicate or older jars in the NGAP library directory. I did not “clean up” those duplicates because this phase is about parity, not modernization.
+
+I also added:
+
+- `showDependencySets` for a readable dump of the resolved file collections
+- `verifyDependencyLayout` to fail fast if the sets drift away from Ant parity
+
+### Validation Results
+
+- `showInfo` reported:
+  - `hyrax-libs: 45 jars`
+  - `providedTomcatLibs: 2 jars`
+  - `ngapWarLibs: 56 jars`
+- `showDependencySets` listed the exact resolved file names for each set.
+- `verifyDependencyLayout` passed.
+- `compileJava -PHYRAX_VERSION=CI-Build -POLFS_VERSION=CI-Build` passed.
+
+The compile succeeded with only deprecation and Java 8 obsolescence warnings under the newer JDK, which is expected for this codebase and toolchain.
+
+### Known Remaining Gaps
+
+This phase intentionally did not implement:
+
+- Ant-parity WAR assembly and naming
+- robots/NGAP/web descriptor packaging behavior
+- distribution bundles
+- Ant-style `check` / `test`
+- Sonar classpath/source-set reconciliation
