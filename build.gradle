@@ -98,9 +98,20 @@ def hyraxLibFiles = files(hyraxLibNames.collect { "lib/${it}" })
 def providedTomcatLibFiles = files(providedTomcatLibNames.collect { "lib/${it}" })
 def ngapAdditionalLibFiles = fileTree(dir: 'resources/ngap/lib', include: ['*.jar'], exclude: ngapContainerExcludedLibNames)
 def distDir = layout.buildDirectory.dir('dist')
+def hexEncoderDir = layout.buildDirectory.dir('dist/hexEncoder')
 def hyraxDocsTree = fileTree('doc') {
     exclude 'src.distribution.readme'
 }
+def validatorSupportLibNames = [
+    'apache-commons-cli-1.2.jar',
+    'apache-commons-httpclient-3.1.jar',
+    'apache-commons-logging-1.1.3.jar',
+    'apache-commons-codec-1.8.jar',
+    'xercesImpl-2.12.2.jar',
+    'xerces-xml-apis-2.12.2.jar',
+    'jdom-1.1.1.jar'
+]
+def validatorSupportLibFiles = files(validatorSupportLibNames.collect { "lib/${it}" })
 
 def stagedSourceDir = layout.buildDirectory.dir('src')
 def stagedHyraxResourcesDir = layout.buildDirectory.dir('resources')
@@ -244,6 +255,12 @@ tasks.register('showDependencySets') {
     }
 }
 
+tasks.register('prepareReleaseBuild') {
+    group = 'build'
+    description = 'Prepare a clean tree for release-oriented packaging tasks.'
+    dependsOn tasks.named('clean')
+}
+
 tasks.register('verifyDependencyLayout') {
     group = 'verification'
     description = 'Verify that Gradle dependency sets match the Ant packaging split.'
@@ -351,6 +368,7 @@ tasks.register('PreProcessSourceCode') {
     group = 'build setup'
     description = 'Move filtered sources and resources into generated build trees.'
 
+    dependsOn tasks.named('clean')
     dependsOn(
         tasks.named('stageSourceTree'),
         tasks.named('mergeWcsResources'),
@@ -483,5 +501,226 @@ tasks.register('ngap', War) {
     from('resources/ngap/landing') {
         include '*.png'
         into 'docs/ngap'
+    }
+}
+
+tasks.register('srcDist', Tar) {
+    group = 'distribution'
+    description = 'Build the Ant-parity source distribution tarball.'
+
+    dependsOn tasks.named('prepareReleaseBuild'), tasks.named('PreProcessSourceCode')
+    archiveFileName = "${SRC_DIST}.tgz"
+    destinationDirectory = distDir.get().asFile
+    compression = Compression.GZIP
+
+    from(stagedSourceDir) {
+        into "${SRC_DIST}/src"
+    }
+
+    from('doc') {
+        into "${SRC_DIST}/doc"
+    }
+
+    from('lib') {
+        into "${SRC_DIST}/lib"
+    }
+
+    from('resources/hyrax') {
+        into "${SRC_DIST}/resources/hyrax"
+    }
+
+    from('build.xml') {
+        into SRC_DIST
+    }
+
+    from('NEWS') {
+        into SRC_DIST
+    }
+
+    from('ChangeLog') {
+        into SRC_DIST
+    }
+
+    from('COPYRIGHT') {
+        into SRC_DIST
+    }
+}
+
+tasks.register('src-dist') {
+    group = 'distribution'
+    description = 'Alias for srcDist.'
+    dependsOn tasks.named('srcDist')
+}
+
+tasks.register('serverDist', Tar) {
+    group = 'distribution'
+    description = 'Package the Hyrax WAR into the Ant-style webapp tarball.'
+
+    dependsOn tasks.named('prepareReleaseBuild'), tasks.named('server')
+    archiveFileName = "${WEBAPP_DIST}.tgz"
+    destinationDirectory = distDir.get().asFile
+    compression = Compression.GZIP
+
+    from(file("${distDir.get().asFile}/${DEPLOYMENT_CONTEXT}.war")) {
+        into WEBAPP_DIST
+    }
+
+    from('README.md') {
+        into WEBAPP_DIST
+        rename { 'README' }
+    }
+
+    doLast {
+        delete file("${distDir.get().asFile}/${DEPLOYMENT_CONTEXT}.war")
+    }
+}
+
+tasks.register('server-dist') {
+    group = 'distribution'
+    description = 'Alias for serverDist.'
+    dependsOn tasks.named('serverDist')
+}
+
+tasks.register('hyraxRobotsDist', Tar) {
+    group = 'distribution'
+    description = 'Package the Hyrax and robots WARs into the Ant-style robots webapp tarball.'
+
+    dependsOn tasks.named('prepareReleaseBuild'), tasks.named('hyrax-robots')
+    archiveFileName = "robots-${WEBAPP_DIST}.tgz"
+    destinationDirectory = distDir.get().asFile
+    compression = Compression.GZIP
+
+    from(file("${distDir.get().asFile}/${DEPLOYMENT_CONTEXT}.war")) {
+        into "robots-${WEBAPP_DIST}"
+    }
+
+    from(file("${distDir.get().asFile}/ROOT.war")) {
+        into "robots-${WEBAPP_DIST}"
+    }
+
+    from('README.md') {
+        into "robots-${WEBAPP_DIST}"
+        rename { 'README' }
+    }
+
+    doLast {
+        delete file("${distDir.get().asFile}/${DEPLOYMENT_CONTEXT}.war")
+        delete file("${distDir.get().asFile}/ROOT.war")
+    }
+}
+
+tasks.register('hyrax-robots-dist') {
+    group = 'distribution'
+    description = 'Alias for hyraxRobotsDist.'
+    dependsOn tasks.named('hyraxRobotsDist')
+}
+
+tasks.register('ngapDist', Tar) {
+    group = 'distribution'
+    description = 'Package the NGAP WAR into the Ant-style webapp tarball.'
+
+    dependsOn tasks.named('prepareReleaseBuild'), tasks.named('ngap')
+    archiveFileName = "${NGAP_DIST_BASE}-webapp.tgz"
+    destinationDirectory = distDir.get().asFile
+    compression = Compression.GZIP
+
+    from(file("${distDir.get().asFile}/${NGAP_DEPLOYMENT_CONTEXT}.war")) {
+        into "${NGAP_DIST_BASE}-webapp"
+    }
+
+    doLast {
+        delete file("${distDir.get().asFile}/${NGAP_DEPLOYMENT_CONTEXT}.war")
+    }
+}
+
+tasks.register('ngap-dist') {
+    group = 'distribution'
+    description = 'Alias for ngapDist.'
+    dependsOn tasks.named('ngapDist')
+}
+
+tasks.register('DISTRO') {
+    group = 'distribution'
+    description = 'Build the complete Ant-style distribution set.'
+    dependsOn tasks.named('srcDist'), tasks.named('serverDist'), tasks.named('hyraxRobotsDist')
+}
+
+tasks.register('hexEncoderJar', Jar) {
+    group = 'distribution'
+    description = 'Build the helper JAR for the hex encoder application.'
+
+    dependsOn tasks.named('prepareReleaseBuild'), tasks.named('classes')
+    archiveFileName = 'hexEncoder.jar'
+    destinationDirectory = hexEncoderDir.get().asFile
+    manifest.from('resources/hexEncoder/hexEncoder.MANIFEST.MF')
+
+    from(sourceSets.main.output.classesDirs) {
+        include 'opendap/gateway/Encoder.class'
+        include 'opendap/gateway/HexAsciiEncoder.class'
+    }
+}
+
+tasks.register('stageHexEncoderApp', Copy) {
+    group = 'distribution'
+    description = 'Stage the Ant-style hex encoder app directory.'
+
+    dependsOn tasks.named('hexEncoderJar')
+    into hexEncoderDir
+
+    from('lib/apache-commons-cli-1.2.jar')
+    from('resources/hexEncoder/hexEncoder')
+}
+
+tasks.register('hexEncoderApp', Tar) {
+    group = 'distribution'
+    description = 'Build the Ant-style hex encoder application tarball.'
+
+    dependsOn tasks.named('stageHexEncoderApp')
+    archiveFileName = 'hexEncoder.tgz'
+    destinationDirectory = distDir.get().asFile
+    compression = Compression.GZIP
+
+    from(hexEncoderDir)
+}
+
+tasks.register('validatorApp', Jar) {
+    group = 'distribution'
+    description = 'Build the Ant-style validator helper JAR and support libs.'
+
+    dependsOn tasks.named('prepareReleaseBuild'), tasks.named('classes')
+    archiveFileName = 'validator.jar'
+    destinationDirectory = distDir.get().asFile
+    manifest.from('resources/META-INF/validator.MANIFEST.MF')
+
+    from(sourceSets.main.output.classesDirs) {
+        include 'opendap/xml/Validator.class'
+    }
+
+    doFirst {
+        copy {
+            from(validatorSupportLibFiles)
+            into distDir
+        }
+    }
+}
+
+tasks.register('XSLTransformer', Jar) {
+    group = 'distribution'
+    description = 'Build the Ant-style XSL transformer helper JAR and support libs.'
+
+    dependsOn tasks.named('prepareReleaseBuild'), tasks.named('classes')
+    archiveFileName = 'xslt.jar'
+    destinationDirectory = distDir.get().asFile
+    manifest.from('resources/META-INF/xsltransformer.MANIFEST.MF')
+
+    from(sourceSets.main.output.classesDirs) {
+        include 'opendap/xml/Transformer.class'
+    }
+
+    doFirst {
+        copy {
+            from(validatorSupportLibFiles)
+            into distDir
+        }
     }
 }

@@ -373,3 +373,179 @@ This phase intentionally did not implement:
 - distribution bundles and helper artifacts
 - Ant-style `check` / `test`
 - Sonar classpath/source-set reconciliation
+
+## Phase 6 Implementation
+
+Date: 2026-04-26
+
+### Goal
+
+Implement the remaining release-oriented packaging tasks:
+
+- `srcDist` / `src-dist`
+- `serverDist` / `server-dist`
+- `hyraxRobotsDist` / `hyrax-robots-dist`
+- `ngapDist` / `ngap-dist`
+- `DISTRO`
+- `hexEncoderApp`
+- `validatorApp`
+- `XSLTransformer`
+
+### Files Changed
+
+- `build.gradle`
+
+### Commands Run
+
+```bash
+sed -n '540,725p' build.xml
+find resources -maxdepth 2 -type d | sort
+find resources -maxdepth 2 \( -path 'resources/hexEncoder/*' -o -path 'resources/META-INF/*' \) -type f | sort
+find doc -maxdepth 2 -type f | sort
+rg -n "class Encoder|class HexAsciiEncoder|class Validator|class Transformer" src
+ls -1 README* NEWS* ChangeLog* COPYRIGHT*
+JAVA_HOME=/Library/Java/JavaVirtualMachines/openjdk.jdk/Contents/Home GRADLE_USER_HOME=/tmp/olfs-gradle-home ./gradlew tasks --all --no-daemon | rg "srcDist|src-dist|serverDist|server-dist|hyraxRobotsDist|hyrax-robots-dist|ngapDist|ngap-dist|DISTRO|hexEncoderApp|validatorApp|XSLTransformer"
+JAVA_HOME=/Library/Java/JavaVirtualMachines/openjdk.jdk/Contents/Home GRADLE_USER_HOME=/tmp/olfs-gradle-home ./gradlew srcDist serverDist hyraxRobotsDist ngapDist DISTRO hexEncoderApp validatorApp XSLTransformer --no-daemon -PHYRAX_VERSION=CI-Build -POLFS_VERSION=CI-Build
+ls -l build/dist
+tar -tzf build/dist/olfs-CI-Build-src.tgz
+tar -tzf build/dist/olfs-CI-Build-webapp.tgz
+tar -tzf build/dist/robots-olfs-CI-Build-webapp.tgz
+tar -tzf build/dist/ngap-CI-Build-webapp.tgz
+tar -tzf build/dist/hexEncoder.tgz
+find build/dist/hexEncoder -maxdepth 2 -type f | sort
+jar tf build/dist/validator.jar
+jar tf build/dist/xslt.jar
+ls -1 build/dist/apache-commons-cli-1.2.jar build/dist/apache-commons-httpclient-3.1.jar build/dist/apache-commons-logging-1.1.3.jar build/dist/apache-commons-codec-1.8.jar build/dist/xercesImpl-2.12.2.jar build/dist/xerces-xml-apis-2.12.2.jar build/dist/jdom-1.1.1.jar
+```
+
+### Reasoning Notes
+
+I added a release-packaging layer on top of the Phase 5 WAR tasks and the existing staged build trees.
+
+Implemented task families:
+
+- `srcDist` and alias `src-dist`
+- `serverDist` and alias `server-dist`
+- `hyraxRobotsDist` and alias `hyrax-robots-dist`
+- `ngapDist` and alias `ngap-dist`
+- `DISTRO`
+- helper artifact tasks:
+  - `hexEncoderJar`
+  - `stageHexEncoderApp`
+  - `hexEncoderApp`
+  - `validatorApp`
+  - `XSLTransformer`
+
+Packaging behavior added:
+
+- `srcDist`
+  - creates `${SRC_DIST}.tgz`
+  - uses filtered staged sources from `build/src`
+  - includes `doc/`, `lib/`, `resources/hyrax/`, `build.xml`, `NEWS`, `ChangeLog`, `COPYRIGHT`
+
+- `serverDist`
+  - creates `${WEBAPP_DIST}.tgz`
+  - packages `opendap.war` plus `README.md` renamed to `README`
+  - deletes `opendap.war` afterward to match Ant’s post-package dist state
+
+- `hyraxRobotsDist`
+  - creates `robots-${WEBAPP_DIST}.tgz`
+  - packages `opendap.war`, `ROOT.war`, and `README`
+  - deletes both WARs afterward
+
+- `ngapDist`
+  - creates `${NGAP_DIST_BASE}-webapp.tgz`
+  - packages `ngap.war`
+  - deletes `ngap.war` afterward
+
+- `DISTRO`
+  - depends on the source dist, Hyrax webapp dist, and robots webapp dist
+
+- `hexEncoderApp`
+  - stages a `build/dist/hexEncoder` directory
+  - copies `apache-commons-cli-1.2.jar`
+  - copies the `resources/hexEncoder/hexEncoder` launcher file
+  - builds `hexEncoder.jar`
+  - packages the directory contents into `hexEncoder.tgz`
+
+- `validatorApp`
+  - builds `validator.jar`
+  - copies the exact Ant support libs into `build/dist`
+
+- `XSLTransformer`
+  - builds `xslt.jar`
+  - copies the same support libs into `build/dist`
+
+One real bug surfaced during validation:
+
+- the release-clean path and staged preprocessing were initially unordered
+- that let `clean` remove `build/resources/WEB-INF/web.xml` after preprocessing but before WAR packaging
+- I fixed it by making `PreProcessSourceCode` depend on `clean`, which is also much closer to Ant’s actual `PreProcessSourceCode -> clean, init` behavior
+
+### Validation Results
+
+Task discovery passed and listed all required Phase 6 tasks and aliases.
+
+Combined packaging validation passed:
+
+```bash
+./gradlew srcDist serverDist hyraxRobotsDist ngapDist DISTRO hexEncoderApp validatorApp XSLTransformer \
+  -PHYRAX_VERSION=CI-Build -POLFS_VERSION=CI-Build
+```
+
+Post-build `build/dist` state matched the intended Ant-style packaging flow:
+
+- tarballs present:
+  - `olfs-CI-Build-src.tgz`
+  - `olfs-CI-Build-webapp.tgz`
+  - `robots-olfs-CI-Build-webapp.tgz`
+  - `ngap-CI-Build-webapp.tgz`
+  - `hexEncoder.tgz`
+- helper outputs present:
+  - `build/dist/hexEncoder/`
+  - `validator.jar`
+  - `xslt.jar`
+  - copied support jars for validator/XSLTransformer
+- WAR files were absent from `build/dist` after the dist tasks, which matches the intended cleanup behavior
+
+Archive spot checks:
+
+- `olfs-CI-Build-src.tgz` contains:
+  - `olfs-CI-Build-src/src/...`
+  - `olfs-CI-Build-src/lib/...`
+  - `olfs-CI-Build-src/resources/hyrax/...`
+  - `olfs-CI-Build-src/build.xml`
+  - `olfs-CI-Build-src/NEWS`
+  - `olfs-CI-Build-src/ChangeLog`
+  - `olfs-CI-Build-src/COPYRIGHT`
+
+- `olfs-CI-Build-webapp.tgz` contains:
+  - `olfs-CI-Build-webapp/opendap.war`
+  - `olfs-CI-Build-webapp/README`
+
+- `robots-olfs-CI-Build-webapp.tgz` contains:
+  - `robots-olfs-CI-Build-webapp/ROOT.war`
+  - `robots-olfs-CI-Build-webapp/README`
+
+- `ngap-CI-Build-webapp.tgz` contains:
+  - `ngap-CI-Build-webapp/ngap.war`
+
+- `hexEncoder.tgz` contains:
+  - `hexEncoder`
+  - `apache-commons-cli-1.2.jar`
+  - `hexEncoder.jar`
+
+- `validator.jar` contains `opendap/xml/Validator.class`
+- `xslt.jar` contains `opendap/xml/Transformer.class`
+
+### Behavior Notes
+
+The source distribution intentionally does not add a synthetic `README` file. The current repo has `README.md`, while the Ant `src-dist` target includes `README` only. In this checkout, preserving repository truth means the source dist includes the files that actually exist rather than inventing a renamed `README`.
+
+### Known Remaining Gaps
+
+This phase intentionally did not implement:
+
+- Ant-style focused `check` / `test`
+- Sonar reconciliation with the staged/classpath-aware Gradle build
+- the final full verification matrix and closeout documentation updates
