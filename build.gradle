@@ -1,22 +1,4 @@
-/// This build.gradle file was adapted from the Feedback project. That project
-/// built a war file using Java files that relied on teh Spring framework. In this
-/// build file I have removed or commented the parts that have to do with Spring.
-///
-/// The build will try to use the existing organization of the Java sources in the
-/// ant-based OLFS project.
-///
-/// jhrg 9/8/21
-
-// The 'buildscript' block holds what gradle needs to run the build script
-buildscript {
-    repositories {
-        // Required repos
-        mavenCentral()
-    }
-    dependencies {
-        classpath group: 'org.apache.ant', name: 'ant', version: '1.9.4'
-    }
-}
+import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
     id 'java'
@@ -26,507 +8,215 @@ plugins {
     id 'org.sonarqube' version '6.2.0.5505'
 }
 
-// While these properties are inside a 'sonarqube' block, the task is called 'sonar.' jhrg 1/22/24
-// The sonarqube block is outside the buildscript block.
-// See https://docs.sonarqube.org/latest/analysis/scan/sonarscanner-for-gradle/
-//  jhrg 1/22/24
-sonarqube {
-    properties {
-        property "sonar.sourceEncoding", "UTF-8"
-        property "sonar.projectKey", "opendap-olfs"
-        property "sonar.projectName", "olfs"
-        property "sonar.projectVersion", "${OLFS_VERSION}"
-        property "sonar.organization", "opendap"
-        property "sonar.inclusions", "src"
-        property "sonar.exclusions", "src/opendap/Coverity_Model.java," +
-                                    "retired/**/*.java," +
-                                    "src/opendap/**/*Test.java"
-        property "sonar.java.binaries", "build"
-        property "sonar.java.libraries", "lib/*.jar"
-    }
-}
-
-// used to auto publish scan results in travis or travis hangs. SBL 1.12.22
-if (hasProperty('buildScan')) {
-    buildScan {
-        termsOfServiceUrl = 'https://gradle.com/terms-of-service'
-        //change to 'no' if we don't want to publish scan results. SBL 1.12.22
-        termsOfServiceAgree = 'no'
-    }
-}
-
 group = 'org.opendap'
-description = 'The OLFs build'
+description = 'The OLFS build'
 
-sourceCompatibility = 1.9
-targetCompatibility = 1.9
-
-repositories {
-    // For just about everything except...
-    mavenCentral()
-
-    // I cannot get the 'enonic' repo to work and cannot find saxon 9.1.0.8
-    // anywhere. But we have 9.1.0.5 locally. The URL to the enomic repo was:
-    // 'https://repo.enonic.com/public' jhrg 9/8/21
-    flatDir {
-        dirs 'lib'
-    }
-}
-
-configurations {
-    opendapDep
-    ngapDep
-    robotDep
+def propertyOrDefault = { String name, String defaultValue ->
+    project.findProperty(name)?.toString() ?: defaultValue
 }
 
 ext {
-    DEPLOYMENT_CONTEXT = 'opendap'
-    NGAP_DEPLOYMENT_CONTEXT = 'ngap'
+    DEPLOYMENT_CONTEXT = propertyOrDefault('DEPLOYMENT_CONTEXT', 'opendap')
+    NGAP_DEPLOYMENT_CONTEXT = propertyOrDefault('NGAP_DEPLOYMENT_CONTEXT', 'ngap')
 
-    // Use gradle showInfo -P OLFS_VERSION=x.y.z to override the default. jhrg 9/20/21
-    HYRAX_VERSION = project.hasProperty('HYRAX_VERSION') ? project.property('HYRAX_VERSION') : 'Not.A.Release'
-    OLFS_VERSION = project.hasProperty('OLFS_VERSION') ? project.property('OLFS_VERSION') : 'Not.A.Release'
+    HYRAX_VERSION = propertyOrDefault('HYRAX_VERSION', 'Not.A.Release')
+    OLFS_VERSION = propertyOrDefault('OLFS_VERSION', 'Not.A.Release')
+    NGAP_VERSION = propertyOrDefault('NGAP_VERSION', HYRAX_VERSION)
+    WCS_VERSION = propertyOrDefault('WCS_VERSION', HYRAX_VERSION)
 
-    WCS_VERSION = project.OLFS_VERSION
+    OLFS_DIST_BASE = propertyOrDefault('OLFS_DIST_BASE', "olfs-${OLFS_VERSION}")
+    NGAP_DIST_BASE = propertyOrDefault('NGAP_DIST_BASE', "ngap-${HYRAX_VERSION}")
+    WEBAPP_DIST = "${OLFS_DIST_BASE}-webapp"
 
-    // TODO Fix these strings. Maybe add a task to print them all. jhrg 9/17/21
-    OLFS_DIST_BASE = 'olfs-' + project.OLFS_VERSION // olfs-${OLFS_VERSION}'
-    WEBAPP_DIST = project.OLFS_DIST_BASE + '-webapp' //'${OLFS_DIST_BASE}-webapp'
-
-    SRC_DIST = project.OLFS_DIST_BASE + '-src' // '${OLFS_DIST_BASE}-src'
-    DOC_DIST = project.OLFS_DIST_BASE + '-doc' //${OLFS_DIST_BASE}-doc'
-    OLFS_LIB = project.OLFS_DIST_BASE // ${OLFS_DIST_BASE}'
+    SRC_DIST = "${OLFS_DIST_BASE}-src"
+    DOC_DIST = "${OLFS_DIST_BASE}-doc"
+    OLFS_LIB = OLFS_DIST_BASE
 }
 
-tasks.register('showInfo') {
-    group = 'info'
-    description = 'Display additional project properties - used to control version numbers'
+def stagedSourceDir = layout.buildDirectory.dir('src')
+def stagedHyraxResourcesDir = layout.buildDirectory.dir('resources')
+def stagedRobotsResourcesDir = layout.buildDirectory.dir('robots')
+def stagedNgapResourcesDir = layout.buildDirectory.dir('ngap')
 
-    println 'DEPLOYMENT_CONTEXT: ' + project.DEPLOYMENT_CONTEXT
-    println 'NGAP_DEPLOYMENT_CONTEXT: ' + project.NGAP_DEPLOYMENT_CONTEXT
-    println 'HYRAX_VERSION: ' + project.HYRAX_VERSION
-    println 'OLFS_VERSION: ' + project.OLFS_VERSION
-    println 'WCS_VERSION: ' + project.OLFS_VERSION
+def filterTokens = [
+    HyraxVersion      : HYRAX_VERSION,
+    OlfsVersion       : OLFS_VERSION,
+    SERVICE_CONTEXT   : DEPLOYMENT_CONTEXT,
+    WCS_SOFTWARE_VERSION: WCS_VERSION,
+    WcsSoftwareVersion: WCS_VERSION
+]
 
-    println 'OLFS_DIST_BASE: ' + project.OLFS_DIST_BASE
-    println 'WEBAPP_DIST: ' + project.WEBAPP_DIST
-
-    println 'SRC_DIST: ' + project.SRC_DIST
-    println 'DOC_DIST: ' + project.DOC_DIST
-    println 'OLFS_LIB: ' + project.OLFS_LIB
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 }
 
-// See https://docs.gradle.org/current/userguide/building_java_projects.html#sec:java_source_sets
-// and https://docs.gradle.org/current/dsl/org.gradle.api.tasks.SourceSet.html
-// jhrg 9/8/21
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation fileTree(dir: 'lib', include: ['*.jar'], exclude: ['catalina-6.0.53.jar', 'servlet-api-3.0.jar'])
+    compileOnly files('lib/catalina-6.0.53.jar', 'lib/servlet-api-3.0.jar')
+}
 
 sourceSets {
     main {
         java {
-            srcDirs = ['src']
-            exclude '**/*Test.java'
-            // See also: https://docs.gradle.org/current/userguide/java_testing.html#java_testing
-            // and https://docs.gradle.org/current/userguide/java_testing.html#sec:configuring_java_integration_tests
+            srcDirs = []
+            srcDir(stagedSourceDir)
         }
-
         resources {
+            srcDirs = []
         }
     }
-
     test {
         java {
-            srcDirs = ['src']
-            include 'src/**/*Test.java'
+            srcDirs = []
         }
-    }
-
-    /*
-     * Block comment this out. Look at multi-project gradle.build files.
-     * jhrg 9/22/21
-    ngap {
-        java {
-            srcDirs = ['src']
-        }
-
         resources {
-
-        }
-
-        dependencies {
-            implementation group: 'com.amazonaws', name: 'elasticache-java-cluster-client', version: '1.1.2'
-            implementation group: 'com.esotericsoftware', name: 'kryo', version: '4.0.2'
-            implementation group: 'de.javakaffee', name: 'kryo-serializers', version: '0.45'
-            implementation group: 'de.javakaffee.msm', name: 'memcached-session-manager', version: '2.3.2'
-            implementation group: 'de.javakaffee.msm', name: 'memcached-session-manager-tc7', version: '2.3.2'
-
-            implementation group: 'com.esotericsoftware', name: 'minlog', version: '1.3.0'
-            implementation group: 'de.javakaffee.msm', name: 'msm-kryo-serializer', version: '2.3.2'
-            // DO NOT use redisson-all, that will include all of the redisson's deps and that
-            // will break our code. Use the lib with a version number.
-            implementation group: 'org.redisson', name: 'redisson', version: '3.11.6'
-            implementation group: 'com.esotericsoftware', name: 'reflectasm', version: '1.11.9'
-        }
-
-        war {
-            archiveBaseName = 'ngap'
-
-            // Copy/filter the various resource files
-            dependsOn 'copyHyraxResources'
-            dependsOn 'copyDocResources'
-            dependsOn 'copyWCSResources'
-
-            // Use the file in build/resources to populate the war file's resources
-            from layout.buildDirectory.dir("resources")
+            srcDirs = []
         }
     }
-    */
 }
 
-dependencies {
-    // The biggest difference I see between the gradle file written by Slav for the Snyk
-    // integration and my old 'Feedback' project is the use of 'compile' versus
-    // 'implementation' in the dependencies. I'll leave some of the old lines in here as
-    // comments.
-    // NB: https://docs.gradle.org/current/userguide/declaring_dependencies.html
-    // jhrg 9/8/21
-
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.6.0'
-    testImplementation group: 'org.objenesis', name: 'objenesis', version: '3.2'
-    testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.6'
-
-    providedCompile group: 'org.apache.tomcat', name: 'catalina', version: '6.0.53'
-    providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.0.1'
-    providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.1.0'
-    providedCompile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'
-
-    implementation group: 'org.jdom', name: 'jdom', version: '1.1.3'
-
-    implementation group: 'org.tuckey', name: 'urlrewritefilter', version: '3.2.0'
-    implementation group: 'junit', name: 'junit', version: '4.13.2'
-    implementation group: 'org.hamcrest', name: 'hamcrest-all', version: '1.3'
-
-    implementation group: 'com.google.code.gson', name: 'gson', version: '2.8.9'
-
-    // Including logback-classic will transitively include logback-core and slf4j-api 01/23/25 - ndp
-    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.16'
-
-    implementation group: 'aws-java-sdk-core', name: 'aws-java-sdk-core', version: '1.12.734'
-    implementation group: 'aws-java-sdk-ec2', name: 'aws-java-sdk-ec2', version: '1.12.734'
-    implementation group: 'aws-java-sdk-logs', name: 'aws-java-sdk-logs', version: '1.12.734'
-
-    implementation group: 'com.auth0', name: 'java-jwt', version: '4.5.0'
-    implementation group: 'com.auth0', name: 'jwks-rsa', version: '0.22.1'
-
-    implementation group: 'jackson', name: 'jackson-core', version: '2.17.0'
-    implementation group: 'jackson', name: 'jackson-databind', version: '2.17.0'
-    implementation group: 'jackson', name: 'jackson-annotations', version: '2.17.0'
-
-    implementation group: 'joda-time', name: 'joda-time', version: '2.12.7'
-
-    implementation group: 'commons-cli', name: 'commons-cli', version: '1.2'
-    implementation group: 'commons-codec', name: 'commons-codec', version: '1.13'
-    implementation group: 'commons-httpclient', name: 'commons-httpclient', version: '3.1'
-
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.14.0'
-    implementation group: 'org.apache.commons', name: 'commons-text', version: '1.12.0'
-    implementation group: 'commons-logging', name: 'commons-logging', version: '1.1.3'
-    implementation group: 'commons-io', name: 'commons-io', version: '2.7'
-
-    implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
-    implementation group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4.6'
-
-    // TODO Find a repo that will give us a recent copy of the saxon 9 code. jhrg
-    // implementation group: 'net.sf.saxon', name: 'saxon', version: '9.1.0.8'
-    // implementation group: 'net.sf.saxon', name: 'saxon-jdom', version: '9.1.0.8'
-    // implementation group: 'org.clojars.pjt', name: 'saxon9-s9api', version: '9.1.0.8'
-    implementation files('lib/saxon-9.1.0.5-jdom.jar')
-    implementation files('lib/saxon-9.1.0.5-s9api.jar')
-    implementation files('lib/saxon-9.1.0.5.jar')
-
-    implementation group: 'org.owasp.encoder', name: 'encoder', version: '1.2'
-    implementation group: 'org.owasp.encoder', name: 'encoder-jsp', version: '1.2.2'
-
-    implementation group: 'com.google.code.gson', name: 'gson', version: '2.3'
-    implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
-
-    /// WCS libs
-    implementation group: 'org.jvnet.ogc', name: 'wcs-v_2_0', version: '2.6.1'
-    implementation group: 'org.jvnet.ogc', name: 'gml-v_3_2_1', version: '2.6.1'
-    implementation group: 'org.jvnet.ogc', name: 'sweCommon-v_2_0', version: '2.6.1'
-    implementation group: 'org.jvnet.ogc', name: 'gmlcov-v_1_0', version: '2.6.1'
-    implementation group: 'org.jvnet.ogc', name: 'ows-v_2_0', version: '2.6.1'
-
-
-    // implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
-    implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.6'
-    implementation group: 'javax.annotation', name: 'javax.annotation-api', version: '1.3.2'
-    implementation group: 'javax.activation', name: 'activation', version: '1.1.1'
-
-    implementation group: 'org.jvnet.jaxb2_commons', name: 'jaxb2-basics-runtime', version: '0.11.0'
-    implementation group: 'com.sun.xml.bind', name: 'jaxb-api', version: '2.3.1'
-    implementation group: 'com.sun.xml.bind', name: 'jaxb-core', version: '2.3.0-b170127.1453'
-    implementation group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.0-b170127.1453'
-
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.5.1'
-    implementation group: 'io.netty', name: 'netty-codec', version: '4.1.68.Final'
-
-    implementation group: 'xerces', name: 'xercesImpl', version: '2.12.2'
-    implementation group: 'xalan', name: 'xalan', version: '2.7.3'
-
-    // ---- NGAP libraries -----
-    ngapDep providedCompile("com.amazonaws:elasticache-java-cluster-client:1.1.2")
-
-    ngapDep providedCompile("de.javakaffee.msm:memcached-session-manager:2.3.2")
-    ngapDep providedCompile("de.javakaffee.msm:memcached-session-manager-tc7:2.3.2")
-    ngapDep implementation("de.javakaffee:kryo-serializers:0.45")
-    ngapDep implementation("de.javakaffee.msm:msm-kryo-serializer:2.3.2")
-
-    ngapDep implementation("com.esotericsoftware:kryo:4.0.2")
-    ngapDep implementation("com.esotericsoftware:minlog:1.3.0")
-    ngapDep implementation("com.esotericsoftware:reflectasm:1.11.9")
-
-    ngapDep implementation( "org.redisson:redisson:3.22.0")
-
-    // This form:
-    //    implementation group: 'org.redisson', name: 'redisson', version: '3.22.0'
-    // Can be rewritten as a dependency:
-    //    ngapDep implementation( "org.redisson:redisson:3.22.0")
-    // Where the implementation is ("group:name:version")
-
-
-    ngapDep testImplementation("org.objenesis:objenesis:3.2")
-
-    // Cloudwatch logback appender
-    implementation group: 'cloudwatch logback appender', name: 'cloudwatch-logback-appender', version: '3.1'
-
-}
-
-// Substitute the version information before compilation
-compileJava {
-    doFirst {
-    	println 'HYRAX_VERSION: ' + project.HYRAX_VERSION
-    }
-
-    dependsOn 'substituteVersionInfo'
-}
-
-// see https://docs.gradle.org/current/dsl/org.gradle.api.plugins.ExtraPropertiesExtension.html
-project.ext {
-    resources_dir = "${projectDir}/resources"
-    // WebInf_resources_dir = "${project.resources_dir}/hyrax/WEB-INF"
-    // distribution_resources_dir = "${project.resources_dir}/distribution"
-
-    // Build Directories
-    build_dir = "${buildDir}"
-    build_classes = "${project.build_dir}/classes"
-    build_docs = "${project.build_dir}/docs"
-    build_dist = "${project.build_dir}/dist"
-    build_lib = "${project.build_dir}/lib"
-    build_run = "${project.build_dir}/run"
-    build_src = "${project.build_dir}/src"
-    build_resources = "${project.build_dir}/resources"
-
-    hyrax_resources_dir = "${project.resources_dir}/hyrax"
-    ngap_resources_dir = "${project.resources_dir}/ngap"
-    robots_resources_dir = "${project.resources_dir}/robots"
-    build_robots_resources = "${project.build_dir}/robots"
-    wcs_resources_dir = "${project.resources_dir}/WCS/2.0"
-}
-
-clean.doFirst {
-    delete "src_gradle"
-}
-
-task init_dir {
-    description "Create required folders in the build directory."
-    doLast {
-        mkdir "${project.build_dir}"
-        mkdir "${project.build_classes}"
-    }
-
-}
-
-// See: https://docs.gradle.org/current/userguide/war_plugin.html
-// We want to make multiple war files (opendap, ROOT, ngap) I think. This answer shows how:
-// given that https://stackoverflow.com/questions/13077694/create-multiple-war-files-with-different-dependencies-in-gradle
-war {
-    archiveBaseName = 'opendap'
-
-    // Copy/filter the various resource files
-    dependsOn 'copyHyraxResources'
-    dependsOn 'copyDocResources'
-    dependsOn 'copyWCSResources'
-
-    // Use the files in build/resources to populate the war file's resources
-    from layout.buildDirectory.dir("resources")
-}
-
-task buildOpendapWar(type: War, dependsOn: classes){
-    archiveBaseName = 'opendap_server'
-    destinationDirectory = file("$buildDir/dist")
-
-    group = 'warBuilds'
-    description = 'Build the Opendap Server war'
-
-    // Copy/filter the various resource files
-    dependsOn 'copyHyraxResources'
-    dependsOn 'copyDocResources'
-    dependsOn 'copyNgapResources'
-    dependsOn 'copyWCSResources'
-
-    // Use the file in build/resources to populate the war file's resources
-    from layout.buildDirectory.dir("resources")
-}
-
-task buildNgapWar(type: War, dependsOn: classes){
-    dependsOn configurations.ngapDep
-    archiveBaseName = 'opendap_ngap'
-    destinationDirectory = file("$buildDir/dist")
-
-    group = 'warBuilds'
-    description = 'Build the Opendap Ngap war.'
-
-    // Copy/filter the various resource files
-    dependsOn 'copyHyraxResources'
-    dependsOn 'copyDocResources'
-    dependsOn 'copyNgapResources'
-    dependsOn 'copyWCSResources'
-
-    // Use the file in build/resources to populate the war file's resources
-    from layout.buildDirectory.dir("resources")
-}
-
-task buildRobotsWar(type: War, dependsOn: classes){
-    archiveBaseName = 'opendap_robots'
-    destinationDirectory = file("$buildDir/dist")
-
-    group = 'warBuilds'
-    description = 'Build the Opendap Robots war.'
-}
-
-task buildDists(dependsOn: [buildOpendapWar, buildNgapWar]){ //hold for later ", buildRobotsWar"
-    group = 'warBuilds'
-    description = 'Build the Opendap, Ngap, and Robots war.'
-}
-
-clean {
-    // FIXME: Awful. instead, look for all (.+)\\.java.in files and delete $1.java jhrg 9/16/21
-    delete 'src/opendap/bes/Version.java'
-}
-
-tasks.withType(JavaCompile) {
-    //options.compilerArgs << '-Xlint:unchecked'
-    //options.compilerArgs << '-Xlint:unchecked' << '-Werror' //enable to mark deprecated warnings as errors
+tasks.withType(JavaCompile).configureEach {
     options.deprecation = true
+    options.encoding = 'UTF-8'
+    options.release = 8
 }
 
-// Copy and filter the resource files. These tasks are run by the 'war' task.
-// Looking for the substitutions in the src/ and resource/ dirs shows these
-// files need to be processed.
-//
-// SERVICE_CONTEXT:
-// ./resources/hyrax/test_filtering.txt
-// ./resources/hyrax/xsl/serviceDescription.xsl
-// ./resources/hyrax/xsl/asyncResponse.xsl
-//
-// HyraxVersion:
-// ./src/opendap/bes/Version.java
-// ./resources/osx/Info.plist
-// ./resources/hyrax/xsl/version.xsl
-// ./resources/hyrax/gateway/gateway_form.html
-// ./resources/ngap/landing/ngap.html
-//
-// OlfsVersion:
-// ./src/opendap/bes/Version.java
-// ./resources/osx/Info.plist
-//
-// WCS_SOFTWARE_VERSION:
-// Does not appear in any source file.
-//
-// WcsSoftwareVersion
-// capabilities.xsl
-// coverageDescription.xsl
-// jhrg 9/15/21
-
-import org.apache.tools.ant.filters.ReplaceTokens
-
-def tokens = [SERVICE_CONTEXT: project.DEPLOYMENT_CONTEXT,
-              HyraxVersion: project.HYRAX_VERSION,
-              OlfsVersion: project.OLFS_VERSION,
-              WcsSoftwareVersion: project.WCS_VERSION]
-
-// Not used. jhrg 9/17/21 WCS_SOFTWARE_VERSION: project.WCS_VERSION
-
-// This task copies resources from 'resources/hyrax' to $buildDir/resources
-// and, along the way, substitutes various tokes in the files.
-tasks.register('copyHyraxResources', Copy) {
-    group = 'Filtering'
-    description = 'Copy and filter the resources in resources/hyrax/.'
-
-    from layout.projectDirectory.dir("resources/hyrax")
-    into layout.buildDirectory.dir("resources")
-    filter(ReplaceTokens, tokens: tokens)
+sonarqube {
+    properties {
+        property 'sonar.sourceEncoding', 'UTF-8'
+        property 'sonar.projectKey', 'opendap-olfs'
+        property 'sonar.projectName', 'olfs'
+        property 'sonar.projectVersion', OLFS_VERSION
+        property 'sonar.organization', 'opendap'
+        property 'sonar.inclusions', 'src'
+        property 'sonar.exclusions', 'src/opendap/Coverity_Model.java,retired/**/*.java,src/opendap/**/*Test.java'
+        property 'sonar.java.binaries', layout.buildDirectory.dir('classes').get().asFile.absolutePath
+        property 'sonar.java.libraries', fileTree(dir: 'lib', include: ['*.jar']).files*.absolutePath.join(',')
+    }
 }
 
-// Copy the files in 'doc/' to /$buildDir/resources/docs'. Note the plural ending.
-tasks.register('copyDocResources', Copy) {
-    group = 'Filtering'
-    description = 'Copy and filter the resources in doc/.'
+tasks.register('showInfo') {
+    group = 'help'
+    description = 'Display build and version properties.'
 
-    from layout.projectDirectory.dir("doc")
-    into layout.buildDirectory.dir("resources/docs")
-
-    exclude 'src.distribution.readme'
-
-    shouldRunAfter 'copyHyraxResources'
+    doLast {
+        println '##########################################################'
+        println '# Gradle Build Settings'
+        println '#'
+        println "                  Project Name: ${project.name}"
+        println "                 Hyrax Version: ${HYRAX_VERSION}"
+        println "                  OLFS Version: ${OLFS_VERSION}"
+        println "                  NGAP Version: ${NGAP_VERSION}"
+        println "                   WCS Version: ${WCS_VERSION}"
+        println "            Deployment Context: ${DEPLOYMENT_CONTEXT}"
+        println "       NGAP Deployment Context: ${NGAP_DEPLOYMENT_CONTEXT}"
+        println ''
+        println 'Distribution Targets:'
+        println "            OLFS_DIST_BASE: ${OLFS_DIST_BASE}"
+        println "            NGAP_DIST_BASE: ${NGAP_DIST_BASE}"
+        println "               WEBAPP_DIST: ${WEBAPP_DIST}"
+        println "                  SRC_DIST: ${SRC_DIST}"
+        println "                  DOC_DIST: ${DOC_DIST}"
+        println "                  OLFS_LIB: ${OLFS_LIB}"
+        println ''
+        println 'Generated Directories:'
+        println "                 build/src: ${stagedSourceDir.get().asFile}"
+        println "           build/resources: ${stagedHyraxResourcesDir.get().asFile}"
+        println "              build/robots: ${stagedRobotsResourcesDir.get().asFile}"
+        println "                build/ngap: ${stagedNgapResourcesDir.get().asFile}"
+        println '##########################################################'
+    }
 }
 
-// Copy the files in 'resources/ngap/landing' to /$buildDir/resources/docs'. Note the plural ending.
-tasks.register('copyNgapResources', Copy) {
-    group = 'ngap'
-    description = 'Copy the ngap resources in resources/ngap/landing.'
+tasks.register('stageSourceTree', Copy) {
+    group = 'build setup'
+    description = 'Stage and filter Java sources into build/src.'
 
-    from layout.projectDirectory.dir("resources/ngap/landing")
-    into layout.buildDirectory.dir("resources/docs/ngap")
+    from('src') {
+        include 'com/**'
+        include 'opendap/**'
+        include 'org/opendap/**'
 
-    shouldRunAfter 'copyDocResources'
+        exclude 'opendap/cmr/**'
+        exclude 'opendap/wcs/v1_1_2/**'
+        exclude 'opendap/semantics/**'
+        exclude 'opendap/aws/**'
+        exclude 'opendap/async/**'
+    }
+    into stagedSourceDir
+    filteringCharset = 'UTF-8'
+    filter(ReplaceTokens, tokens: filterTokens)
 }
 
-// Copy the resources for the WCS code
-tasks.register('copyWCSResources', Copy) {
-    group = 'Filtering'
-    description = 'Copy and filter the resources in resources/WCS/2.0.'
+tasks.register('stageHyraxResources', Copy) {
+    group = 'build setup'
+    description = 'Stage and filter Hyrax resources into build/resources.'
 
-    from layout.projectDirectory.dir("resources/WCS/2.0")
-    into layout.buildDirectory.dir("resources/")
-
-    include 'xsl/**'
-    include 'WEB-INF/**'
-
-    exclude 'WEB-INF/web.xml'
-    exclude 'WEB-INF/urlrewrite.xml'
-    exclude 'WEB-INF/logback.xml'
-    exclude 'WEB-INF/logback-test.xml'
-
-    filter(ReplaceTokens, tokens: tokens)
-    shouldRunAfter 'copyHyraxResources'
+    from('resources/hyrax')
+    into stagedHyraxResourcesDir
+    filteringCharset = 'UTF-8'
+    filter(ReplaceTokens, tokens: filterTokens)
 }
 
-// This task looks for anything in 'src/' that ends in .java.in, substitutes the
-// tokens in it and places the result into a file with the same basename ending in
-// '.java'.
-//
-// I made this to see if I could and because I wanted to make the files that get
-// tokens substituted explict in the sources. There might be better ways to do this.
-// And handling the substitution this way makes the clean target more complex.
-// jhrg 9/16 21
-tasks.register('substituteVersionInfo', Copy) {
-    group = 'Filtering'
-    description = 'Copy and substitute version numbers in java source templates.'
+tasks.register('mergeWcsResources', Copy) {
+    group = 'build setup'
+    description = 'Merge filtered WCS 2.0 resources into build/resources.'
 
-    from 'src'
-    into 'src'
-    include '**/*.java.in'
-    filter(ReplaceTokens, tokens: tokens)
-    rename '(.+)\\.in', '$1'
+    from('resources/WCS/2.0') {
+        include 'xsl/**'
+        include 'WEB-INF/**'
+
+        exclude 'WEB-INF/web.xml'
+        exclude 'WEB-INF/urlrewrite.xml'
+        exclude 'WEB-INF/logback.xml'
+        exclude 'WEB-INF/logback-test.xml'
+    }
+    into stagedHyraxResourcesDir
+    filteringCharset = 'UTF-8'
+    filter(ReplaceTokens, tokens: filterTokens)
+    dependsOn tasks.named('stageHyraxResources')
+}
+
+tasks.register('stageRobotsResources', Copy) {
+    group = 'build setup'
+    description = 'Stage and filter robots resources into build/robots.'
+
+    from('resources/robots')
+    into stagedRobotsResourcesDir
+    filteringCharset = 'UTF-8'
+    filter(ReplaceTokens, tokens: filterTokens)
+}
+
+tasks.register('stageNgapResources', Copy) {
+    group = 'build setup'
+    description = 'Stage and filter NGAP resources into build/ngap.'
+
+    from('resources/ngap') {
+        exclude '*.png'
+        exclude 'lib/**'
+    }
+    into stagedNgapResourcesDir
+    filteringCharset = 'UTF-8'
+    filter(ReplaceTokens, tokens: filterTokens)
+}
+
+tasks.register('PreProcessSourceCode') {
+    group = 'build setup'
+    description = 'Move filtered sources and resources into generated build trees.'
+
+    dependsOn(
+        tasks.named('stageSourceTree'),
+        tasks.named('mergeWcsResources'),
+        tasks.named('stageRobotsResources'),
+        tasks.named('stageNgapResources')
+    )
+}
+
+tasks.named('compileJava') {
+    dependsOn tasks.named('PreProcessSourceCode')
 }

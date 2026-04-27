@@ -54,3 +54,86 @@ One discrepancy needs explicit validation: Ant defines a `WCS_SOFTWARE_VERSION` 
 ## Output
 
 Created `AI-docs/gradle-build-replacement-plan.md` with the candidate comparison, starting-point recommendation, phased migration plan, and verification matrix.
+
+## Phase 3 Implementation
+
+Date: 2026-04-26
+
+### Goal
+
+Implement the Phase 3 bootstrap and staging foundation:
+
+- make the Gradle wrapper/build script configure on a current Gradle/JDK stack
+- move `showInfo` output to task execution time
+- remove source-mutation behavior from Gradle cleanup/preprocessing
+- stage filtered Java and resource trees under `build/`
+- explicitly handle the live WCS token form `@WcsSoftwareVersion@`
+
+### Files Changed
+
+- `build.gradle`
+- `gradle/wrapper/gradle-wrapper.properties`
+
+### Commands Run
+
+```bash
+ant -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build PreProcessSourceCode
+sed -n '1,120p' src/opendap/bes/Version.java
+sed -n '1,120p' resources/WCS/2.0/xsl/capabilities.xsl
+JAVA_HOME=/Library/Java/JavaVirtualMachines/openjdk.jdk/Contents/Home GRADLE_USER_HOME=/tmp/olfs-gradle-home ./gradlew help --no-daemon
+JAVA_HOME=/Library/Java/JavaVirtualMachines/openjdk.jdk/Contents/Home GRADLE_USER_HOME=/tmp/olfs-gradle-home ./gradlew tasks --all --no-daemon
+JAVA_HOME=/Library/Java/JavaVirtualMachines/openjdk.jdk/Contents/Home GRADLE_USER_HOME=/tmp/olfs-gradle-home ./gradlew showInfo --no-daemon
+JAVA_HOME=/Library/Java/JavaVirtualMachines/openjdk.jdk/Contents/Home GRADLE_USER_HOME=/tmp/olfs-gradle-home ./gradlew showInfo -PHYRAX_VERSION=CI-Build -POLFS_VERSION=CI-Build --no-daemon
+JAVA_HOME=/Library/Java/JavaVirtualMachines/openjdk.jdk/Contents/Home GRADLE_USER_HOME=/tmp/olfs-gradle-home ./gradlew PreProcessSourceCode -PHYRAX_VERSION=CI-Build -POLFS_VERSION=CI-Build --no-daemon
+sed -n '35,55p' build/src/opendap/bes/Version.java
+sed -n '40,55p' build/resources/xsl/capabilities.xsl
+find build/src/opendap -maxdepth 3 \( -path 'build/src/opendap/cmr' -o -path 'build/src/opendap/wcs/v1_1_2' -o -path 'build/src/opendap/semantics' -o -path 'build/src/opendap/aws' -o -path 'build/src/opendap/async' \)
+find build/ngap -maxdepth 2 -type f | sort
+```
+
+### Reasoning Notes
+
+The original `build.gradle` was too entangled to safely patch in place for this phase. It mixed obsolete preprocessing (`*.java.in`), destructive cleanup of checked-in source, Java 1.9 compilation settings, configuration-time logging, and older task experiments that were not a reliable base for parity work.
+
+I replaced it with a smaller Phase 3 foundation that keeps `build.gradle` as the canonical file while focusing only on bootstrap and staging:
+
+- Java compile semantics are now `1.8`.
+- `showInfo` now prints only during task execution.
+- `clean` no longer deletes checked-in source.
+- `PreProcessSourceCode` stages filtered source and resources into `build/src`, `build/resources`, `build/robots`, and `build/ngap`.
+- Source staging matches Ant's include/exclude rules for `com/**`, `opendap/**`, and `org/opendap/**`.
+- WCS staging now replaces both `WCS_SOFTWARE_VERSION` and `WcsSoftwareVersion`.
+
+I also updated the wrapper distribution from Gradle `6.5` to `8.14.3`. That resolves the repo-level incompatibility between the old wrapper line and the current Sonar plugin/JDK expectations.
+
+One local environment issue surfaced during validation: this machine's `JAVA_HOME` is set to an old JDK 8 while `java` on `PATH` is a newer JDK. The successful validation commands used:
+
+```bash
+JAVA_HOME=/Library/Java/JavaVirtualMachines/openjdk.jdk/Contents/Home
+```
+
+That is an environment issue, not a repo-tracked build script issue, so I did not change `gradlew` itself in Phase 3.
+
+### Validation Results
+
+- `./gradlew help` succeeded with the updated wrapper/runtime.
+- `./gradlew tasks --all` succeeded and listed the new staging tasks plus `showInfo`.
+- `./gradlew showInfo` succeeded and no longer prints during configuration.
+- `./gradlew showInfo -PHYRAX_VERSION=CI-Build -POLFS_VERSION=CI-Build` confirmed Ant-style property overrides.
+- `./gradlew PreProcessSourceCode -PHYRAX_VERSION=CI-Build -POLFS_VERSION=CI-Build` succeeded.
+- `build/src/opendap/bes/Version.java` contains substituted `CI-Build` values.
+- `build/resources/xsl/capabilities.xsl` contains substituted `CI-Build` for `WcsSoftwareVersion`.
+- excluded source trees such as `opendap/cmr`, `opendap/wcs/v1_1_2`, `opendap/semantics`, `opendap/aws`, and `opendap/async` were not staged.
+- `build/ngap` was staged without `lib/**`, while landing-page assets under `landing/` remained present.
+
+### Known Remaining Gaps
+
+This phase intentionally did not implement:
+
+- Ant-parity dependency file collections
+- Ant-parity WAR assembly tasks
+- distribution bundles
+- Ant-parity `check`/`test` behavior
+- README updates
+
+Those belong to Phases 4 through 7.
