@@ -25,12 +25,12 @@ Technology stack
   - Web descriptor: resources/hyrax/WEB-INF/web.xml (Servlet 4.0)
 - Build systems:
   - Gradle (preferred; wrapper included)
-  - Apache Ant (legacy build maintained; still used for release packaging)
+  - Apache Ant (legacy build maintained for comparison and fallback)
 - CI/CD: Travis CI; SonarCloud analysis; Snyk security scan
 - Logging: Logback (logback-classic)
 
 Requirements
-- Java Development Kit: OpenJDK 17 (CI builds with JDK 17). The Gradle build targets Java 9 bytecode (source/targetCompatibility 1.9) and is compatible with newer JDKs.
+- Java Development Kit: OpenJDK 17 is the CI baseline. The Gradle and Ant builds compile Java 8 bytecode.
 - Apache Tomcat: 9.x or newer recommended. Older servlet containers may work, but web.xml declares Servlet 4.0.
 - BES and libdap4 installed and running (BES listener reachable from OLFS). You can use besctl to start BES and confirm beslistener is running.
 - Tools (pick one build path):
@@ -48,8 +48,8 @@ Quick start
    - Default OLFS config assumes BES at localhost:10022 (configurable).
 
 3a) Build with Gradle (recommended)
-   ./gradlew clean war
-   # Artifact: build/libs/opendap.war
+   ./gradlew -PHYRAX_VERSION=CI-Build -POLFS_VERSION=CI-Build server
+   # Artifact: build/dist/opendap.war
 
 3b) Build with Ant (legacy)
    ant server
@@ -61,7 +61,7 @@ Quick start
    export CATALINA_HOME=/path/to/tomcat
    rm -rf "$CATALINA_HOME"/webapps/opendap*
    # Using Gradle build output:
-   cp build/libs/opendap.war "$CATALINA_HOME"/webapps/
+   cp build/dist/opendap.war "$CATALINA_HOME"/webapps/
    # Or Ant build output:
    # cp build/dist/opendap.war "$CATALINA_HOME"/webapps/
 
@@ -92,10 +92,13 @@ Entry points and web context
 Build, tasks, and scripts
 Gradle (preferred)
 - Common tasks:
-  - ./gradlew clean war — build the opendap.war
-  - ./gradlew test — run unit tests (JUnit 5 engine is configured)
-  - ./gradlew showInfo — print build/version properties (HYRAX_VERSION, OLFS_VERSION, etc.)
-  - ./gradlew sonar -Dsonar.token=... — run SonarCloud analysis (see CI example)
+  - ./gradlew server - build build/dist/opendap.war
+  - ./gradlew DISTRO - build source, OLFS webapp, and robots webapp distribution tarballs
+  - ./gradlew ngap, ngap-dist - build the NGAP WAR or NGAP webapp tarball
+  - ./gradlew check - run the Ant-parity focused JUnit 4 checks
+  - ./gradlew test - same focused check suite as ./gradlew check
+  - ./gradlew showInfo - print build/version properties (HYRAX_VERSION, OLFS_VERSION, etc.)
+  - ./gradlew sonar -Dsonar.token=... - run SonarCloud analysis after Gradle classes are compiled
 - Properties (overrides):
   - -POLFS_VERSION=x.y.z -PHYRAX_VERSION=x.y.z to set release numbers
 
@@ -124,14 +127,14 @@ Environment variables
 - CI/analysis (used in CI): SONAR_LOGIN (token), SNYK_TOKEN, AWS_* for uploading snapshot artifacts
 
 Tests
-- Unit tests: Gradle uses JUnit 5; run with:
-  ./gradlew test
+- Focused unit checks: Gradle uses JUnit 4 and runs the same class list as Ant check:
+  ./gradlew check
 - Ant-based checks: if available in your environment:
   ant check
 - Additional integration and legacy tests may exist under retired/ and load_tests/ (not run by default).
 
 Project structure (selected)
-- build.gradle — Gradle build (Java 9 bytecode, WAR, Sonar integration)
+- build.gradle — Gradle build (Java 8 bytecode, WAR, distributions, checks, Sonar integration)
 - build.xml — Ant build with many targets (server, DISTRO, ngap, robots, etc.)
 - resources/ — web resources, including hyrax/WEB-INF/web.xml and configuration templates
 - src/ — Java source code for OLFS and related components
@@ -153,7 +156,6 @@ TODOs / Open items
 - Document the exact Tomcat versions officially supported and any container-specific settings.
 - Provide a Docker-based quickstart if available (hyrax-docker is referenced in CI, but container details belong in that repo).
 - Expand testing section with integration test instructions if/when maintained tests are added back to active build.
-
 
 
 

@@ -549,3 +549,113 @@ This phase intentionally did not implement:
 - Ant-style focused `check` / `test`
 - Sonar reconciliation with the staged/classpath-aware Gradle build
 - the final full verification matrix and closeout documentation updates
+
+## Phase 7 Implementation
+
+Date: 2026-05-02 16:52:08 MDT
+
+### Goal
+
+Implement Phase 7 of the Gradle replacement plan:
+
+- recreate Ant's focused `check` behavior in Gradle
+- keep `test` and `check` aligned for the same focused suite
+- make Sonar consume Gradle-compiled classes and Ant-parity library scopes
+- update README build guidance after the Gradle gate passed
+- update CI coverage for the Gradle gate without moving release publishing away from Ant before Phase 8 artifact comparison
+
+### Files Changed
+
+- `build.gradle`
+- `README.md`
+- `.travis.yml`
+- `AI-docs/gradle-build-replacement-log.md`
+
+I did not modify `retired/` or generated `build/` sources. I also did not modify the already dirty `gradle/wrapper/gradle-wrapper.properties` or untracked `.vscode/` entry that were present before this phase.
+
+### Commands Run
+
+```bash
+sed -n '400,455p' build.xml
+find src -path '*/retired/*' -prune -o -name '*Test.java' -print | sort
+sed -n '1,240p' src/opendap/coreServlet/Scrub.java
+sed -n '1,220p' src/opendap/aggregation/AggregationParamsTest.java
+sed -n '1,220p' src/opendap/auth/UrsIdPTest.java
+sed -n '1,220p' src/opendap/bes/dap4Responders/Dap4ResponderTest.java
+sed -n '1,220p' src/opendap/coreServlet/RequestIdTest.java
+rg -n "Java 9|JUnit 5|build/libs|gradle war|Gradle uses JUnit 5|source/targetCompatibility 1\\.9" README.md .travis.yml build.gradle
+JAVA_HOME=/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home GRADLE_USER_HOME=/tmp/olfs-gradle-home /tmp/gradle-9.4.1/bin/gradle tasks --all --no-daemon
+JAVA_HOME=/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home GRADLE_USER_HOME=/tmp/olfs-gradle-home /tmp/gradle-9.4.1/bin/gradle check --no-daemon -PHYRAX_VERSION=CI-Build -POLFS_VERSION=CI-Build
+JAVA_HOME=/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home GRADLE_USER_HOME=/tmp/olfs-gradle-home /tmp/gradle-9.4.1/bin/gradle server DISTRO ngap-dist check --no-daemon -PHYRAX_VERSION=CI-Build -POLFS_VERSION=CI-Build
+tar -tzf build/dist/olfs-CI-Build-webapp.tgz
+tar -tzf build/dist/robots-olfs-CI-Build-webapp.tgz | head -20
+tar -tzf build/dist/ngap-CI-Build-webapp.tgz
+JAVA_HOME=/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home ant check
+git status --short
+```
+
+I first tried `./gradlew tasks --all`, but this checkout's wrapper currently points at Gradle `8.9` and the only installed local JDK I found is Homebrew OpenJDK `25`. Gradle `8.9` cannot run on Java `25`, so local validation used a temporary `/tmp/gradle-9.4.1` distribution. I left the checked-in wrapper properties untouched.
+
+### Reasoning Notes
+
+Ant `check` runs an explicit JUnit 4 list, not general test discovery:
+
+- `opendap.coreServlet.Scrub`
+- `opendap.aggregation.AggregationParamsTest`
+- `opendap.auth.UrsIdPTest`
+- `opendap.bes.dap4Responders.Dap4ResponderTest`
+- `opendap.coreServlet.RequestIdTest`
+
+Those classes live in the main `src/` tree and Ant compiles them into the main `build/classes` output. I mirrored that in Gradle by pointing the `test` task at `sourceSets.main.output.classesDirs`, disabling test scanning, and including only the Ant class list.
+
+The first Gradle `check` run failed in `UrsIdPTest` because `javax.servlet.ServletException` was missing at test runtime. That exposed a classpath difference: Ant's `olfs.compile.classpath` includes the Tomcat-provided servlet jar, while Gradle's normal `runtimeClasspath` excludes `compileOnly` dependencies. I fixed the test classpath by adding `configurations.providedTomcatLibs` to the Gradle `test` task only.
+
+I updated Sonar properties so analysis uses:
+
+- `sonar.sources=src`
+- `sonar.java.binaries` from `sourceSets.main.output.classesDirs`
+- `sonar.java.libraries` from the Ant-parity Hyrax libs plus Tomcat-provided compile libs
+
+I also made `sonar` and deprecated `sonarqube` tasks depend on `classes` so the Gradle-compiled classes exist before analysis.
+
+The combined Gradle gate found one Phase 6 packaging bug: `serverDist`, `hyraxRobotsDist`, and `ngapDist` deleted WAR files in `doLast`. That Ant-style cleanup side effect does not compose in a Gradle task graph. In one invocation, `hyraxRobotsDist` could delete `opendap.war` before `serverDist` packaged it, producing a tiny webapp tarball with only `README`. I removed those `doLast` deletes so the distribution tasks are composable and the generated archives contain their WARs.
+
+I updated `.travis.yml` only for the Gradle build job, changing it from `gradle war` to the phase gate:
+
+```bash
+gradle -PHYRAX_VERSION=CI-Build -POLFS_VERSION=CI-Build server DISTRO ngap-dist check
+```
+
+I intentionally left Ant-based snapshot/release publishing jobs in place. Switching release publishing should wait for Phase 8 artifact comparison, not just successful Gradle task execution.
+
+### Validation Results
+
+Gradle task discovery succeeded and showed:
+
+- `check - Run Ant-parity focused checks.`
+- `test - Run the same focused JUnit 4 checks as Ant check.`
+- `sonar`
+- deprecated `sonarqube`
+
+Gradle `check` passed:
+
+- 17 JUnit assertions executed
+- all focused Ant check classes passed
+
+The combined Gradle gate passed:
+
+```bash
+gradle server DISTRO ngap-dist check -PHYRAX_VERSION=CI-Build -POLFS_VERSION=CI-Build
+```
+
+Archive spot checks after the final Gradle gate:
+
+- `olfs-CI-Build-webapp.tgz` contains `opendap.war` and `README`
+- `robots-olfs-CI-Build-webapp.tgz` contains `opendap.war`, `ROOT.war`, and `README`
+- `ngap-CI-Build-webapp.tgz` contains `ngap.war`
+
+Ant `check` also passed under the available OpenJDK `25`, with the same focused class list.
+
+### Known Remaining Gaps
+
+Phase 8 still needs the full Ant-vs-Gradle verification matrix and artifact comparisons before declaring Gradle the production replacement. In particular, release publishing still uses Ant in `.travis.yml` pending those comparisons.

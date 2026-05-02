@@ -117,6 +117,14 @@ def stagedSourceDir = layout.buildDirectory.dir('src')
 def stagedHyraxResourcesDir = layout.buildDirectory.dir('resources')
 def stagedRobotsResourcesDir = layout.buildDirectory.dir('robots')
 def stagedNgapResourcesDir = layout.buildDirectory.dir('ngap')
+def antCheckTestClasses = [
+    'opendap.coreServlet.Scrub',
+    'opendap.aggregation.AggregationParamsTest',
+    'opendap.auth.UrsIdPTest',
+    'opendap.bes.dap4Responders.Dap4ResponderTest',
+    'opendap.coreServlet.RequestIdTest'
+]
+def antCheckTestIncludes = antCheckTestClasses.collect { "${it.replace('.', '/')}.class" }
 
 def filterTokens = [
     HyraxVersion      : HYRAX_VERSION,
@@ -193,10 +201,10 @@ sonarqube {
         property 'sonar.projectName', 'olfs'
         property 'sonar.projectVersion', OLFS_VERSION
         property 'sonar.organization', 'opendap'
-        property 'sonar.inclusions', 'src'
+        property 'sonar.sources', 'src'
         property 'sonar.exclusions', 'src/opendap/Coverity_Model.java,retired/**/*.java,src/opendap/**/*Test.java'
-        property 'sonar.java.binaries', layout.buildDirectory.dir('classes').get().asFile.absolutePath
-        property 'sonar.java.libraries', fileTree(dir: 'lib', include: ['*.jar']).files*.absolutePath.join(',')
+        property 'sonar.java.binaries', sourceSets.main.output.classesDirs.files*.absolutePath.join(',')
+        property 'sonar.java.libraries', files(hyraxLibFiles, providedTomcatLibFiles).files*.absolutePath.join(',')
     }
 }
 
@@ -379,6 +387,33 @@ tasks.register('PreProcessSourceCode') {
 
 tasks.named('compileJava') {
     dependsOn tasks.named('PreProcessSourceCode')
+}
+
+tasks.named('test', Test) {
+    group = 'verification'
+    description = 'Run the same focused JUnit 4 checks as Ant check.'
+
+    dependsOn tasks.named('classes')
+    useJUnit()
+    testClassesDirs = sourceSets.main.output.classesDirs
+    classpath = sourceSets.main.runtimeClasspath + configurations.providedTomcatLibs
+    scanForTestClasses = false
+    include antCheckTestIncludes
+
+    testLogging {
+        events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+        exceptionFormat = 'full'
+        showStandardStreams = true
+    }
+}
+
+tasks.named('check') {
+    group = 'verification'
+    description = 'Run Ant-parity focused checks.'
+}
+
+tasks.matching { it.name in ['sonar', 'sonarqube'] }.configureEach {
+    dependsOn tasks.named('classes')
 }
 
 tasks.named('war', War) {
@@ -570,9 +605,6 @@ tasks.register('serverDist', Tar) {
         rename { 'README' }
     }
 
-    doLast {
-        delete file("${distDir.get().asFile}/${DEPLOYMENT_CONTEXT}.war")
-    }
 }
 
 tasks.register('server-dist') {
@@ -603,10 +635,6 @@ tasks.register('hyraxRobotsDist', Tar) {
         rename { 'README' }
     }
 
-    doLast {
-        delete file("${distDir.get().asFile}/${DEPLOYMENT_CONTEXT}.war")
-        delete file("${distDir.get().asFile}/ROOT.war")
-    }
 }
 
 tasks.register('hyrax-robots-dist') {
@@ -628,9 +656,6 @@ tasks.register('ngapDist', Tar) {
         into "${NGAP_DIST_BASE}-webapp"
     }
 
-    doLast {
-        delete file("${distDir.get().asFile}/${NGAP_DEPLOYMENT_CONTEXT}.war")
-    }
 }
 
 tasks.register('ngap-dist') {

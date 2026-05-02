@@ -105,7 +105,7 @@ jobs:
         - export STAGE=build
         - gradle --version
         - gradle tasks
-        - gradle war
+        - gradle -PHYRAX_VERSION=CI-Build -POLFS_VERSION=CI-Build server DISTRO ngap-dist check
       before_install:
         - wget http://services.gradle.org/distributions/gradle-8.14.3-bin.zip
         - unzip -qq gradle-8.14.3-bin.zip
