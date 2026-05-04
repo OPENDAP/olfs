@@ -28,6 +28,7 @@ package opendap.coreServlet;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -173,10 +174,9 @@ public class RequestCache {
 
         String msg="It appears that the RequestCache was not initialized prior " +
                    "to attempting to acquire a RequestId object.\n";
-        String stackTrace = StackWalker.getInstance()
-                .walk(frames -> frames
-                        .map(Object::toString)
-                        .collect(Collectors.joining("\n")));
+        String stackTrace = Arrays.stream(Thread.currentThread().getStackTrace())
+                .map(StackTraceElement::toString)
+                .collect(Collectors.joining("\n"));
         log.error("{}Stack trace: {}",msg, stackTrace);
 
         return new RequestId("ERROR(NOT FATAL): No request id was located in the RequestCache.");

@@ -208,3 +208,27 @@ Attempted Gradle validation with:
 The first run failed because the sandbox could not write to `~/.gradle`, so it was rerun with a writable temp `GRADLE_USER_HOME`. The rerun downloaded the wrapper and then failed with `Unsupported class file major version 67`.
 
 Reasoning: that failure points to the local Gradle/JDK runtime combination on this machine rather than the WCS cleanup itself. The machine currently exposes JDK 23 plus older JDK 8/7 installs, and Gradle 8.9 did not complete configuration under JDK 23 here.
+
+### 2026-05-04 16:48:19 MDT
+
+Query/prompt: `The gradle build for the 'server' target now fails on my machine using /opt/homebrew/opt/openjdk/bin/javac. Here's the error message: ... /src/opendap/coreServlet/RequestCache.java:176: error: cannot find symbol StackWalker ...`
+
+Reviewed the reported compile failure against the live source tree and confirmed the problem is in `src/opendap/coreServlet/RequestCache.java`, not only in generated `build/src`. The file now used `StackWalker`, which is a Java 9 API, while both Ant and Gradle still compile the production sources with Java 8 source/target settings.
+
+Reasoning: the failure is real and deterministic. `StackWalker` cannot compile when the build is intentionally pinned to Java 8 compatibility, so the right fix is to remove the Java 9 dependency rather than weaken the build target.
+
+### 2026-05-04 16:48:19 MDT
+
+Updated `RequestCache.getRequestId()` to build the diagnostic stack trace from `Thread.currentThread().getStackTrace()` and `Arrays.stream(...)` instead of `StackWalker`.
+
+Reasoning: this preserves the intent of the logging path, keeps the implementation small, and stays compatible with Java 8, which matches the repository's documented build authority and current Gradle settings.
+
+### 2026-05-04 16:52:20 MDT
+
+Verification results:
+
+- `JAVA_HOME=/opt/homebrew/opt/openjdk@23/libexec/openjdk.jdk/Contents/Home ant -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build check` succeeded
+- `gradle server --no-daemon` under Homebrew `openjdk` failed before project compilation with `Unsupported class file major version 69`
+- `gradle compileJava --no-daemon` under Homebrew `openjdk@21` with a fresh `GRADLE_USER_HOME` failed the same way, also before project compilation
+
+Reasoning: the Java source change removed the reported `StackWalker` compile error, which is confirmed by a full Ant compile and test pass. The remaining Gradle failure appears to be a separate build-runtime or environment problem in this machine's Gradle script evaluation path, not a Java source-level `RequestCache` problem.
