@@ -1,166 +1,140 @@
 # Codex Deep Dive: Hyrax OLFS Repository
 
-Date: 2026-04-26  
-Repository root: `/Users/jhrg/src/hyrax/olfs`
+Date: 2026-05-04  
+Repository root: `/Users/jimg/src/opendap/hyrax/olfs`
 
 ## Executive Summary
 
-This repository is the Java servlet front end for Hyrax, commonly referred to as the OLFS. It is not only the OLFS request dispatcher, however. The active source and resource trees also contain several related web services, filters, helper servlets, and standalone build outputs:
+This repository is still the Java servlet front end for Hyrax, but the active runtime surface is narrower than the previous deep dive described. The current live tree centers on:
 
-- the main Hyrax/OLFS servlet application, rooted at the `opendap` deployment context by default
-- DAP2 and DAP4 request dispatching backed by BES
-- WCS 2.0 service support
-- W10n service support
-- aggregation ZIP service support
-- viewer and Java WebStart launch support
-- documentation, sitemap, and robots services
-- gateway and NGAP-specific dispatch paths
-- authentication, authorization, PDP, bot filtering, and clickjacking filters
-- standalone helper applications and tools such as the PDP WAR, robots WAR, XML validator, XSL transformer, and hex encoder
+- the main Hyrax/OLFS servlet application
+- BES-backed DAP request dispatch
+- NGAP-specific dispatch and packaging
+- aggregation, viewers, docs, and sitemap/robots services
+- authentication, authorization, and a standalone PDP service
 
-The production build story is Ant-first. The Gradle files are real and used in some CI/security/analysis paths, but they are still secondary and appear to have drift from the production Ant build. `.travis.yml` confirms this: production-like build and release packaging use Ant targets such as `server`, `DISTRO`, and `ngap-dist`, while Gradle has a separate build stage and scan-related usage.
+The old deep dive treated WCS 2.0 and W10n as active first-class services in the current tree. That is no longer correct. In the current repository state:
 
-The `retired/` directory was intentionally ignored for this analysis, per request. Some files under active `src/` and `resources/` also appear stale, experimental, or only conditionally used. The most important examples are older WCS 1.1.2 resources and several `resources/experiments` descriptors that reference classes not present in the active source tree.
+- there is no active `opendap.wcs` source package
+- there is no active `opendap.w10n` source package
+- the main `web.xml` files do not map WCS or W10n servlets
+- there is no live `resources/WCS` tree in `resources/`
 
-## Repository Shape
+That matches your note that many formerly active `src` files have since been moved into `retired/`. For this refresh, `retired/` was treated as historical only and was not inspected.
 
-Top-level files and directories of interest:
+The build story is also more nuanced than before. Ant remains the production authority and the release packaging path, but Gradle is no longer just a loose sidecar: it now mirrors the Ant task names and Java 8 settings closely enough that Travis runs both Ant and Gradle build paths. There is still some historical residue in the build scripts, especially around removed WCS-era paths.
 
-- `build.xml`: primary production Ant build for OLFS/Hyrax, NGAP, robots, and helper jars.
-- `pdpservice-build.xml`: Ant build for the standalone PDP service WAR.
-- `aggregation-build.xml`: Ant build for a standalone aggregation service WAR.
-- `.travis.yml`: CI definition; shows Ant production build and release packaging paths.
-- `build.gradle`: evolving Gradle build for WAR creation, Sonar, and related work.
-- `build-for-snyk.gradle`: older Gradle/Snyk-oriented dependency scan build file.
-- `src/`: Java source tree.
-- `resources/`: webapp resources, configuration, XSL, JSP, web descriptors, static assets, and test/demo inputs.
-- `doc/`: static user and admin documentation copied into the webapp.
-- `lib/`: checked-in jar dependencies used heavily by the Ant build.
-- `ant_targets`: notes about active Ant targets and historical build files.
-- `README.md`, `INSTALL`, `install.html`: user-facing build/install guidance.
+## Current Repository Shape
 
-The active source tree contains 356 Java files under `src/`. The largest packages are:
+Current active inventory, excluding `retired/`:
 
-- `opendap.bes`: BES API, dispatchers, responders, node cache, sitemap, DAP response handling.
-- `opendap.wcs`: WCS service implementation.
-- `opendap.dap4`: DAP4 utilities and response support.
-- `opendap.http`: HTTP request/response helpers.
-- `opendap.coreServlet`: core servlet framework, main dispatcher, filters, docs servlet, persistent config.
-- `opendap.auth`: authentication, authorization, IdP, PEP, PDP, user profile support.
-- `opendap.threddsHandler`: static and dynamic THREDDS catalog support.
-- `opendap.gateway`, `opendap.aggregation`, `opendap.viewers`, `opendap.w10n`, `opendap.ngap`: service-specific implementations.
+- `288` Java source files under `src/`
+- `185` files under `resources/`
 
-The active resource tree contains about 330 files. The heaviest resource areas are:
+Largest active source areas:
 
-- `resources/hyrax`: main webapp resources and default configuration.
-- `resources/WCS`: WCS resources, especially WCS 2.0 schemas, examples, XSL, and config.
-- `resources/ngap`: NGAP-specific deployment descriptor, config, logging, landing page, errors, and supporting jars.
-- `resources/aggregation`: aggregation test/demo inputs and baselines.
-- `resources/robots`: standalone robots/sitemap webapp.
-- `resources/pdpService`: standalone PDP service webapp.
-- `resources/experiments`: experimental descriptors and pages, likely not part of production.
+- `opendap/bes`: 73 files
+- `opendap/dap4`: 29 files
+- `opendap/http`: 27 files
+- `opendap/coreServlet`: 27 files
+- `opendap/auth`: 25 files
+- `opendap/threddsHandler`: 21 files
+
+Active top-level resource areas:
+
+- `resources/hyrax`: main Hyrax webapp resources
+- `resources/ngap`: NGAP-specific webapp resources
+- `resources/robots`: standalone sitemap/robots webapp
+- `resources/pdpService`: standalone PDP webapp
+- `resources/aggregation`: aggregation examples and tests
+
+Still present but not part of the main Hyrax WAR staging path:
+
+- `resources/experiments`
+- `resources/gsoc`
+- `resources/sonar`
+
+Important top-level build files:
+
+- `build.xml`
+- `build.gradle`
+- `pdpservice-build.xml`
+- `aggregation-build.xml`
+- `.travis.yml`
 
 ## Build System
 
-### Ant Is The Production Authority
+### Ant Is Still The Release Authority
 
-`build.xml` is the primary build file. It declares the project as `Hyrax-OLFS` and provides the main build path for:
+`build.xml` remains the authoritative production build file. It defines the expected release and packaging targets, including:
 
-- `server`: builds the main `opendap.war`.
-- `DISTRO`: builds source, server, and robots distributions.
-- `robots` / `hyrax-robots`: builds a standalone `ROOT.war` robots/sitemap app.
-- `ngap`: builds `ngap.war`.
-- `ngap-dist`: builds NGAP distribution packaging.
-- `check`: runs a focused JUnit suite.
-- helper jar targets including hex encoder, XML validator, and XSL transformer.
+- `server`
+- `check`
+- `DISTRO`
+- `ngap`
+- `ngap-dist`
+- `robots`
+- `hyrax-robots`
 
-The Ant build copies source to `build/src` and filters version/service tokens before compilation. Important tokens include:
+It still preprocesses source and resources by copying them into `build/` and filtering tokens before compilation. That matters because `src/opendap/bes/Version.java` is intentionally tokenized in source and compiled from the filtered staged copy in `build/src`.
 
-- `@HyraxVersion@`
-- `@OlfsVersion@`
-- `@SERVICE_CONTEXT@`
-- `@WCS_SOFTWARE_VERSION@`
+Important Ant facts verified from the current tree:
 
-This matters because `src/opendap/bes/Version.java` contains unresolved version tokens in source. That is expected for the Ant path, where filtered copies are compiled from `build/src`.
+- Java source/target is `1.8`
+- `check` runs a focused five-test JUnit suite
+- `PreProcessSourceCode` stages filtered source and resource trees before `compile`
 
-The Ant compiler settings use Java source/target 1.8. CI currently runs the Ant build under JDK 17.
+From the `ant check` run on 2026-05-04:
 
-### Main Ant Build Outputs
+- Ant copied `290` files into `build/src`
+- Ant copied `54` Hyrax resource files into `build/resources`
+- Ant copied `23` NGAP resource files into `build/ngap`
+- Ant copied `3` robots files into `build/robots`
+- Ant compiled `288` Java source files
 
-Important Ant targets include:
+### Gradle Has Moved Closer To Ant Parity
+
+The previous deep dive overstated Gradle drift. The current `build.gradle` now explicitly mirrors Ant in several important ways:
+
+- Java source/target compatibility is `1.8`
+- `options.release = 8`
+- Ant-style task names exist: `server`, `DISTRO`, `ngap-dist`, `robots`, `hyrax-robots`, `check`
+- source and resource staging/filtering is modeled explicitly
+- the `check` task is wired to the same focused JUnit suite as Ant
+
+Travis confirms this is not theoretical. The build stage runs both:
 
 - `ant -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build show server`
-  - CI-style main WAR build.
-- `ant check`
-  - Runs a small JUnit suite.
-- `ant DISTRO`
-  - Builds source/server/robots distribution artifacts.
-- `ant ngap`
-  - Builds NGAP WAR.
-- `ant ngap-dist`
-  - Builds NGAP distribution artifacts.
-- `ant robots`
-  - Builds standalone `ROOT.war` for robots/sitemap behavior.
+- `gradle -PHYRAX_VERSION=CI-Build -POLFS_VERSION=CI-Build server DISTRO ngap-dist check`
 
-`ant_targets` reinforces that the active build file is `build.xml`, covering OLFS/Hyrax and NGAP production rules.
+So the right current description is:
 
-### Standalone Ant Builds
+- Ant is still the release authority
+- Gradle is an active parity effort, not just a placeholder
 
-`pdpservice-build.xml` builds a standalone PDP service:
+### Build Script Drift Still Exists
 
-- deployment context: `pdp`
-- servlet: `opendap.auth.PDPService`
-- resources: `resources/pdpService`
-- output: WAR under `build/dist`
+There is still historical build residue worth calling out:
 
-`aggregation-build.xml` builds a standalone aggregation service:
+- `build.gradle` has `mergeWcsResources`, which references `resources/WCS/2.0`, but that directory is absent in the live tree.
+- `stageSourceTree` excludes packages such as `opendap/wcs/v1_1_2/**` that no longer exist in the active source tree.
+- `build.xml` source-distribution packaging still references older top-level resource paths such as `resources/WebStart/**`, `resources/gateway/**`, and `resources/nciso/**`, while the current live layout places these under `resources/hyrax/...`.
 
-- deployment context: `opendap`
-- servlet: `opendap.aggregation.AggregationServlet`
-- output: WAR named like the main app
+Those are real drift signals. I am inferring from the current tree that these are historical leftovers, not current product-defining structure.
 
-The aggregation servlet is also present in the main Hyrax web descriptor, so the standalone build is not the only way to expose it.
+## CI
 
-### Gradle Is Present But Secondary
+`.travis.yml` currently shows:
 
-`build.gradle` defines Java/WAR/Eclipse/IDEA/Sonar support and custom WAR tasks:
+- Ant build coverage
+- Gradle build coverage
+- Snyk scanning
+- Gradle Sonar scanning
+- Ant-based snapshot packaging for OLFS and NGAP
 
-- `war`
-- `buildOpendapWar`
-- `buildNgapWar`
-- `buildRobotsWar`
-- `sonar`
+That reinforces the build conclusion above: Ant is still the release/package authority, but Gradle is part of current CI, not abandoned.
 
-It uses both Maven Central dependencies and `lib/` via `flatDir`. It also has custom version substitution logic.
-
-There are signs of drift:
-
-- Gradle source compatibility is set to 1.9, while Ant compiles for 1.8.
-- Gradle `clean` deletes `src/opendap/bes/Version.java`.
-- Gradle `substituteVersionInfo` processes `**/*.java.in`, but no active `Version.java.in` was found.
-- The checked-in `Version.java` still contains Ant-style tokens.
-- Some dependencies appear duplicated or version-divergent between checked-in jars and Gradle declarations.
-
-CI has a Gradle build stage, but the release/package stages are Ant based. Treat Gradle support as useful but still in-progress unless the project maintainers explicitly say otherwise.
-
-### CI
-
-`.travis.yml` contains several relevant stages:
-
-- build stage:
-  - installs Ant
-  - runs `ant -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build show server`
-  - also has a Gradle stage downloading Gradle 8.14.3 and running `gradle tasks` and `gradle war`
-- scan stage:
-  - runs Snyk via `run-snyk.sh`
-  - runs `gradle sonar`
-- snapshot stage:
-  - uses Ant `DISTRO`
-  - packages OLFS/Hyrax and NGAP artifacts
-
-This supports the conclusion that Ant is the production build authority and Gradle is supplemental.
-
-## Runtime Deployment Descriptors
+## Runtime Deployment Descriptors And Routing
 
 ### Main Hyrax Webapp
 
@@ -168,25 +142,32 @@ Primary descriptor:
 
 - `resources/hyrax/WEB-INF/web.xml`
 
-Important filters:
+Current active filters:
 
-- `ClickJackFilter`: `opendap.coreServlet.ClickjackFilter`, mapped to `/*`.
-- `BotFilter`: `opendap.coreServlet.BotFilter`, mapped to `/*`.
-- `UrlRewriteFilter`: Tuckey URL rewrite filter, mapped to `/*`.
-- `IdFilter`: present but commented out by default.
-- `PEPFilter`: present but commented out by default.
+- `ClickJackFilter` mapped to `/*`
+- `BotFilter` mapped to `/*`
+- `UrlRewriteFilter` mapped to `/*`
 
-Important servlets:
+Filters present but disabled by default in the main Hyrax descriptor:
 
-- `hyrax`: `opendap.coreServlet.DispatchServlet`, mapped to `/hyrax/*`.
-- `wcs`: `opendap.wcs.v2_0.http.Servlet`, mapped to `/wcs/*`.
-- `w10n`: `opendap.w10n.W10nServlet`, mapped to `/w10n/*`.
-- `aggregation`: `opendap.aggregation.AggregationServlet`, mapped to `/aggregation/*`.
-- `viewers`: `opendap.viewers.ViewersServlet`, mapped to `/viewers/*`.
-- `docs_servlet`: `opendap.coreServlet.DocServlet`, mapped to `/docs/*`.
-- `site_map_service`: `opendap.bes.BESSiteMapService`, mapped to `/siteMap/*`.
+- `IdFilter`
+- `PEPFilter`
 
-The URL rewrite rules in `resources/hyrax/WEB-INF/urlrewrite.xml` preserve explicit service prefixes such as `wcs`, `docs`, `viewers`, `hyrax`, `w10n`, `aggregation`, and `siteMap`. Requests outside those prefixes are rewritten into `/hyrax/...`, making the main dispatcher the default route for dataset-style paths.
+Current active servlet mappings in the main Hyrax descriptor:
+
+- `opendap.coreServlet.DispatchServlet` at `/hyrax/*`
+- `opendap.aggregation.AggregationServlet` at `/aggregation/*`
+- `opendap.viewers.ViewersServlet` at `/viewers/*`
+- `opendap.coreServlet.DocServlet` at `/docs/*`
+- `opendap.bes.BESSiteMapService` at `/siteMap/*`
+
+Important routing behavior from `resources/hyrax/WEB-INF/urlrewrite.xml`:
+
+- `/` rewrites to `/siteMap/`
+- explicitly named prefixes such as `docs`, `viewers`, `hyrax`, `aggregation`, and `siteMap` are preserved
+- everything else is rewritten into `/hyrax/...`
+
+That makes the dispatch servlet the default target for dataset-style requests.
 
 ### NGAP Webapp
 
@@ -194,123 +175,151 @@ Primary descriptor:
 
 - `resources/ngap/web.xml`
 
-NGAP exposes many of the same services as the main Hyrax webapp, but with NGAP-specific config:
+Compared with the main Hyrax descriptor, NGAP differs in important ways:
 
-- deployment context defaults to `ngap`
 - `IdFilter` is enabled
 - `PEPFilter` is enabled
-- NGAP-specific `urlrewrite.xml`
-- NGAP-specific `olfs.xml`
-- NGAP-specific `logback.xml`
-- `<distributable/>` is enabled
+- `BotFilter` is not present
+- `<distributable />` is enabled
+- NGAP has its own `olfs.xml`
+- NGAP has its own `urlrewrite.xml`
+- NGAP has its own logging config
 
-The NGAP rewrite rules send ordinary paths to `/hyrax/ngap/...` and route `/` or `/index.html` to the NGAP landing documentation page.
+Important routing behavior from `resources/ngap/urlrewrite.xml`:
 
-### Robots/Sitemap Webapp
+- `/` and `/index.html` route to `/docs/ngap/ngap.html`
+- some explicit prefixes are preserved
+- ordinary unmatched paths are rewritten to `/hyrax/ngap/...`
+
+So NGAP is not a separate top-level servlet implementation. It is the same main dispatch servlet plus NGAP-specific routing, config, and auth/logging behavior.
+
+### Standalone Robots/Sitemap Webapp
 
 Primary descriptor:
 
 - `resources/robots/WEB-INF/web.xml`
 
-This builds as a standalone ROOT context application. It maps:
+This standalone app maps:
 
-- `BESSiteMapService` to `/siteMap/*`
-- JSP handling to `/robots.txt` and `*.jsp`
+- `opendap.bes.BESSiteMapService` at `/siteMap/*`
+- JSP handling for `/robots.txt` and `*.jsp`
 
-It is designed to expose robot and sitemap behavior separately from the full OLFS webapp.
+The Ant and Gradle robots builds both turn `robots.jsp` into `robots.txt`.
 
-### PDP Service Webapp
+### Standalone PDP Webapp
 
 Primary descriptor:
 
 - `resources/pdpService/WEB-INF/web.xml`
 
-This standalone service maps:
+This app maps:
 
-- `opendap.auth.PDPService` to `/*`
+- `opendap.auth.PDPService` at `/*`
 
-The servlet evaluates authorization decisions from request parameters such as user id, auth context, resource id, query, and action. By default it expects secure transport unless configured otherwise.
+It is a separate deployment path from the main Hyrax and NGAP webapps.
 
-### WCS Standalone Descriptor
+## Core Configuration Behavior
 
-Primary descriptor:
+### Persistent Config Lookup
 
-- `resources/WCS/2.0/WEB-INF/web.xml`
+`opendap.coreServlet.ServletUtil` currently checks configuration locations in this order:
 
-This descriptor maps:
+1. `/etc/olfs/`
+2. `/usr/share/olfs/`
+3. bundled `WEB-INF/conf`
 
-- `opendap.wcs.v2_0.http.Servlet`
-- `opendap.coreServlet.DocServlet`
+That is still the live code path. If docs or old notes imply different environment-based lookup, that should be treated as documentation drift until proven in code.
 
-The main Hyrax WAR also exposes WCS 2.0 under `/wcs/*`, so this descriptor is best understood as standalone WCS packaging support.
+`PersistentConfigurationHandler` still installs bundled default configuration into the persistent config directory when the expected semaphore file is missing.
 
-### Legacy Or Experimental Descriptors
+### Main Hyrax `olfs.xml`
 
-Some descriptors in active `resources/` do not appear production-active:
-
-- `resources/WCS/1.1.2/WEB-INF/web.xml` references `opendap.wcs.v1_1_2.http.Servlet`, but no active `src/opendap/wcs/v1_1_2` package was found.
-- `resources/experiments` contains descriptors referencing packages such as `opendap.noaa_s3`, `opendap.aws.glacier`, `opendap.experiments`, and `opendap.hai`; these classes were not found in active `src/`.
-
-These files may be historical, prototype, or externally coupled. Do not assume resource presence means production support.
-
-## Main Configuration
-
-Primary default configuration:
+Primary default config:
 
 - `resources/hyrax/WEB-INF/conf/olfs.xml`
 
-Important defaults:
+Important active defaults:
 
-- BES root prefix `/`
+- BES prefix `/`
 - BES host `localhost`
 - BES port `10022`
-- BES client pool maximum `200`
-- BES max commands `2000`
-- node cache max entries `20000`
-- node cache refresh interval `600`
-- site map cache refresh interval `600`
-- THREDDS prefix `thredds`
-- THREDDS remote catalogs disabled by default
-- gateway prefix `gateway`
-- dataset URL response type `download`
-- DAP request form type `dap4`
-- HTTP POST enabled with max size `2000000`
+- BES `ClientPool maximum="200" maxCmds="2000"`
+- `NodeCache maxEntries="20000" refreshInterval="600"`
+- `SiteMapCache refreshInterval="600"`
+- `ThreddsService prefix="thredds" useMemoryCache="true" allowRemote="false"`
+- `GatewayService prefix="gateway"`
+- `DatasetUrlResponse type="download"`
+- `DataRequestForm type="dap4"`
+- `HttpPost enabled="true" max="2000000"`
 
-Commented or optional controls include:
+Optional or commented-out controls include:
 
-- direct data source access
-- forced HTTPS links
-- required user selection before file access
-- download filename suffix handling
-- combined logging to BES
-- dynamic navigation disabling
-- bot filtering rules
-- timers
-- NCML preload
+- `AllowDirectDataSourceAccess`
+- `ForceLinksToHttps`
+- `ShowDmrppLink`
+- `RequireUserSelection`
+- `AddFileoutTypeSuffixToDownloadFilename`
+- `EnableCombinedLog`
+- `NoDynamicNavigation`
+- `BotFilter`
+- `Timer`
+- `PreloadNcmlIntoBes`
 
-The code path for configuration localization is in `opendap.coreServlet.ServletUtil`. It checks `/etc/olfs/`, then `/usr/share/olfs/`, then bundled `WEB-INF/conf`. The README/install files mention `OLFS_CONFIG_DIR`, but that variable was not found in the active config lookup code. Treat that as documentation/code drift to verify before relying on the environment variable.
+### NGAP `olfs.xml`
 
-`PersistentConfigurationHandler` copies bundled default configuration into a persistent config directory when the expected semaphore file, such as `olfs.xml`, is missing.
+Primary NGAP config:
 
-## Core OLFS Request Flow
+- `resources/ngap/olfs.xml`
 
-The central servlet is:
+This file explicitly says it is a stand-in that will be replaced by an injected version in deployed NGAP environments, so treat the checked-in file as representative but not authoritative for production NGAP.
 
-- `opendap.coreServlet.DispatchServlet`
+Important differences from the default Hyrax config:
 
-It initializes:
+- `ClientPool maximum="25"`
+- `DatasetUrlResponse type="requestForm"`
+- `UseDualCloudWatchLogs` enabled
+- `ShowDmrppLink` enabled
+- `EnableCombinedLog` enabled
 
-- logging
-- persistent configuration
-- `olfs.xml`
-- combined logging settings
-- HTTP POST controls
-- request timers
-- `BESManager`
-- authentication controls
-- GET and POST dispatch handler chains
+### Auth Configuration
 
-The GET handler chain is ordered as follows:
+Primary auth config:
+
+- `resources/hyrax/WEB-INF/conf/user-access.xml`
+
+Important current behavior:
+
+- URS is the configured `IdProvider`
+- a local `SimplePDP` is defined
+- guest access is limited
+- `users` role gets broad access
+
+But the key deployment nuance is this:
+
+- the main Hyrax `web.xml` does not enable `IdFilter` or `PEPFilter` by default
+- the NGAP `web.xml` does enable them
+
+So `user-access.xml` matters more to NGAP and to deployments that explicitly turn on auth in the main Hyrax app.
+
+## Core Request Flow
+
+The main request entry point is:
+
+- `src/opendap/coreServlet/DispatchServlet.java`
+
+During init it does all of the following:
+
+- debug/logging setup
+- persistent config installation
+- config load from `olfs.xml`
+- combined log and CloudWatch toggles
+- POST enablement detection
+- timer setup
+- `BESManager` initialization
+- `AuthenticationControls` initialization
+- dispatch handler chain construction
+
+Current GET handler order:
 
 1. `opendap.bes.VersionDispatchHandler`
 2. `opendap.ncml.NcmlDatasetDispatcher`
@@ -318,397 +327,181 @@ The GET handler chain is ordered as follows:
 4. `opendap.gateway.DispatchHandler`
 5. `opendap.ngap.NgapDapDispatcher`
 6. `opendap.bes.BesDapDispatcher`
-7. `opendap.bes.DirectoryDispatchHandler`, unless dynamic navigation is disabled
-8. `opendap.bes.BESThreddsDispatchHandler`, unless dynamic navigation is disabled
+7. `opendap.bes.DirectoryDispatchHandler` unless `NoDynamicNavigation` is set
+8. `opendap.bes.BESThreddsDispatchHandler` unless `NoDynamicNavigation` is set
 9. `opendap.bes.FileDispatchHandler`
 
-The POST handler chain includes:
+Current POST handler order:
 
 1. `opendap.ngap.NgapDapDispatcher`
 2. `opendap.bes.BesDapDispatcher`
 
-`DispatchServlet` opens a request cache, assigns a request id, logs access details, and dispatches to the first handler that claims the request. If no handler matches, it returns a not-found response. HEAD handling is intentionally narrow and only accepts root-ish HEAD requests.
+`doHead()` is intentionally restricted. Outside the service root it returns `405` with `Allow: GET, POST`.
 
-The handler interface is:
+## BES And DAP Integration
 
-- `opendap.coreServlet.DispatchHandler`
+### BESManager
 
-Handlers implement:
+`opendap.bes.BESManager` remains the central BES bootstrap and routing manager.
 
-- `init`
-- `requestCanBeHandled`
-- `handleRequest`
-- `getLastModified`
-- `destroy`
+Important current behavior:
 
-## BES Integration
+- requires at least one BES entry
+- requires a root `/` BES prefix
+- groups BES instances by prefix
+- uses longest-prefix matching
+- initializes node cache and sitemap cache from config
 
-The BES integration center is:
+### DAP Dispatch
 
-- `opendap.bes.BESManager`
-- `opendap.bes.BesApi`
-
-`BESManager` is a singleton that reads BES configuration from `olfs.xml`, groups BES instances by path prefix, requires a root `/` prefix, and chooses the longest matching prefix for a request. Within a group, it round-robins among configured BES instances.
-
-`BesApi` builds BES XML requests and transmits them using the PPT/BES client code. It handles:
-
-- BES version requests
-- catalog and node requests
-- DAP2 and DAP4 metadata/data responses
-- file response support
-- request id propagation
-- max response and variable size settings
-- XML base handling
-- DAP4 checksum flags
-- request context fields used by BES modules
-
-Supporting packages include:
-
-- `opendap.ppt`: PPT client and protocol support.
-- `opendap.io`: chunked transfer and Hyrax encoding support.
-- `opendap.dap4`: DAP4 request/response metadata and helpers.
-
-## DAP And Dataset Responses
-
-The main DAP dispatcher is:
-
-- `opendap.bes.BesDapDispatcher`
-
-It reads configuration flags such as:
+`opendap.bes.BesDapDispatcher` is still the main DAP dispatcher. It consumes settings such as:
 
 - `AllowDirectDataSourceAccess`
-- `RequireUserSelection`
-- `ShowDmrppLink`
-- `DataRequestForm`
-- `ForceLinksToHttps`
 - `DatasetUrlResponse`
+- `DataRequestForm`
+- `RequireUserSelection`
+- `ForceLinksToHttps`
 - `AddFileoutTypeSuffixToDownloadFilename`
-- `HttpPost max`
 
-It builds a large ordered set of DAP responders.
+The current tree still supports a broad responder set across DAP2 and DAP4, including:
 
-DAP4 support includes:
+- metadata responses
+- data responses
+- request forms
+- file access handling
+- ISO and rubric-style alternate handlers through `nciso`
+- DMR++ support in NGAP through `NgapDmrppResponder`
 
-- Dataset Services Response
-- `.dap`
-- `.dmr`
-- `.dmr.html`
-- `.dmr.rdf`
-- `.dmr.json`
-- `.dmr.ijsn`
-- `.dmr.iso`
-- `.dmr.rubric`
-- output alternatives such as CSV, XML, NetCDF, TIFF, JPEG2000, JSON, I-JSON, and CoverageJSON
+I did not re-enumerate every suffix from the responder classes this time because the bigger correctness issue was whether the surrounding services were still wired at all. The DAP responder surface is still large and BES-centered.
 
-DAP2 support includes:
-
-- `.dods`
-- `.ascii`
-- `.csv`
-- `.nc`
-- `.nc4`
-- `.xdap`
-- `.tiff`
-- `.jp2`
-- `.json`
-- `.ijsn`
-- `.covjson`
-- `.ddx`
-- `.dds`
-- `.das`
-- `.rdf`
-- `.info`
-- `.iso`
-- `.rubric`
-
-`opendap.bes.dap4Responders.Dap4Responder` handles suffix matching, alternative representations, and DAP4 HTTP Accept negotiation. It returns `406 Not Acceptable` when no acceptable representation can be produced.
-
-`opendap.bes.dapResponders.FileAccess` controls direct file/source access. Without `AllowDirectDataSourceAccess`, direct source access is denied. Dataset URL behavior is controlled by `DatasetUrlResponse`, which can produce a DSR-style response, redirect to a request form, or attempt download behavior.
-
-## Other Services And Servlets
-
-### WCS 2.0
-
-Primary class:
-
-- `opendap.wcs.v2_0.http.Servlet`
-
-Primary mapping:
-
-- `/wcs/*`
-
-This servlet initializes WCS service configuration, request handlers, and a `WcsServiceManager`. It also attempts to initialize `BESManager` from `olfs.xml` if needed. GET requests go through the HTTP GET handler. POST requests try XML, SOAP, and form handling.
-
-Default WCS service configuration:
-
-- `resources/hyrax/WEB-INF/conf/wcs_service.xml`
-
-This loads:
-
-- service identification XML
-- service provider XML
-- operations metadata XML
-- WCS catalog implementations
-
-The default catalog configuration uses dynamic catalog support, including a COADS dynamic service example.
-
-### W10n
-
-Primary class:
-
-- `opendap.w10n.W10nServlet`
-
-Primary mapping:
-
-- `/w10n/*`
-
-W10n initializes `W10nResponder` and registers a W10n service. It asks BES for W10n path information, distinguishes metadata requests by trailing slash, and supports JSON/HTML metadata plus data outputs such as W10n JSON, DAP2, NetCDF-3, and NetCDF-4.
-
-Common query parameters include:
-
-- `output`
-- `callback`
-- `reCache`
-- `flatten`
-- `traverse`
-
-W10n rendering uses XSL resources such as:
-
-- `w10nDataset.xsl`
-- `showNodeToW10nCatalog.xsl`
-
-### Aggregation
-
-Primary class:
-
-- `opendap.aggregation.AggregationServlet`
-
-Primary mapping:
-
-- `/aggregation/*`
-
-The aggregation servlet was developed for archive-style workflows that build ZIP archives by iteratively calling BES. It supports GET, POST, and HEAD.
-
-Operations include:
-
-- `version`
-- `file`
-- `netcdf3`
-- `netcdf4`
-- `ascii`
-- `csv`
-
-Inputs include file parameters, variable selections or constraint expressions, and optional bounding boxes. Test and example resources live under `resources/aggregation`.
-
-### Viewers
-
-Primary class:
-
-- `opendap.viewers.ViewersServlet`
-
-Primary mapping:
-
-- `/viewers/*`
-
-The viewers service loads `viewers.xml`, locates WebStart resources, and creates handlers for configured viewers and web services. Built-in viewer/service handlers include:
-
-- IDV
-- NetCDF Tools
-- Autoplot
-- ncWMS/Godiva
-- WCS
-
-Requests generally need:
-
-- `dapService`
-- `datasetID`
-
-The root viewers endpoint produces a dataset viewer page. Other viewer ids can return JNLP launch content.
-
-### Documentation
-
-Primary class:
-
-- `opendap.coreServlet.DocServlet`
-
-Primary mapping:
-
-- `/docs/*`
-
-`DocServlet` serves documentation from the persistent config docs directory when present, otherwise from bundled webapp documentation. It performs token replacement for context and servlet values in text-like files.
-
-### Sitemap And Robots
-
-Primary class:
-
-- `opendap.bes.BESSiteMapService`
-
-Primary mapping in main app:
-
-- `/siteMap/*`
-
-Standalone mapping:
-
-- ROOT app via `resources/robots/WEB-INF/web.xml`
-
-This service initializes BES support if necessary and emits robots/sitemap content using BES site map data and configured cache behavior.
+## Other Active Services
 
 ### Gateway
 
-Primary class in active dispatcher chain:
+The active gateway path is the dispatch handler:
 
 - `opendap.gateway.DispatchHandler`
 
-The gateway handler extends the BES DAP dispatcher with a gateway-oriented BES API. It handles a configured prefix, usually `gateway`, serves a gateway form, and proxies remote data source requests through BES gateway support.
+It is in the main dispatch chain and is driven by the configured gateway prefix.
 
-There is also a deprecated standalone `opendap.gateway.DispatchServlet`. It is not mapped by the main Hyrax web descriptor.
+There is also:
+
+- `opendap.gateway.DispatchServlet`
+
+but that class is explicitly marked `@Deprecated` and is not mapped by the live main web descriptors.
 
 ### NGAP
 
-Primary class:
+NGAP logic is implemented by:
 
 - `opendap.ngap.NgapDapDispatcher`
+- `opendap.ngap.NgapBesApi`
+- `opendap.ngap.NgapDmrppResponder`
 
-NGAP is integrated into the main dispatcher chain and into the NGAP-specific WAR. It extends the BES DAP dispatcher with `NgapBesApi`, Earthdata Login/URS context, NGAP BES module fields, and DMR++ response support.
+NGAP is not a separate servlet mapping. It is a prefix-aware dispatch extension inside the main dispatch chain, plus separate NGAP packaging and rewrite rules.
 
-The NGAP WAR enables authentication and authorization filters and uses CloudWatch-oriented logging configuration.
+### Aggregation
 
-### Authentication, Authorization, And PDP
+Primary servlet:
 
-Important classes:
+- `opendap.aggregation.AggregationServlet`
 
-- `opendap.auth.IdFilter`
-- `opendap.auth.PEPFilter`
+Mapped in the main app:
+
+- `/aggregation/*`
+
+Also built separately by:
+
+- `aggregation-build.xml`
+
+### Viewers
+
+Primary servlet:
+
+- `opendap.viewers.ViewersServlet`
+
+Current live config:
+
+- `resources/hyrax/WEB-INF/conf/viewers.xml`
+
+Currently active viewer handlers in config:
+
+- `opendap.webstart.IdvViewerRequestHandler`
+- `opendap.webstart.NetCdfToolsViewerRequestHandler`
+- `opendap.webstart.AutoplotRequestHandler`
+
+The ncWMS and Godiva service handler examples are present but commented out, so they should not be described as active defaults.
+
+`ViewersServlet` prefers localized `WebStart` resources from the persistent config directory and falls back to bundled `WebStart` resources in the webapp.
+
+### Docs
+
+Primary servlet:
+
+- `opendap.coreServlet.DocServlet`
+
+It serves docs from persistent config `docs/` when present, otherwise from bundled webapp docs, and performs simple token replacement for `<CONTEXT_PATH />` and `<SERVLET_NAME />` in text content.
+
+### Sitemap/Robots
+
+Primary servlet:
+
+- `opendap.bes.BESSiteMapService`
+
+It is still mapped in the main app and in the standalone robots app, even though the main `web.xml` comments say it was moved to the robots service.
+
+### PDP
+
+Primary servlet:
+
 - `opendap.auth.PDPService`
-- `opendap.auth.UrsIdP`
-- `opendap.auth.UserProfile`
-- `opendap.auth.PolicyDecisionPoint`
 
-`IdFilter` manages authentication sessions and user identity providers using `user-access.xml`.
+It supports both GET and POST evaluation and enforces secure transport by default unless the config explicitly disables that behavior.
 
-`PEPFilter` enforces configured policy decisions. It can redirect unauthenticated users to an IdP or return 401/403 responses.
+## What Is No Longer Active In The Current Tree
 
-`PDPService` exposes policy decisions as a standalone servlet. It evaluates request fields such as:
+These are the biggest corrections to the previous deep dive:
 
-- user id
-- authentication context
-- resource id
-- query string
-- action
+- There is no active `opendap.wcs` package in `src/`.
+- There is no active `opendap.w10n` package in `src/`.
+- The main `resources/hyrax/WEB-INF/web.xml` does not map WCS or W10n servlets.
+- The NGAP `web.xml` does not map WCS or W10n servlets either.
+- There is no live `resources/WCS` tree in `resources/`.
 
-The default user-access configuration is permissive in development-oriented ways and should be reviewed carefully before production changes.
+That means the old sections that described WCS 2.0 and W10n as current mapped services are now wrong for this repository state.
 
-### Bot And Clickjacking Filters
+The repository still contains historical clues in build logic and comments that those services once mattered. Those clues should now be treated as historical residue unless a future active tree reintroduces them outside `retired/`.
 
-`opendap.coreServlet.BotFilter` blocks or handles requests based on bot filtering rules configured in `olfs.xml`. It can match by IP, user agent, path, and response behavior.
+## Testing And Verification
 
-`opendap.coreServlet.ClickjackFilter` is installed over all requests and is intended to set clickjacking-related response protection.
+Commands run during this refresh:
 
-## Static And Dynamic Navigation
+1. `ant -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build show`
+2. `ant -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build check`
 
-Static THREDDS support is handled by:
+Notes from verification:
 
-- `opendap.threddsHandler.StaticCatalogDispatch`
+- Both commands required an explicit `JAVA_HOME` in this shell because Ant otherwise tried to use `/System/Library/Frameworks/JavaVM.framework/Home`.
+- `ant check` succeeded.
+- The focused JUnit suite passed.
+- Compilation under JDK 23 produced 36 warnings, mostly deprecation and Java 8 bootstrap-path warnings rather than immediate build breaks.
 
-Dynamic directory and catalog behavior includes:
+## Current Risk Areas
 
-- `opendap.bes.DirectoryDispatchHandler`
-- `opendap.bes.BESThreddsDispatchHandler`
+- Build scripts still contain historical path references and exclusions related to removed WCS-era content.
+- Main Hyrax and NGAP differ materially in auth behavior; do not assume a config change affects both the same way.
+- Persistent config precedence still matters for docs, viewers, and `olfs.xml`.
+- `DatasetUrlResponse` and `AllowDirectDataSourceAccess` remain security- and behavior-sensitive.
+- The checked-in NGAP `olfs.xml` is explicitly a stand-in, not necessarily the deployed reality.
+- Reflection-heavy code in auth/viewers and deprecated JDK APIs compile today but generate many warnings on newer JDKs.
 
-Default THREDDS configuration uses prefix `thredds` and disables remote catalog traversal. XSL resources transform static catalogs and BES node listings into browsable HTML and catalog responses.
+## Practical Guidance
 
-Dynamic navigation can be disabled through `NoDynamicNavigation` in `olfs.xml`.
+For future work in this repository:
 
-## Resource Areas
-
-### `resources/hyrax`
-
-This is the main webapp resource tree. It contains:
-
-- main `WEB-INF/web.xml`
-- main `urlrewrite.xml`
-- default `olfs.xml`
-- `user-access.xml`
-- `viewers.xml`
-- `wcs_service.xml`
-- XSL transforms
-- JSP pages
-- error pages
-- JavaScript and static assets
-- WebStart resources
-- gateway form resources
-
-### `resources/WCS`
-
-This tree contains WCS resources. WCS 2.0 is active in the main webapp. WCS 1.1.2 resources appear legacy or incomplete relative to active source.
-
-### `resources/ngap`
-
-This tree contains the NGAP web descriptor, config, URL rewrite rules, logging config, landing documentation, session manager support, NGAP-specific errors, and jars.
-
-### `resources/robots`
-
-This tree contains resources for the standalone ROOT robots/sitemap app.
-
-### `resources/pdpService`
-
-This tree contains resources for the standalone PDP service app.
-
-### `resources/aggregation`
-
-This tree contains examples, tests, and baselines for aggregation behavior.
-
-### `resources/experiments`
-
-This tree appears experimental and references classes not present in active `src/`. Treat it as non-production unless maintainers say otherwise.
-
-## Documentation
-
-`doc/` contains static documentation, CSS, images, and install/user guide material. The Ant build copies it into the webapp documentation location.
-
-`DocServlet` may also serve localized documentation from a persistent config directory if installed.
-
-## Tests
-
-Tests are mixed into active source packages. The Ant `check` target currently runs a focused suite including:
-
-- `opendap.coreServlet.Scrub`
-- `opendap.aggregation.AggregationParamsTest`
-- `opendap.auth.UrsIdPTest`
-- `opendap.bes.dap4Responders.Dap4ResponderTest`
-- `opendap.coreServlet.RequestIdTest`
-
-Additional tests exist but are not necessarily part of Ant `check`, including WCS and DAP4 tests.
-
-Because much of this repository is servlet and BES-integrated code, unit tests cover only part of the behavior. Changes to dispatching, BES calls, config parsing, or web descriptors often require WAR-level testing with Tomcat and a BES instance.
-
-## Risks, Drift, And Things To Watch
-
-- Ant is the production build authority; Gradle is present but not equivalent.
-- Version token filtering is Ant-oriented. Be careful changing `src/opendap/bes/Version.java` or Gradle clean/substitution behavior.
-- Some active resources reference missing source packages. Verify class existence and build inclusion before treating a descriptor as active.
-- `resources/experiments` appears non-production despite being outside `retired/`.
-- Documentation mentions `OLFS_CONFIG_DIR`, but active config lookup code checked `/etc/olfs`, `/usr/share/olfs`, and bundled config.
-- Dependency versions differ between checked-in `lib/` jars and Gradle declarations.
-- Main web.xml is broad and includes several services; servlet changes should consider rewrite rules and descriptor mappings.
-- Authentication and authorization behavior differs between default Hyrax and NGAP descriptors.
-- Direct source file access is deliberately gated by `AllowDirectDataSourceAccess`.
-- NGAP behavior depends on Earthdata Login/URS context, auth filters, and CloudWatch logging configuration.
-- WCS 2.0 is active; WCS 1.1.2 appears legacy in this active tree.
-- Dynamic navigation and THREDDS behavior depend on config, XSL transforms, and BES node/catalog responses.
-
-## Practical Change Guidance
-
-For production-facing changes:
-
-1. Start by checking the relevant web descriptor and Ant target.
-2. Prefer Ant commands for build verification.
-3. Keep Gradle changes synchronized with Ant only when intentionally improving Gradle support.
-4. Do not edit generated `build/` outputs.
-5. Do not assume resources are active unless they are copied by Ant, referenced from a descriptor, or instantiated by active code.
-6. For servlet changes, inspect URL rewrite behavior as well as Java code.
-7. For request handling changes, check the `DispatchServlet` handler order.
-8. For DAP changes, check both DAP2 and DAP4 responders.
-9. For config changes, check persistent config installation behavior.
-10. For security changes, check both default Hyrax and NGAP deployments.
-
+1. Treat `retired/` as historical unless you explicitly need archaeology.
+2. Verify servlet mappings in the live `web.xml` files before describing a service as active.
+3. Use Ant as the release/build authority.
+4. Treat Gradle as important and increasingly accurate, but still verify historical-path assumptions.
+5. Check `urlrewrite.xml` whenever you change routing or service exposure.
+6. Distinguish main Hyrax behavior from NGAP behavior before changing auth, logging, or URL semantics.

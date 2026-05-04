@@ -86,3 +86,94 @@ Documented the main conclusions:
 
 Reasoning: these points are the highest-risk assumptions future maintainers or agents might otherwise get wrong.
 
+### 2026-05-04 15:19:50 MDT
+
+Started a second-pass deep dive refresh in `/Users/jimg/src/opendap/hyrax/olfs`, explicitly using the current repository state rather than trusting the earlier summary. Re-read `AI-docs/codex-deep-dive.md`, `AI-docs/codex-deep-dive-log.md`, `AGENTS.md`, `build.xml`, `build.gradle`, `.travis.yml`, the live web descriptors, and the key dispatch/config classes.
+
+Reasoning: the user reported that many former `src/` files had been moved into `retired/`, so the highest-value work was to re-verify every claim that could have become stale, especially claims about active services.
+
+### 2026-05-04 15:19:50 MDT
+
+Confirmed that `retired/` should be treated as historical only and avoided inspecting it. Built the refreshed understanding from the live `src/`, `resources/`, build files, and deployment descriptors only.
+
+Reasoning: this avoids polluting the deep dive with behavior that now exists only for archaeology.
+
+### 2026-05-04 15:19:50 MDT
+
+Verified the largest correctness changes from the prior deep dive:
+
+- no active `opendap.wcs` package exists in `src/`
+- no active `opendap.w10n` package exists in `src/`
+- the main Hyrax and NGAP `web.xml` files do not map WCS or W10n servlets
+- no live `resources/WCS` tree exists under `resources/`
+
+Reasoning: the prior deep dive described WCS and W10n as active first-class services. That is no longer true in this tree and was the most important documentation error to fix.
+
+### 2026-05-04 15:19:50 MDT
+
+Measured the current active tree and package distribution. Found `288` Java source files under `src/` and `185` files under `resources/`, excluding `retired/`.
+
+Reasoning: the earlier document included counts and shape statements. Those needed to be refreshed so the new deep dive anchors itself in the current repository, not the earlier snapshot.
+
+### 2026-05-04 15:19:50 MDT
+
+Re-verified the live servlet and rewrite surface:
+
+- main Hyrax maps `DispatchServlet`, `AggregationServlet`, `ViewersServlet`, `DocServlet`, and `BESSiteMapService`
+- main Hyrax enables `ClickJackFilter` and `BotFilter`, but leaves `IdFilter` and `PEPFilter` commented out
+- NGAP enables `ClickJackFilter`, `IdFilter`, and `PEPFilter`
+- Hyrax root rewrites to `/siteMap/`
+- NGAP root rewrites to `/docs/ngap/ngap.html`
+
+Reasoning: this is the authoritative runtime surface for the current tree. It is the fastest way to distinguish active services from classes that merely still exist in source.
+
+### 2026-05-04 15:19:50 MDT
+
+Re-verified the dispatch chain in `DispatchServlet` and confirmed that the active GET handler order is:
+
+1. `VersionDispatchHandler`
+2. `NcmlDatasetDispatcher`
+3. `StaticCatalogDispatch`
+4. `gateway.DispatchHandler`
+5. `NgapDapDispatcher`
+6. `BesDapDispatcher`
+7. `DirectoryDispatchHandler` unless dynamic navigation is disabled
+8. `BESThreddsDispatchHandler` unless dynamic navigation is disabled
+9. `FileDispatchHandler`
+
+Reasoning: the dispatch chain is still one of the highest-leverage facts in the repository because many behaviors are controlled by ordered handler precedence rather than separate servlet mappings.
+
+### 2026-05-04 15:19:50 MDT
+
+Re-assessed the build story. The prior deep dive said Gradle was secondary and drifted significantly. That now needs nuance:
+
+- Ant is still the release/package authority
+- Gradle now mirrors Ant’s Java 8 settings and task names closely
+- Travis actively runs both Ant and Gradle build paths
+- some stale Gradle and Ant references to removed WCS-era or older resource paths still remain
+
+Reasoning: the old description was directionally useful but no longer precise enough. The current repo shows real Ant-parity work in Gradle, even though historical residue remains.
+
+### 2026-05-04 15:19:50 MDT
+
+Ran build verification commands:
+
+- `ant -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build show`
+- `ant -DHYRAX_VERSION=CI-Build -DOLFS_VERSION=CI-Build check`
+
+Both required an explicit `JAVA_HOME` because Ant otherwise tried to use `/System/Library/Frameworks/JavaVM.framework/Home`. `ant check` succeeded, compiled `288` source files, and passed the focused five-test suite. Compilation under JDK 23 produced warnings, mostly deprecations and Java-8 bootstrap-path warnings.
+
+Reasoning: this gives the refreshed deep dive at least one real build-and-test sanity check rather than relying only on static inspection.
+
+### 2026-05-04 15:19:50 MDT
+
+Rewrote `AI-docs/codex-deep-dive.md` to:
+
+- correct the repository root path
+- remove stale claims that WCS and W10n are currently active services
+- update the repository counts and current active package/resource layout
+- describe the present Hyrax, NGAP, robots, viewers, docs, aggregation, gateway, BES, and PDP surfaces
+- document the current Ant-versus-Gradle story more accurately
+- explicitly call out build-script historical residue as drift risk rather than treating it as active runtime behavior
+
+Reasoning: the deep dive should now describe the active repository as it exists today, while still flagging the places where the codebase carries older assumptions forward in comments or build logic.
