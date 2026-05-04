@@ -415,6 +415,7 @@ tasks.register('PreProcessSourceCode') {
     dependsOn tasks.named('clean')
     dependsOn(
         tasks.named('stageSourceTree'),
+        tasks.named('stageHyraxResources'),
         tasks.named('stageRobotsResources'),
         tasks.named('stageNgapResources')
     )

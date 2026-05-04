@@ -721,3 +721,72 @@ One more nuance: NGAP and distro-oriented Ant targets clean and rebuild overlapp
 
 - I did not change `.travis.yml` or `README.md` in this phase. The verification matrix is now implemented and passing; CI/doc promotion to declare Gradle the sole release authority is a separate decision.
 - `git status --short` also showed an existing modified `.vscode/settings.json`. I left it untouched.
+
+## Incremental Fix
+
+Date: 2026-05-04 13:26 MDT
+
+### Request
+
+The Gradle `server` target still fails. The reported failure is from `:war`, which expects `build/resources/WEB-INF/web.xml` to exist.
+
+### Files Inspected
+
+- `build.gradle`
+- `build.xml`
+- `AI-docs/gradle-build-replacement-log.md`
+
+I did not inspect or modify `retired/`.
+
+### Commands Run
+
+```bash
+rg -n "webXml|build/resources|resources/hyrax/WEB-INF/web.xml|server" build.gradle build.xml settings.gradle gradle.properties
+sed -n '340,560p' build.gradle
+sed -n '700,830p' build.xml
+git status --short
+```
+
+### Reasoning Notes
+
+The `war` task is configured to package the Hyrax WAR using:
+
+- `webXml = build/resources/WEB-INF/web.xml`
+- additional staged content from `build/resources`
+
+That matches the Ant build, where `server` consumes `${build.hyrax.resources}/WEB-INF/web.xml`.
+
+The breakage was in the Gradle task graph rather than in the WAR declaration itself. `PreProcessSourceCode` depended on:
+
+- `stageSourceTree`
+- `stageRobotsResources`
+- `stageNgapResources`
+
+but not `stageHyraxResources`.
+
+As a result, `compileJava` could succeed because it only needs staged Java sources, while `war` later failed when it tried to validate the Hyrax `web.xml` input under `build/resources`.
+
+The fix is to make `PreProcessSourceCode` also depend on `stageHyraxResources`, so the main Hyrax staged resource tree exists before any downstream WAR assembly task runs.
+
+### Files Changed
+
+- `build.gradle`
+
+### Expected Result
+
+Running `gradle server` should now stage `resources/hyrax` into `build/resources` before the `war` task evaluates its `webXml` input, eliminating the missing-file failure for `build/resources/WEB-INF/web.xml`.
+
+### Verification Notes
+
+I attempted to re-run the Gradle target after the fix, but this execution environment surfaced a separate toolchain/runtime problem before task execution:
+
+```bash
+/bin/zsh -lc 'GRADLE_USER_HOME=/private/tmp/olfs-gradle-home JAVA_HOME=/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home gradle server --no-daemon'
+/bin/zsh -lc 'mkdir -p /private/tmp/olfs-gradle-home-verify21 && GRADLE_USER_HOME=/private/tmp/olfs-gradle-home-verify21 JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home gradle compileJava --no-daemon'
+```
+
+Both commands failed before normal task execution with:
+
+- `BUG! exception in phase 'semantic analysis' in source unit '_BuildScript_' Unsupported class file major version 69`
+
+That is distinct from the original missing `build/resources/WEB-INF/web.xml` failure. It indicates a local Gradle/JDK mismatch in this agent runtime, not another problem in the `war` task graph. The task-graph fix for Hyrax resource staging still stands.
