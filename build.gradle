@@ -22,7 +22,6 @@ ext {
     HYRAX_VERSION = propertyOrDefault('HYRAX_VERSION', 'Not.A.Release')
     OLFS_VERSION = propertyOrDefault('OLFS_VERSION', 'Not.A.Release')
     NGAP_VERSION = propertyOrDefault('NGAP_VERSION', HYRAX_VERSION)
-    WCS_VERSION = propertyOrDefault('WCS_VERSION', HYRAX_VERSION)
 
     OLFS_DIST_BASE = propertyOrDefault('OLFS_DIST_BASE', "olfs-${OLFS_VERSION}")
     NGAP_DIST_BASE = propertyOrDefault('NGAP_DIST_BASE', "ngap-${HYRAX_VERSION}")
@@ -130,11 +129,9 @@ def antCheckTestClasses = [
 def antCheckTestIncludes = antCheckTestClasses.collect { "${it.replace('.', '/')}.class" }
 
 def filterTokens = [
-    HyraxVersion      : HYRAX_VERSION,
-    OlfsVersion       : OLFS_VERSION,
-    SERVICE_CONTEXT   : DEPLOYMENT_CONTEXT,
-    WCS_SOFTWARE_VERSION: WCS_VERSION,
-    WcsSoftwareVersion: WCS_VERSION
+    HyraxVersion    : HYRAX_VERSION,
+    OlfsVersion     : OLFS_VERSION,
+    SERVICE_CONTEXT : DEPLOYMENT_CONTEXT
 ]
 
 def phase8ArtifactNames = [
@@ -280,7 +277,6 @@ tasks.register('showInfo') {
         println "                 Hyrax Version: ${HYRAX_VERSION}"
         println "                  OLFS Version: ${OLFS_VERSION}"
         println "                  NGAP Version: ${NGAP_VERSION}"
-        println "                   WCS Version: ${WCS_VERSION}"
         println "            Deployment Context: ${DEPLOYMENT_CONTEXT}"
         println "       NGAP Deployment Context: ${NGAP_DEPLOYMENT_CONTEXT}"
         println ''
@@ -370,7 +366,6 @@ tasks.register('stageSourceTree', Sync) {
         include 'org/opendap/**'
 
         exclude 'opendap/cmr/**'
-        exclude 'opendap/wcs/v1_1_2/**'
         exclude 'opendap/semantics/**'
         exclude 'opendap/aws/**'
         exclude 'opendap/async/**'
@@ -388,25 +383,6 @@ tasks.register('stageHyraxResources', Sync) {
     into stagedHyraxResourcesDir
     filteringCharset = 'UTF-8'
     filter(ReplaceTokens, tokens: filterTokens)
-}
-
-tasks.register('mergeWcsResources', Copy) {
-    group = 'build setup'
-    description = 'Merge filtered WCS 2.0 resources into build/resources.'
-
-    from('resources/WCS/2.0') {
-        include 'xsl/**'
-        include 'WEB-INF/**'
-
-        exclude 'WEB-INF/web.xml'
-        exclude 'WEB-INF/urlrewrite.xml'
-        exclude 'WEB-INF/logback.xml'
-        exclude 'WEB-INF/logback-test.xml'
-    }
-    into stagedHyraxResourcesDir
-    filteringCharset = 'UTF-8'
-    filter(ReplaceTokens, tokens: filterTokens)
-    dependsOn tasks.named('stageHyraxResources')
 }
 
 tasks.register('stageRobotsResources', Sync) {
@@ -439,7 +415,6 @@ tasks.register('PreProcessSourceCode') {
     dependsOn tasks.named('clean')
     dependsOn(
         tasks.named('stageSourceTree'),
-        tasks.named('mergeWcsResources'),
         tasks.named('stageRobotsResources'),
         tasks.named('stageNgapResources')
     )

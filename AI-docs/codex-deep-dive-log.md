@@ -177,3 +177,34 @@ Rewrote `AI-docs/codex-deep-dive.md` to:
 - explicitly call out build-script historical residue as drift risk rather than treating it as active runtime behavior
 
 Reasoning: the deep dive should now describe the active repository as it exists today, while still flagging the places where the codebase carries older assumptions forward in comments or build logic.
+
+### 2026-05-04 15:40:00 MDT
+
+Query/prompt: `Based on the following statement from codex-deep-dive.md evaluate and update the build.gradle file: "Build scripts still contain historical path references and exclusions related to removed WCS-era content."`
+
+Reviewed `build.gradle` against the refreshed deep dive note and cross-checked the active tree without inspecting `retired/`. Verified that the live repository has no `resources/WCS/` tree and no active `src/opendap/wcs/` package. Cross-checked `build.xml` and confirmed Ant no longer stages any separate WCS resource tree during `PreProcessSourceCode`.
+
+Reasoning: the safest cleanup was to remove only the Gradle behavior that was clearly stale in the active tree and already absent from the Ant production build.
+
+### 2026-05-04 15:40:00 MDT
+
+Updated `build.gradle` to remove the stale Gradle-only WCS residue:
+
+- removed the unused `WCS_VERSION` extra property
+- removed the unused `WCS_SOFTWARE_VERSION` and `WcsSoftwareVersion` token filters
+- removed the `showInfo` WCS version line
+- removed the dead `opendap/wcs/v1_1_2/**` source exclude
+- removed the `mergeWcsResources` task that still referenced `resources/WCS/2.0`
+- removed the `PreProcessSourceCode` dependency on `mergeWcsResources`
+
+Reasoning: these references described a resource/source layout that no longer exists in the live repository and were not needed for Ant parity.
+
+### 2026-05-04 15:40:00 MDT
+
+Attempted Gradle validation with:
+
+- `JAVA_HOME=/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home GRADLE_USER_HOME=/private/tmp/olfs-gradle-home ./gradlew -q help -PHYRAX_VERSION=CI-Build -POLFS_VERSION=CI-Build`
+
+The first run failed because the sandbox could not write to `~/.gradle`, so it was rerun with a writable temp `GRADLE_USER_HOME`. The rerun downloaded the wrapper and then failed with `Unsupported class file major version 67`.
+
+Reasoning: that failure points to the local Gradle/JDK runtime combination on this machine rather than the WCS cleanup itself. The machine currently exposes JDK 23 plus older JDK 8/7 installs, and Gradle 8.9 did not complete configuration under JDK 23 here.
