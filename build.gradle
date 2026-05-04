@@ -99,6 +99,9 @@ def providedTomcatLibFiles = files(providedTomcatLibNames.collect { "lib/${it}" 
 def ngapAdditionalLibFiles = fileTree(dir: 'resources/ngap/lib', include: ['*.jar'], exclude: ngapContainerExcludedLibNames)
 def distDir = layout.buildDirectory.dir('dist')
 def hexEncoderDir = layout.buildDirectory.dir('dist/hexEncoder')
+def phase8SnapshotBaseDir = file("${System.getProperty('java.io.tmpdir')}/olfs-phase8-${HYRAX_VERSION}-${OLFS_VERSION}")
+def gradleVerificationDir = new File(phase8SnapshotBaseDir, 'gradle')
+def antVerificationDir = new File(phase8SnapshotBaseDir, 'ant')
 def hyraxDocsTree = fileTree('doc') {
     exclude 'src.distribution.readme'
 }
@@ -133,6 +136,63 @@ def filterTokens = [
     WCS_SOFTWARE_VERSION: WCS_VERSION,
     WcsSoftwareVersion: WCS_VERSION
 ]
+
+def phase8ArtifactNames = [
+    "${DEPLOYMENT_CONTEXT}.war",
+    'ROOT.war',
+    "${NGAP_DEPLOYMENT_CONTEXT}.war",
+    "${SRC_DIST}.tgz",
+    "${WEBAPP_DIST}.tgz",
+    "robots-${WEBAPP_DIST}.tgz",
+    "${NGAP_DIST_BASE}-webapp.tgz"
+]
+
+def warEntriesWithoutMetadata = { File archiveFile ->
+    def zip = new java.util.zip.ZipFile(archiveFile)
+    try {
+        zip.entries()
+            .findAll { !it.directory }
+            .collect { it.name }
+            .findAll { !it.startsWith('META-INF/') }
+            .sort()
+    }
+    finally {
+        zip.close()
+    }
+}
+
+def archiveEntryBytes = { File archiveFile, String entryName ->
+    def zip = new java.util.zip.ZipFile(archiveFile)
+    try {
+        def entry = zip.getEntry(entryName)
+        if (entry == null) {
+            throw new GradleException("Archive ${archiveFile.name} is missing ${entryName}")
+        }
+        zip.getInputStream(entry).bytes
+    }
+    finally {
+        zip.close()
+    }
+}
+
+def tarEntries = { File archiveFile ->
+    def entries = []
+    tarTree(resources.gzip(archiveFile)).visit { details ->
+        if (!details.isDirectory()) {
+            entries << details.path
+        }
+    }
+    entries.sort()
+}
+
+def formatSetDiff = { Collection leftEntries, Collection rightEntries, String leftLabel, String rightLabel ->
+    def leftOnly = (leftEntries as Set) - (rightEntries as Set)
+    def rightOnly = (rightEntries as Set) - (leftEntries as Set)
+    [
+        leftOnly ? "${leftLabel} only: ${leftOnly.sort().join(', ')}" : null,
+        rightOnly ? "${rightLabel} only: ${rightOnly.sort().join(', ')}" : null
+    ].findAll { it != null }.join('\n')
+}
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -748,4 +808,235 @@ tasks.register('XSLTransformer', Jar) {
             into distDir
         }
     }
+}
+
+tasks.register('phase8GradleMatrix') {
+    group = 'verification'
+    description = 'Run the Gradle side of the Phase 8 replacement verification matrix.'
+    dependsOn(
+        tasks.named('showInfo'),
+        tasks.named('server'),
+        tasks.named('check'),
+        tasks.named('DISTRO'),
+        tasks.named('ngap'),
+        tasks.named('ngap-dist'),
+        tasks.named('robots'),
+        tasks.named('hyrax-robots')
+    )
+}
+
+tasks.register('verifyGradleReplacementArtifacts') {
+    group = 'verification'
+    description = 'Verify the Gradle-built Phase 8 artifacts before Ant comparison.'
+    dependsOn tasks.named('phase8GradleMatrix')
+
+    doLast {
+        def distPath = distDir.get().asFile
+        def hyraxWar = file("${distPath}/${DEPLOYMENT_CONTEXT}.war")
+        def robotsWar = file("${distPath}/ROOT.war")
+        def ngapWar = file("${distPath}/${NGAP_DEPLOYMENT_CONTEXT}.war")
+        def stagedVersionFile = file("${stagedSourceDir.get().asFile}/opendap/bes/Version.java")
+
+        phase8ArtifactNames.each { artifactName ->
+            def artifact = file("${distPath}/${artifactName}")
+            if (!artifact.exists()) {
+                throw new GradleException("Missing expected Gradle Phase 8 artifact: ${artifact}")
+            }
+        }
+
+        if (!stagedVersionFile.exists()) {
+            throw new GradleException("Missing staged Version.java for Gradle verification: ${stagedVersionFile}")
+        }
+
+        def versionSource = stagedVersionFile.getText('UTF-8')
+        if (!versionSource.contains(HYRAX_VERSION) || !versionSource.contains(OLFS_VERSION)) {
+            throw new GradleException("Gradle-staged Version.java does not contain the substituted version values.")
+        }
+
+        [
+            [file: hyraxWar, expectedLibs: hyraxLibNames.collect { "WEB-INF/lib/${it}" }, expectedEntries: ['WEB-INF/web.xml', 'WEB-INF/urlrewrite.xml', 'WEB-INF/conf/olfs.xml']],
+            [file: robotsWar, expectedLibs: hyraxLibNames.collect { "WEB-INF/lib/${it}" }, expectedEntries: ['WEB-INF/web.xml', 'WEB-INF/conf/olfs.xml', 'robots.txt']],
+            [file: ngapWar, expectedLibs: configurations.ngapWarLibs.files.collect { "WEB-INF/lib/${it.name}" }.sort(), expectedEntries: ['WEB-INF/web.xml', 'WEB-INF/urlrewrite.xml', 'WEB-INF/conf/olfs.xml', 'WEB-INF/conf/logback.xml']]
+        ].each { spec ->
+            def warEntries = warEntriesWithoutMetadata(spec.file)
+            def libEntries = warEntries.findAll { it.startsWith('WEB-INF/lib/') }
+
+            if (libEntries != spec.expectedLibs.sort()) {
+                throw new GradleException("Unexpected WEB-INF/lib contents for ${spec.file.name}.\n${formatSetDiff(libEntries, spec.expectedLibs, 'WAR', 'Expected')}")
+            }
+
+            spec.expectedEntries.each { entryName ->
+                if (!warEntries.contains(entryName)) {
+                    throw new GradleException("${spec.file.name} is missing ${entryName}")
+                }
+            }
+
+            if (!warEntries.any { it.startsWith('docs/') }) {
+                throw new GradleException("${spec.file.name} is missing bundled docs/")
+            }
+
+            if (warEntries.contains('docs/src.distribution.readme')) {
+                throw new GradleException("${spec.file.name} still contains docs/src.distribution.readme")
+            }
+        }
+
+        if (archiveEntryBytes(hyraxWar, 'WEB-INF/web.xml') != file("${stagedHyraxResourcesDir.get().asFile}/WEB-INF/web.xml").bytes) {
+            throw new GradleException("Gradle Hyrax WAR WEB-INF/web.xml does not match the staged Hyrax descriptor.")
+        }
+
+        if (archiveEntryBytes(hyraxWar, 'WEB-INF/urlrewrite.xml') != file("${stagedHyraxResourcesDir.get().asFile}/WEB-INF/urlrewrite.xml").bytes) {
+            throw new GradleException("Gradle Hyrax WAR WEB-INF/urlrewrite.xml does not match the staged Hyrax rewrite config.")
+        }
+
+        if (archiveEntryBytes(robotsWar, 'WEB-INF/web.xml') != file("${stagedRobotsResourcesDir.get().asFile}/WEB-INF/web.xml").bytes) {
+            throw new GradleException("Gradle robots WAR WEB-INF/web.xml does not match the staged robots descriptor.")
+        }
+
+        if (archiveEntryBytes(robotsWar, 'WEB-INF/conf/olfs.xml') != file("${stagedHyraxResourcesDir.get().asFile}/WEB-INF/conf/olfs.xml").bytes) {
+            throw new GradleException("Gradle robots WAR WEB-INF/conf/olfs.xml does not match the staged Hyrax config.")
+        }
+
+        if (archiveEntryBytes(ngapWar, 'WEB-INF/web.xml') != file("${stagedNgapResourcesDir.get().asFile}/web.xml").bytes) {
+            throw new GradleException("Gradle NGAP WAR WEB-INF/web.xml does not match the staged NGAP descriptor.")
+        }
+
+        if (archiveEntryBytes(ngapWar, 'WEB-INF/urlrewrite.xml') != file("${stagedNgapResourcesDir.get().asFile}/urlrewrite.xml").bytes) {
+            throw new GradleException("Gradle NGAP WAR WEB-INF/urlrewrite.xml does not match the staged NGAP rewrite config.")
+        }
+
+        if (archiveEntryBytes(ngapWar, 'WEB-INF/conf/olfs.xml') != file("${stagedNgapResourcesDir.get().asFile}/olfs.xml").bytes) {
+            throw new GradleException("Gradle NGAP WAR WEB-INF/conf/olfs.xml does not match the staged NGAP config.")
+        }
+
+        if (archiveEntryBytes(ngapWar, 'WEB-INF/conf/logback.xml') != file("${stagedNgapResourcesDir.get().asFile}/logback.xml").bytes) {
+            throw new GradleException("Gradle NGAP WAR WEB-INF/conf/logback.xml does not match the staged NGAP logback config.")
+        }
+
+        def ngapLibEntries = warEntriesWithoutMetadata(ngapWar).findAll { it.startsWith('WEB-INF/lib/') }
+        ngapContainerExcludedLibNames.each { excludedName ->
+            if (ngapLibEntries.contains("WEB-INF/lib/${excludedName}")) {
+                throw new GradleException("Gradle NGAP WAR still contains excluded container-managed jar ${excludedName}")
+            }
+        }
+    }
+}
+
+tasks.register('snapshotGradleReplacementArtifacts') {
+    group = 'verification'
+    description = 'Copy the verified Gradle Phase 8 artifacts into build/verification/gradle.'
+    dependsOn tasks.named('verifyGradleReplacementArtifacts')
+
+    doLast {
+        def targetDir = gradleVerificationDir
+        delete(targetDir)
+
+        copy {
+            from(distDir)
+            include phase8ArtifactNames
+            into targetDir
+        }
+
+        copy {
+            from("${stagedSourceDir.get().asFile}/opendap/bes/Version.java")
+            into file("${targetDir}/staged-src/opendap/bes")
+        }
+    }
+}
+
+tasks.register('phase8AntMatrix', Exec) {
+    group = 'verification'
+    description = 'Run the Ant side of the Phase 8 replacement verification matrix.'
+    dependsOn tasks.named('snapshotGradleReplacementArtifacts')
+
+    workingDir = project.projectDir
+    environment 'JAVA_HOME', System.getProperty('java.home')
+    commandLine '/bin/zsh', '-lc', """
+        set -euo pipefail
+        rm -rf '${antVerificationDir}'
+        mkdir -p '${antVerificationDir}/staged-src/opendap/bes'
+        ant -DHYRAX_VERSION='${HYRAX_VERSION}' -DOLFS_VERSION='${OLFS_VERSION}' clean show check DISTRO
+        cp build/dist/${SRC_DIST}.tgz '${antVerificationDir}/'
+        cp build/dist/${WEBAPP_DIST}.tgz '${antVerificationDir}/'
+        cp build/dist/robots-${WEBAPP_DIST}.tgz '${antVerificationDir}/'
+        cp build/src/opendap/bes/Version.java '${antVerificationDir}/staged-src/opendap/bes/Version.java'
+        ant -DHYRAX_VERSION='${HYRAX_VERSION}' -DOLFS_VERSION='${OLFS_VERSION}' ngap-dist
+        cp build/dist/${NGAP_DIST_BASE}-webapp.tgz '${antVerificationDir}/'
+        ant -DHYRAX_VERSION='${HYRAX_VERSION}' -DOLFS_VERSION='${OLFS_VERSION}' hyrax-robots
+        cp build/dist/opendap.war '${antVerificationDir}/'
+        cp build/dist/ROOT.war '${antVerificationDir}/'
+        ant -DHYRAX_VERSION='${HYRAX_VERSION}' -DOLFS_VERSION='${OLFS_VERSION}' ngap
+        cp build/dist/${NGAP_DEPLOYMENT_CONTEXT}.war '${antVerificationDir}/'
+    """
+}
+
+tasks.register('snapshotAntReplacementArtifacts') {
+    group = 'verification'
+    description = 'Verify that the Ant Phase 8 snapshot contains the expected artifacts.'
+    dependsOn tasks.named('phase8AntMatrix')
+
+    doLast {
+        phase8ArtifactNames.each { artifactName ->
+            def artifact = file("${antVerificationDir}/${artifactName}")
+            if (!artifact.exists()) {
+                throw new GradleException("Missing expected Ant Phase 8 artifact snapshot: ${artifact}")
+            }
+        }
+    }
+}
+
+tasks.register('compareAntAndGradleReplacementArtifacts') {
+    group = 'verification'
+    description = 'Compare the Ant and Gradle Phase 8 artifacts for release-authority parity.'
+    dependsOn tasks.named('snapshotAntReplacementArtifacts')
+
+    doLast {
+        def gradleDir = gradleVerificationDir
+        def antDir = antVerificationDir
+        def warNames = ["${DEPLOYMENT_CONTEXT}.war", 'ROOT.war', "${NGAP_DEPLOYMENT_CONTEXT}.war"]
+        def descriptorEntriesByWar = [
+            "${DEPLOYMENT_CONTEXT}.war": ['WEB-INF/web.xml', 'WEB-INF/urlrewrite.xml', 'WEB-INF/conf/olfs.xml'],
+            'ROOT.war'               : ['WEB-INF/web.xml', 'WEB-INF/conf/olfs.xml', 'robots.txt'],
+            "${NGAP_DEPLOYMENT_CONTEXT}.war": ['WEB-INF/web.xml', 'WEB-INF/urlrewrite.xml', 'WEB-INF/conf/olfs.xml', 'WEB-INF/conf/logback.xml']
+        ]
+
+        warNames.each { warName ->
+            def gradleWar = file("${gradleDir}/${warName}")
+            def antWar = file("${antDir}/${warName}")
+            def gradleEntries = warEntriesWithoutMetadata(gradleWar)
+            def antEntries = warEntriesWithoutMetadata(antWar)
+
+            if ((gradleEntries as Set) != (antEntries as Set)) {
+                throw new GradleException("WAR contents differ for ${warName}.\n${formatSetDiff(gradleEntries, antEntries, 'Gradle', 'Ant')}")
+            }
+
+            def gradleLibs = gradleEntries.findAll { it.startsWith('WEB-INF/lib/') }
+            def antLibs = antEntries.findAll { it.startsWith('WEB-INF/lib/') }
+            if (gradleLibs != antLibs) {
+                throw new GradleException("WEB-INF/lib differs for ${warName}.\n${formatSetDiff(gradleLibs, antLibs, 'Gradle', 'Ant')}")
+            }
+
+            descriptorEntriesByWar[warName].each { entryName ->
+                if (archiveEntryBytes(gradleWar, entryName) != archiveEntryBytes(antWar, entryName)) {
+                    throw new GradleException("WAR entry ${entryName} differs between Gradle and Ant for ${warName}")
+                }
+            }
+        }
+
+        def gradleVersionSource = file("${gradleDir}/staged-src/opendap/bes/Version.java").getText('UTF-8')
+        def antVersionSource = file("${antDir}/staged-src/opendap/bes/Version.java").getText('UTF-8')
+
+        if (!gradleVersionSource.contains(HYRAX_VERSION) || !gradleVersionSource.contains(OLFS_VERSION)) {
+            throw new GradleException('Gradle staged Version.java lost the substituted version strings.')
+        }
+
+        if (!antVersionSource.contains(HYRAX_VERSION) || !antVersionSource.contains(OLFS_VERSION)) {
+            throw new GradleException('Ant staged Version.java lost the substituted version strings.')
+        }
+    }
+}
+
+tasks.register('phase8Verification') {
+    group = 'verification'
+    description = 'Run the full Phase 8 matrix and compare Ant vs Gradle release artifacts.'
+    dependsOn tasks.named('compareAntAndGradleReplacementArtifacts')
 }

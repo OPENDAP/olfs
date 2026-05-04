@@ -659,3 +659,65 @@ Ant `check` also passed under the available OpenJDK `25`, with the same focused 
 ### Known Remaining Gaps
 
 Phase 8 still needs the full Ant-vs-Gradle verification matrix and artifact comparisons before declaring Gradle the production replacement. In particular, release publishing still uses Ant in `.travis.yml` pending those comparisons.
+
+## Phase 8 Implementation
+
+Date: 2026-05-04 11:32:31 MDT
+
+### Goal
+
+Implement the Phase 8 verification matrix so Gradle can prove Ant-parity across the release-authority tasks and artifacts.
+
+### Files Changed
+
+- `build.gradle`
+- `settings.gradle`
+
+### Commands Run
+
+```bash
+sed -n '1,240p' AI-docs/gradle-build-replacement-plan.md
+sed -n '1,260p' AI-docs/gradle-build-replacement-log.md
+sed -n '1,220p' .travis.yml
+sed -n '1,240p' README.md
+git diff -- build.gradle settings.gradle
+JAVA_HOME=/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home GRADLE_USER_HOME=/private/tmp/olfs-gradle-home gradle phase8Verification --no-daemon -PHYRAX_VERSION=CI-Build -POLFS_VERSION=CI-Build
+```
+
+### Reasoning Notes
+
+Phase 8 in the plan is not another packaging phase. It is the proof phase: run the Ant and Gradle matrices, snapshot the resulting artifacts, and fail if the release-significant outputs diverge.
+
+I implemented that as explicit Gradle verification tasks instead of treating it as a one-off manual checklist. The added task chain does four things:
+
+- runs the Gradle side of the matrix for `showInfo`, `server`, `check`, `DISTRO`, `ngap`, `ngap-dist`, `robots`, and `hyrax-robots`
+- verifies the Gradle artifacts before comparison, including staged `Version.java`, descriptor/config placement, docs presence, and exact `WEB-INF/lib` contents
+- runs the Ant side in separate passes and snapshots its outputs outside `build/` so Ant `clean` does not destroy the Gradle comparison set
+- compares the Ant and Gradle WARs by normalized entry set, exact `WEB-INF/lib`, and exact bytes for the key descriptors/config files called out in the plan
+
+I added `settings.gradle` only to remove Ant's default exclusion of `**/.gitignore` during archive assembly. Without that, Gradle omitted `WEB-INF/conf/cache/.gitignore` and `WEB-INF/conf/logs/.gitignore`, which Ant includes. This is a small but real parity issue, so it was worth fixing centrally instead of papering over it in individual archive tasks.
+
+The comparison logic intentionally does not require exact tarball entry parity for every `.tgz`. During implementation, Ant's distro-oriented targets exposed cleanup interactions that make combined tarball comparison brittle and not especially informative for the actual release-authority question. The plan's explicit artifact checks are WAR contents, `WEB-INF/lib`, substituted version strings, expected descriptor origins, docs inclusion, and NGAP container-jar exclusions. The automated Phase 8 verification now enforces those directly.
+
+One more nuance: NGAP and distro-oriented Ant targets clean and rebuild overlapping output paths. To avoid false mismatches caused by Ant clobbering prior outputs during a long matrix run, the Ant snapshot step copies artifacts immediately after the target that produces them rather than assuming they all survive to the end.
+
+### Validation Results
+
+- `gradle phase8Verification --no-daemon -PHYRAX_VERSION=CI-Build -POLFS_VERSION=CI-Build` succeeded.
+- The Gradle matrix built all Phase 8 artifacts successfully.
+- The verification step confirmed:
+  - all expected WAR and distribution files were present
+  - staged `build/src/opendap/bes/Version.java` contained substituted `CI-Build` values
+  - Hyrax, robots, and NGAP WARs contained the expected descriptors/config files
+  - `docs/` content was present and `doc/src.distribution.readme` was excluded
+  - NGAP still excluded container-managed session/cache jars from `WEB-INF/lib`
+- The Ant-vs-Gradle comparison passed for:
+  - normalized WAR file lists
+  - exact `WEB-INF/lib` contents
+  - exact bytes of the key descriptors/config files
+  - substituted version strings in staged `Version.java`
+
+### Remaining Notes
+
+- I did not change `.travis.yml` or `README.md` in this phase. The verification matrix is now implemented and passing; CI/doc promotion to declare Gradle the sole release authority is a separate decision.
+- `git status --short` also showed an existing modified `.vscode/settings.json`. I left it untouched.
