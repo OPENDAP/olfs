@@ -129,7 +129,6 @@
     <property name="distributionResources.dir"  location="${resources.dir}/distribution"/>
 
     <property name="hyraxResources.dir" location="${resources.dir}/hyrax"/>
-    <property name="WCS.dir" location="${resources.dir}/WCS"/>
 
     <property name="jspServerWebInf.dir" location="resources/experiments/jsp/WEB-INF"/>
 
@@ -271,23 +270,6 @@
                 <!-- include all the java files -->
                 <include name="opendap/**"/>
                 <include name="org/opendap/**"/>
-
-                <!-- Exclude the experimental code  -->
-                <exclude name="opendap/experiments/**"/>
-
-                <!-- Exclude the Metacat code  -->
-                <exclude name="opendap/metacat/**"/>
-
-                <!-- Exclude the WCS and semantics code  -->
-                <exclude name="opendap/wcs/**"/>
-                <exclude name="opendap/semantics/**"/>
-
-                <!-- Exclude prototype Amazon Web Services code from production -->
-                <exclude name="opendap/aws/**"/>
-                <exclude name="opendap/noaa_s3/**"/>
-
-                <!-- Exclude async test code -->
-                <exclude name="opendap/async/**"/>
 
             </fileset>
         </copy>

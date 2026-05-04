@@ -197,10 +197,10 @@ public class HexAsciiEncoder implements Encoder {
     public static void test(){
         // byte[] b = {0,1,2,3,4,5,6,7,8,9,0xa,0xb,0xc,0xd,0xf};
 
-        String tests[] = {
+        String[] tests = {
                            "http://www.google.com",
                             //new String(b),
-                            "http://g0dup05u.ecs.nasa.gov/cgi-bin/ceopAIRX2RET?service=WCS&version=1.0.0&request=GetCoverage&coverage=H2OMMRStd&crs=WGS84&bbox=-107.375000,51.625000,-102.625000,56.375000&format=netCDF&TIME=2002-10-03&resx=0.25&resy=0.25&interpolationMethod=Nearest%20neighbor",
+                            "http://g0dup05u.ecs.nasa.gov/cgi-bin/ceopAIRX2RET?service=CRUNK&version=1.0.0&request=GetCoverage&coverage=H2OMMRStd&crs=WGS84&bbox=-107.375000,51.625000,-102.625000,56.375000&format=netCDF&TIME=2002-10-03&resx=0.25&resy=0.25&interpolationMethod=Nearest%20neighbor",
                             "foobar"
 
                          };
@@ -233,27 +233,27 @@ public class HexAsciiEncoder implements Encoder {
     private static void printUsage(PrintStream ps){
 
         ps.println("Usage:  ");
-        ps.println("");
+        ps.println();
         ps.println("        UrlEncoder  -d -e -t [String1 String2...]");
-        ps.println("");
+        ps.println();
         ps.println("Summary:");
         ps.println("    Encodes/decodes ASCII strings as the hexadecimal values");
         ps.println("    of the ASCII characters in the string. Only encoding");
         ps.println("    or decoding may happen at a time.");
-        ps.println("");
-        ps.println("");
+        ps.println();
+        ps.println();
         ps.println("Options:");
-        ps.println("");
+        ps.println();
         ps.println("     -e   encode the command line arguments, may not be");
         ps.println("          used in conjunction with -d (decode).");
-        ps.println("");
+        ps.println();
         ps.println("     -d   decode the command line arguments, cannot be");
         ps.println("          used in conjunction with -e (encode).");
-        ps.println("");
+        ps.println();
         ps.println("     -t   Runs internal tests and produces output on");
         ps.println("          stdout. Using this option causes all other");
         ps.println("          options and inputs to be ignored.");
-        ps.println("");
+        ps.println();
 
 
     }
