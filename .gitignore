@@ -8,6 +8,10 @@
 /*.iml
 /out
 
+# vscode stuff
+.vscode/*.json
+.agents
+
 ## Build dir
 build
 release
