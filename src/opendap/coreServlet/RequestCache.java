@@ -32,6 +32,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 
 /**
  * User: ndp
@@ -95,7 +96,7 @@ public class RequestCache {
                 log.info("Cached new request id: {}", reqId);
             }
             else {
-                log.info("Found existing request id: {}", ((String)idObj.getObj()));
+                log.info("Found existing request id: {}", idObj.getObj());
             }
         }
         else {
@@ -169,6 +170,15 @@ public class RequestCache {
         if(id != null){
             return (RequestId)id;
         }
+
+        String msg="It appears that the RequestCache was not initialized prior " +
+                   "to attempting to acquire a RequestId object.\n";
+        String stackTrace = StackWalker.getInstance()
+                .walk(frames -> frames
+                        .map(Object::toString)
+                        .collect(Collectors.joining("\n")));
+        log.error("{}Stack trace: {}",msg, stackTrace);
+
         return new RequestId("ERROR(NOT FATAL): No request id was located in the RequestCache.");
     }
 

@@ -210,12 +210,6 @@
 
 
     <servlet>
-        <servlet-name>w10n</servlet-name>
-        <servlet-class>opendap.w10n.W10nServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-
-    <servlet>
         <servlet-name>aggregation</servlet-name>
         <servlet-class>opendap.aggregation.AggregationServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
@@ -249,12 +243,6 @@
         <load-on-startup>1</load-on-startup>
     </servlet>
 
-    <!-- servlet>
-        <servlet-name>echo</servlet-name>
-        <servlet-class>opendap.experiments.EchoServlet </servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet -->
-
     <filter>
         <filter-name>UrlRewriteFilter</filter-name>
         <filter-class>org.tuckey.web.filters.urlrewrite.UrlRewriteFilter</filter-class>
@@ -276,11 +264,6 @@
         <dispatcher>INCLUDE</dispatcher>
         <dispatcher>ERROR</dispatcher>
     </filter-mapping>
-
-    <!-- servlet-mapping>
-        <servlet-name>echo</servlet-name>
-        <url-pattern>/echo/*</url-pattern>
-    </servlet-mapping -->
 
     <servlet-mapping>
         <servlet-name>site_map_service</servlet-name>
@@ -306,14 +289,7 @@
         <servlet-name>aggregation</servlet-name>
         <url-pattern>/aggregation/*</url-pattern>
     </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>w10n</servlet-name>
-        <url-pattern>/w10n/*</url-pattern>
-    </servlet-mapping>
-    
-
-    <!-- ==================== Default Session Configuration ================= -->
+  <!-- ==================== Default Session Configuration ================= -->
   <!-- You can set the default session timeout (in minutes) for all newly   -->
   <!-- created sessions by modifying the value below.                       -->
 
