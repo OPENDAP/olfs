@@ -2,9 +2,7 @@
 <%@ page import="opendap.bes.BesSiteMap" %>
 <%@ page import="opendap.dap.Request" %>
 <%@ page import="opendap.PathBuilder" %>
-<%@ page import="opendap.bes.BESError" %>
-<%@ page import="opendap.bes.BadConfigurationException" %>
-<%@ page import="opendap.ppt.PPTException" %>
+<%@ page import="opendap.coreServlet.RequestCache" %>
 <%--
   ~ /////////////////////////////////////////////////////////////////////////////
   ~ // This file is part of the "Hyrax Data Server" project.
@@ -39,7 +37,7 @@
     String webapp = req.getWebApplicationUrl();
 
     String dapService;
-    if(getServletConfig().getServletContext().getContextPath().isEmpty()){
+    if(request.getServletContext().getContextPath().isEmpty()){
         // If we are running in the ROOT context (no contextPath) then we make the assumption that the DAP
         // service is located at the _dapServiceContext as set in the configuration parameter DapServiceContext.
         dapService = PathBuilder.pathConcat(webapp,dapServiceContext);
@@ -50,12 +48,16 @@
 
     BesSiteMap besSiteMap;
     try {
+        RequestCache.open(request);
         besSiteMap = new BesSiteMap(dapService);
 
     }
     catch (Exception e) {
         e.printStackTrace();
         return;
+    }
+    finally {
+        RequestCache.close();
     }
     response.setContentType("text/plain");
 %>
