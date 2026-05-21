@@ -3,6 +3,7 @@
 <%@ page import="opendap.coreServlet.OPeNDAPException" %>
 <%@ page import="org.owasp.encoder.Encode" %>
 <%@ page import="opendap.bes.BadConfigurationException" %>
+<%@ page import="opendap.coreServlet.RequestCache" %>
 <%--
   ~ /////////////////////////////////////////////////////////////////////////////
   ~ // This file is part of the "Hyrax Data Server" project.
@@ -32,21 +33,24 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <%@page session="false" %>
 <%
-    int status = 404;
-    String title = "Hyrax - Resource Not Found ("+status+")";
-
-    String contextPath = request.getContextPath();
-    String localUrl = ReqInfo.getLocalUrl(request);
-    BesApi besApi = new BesApi();
-    String supportEmail;
     try {
-        supportEmail = besApi.getSupportEmail(localUrl);
-    } catch (BadConfigurationException e) {
-        supportEmail=null;
-    }
+        RequestCache.open(request);
 
-    String message = OPeNDAPException.getAndClearCachedErrorMessage();
-    String mailtoHrefAttributeValue = OPeNDAPException.getSupportMailtoLink(request,404,message,supportEmail);
+        int status = 404;
+        String title = "Hyrax - Resource Not Found ("+status+")";
+
+        String contextPath = request.getContextPath();
+        String localUrl = ReqInfo.getLocalUrl(request);
+        BesApi besApi = new BesApi();
+        String supportEmail;
+        try {
+            supportEmail = besApi.getSupportEmail(localUrl);
+        } catch (BadConfigurationException e) {
+            supportEmail=null;
+        }
+
+        String message = OPeNDAPException.getAndClearCachedErrorMessage();
+        String mailtoHrefAttributeValue = OPeNDAPException.getSupportMailtoLink(request,404,message,supportEmail);
 %>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -95,3 +99,9 @@
 <h1 align="center"><%=title%></h1>
 </body>
 </html>
+<%
+    }
+    finally {
+        RequestCache.close();
+    }
+%>
