@@ -171,7 +171,7 @@ public class RequestCache {
             return (RequestId)id;
         }
 
-        String msg="It appears that the RequestCache was not initialized prior " +
+        String msg="ERROR: It appears that the RequestCache was not initialized prior " +
                    "to attempting to acquire a RequestId object.\n";
         String stackTrace = StackWalker.getInstance()
                 .walk(frames -> frames

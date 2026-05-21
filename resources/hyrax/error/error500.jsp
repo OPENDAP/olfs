@@ -3,6 +3,7 @@
 <%@ page import="opendap.coreServlet.OPeNDAPException" %>
 <%@ page import="org.owasp.encoder.Encode" %>
 <%@ page import="opendap.bes.BadConfigurationException" %>
+<%@ page import="opendap.coreServlet.RequestCache" %>
 <%--
   ~ /////////////////////////////////////////////////////////////////////////////
   ~ // This file is part of the "Hyrax Data Server" project.
@@ -33,21 +34,24 @@
 <%@page session="false" %>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <%
-    int status = 500;
-    String title = "Hyrax - Internal Error ("+status+")";
-
-    String contextPath = request.getContextPath();
-    String localUrl = ReqInfo.getLocalUrl(request);
-    BesApi besApi = new BesApi();
-    String supportEmail;
     try {
-        supportEmail = besApi.getSupportEmail(localUrl);
-    } catch (BadConfigurationException e) {
-        supportEmail=null;
-    }
+        RequestCache.open(request);
 
-    String message = OPeNDAPException.getAndClearCachedErrorMessage();
-    String mailtoHrefAttributeValue = OPeNDAPException.getSupportMailtoLink(request,status,message,supportEmail);
+        int status = 500;
+        String title = "Hyrax - Internal Error ("+status+")";
+
+        String contextPath = request.getContextPath();
+        String localUrl = ReqInfo.getLocalUrl(request);
+        BesApi besApi = new BesApi();
+        String supportEmail;
+        try {
+            supportEmail = besApi.getSupportEmail(localUrl);
+        } catch (BadConfigurationException e) {
+            supportEmail=null;
+        }
+
+        String message = OPeNDAPException.getAndClearCachedErrorMessage();
+        String mailtoHrefAttributeValue = OPeNDAPException.getSupportMailtoLink(request,status,message,supportEmail);
 %>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -100,3 +104,9 @@
 <h1 align="center"><%=title%></h1>
 </body>
 </html>
+<%
+    }
+    finally {
+        RequestCache.close();
+    }
+%>
