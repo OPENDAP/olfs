@@ -44,7 +44,7 @@ import java.util.*;
 
 public class DmrppJoinExistingAggregator {
 
-    private Logger log;
+    private final Logger log;
 
     public static final String S3_PROTOCOL    = "s3://";
     public static final String FILE_PROTOCOL  = "file://";
@@ -52,31 +52,31 @@ public class DmrppJoinExistingAggregator {
     public static final String HTTPS_PROTOCOL = "https://";
 
     // The list of dmr++ files that will be used to form the aggregation.
-    private ArrayList<String> aggFileList;
+    private final ArrayList<String> aggFileList;
 
     // The list of dmr++ access URLs loaded from
-    private ArrayList<String> aggFileNames;
+    private final ArrayList<String> aggFileNames;
 
     // The list of dimensions derived from the template dataset
-    private Map<String, Element> dimensions;
+    private final Map<String, Element> dimensions;
 
     // The coordinate vars in the template dataset
-    private Map<String,Element> domainCoordinateVars;
+    private final Map<String,Element> domainCoordinateVars;
 
     // The template aggregation variables from inside the aggDatasetTemplate document.
-    private Map<String,Element> templateVars;
+    private final Map<String,Element> templateVars;
 
     // The template dataset document
     private Document aggDatasetTemplate;
 
     // The name of the dimension to aggregate over
-    private String aggDimensionName;
+    private final String aggDimensionName;
 
     // The file name that holds the list of FQN variable names to be aggregated.
-    private String aggVarsFileName;
+    private final String aggVarsFileName;
 
     // The list of aggregation variable names loaded from aggVarsFileName.
-    private ArrayList<String> aggVarNames;
+    private final ArrayList<String> aggVarNames;
 
     private boolean trustDatasetUrls;
 
@@ -120,7 +120,7 @@ public class DmrppJoinExistingAggregator {
 
     /**
      *
-     * @throws DmrppAggException
+     * @throws DmrppAggException When The Bad Things Happen.
      */
     public void loadAggVarsList() throws IOException, DmrppAggException {
         loadListFile(aggVarsFileName,aggVarNames);
@@ -128,7 +128,7 @@ public class DmrppJoinExistingAggregator {
 
     /**
      *
-     * @throws DmrppAggException
+     * @throws DmrppAggException When The Bad Things Happen.
      */
     public void loadAggFilesList(String fileName) throws IOException, DmrppAggException {
         loadListFile(fileName,aggFileNames);
@@ -140,7 +140,7 @@ public class DmrppJoinExistingAggregator {
 
     /**
      *
-     * @throws DmrppAggException
+     * @throws DmrppAggException When The Bad Things Happen.
      */
     public void loadListFile(String listFileName,  ArrayList<String> list) throws IOException,  DmrppAggException {
 
@@ -176,10 +176,10 @@ public class DmrppJoinExistingAggregator {
     /**
      *
      * @param dmrpp_urls
-     * @throws MalformedURLException
-     * @throws DmrppAggException
+     * @throws MalformedURLException When The Bad Things Happen.
+     * @throws DmrppAggException When The Bad Things Happen.
      */
-    public void ingestDmrppList(ArrayList<String> dmrpp_urls) throws IOException, DmrppAggException {
+    public void ingestDmrppList(ArrayList<String> dmrpp_urls) throws DmrppAggException {
 
         for(String dmrppUrl: dmrpp_urls){
             String targetUrl;
@@ -262,9 +262,9 @@ public class DmrppJoinExistingAggregator {
     /**
      * Aggregates the identified variables from the list of dmr++ files.
      * @return
-     * @throws DmrppAggException
-     * @throws DmrppAggException
-     * @throws JDOMException
+     * @throws DmrppAggException When The Bad Things Happen.
+     * @throws DmrppAggException When The Bad Things Happen.
+     * @throws JDOMException When The Bad Things Happen.
      */
     public Document aggregate() throws IOException, DmrppAggException, JDOMException {
 
@@ -304,7 +304,7 @@ public class DmrppJoinExistingAggregator {
      * @param chunkIndex
      * @throws DmrppAggException
      */
-    public void ingestAggDataset(Document datasetDoc, int chunkIndex) throws DmrppAggException, IOException {
+    public void ingestAggDataset(Document datasetDoc, int chunkIndex) throws DmrppAggException {
 
         Element datasetElement = datasetDoc.getRootElement();
         String s = datasetElement.getAttributeValue(DMRPP.HREF,DMRPP.NS);
