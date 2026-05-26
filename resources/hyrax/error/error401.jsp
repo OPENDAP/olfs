@@ -3,6 +3,7 @@
 <%@ page import="opendap.bes.BesApi" %>
 <%@ page import="opendap.coreServlet.ReqInfo" %>
 <%@ page import="opendap.bes.BadConfigurationException" %>
+<%@ page import="opendap.coreServlet.RequestCache" %>
 <%--
   ~ /////////////////////////////////////////////////////////////////////////////
   ~ // This file is part of the "Hyrax Data Server" project.
@@ -33,21 +34,24 @@
 
 <%@page session="false" %>
 <%
-    int status = 401;
-    String title = "Hyrax - Unauthorized ("+status+")";
-
-    String contextPath = request.getContextPath();
-    String localUrl = ReqInfo.getLocalUrl(request);
-    BesApi besApi = new BesApi();
-    String supportEmail;
     try {
-        supportEmail = besApi.getSupportEmail(localUrl);
-    } catch (BadConfigurationException e) {
-        supportEmail=null;
-    }
+        RequestCache.open(request);
 
-    String message = OPeNDAPException.getAndClearCachedErrorMessage();
-    String mailtoHrefAttributeValue = OPeNDAPException.getSupportMailtoLink(request,401,message,supportEmail);
+        int status = 401;
+        String title = "Hyrax - Unauthorized ("+status+")";
+
+        String contextPath = request.getContextPath();
+        String localUrl = ReqInfo.getLocalUrl(request);
+        BesApi besApi = new BesApi();
+        String supportEmail;
+        try {
+            supportEmail = besApi.getSupportEmail(localUrl);
+        } catch (BadConfigurationException e) {
+            supportEmail=null;
+        }
+
+        String message = OPeNDAPException.getAndClearCachedErrorMessage();
+        String mailtoHrefAttributeValue = OPeNDAPException.getSupportMailtoLink(request,401,message,supportEmail);
 
 %>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -86,3 +90,9 @@
 <h1 align="center"><%=title%></h1>
 </body>
 </html>
+<%
+    }
+    finally {
+        RequestCache.close();
+    }
+%>
