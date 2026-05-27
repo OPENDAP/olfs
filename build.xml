@@ -310,16 +310,6 @@
 
     <property name="joda-time.lib" value="joda-time-2.12.7.jar"/>
 
-    <!--
-    <property name="jaxb-api.lib" value="jaxb-api-2.3.1.jar"/>
-    <property name="jaxb-core.lib" value="jaxb-core-2.3.0-b170127.1453.jar"/>
-    <property name="jaxb-impl.lib" value="jaxb-impl-2.3.0-b170127.1453.jar"/>
-    <property name="jaxb-runtime.lib" value="jaxb-runtime-2.3.6.jar"/>
-    <property name="javax.annotation-api.lib" value="javax.annotation-api-1.3.2.jar"/>
-    <property name="javax.activation.lib" value="activation-1.1.1.jar"/>
-
-    <property name="xlink.lib" value="xlink-v_1_0-1.4.0.jar"/>
-    -->
 
     <!-- Cloudwatch logback appender -->
     <property name="cloudwatch-logback-appender.lib" value="cloudwatch-logback-appender-3.11.jar"/>
