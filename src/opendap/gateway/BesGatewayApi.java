@@ -227,15 +227,15 @@ public class BesGatewayApi extends BesApi implements Cloneable {
         if(qp.computeChecksums())
             request.addContent(setContextElement(DAP4_CHECKSUMS_CONTEXT,"true"));
 
-        request.addContent(setContainerElement("gatewayContainer","gateway",remoteDataSourceUrl,type));
+        request.addContent(setContainerElement(getBesContainerName(),getBesSpaceName(),remoteDataSourceUrl,type));
 
         Element def = defineElement("d1","default");
-        e = (containerElement("gatewayContainer"));
+        e = (containerElement(getBesContainerName()));
 
-        if(qp.getCe()!=null && !qp.getCe().equals(""))
+        if(qp.getCe()!=null && !qp.getCe().isEmpty())
             e.addContent(dap4ConstraintElement(qp.getCe()));
 
-        if(qp.getFunc()!=null && !qp.getFunc().equals(""))
+        if(qp.getFunc()!=null && !qp.getFunc().isEmpty())
             e.addContent(dap4FunctionElement(qp.getFunc()));
 
         def.addContent(e);
