@@ -74,7 +74,6 @@ public class StaticCatalogDispatch implements DispatchHandler {
     private HttpServlet _dispatchServlet;
     private String _prefix;
     private boolean _useMemoryCache = false;
-    private boolean _allowRemoteCatalogTraversal = false;
 
     private String _catalogToHtmlTransformFile = "/xsl/threddsCatalogPresentation.xsl";
     private Transformer _catalogToHtmlTransform = null;
@@ -148,8 +147,6 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
         Procedure timedProc = Timer.start();
         try {
-            User user = new User(request);
-
             String catalogKey = getCatalogKeyFromRelativeUrl(ReqInfo.getLocalUrl(request));
             String requestSuffix = ReqInfo.getRequestSuffix(request);
             String query = request.getQueryString();
@@ -162,16 +159,10 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
             // Are we browsing a remote catalog? a remote dataset?
             if (query != null && query.startsWith("browseCatalog=")) {
-
-                //if(!_allowRemoteCatalogTraversal)
-                    throw new BadRequest("Remote Catalog Browsing Has Been DISABLED.");
-
-                //browseRemoteCatalog(user, orq, response, query);
+                throw new BadRequest("Remote Catalog Browsing Has Been DISABLED.");
             }
             else if (query != null && query.startsWith("browseDataset=")) {
-                // if(!_allowRemoteCatalogTraversal)
-                    throw new BadRequest("Remote Dataset Browsing Has Been DISABLED.");
-                // browseRemoteDataset(user, orq, response, query);
+                throw new BadRequest("Remote Dataset Browsing Has Been DISABLED.");
             }
 
             // Is the request for a presentation view (HTML version) of the catalog?
@@ -689,16 +680,6 @@ public class StaticCatalogDispatch implements DispatchHandler {
                 }
             }
 
-            s = threddsService.getAttributeValue("allowRemote");
-            if (s != null){
-                if(s.equalsIgnoreCase("true")) {
-                    _allowRemoteCatalogTraversal = true;
-                }
-                else {
-                    _allowRemoteCatalogTraversal = false;
-                }
-            }
-
             Element e;
             e = threddsService.getChild("ingestTransformFile");
             if (e != null) {
@@ -708,7 +689,6 @@ public class StaticCatalogDispatch implements DispatchHandler {
         }
         log.debug("init() - prefix: {}", _prefix);
         log.debug("init() - useMemoryCache: {}", _useMemoryCache);
-        log.debug("init() - allowRemoteCatalogTraversal: {}", _allowRemoteCatalogTraversal);
         log.debug("init() - Using ingest transform file: " + ingestTransformFile);
 
 

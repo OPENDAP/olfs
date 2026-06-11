@@ -111,7 +111,7 @@
     </BESManager>
 
 
-    <ThreddsService  prefix="thredds" useMemoryCache="true" allowRemote="false" />
+    <ThreddsService  prefix="thredds" useMemoryCache="true" />
     <GatewayService  prefix="gateway" />
 
     <!-- <UseDAP2ResourceUrlResponse />
