@@ -186,14 +186,8 @@ public class NgapBesApi extends BesApi implements Cloneable {
      * Adds the user id and/or the associated EDL auth token to the request
      * element. If either parameter is the empty string it is omitted.
      *
-     * Constructs the EDL/URS Echo-Token and Authorization headers for use
-     * when connecting to NGAP infrstructure (like cumulus and CMR) The
-     * Echo-Token is made from the
-     * EDL access_token returned for the user and the server's EDL Application
-     * Client-Id.
-     *
-     *    Echo-Token: µedl_access_token:Client-Id
-     *
+     * Constructs the EDL/URS Authorization headers for use
+     * when connecting to NGAP infrastructure (like Cumulus and CMR)
      * The Authorization header is made of the sting:
      *
      *    Authorization: Bearer edl_access_token
