@@ -34,7 +34,7 @@ import opendap.coreServlet.*;
 import opendap.dap.Request;
 import opendap.auth.AuthenticationControls;
 import opendap.dap.User;
-import opendap.gateway.BesGatewayApi;
+// import opendap.gateway.BesGatewayApi;
 import opendap.http.error.BadGateway;
 import opendap.http.error.BadRequest;
 import opendap.logging.Timer;
@@ -163,15 +163,15 @@ public class StaticCatalogDispatch implements DispatchHandler {
             // Are we browsing a remote catalog? a remote dataset?
             if (query != null && query.startsWith("browseCatalog=")) {
 
-                if(!_allowRemoteCatalogTraversal)
+                //if(!_allowRemoteCatalogTraversal)
                     throw new BadRequest("Remote Catalog Browsing Has Been DISABLED.");
 
-                browseRemoteCatalog(user, orq, response, query);
+                //browseRemoteCatalog(user, orq, response, query);
             }
             else if (query != null && query.startsWith("browseDataset=")) {
-                if(!_allowRemoteCatalogTraversal)
+                // if(!_allowRemoteCatalogTraversal)
                     throw new BadRequest("Remote Dataset Browsing Has Been DISABLED.");
-                browseRemoteDataset(user, orq, response, query);
+                // browseRemoteDataset(user, orq, response, query);
             }
 
             // Is the request for a presentation view (HTML version) of the catalog?
@@ -246,7 +246,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
         return redirect;
     }
 
-
+/*
     private void browseRemoteDataset(User user,
                                      Request oRequest,
                                      HttpServletResponse response,
@@ -359,7 +359,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
 
     }
-
+*/
 
     /**
      * This retrieves a remote THREDDS catalog.
@@ -373,6 +373,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
      * @throws IOException
      * @throws JDOMException
      */
+    /*
     private void browseRemoteCatalog(User user, Request oRequest, HttpServletResponse response,
                                      String query) throws OPeNDAPException, IOException, JDOMException {
 
@@ -456,7 +457,7 @@ public class StaticCatalogDispatch implements DispatchHandler {
 
 
     }
-
+*/
 
     private void sendDatasetHtmlPage(HttpServletRequest request,
                                      HttpServletResponse response,
