@@ -90,7 +90,7 @@ ENVIRONMENTS. THE DEPLOYED VERSION MAY DIFFER FROM THIS STAND-IN
     </BESManager>
 
 
-    <ThreddsService  prefix="thredds" useMemoryCache="true" allowRemote="false" />
+    <ThreddsService  prefix="thredds" useMemoryCache="true" />
     <GatewayService  prefix="gateway" useMemoryCache="true" />
 
     <UseDualCloudWatchLogs />
