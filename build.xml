@@ -313,9 +313,6 @@
     <property name="joda-time.lib" value="joda-time-2.12.7.jar"/>
 
 
-    <!-- Cloudwatch logback appender -->
-    <property name="cloudwatch-logback-appender.lib" value="cloudwatch-logback-appender-3.11.jar"/>
-
     <!--
         These are the library jars used by Hyrax.
     -->
