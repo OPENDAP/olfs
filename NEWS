@@ -1,4 +1,48 @@
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+# OLFS Version 1.19.0 (15 January 2025)
+#
+
+- Cleanup pass: retired the cloudwatch-logback-appender jar, retired the Hyrax Gateway WebUI/API entirely (#308), and dropped leftover echo-token comments (#306, #304).
+-  "Dap4 package purge" (#287): removed leftover cruft from old WCS work, updated build.gradle, cleaned up commented-out production rules.
+- Fixed `RequestCache` initialization bugs in the Hyrax JSP pages, including `robots.jsp` (#302, #303).
+- Fixed a request-cache init bug: removed the retired `HAI_DEBUG_LOGGER` appender and added error logging to `RequestCache.getRequestId()` (#301).
+- Replicated request-log info (collectionId, query_string) into the response log for NGAP troubleshooting (#298).
+- Added a JSON-encoded OLFS log appender (#297); retired the w10n service entirely (#296); added an HTTP `Server` response header in Apache-style format (#295).
+- Fixed the Hyrax version shown on the DAP4 "contents" webui page, pulling it from the `HyraxVersion` class; retired old OSX build assets (#293, #291).
+- Refactored how Hyrax/OLFS version numbers are determined, stopped baking Hyrax version numbers into OLFS code/hyrax-docker recipes, and did a round of Sonar fixes (#286, #284, #289).
+- Retired WCS (Web Coverage Service) code and resources.
+- CI/build tweaks: enabled multi-OS Travis builds for hyrax-docker, turned on el9 builds, retargeted hyrax-docker for better build semantics, added `TARGET_OS`/`TOMCAT_MAJOR_VERSION` to the CI-to-docker handoff (#279, #280).
+- Added auto-merge support for tracking branches, fixed an issue updating a tracking branch, streamlined `update_tracking_branch.sh` (#275, #276).
+- Refactored the "show" target used in the Ant production rules (#277).
+- A back-and-forth on the Hyrax Admin Interface (HAI): retired it, then reverted the retirement, then re-applied the retirement ("Rerewind admin retirement"); also allowed JS files as a `returnToUrl` target, dropped `admin`/`hai` from `UrlRewrite`, and added support for tracking test deployments (#263, #264, #267, #268, #269, #271, #273).
+- Check the query string for a client-submitted request id (#243).
+- Fixed a logout-redirect-to-nowhere bug when running in the ROOT context, added a config parameter for the post-logout redirect target (#245); completed transmitting the EDL application client id to the BES (#257).
+- Switched the interactive-tutorials link to the NASA tutorials (#255).
+- Stopped logging "EDL token validation" when there was no token to validate, and switched to reading the user id from the EDL token instead of calling EDL directly (#249, #251).
+- Added CloudWatch profiling logs/instrumentation across the service chain (token auth start/end, request id, cache id) (#239).
+- Improved session management (#240): new session after auth, client-info/`X-Forwarded-For` checks, configurable session timeout with a warning on invalid values, token revocation on logout, landing-page content control, bumped `web.xml` to version 4.0.
+- Turned DAP4 checksums on all the time for the NGAP service, then fixed a bug where the checksum context could leak stale state across requests (#242, #244).
+- Downgraded Travis's Gradle version back to 8.14.3, and set the Gradle Java source-compatibility level to 1.9 (#238).
+- Fixed banner display issues in JSP pages, updated `help.jsp` for DAP4 (#236).
+- Added optional DAP4 data responses with checksums: accepts a `dap4.checksum` query parameter and passes its state to the BES via `setContext` (#235).
+- Added `dap4:Enum` to the list of types incompatible with netCDF-3 (#234).
+- Multi-pass fix to SonarQube/SonarCloud CI integration: PR interop, branch-name handling, raw-scan step, master-branch scanning (#228, #229, #230, #232).
+- Built out EDL token self-validation end-to-end (local JWT/JWKS public-key validation, `getEdlUserIdFromToken`, unit tests for `UrsIdP`), then removed a stale `gson-2.3.1` dependency (#225, #226).
+- Added DMR++ retrieval support to the NGAP module: a `get dmr++` document, a character-encoding class refactor, and config control for showing DMR++ response links (#221).
+- Retired the `build_dmrpp` service from OLFS (#222).
+- Protected request/response/BES application logs from duplicate request ids via a new `RequestID` class pairing each request id with a UUID; updated JUnit/Hamcrest (#214).
+- Added `query_string` to CloudWatch request logs, and normalized `requestId` usage across the codebase, adding BES client id and client command count to the BES command root element (#212, #213).
+- Updated the landing-page NASA official's name (#211); @ndp-opendap briefly tried and then reverted an experimental change disentangling the user's request id from the BES client id.
+- Documentation cleanup: moved `olfs.adoc` out to the separate documentation project, retired unused classes/XSLT, and worked through a broken Travis CI issue (mostly WIP commits, condensed here).
+- Possible fix for an NNVAP-related issue on the DAP4 request form (#210).
+- Reordered the DAP POST handlers so `NgapDispatchHandler` is evaluated before `BesDapDispatchHandler` (#209).
+- Logging cleanup: use `-1` to indicate unknown `output_size`, drop units from `response_size` in logs (#207, #208).
+- Small changes to the request-log record format for NGAP metrics (#206).
+- Began a Redisson upgrade to 3.22.0: added the new jars and updated logback/slf4j dependencies, but excluded the new Redisson jars from production builds for now; updated `build_dmrpp` production rules to match (#203, #204, #205).
+- Updated memcached to run under Tomcat 9.
+- Updated the README/build offsets and bumped the OLFS release version to 1.81.15.
+
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 # OLFS Version 1.18.15 (15 January 2025)
 #
 
