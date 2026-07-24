@@ -1,5 +1,5 @@
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-# OLFS Version 1.19.0 (15 January 2025)
+# OLFS Version 1.19.0 (24 July 2026)
 #
 
 - Cleanup pass: retired the cloudwatch-logback-appender jar, retired the Hyrax Gateway WebUI/API entirely (#308), and dropped leftover echo-token comments (#306, #304).
