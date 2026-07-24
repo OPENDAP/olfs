@@ -1,7 +1,8 @@
-# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-# OLFS Version 1.19.0 (24 July 2026)
-#
 
+--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- 
+# OLFS Version 1.19.0 (24 July 2026)
+
+- **Security**: This release includes changes that resolve **_CVE-2026-16637_**
 - Cleanup pass: retired the cloudwatch-logback-appender jar, retired the Hyrax Gateway WebUI/API entirely (#308), and dropped leftover echo-token comments (#306, #304).
 -  "Dap4 package purge" (#287): removed leftover cruft from old WCS work, updated build.gradle, cleaned up commented-out production rules.
 - Fixed `RequestCache` initialization bugs in the Hyrax JSP pages, including `robots.jsp` (#302, #303).
