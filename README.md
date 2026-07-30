@@ -1,8 +1,11 @@
 # Hyrax OLFS (OPeNDAP Lightweight Front-end Server)
 
-Status badges
-- CI (Travis CI): https://travis-ci.org/OPENDAP/olfs (pipeline uses OpenJDK 17; Gradle and Ant)
-- SonarCloud project: https://sonarcloud.io/project/overview?id=opendap-olfs
+---
+- [Travis CI/CD](https://travis-ci.org/OPENDAP/olfs) [![Build Status](https://app.travis-ci.com/OPENDAP/olfs.svg&branch=master)](https://app.travis-ci.com/OPENDAP/olfs)
+- [SonarCloud](https://sonarcloud.io/project/overview?id=opendap-olfs) 
+[![Quality gate status](https://sonarcloud.io/api/project_badges/measure?project=opendap-olfs&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=opendap-olfs)
+- Zenodo [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14015000.svg)](https://doi.org/10.5281/zenodo.14015000)
+---
 
 Overview
 Hyrax is OPeNDAP’s modular data server. OLFS is the Java web front-end that handles HTTP requests, URL rewriting, user-facing endpoints, and proxies requests to the Hyrax back-end BES (Back-End Server). This repository builds a Java Servlet WAR (opendap.war) deployable to Apache Tomcat under the context /opendap.
