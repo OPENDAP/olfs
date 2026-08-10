@@ -37,9 +37,6 @@
     <xsl:param name="dapService"/>
     <xsl:param name="allowDirectDataSourceAccess"/>
     <xsl:param name="datasetUrlResponseType"/>
-    <xsl:param name="ncWmsServiceBase"/>
-    <xsl:param name="ncWmsDynamicServiceId"/>
-    <xsl:param name="WcsServices"/>
 
     <xsl:output method='xml' version='1.0' encoding='UTF-8' indent='yes'/>
     <xsl:key name="service-by-name" match="//thredds:service" use="@name"/>
@@ -67,13 +64,6 @@
             <!--xsl:comment>besPrefix: <xsl:value-of select="$besPrefix"/></xsl:comment -->
             <thredds:service name="dap" serviceType="OPeNDAP" base="{$dapService}"/>
             <thredds:service name="file" serviceType="HTTPServer" base="{$dapService}"/>
-            <xsl:if test="$ncWmsServiceBase">
-                <thredds:service name="wms" serviceType="WMS" base="{$ncWmsServiceBase}" />
-            </xsl:if>
-            <xsl:if test="$WcsServices">
-                <xsl:apply-templates select="$WcsServices" mode="serviceBase"/>
-            </xsl:if>
-
             <xsl:apply-templates />
         </thredds:catalog>
     </xsl:template>
@@ -341,20 +331,6 @@
                             <xsl:if test='$datasetUrlResponseType != "download"'>.file</xsl:if>
                         </xsl:attribute>
                     </thredds:access>
-                </xsl:if>
-
-
-
-                <xsl:if test="$ncWmsServiceBase">
-                    <thredds:access>
-                        <xsl:attribute name="serviceName">wms</xsl:attribute>
-                        <xsl:attribute name="urlPath">?DATASET=<xsl:value-of select="$ncWmsDynamicServiceId" /><xsl:value-of select="$urlPath" />&amp;SERVICE=WMS&amp;VERSION=1.3.0&amp;REQUEST=GetCapabilities</xsl:attribute>
-                    </thredds:access>
-                </xsl:if>
-                <xsl:if test="$WcsServices">
-                    <xsl:apply-templates select="$WcsServices" mode="dataAccess">
-                        <xsl:with-param name="urlPath"><xsl:value-of select="$urlPath"/></xsl:with-param>
-                    </xsl:apply-templates>
                 </xsl:if>
             </xsl:when>
             <xsl:otherwise>

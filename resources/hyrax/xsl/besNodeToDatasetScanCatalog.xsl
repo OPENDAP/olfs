@@ -32,16 +32,12 @@
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:thredds="http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0"
                 xmlns:xlink="http://www.w3.org/1999/xlink"
-                xmlns:exsl="http://exslt.org/common"
                 xmlns:bes="http://xml.opendap.org/ns/bes/1.0#"
         >
     <xsl:param name="catalogDatasetID" />
     <!-- xsl:param name="dapService"/ -->
     <!-- xsl:param name="allowDirectDataSourceAccess"/ -->
     <!-- xsl:param name="useDAP2ResourceUrlResponse"/ -->
-    <!-- xsl:param name="ncWmsServiceBase"/ -->
-    <!-- xsl:param name="ncWmsDynamicServiceId"/ -->
-
 
     <xsl:output method='xml' version='1.0' encoding='UTF-8' indent='yes'/>
     <xsl:key name="service-by-name" match="//thredds:service" use="@name"/>
