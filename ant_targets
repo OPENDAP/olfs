@@ -1,31 +1,5 @@
 
 ###############################################################
-# aggregation-build.xml
-#
-# status: ACTIVE
-#
-# Builds the aggregation service as a WAR file which can be deployed (in
-# Tomcat) alongside a BES deployment.
-
-Buildfile: /Users/ndp/OPeNDAP/hyrax/olfs/aggregation-build.xml
-
-Main targets:
-
- PreProcessSourceCode  Moves selected source code from the development tree into
-                       the build/src directory. The code text is filtered to update
-                       version numbers.
- all                   Builds lots of stuff.
- check                 Run Unit Tests
- clean                 Clean up ALL build products.
- compile               Compiles the OLFS.
- init                  Prepare all build directories.
- noop                  Do Nothing Target
- server                Performs a clean build of the core software and assembles the WAR file.
- server-fast           Performs a build (but no clean) of the core software and assembles the WAR file.
-Default target: all
-
-
-###############################################################
 # build.xml
 #
 # status: ACTIVE
