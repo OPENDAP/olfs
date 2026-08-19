@@ -31,10 +31,7 @@ import opendap.PathBuilder;
 import opendap.coreServlet.*;
 import opendap.dap.Request;
 import opendap.namespaces.THREDDS;
-import opendap.services.Service;
-import opendap.services.ServicesRegistry;
 import opendap.threddsHandler.InheritedMetadataManager;
-import opendap.viewers.NcWmsService;
 import opendap.xml.Transformer;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -112,13 +109,13 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
         boolean isThreddsRequest = false;
 
 
-        String datasetname = ReqInfo.getDataSetName(request);
+        String datasetName = ReqInfo.getDataSetName(request);
         String reqSuffix = ReqInfo.getRequestSuffix(request);
 
 
 
-        if(     datasetname!=null &&
-                datasetname.equalsIgnoreCase("catalog") &&
+        if(     datasetName!=null &&
+                datasetName.equalsIgnoreCase("catalog") &&
                 reqSuffix!=null   &&
                 reqSuffix.equalsIgnoreCase("xml")
                 ){
@@ -148,12 +145,12 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
 
         d_log.debug("handleRequest() - Processing THREDDS request.");
-        Request oreq = new Request(d_servlet,request);
+        Request oReq = new Request(d_servlet,request);
 
         d_log.debug(ServletUtil.probeRequest(d_servlet, request));
 
         // Construct catalog name
-        String besCatalogName = Scrub.urlContent(oreq.getRelativeUrl());
+        String besCatalogName = Scrub.urlContent(oReq.getRelativeUrl());
         if (besCatalogName.endsWith("/catalog.xml")) {
             besCatalogName = besCatalogName.substring(0, besCatalogName.lastIndexOf("catalog.xml"));
         }
@@ -161,7 +158,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
             besCatalogName += "/";
 
         besCatalogName = PathBuilder.normalizePath(besCatalogName,true,false);
-        d_log.debug("handleRequest() - besCatalogName:  " + besCatalogName);
+        d_log.debug("handleRequest() - besCatalogName:  {}", besCatalogName);
 
 
         // Get the BES catalog for this node.
@@ -178,21 +175,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
         // Configure services
 
         // Add a DAP service, because we are a DAP server above all else.
-        showNodeToThreddsCatalog.setParameter("dapService",oreq.getServiceLocalId());
-
-        String base = null;
-        String dsId;
-
-        // Add WMS if we have it
-        Service s = ServicesRegistry.getWebServiceById(NcWmsService.ID);
-        if(s instanceof NcWmsService){
-            NcWmsService nws = (NcWmsService) s;
-            base  = nws.getBase();
-            dsId = nws.getDynamicServiceId();
-            showNodeToThreddsCatalog.setParameter("ncWmsServiceBase",base);
-            showNodeToThreddsCatalog.setParameter("ncWmsDynamicServiceId",dsId);
-        }
-        d_log.debug("handleRequest() - ncWMS service base: {}",base);
+        showNodeToThreddsCatalog.setParameter("dapService",oReq.getServiceLocalId());
 
         if(d_allowDirectDataSourceAccess)
             showNodeToThreddsCatalog.setParameter("allowDirectDataSourceAccess","true");
@@ -201,7 +184,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
         JDOMSource besCatalog = new JDOMSource(showNodeDoc);
 
-        String threddsCatalogID = oreq.getServiceLocalId() + (besCatalogName.startsWith("/")?"":"/") + besCatalogName;
+        String threddsCatalogID = oReq.getServiceLocalId() + (besCatalogName.startsWith("/")?"":"/") + besCatalogName;
 
 
         response.setContentType("text/xml");
@@ -210,7 +193,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
 
         if(InheritedMetadataManager.hasInheritedMetadata(threddsCatalogID)){
-            d_log.debug("handleRequest() - Found inherited metadata for collection '"+ besCatalogName +"'");
+            d_log.debug("handleRequest() - Found inherited metadata for collection '{}'", besCatalogName);
 
             // Go get the inherited metadata elements.
             Vector<Element> metadata = InheritedMetadataManager.getInheritedMetadata(threddsCatalogID);
@@ -235,7 +218,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
             Element inheritedServicesElement = InheritedMetadataManager.getInheritedServices(threddsCatalogID);
             d_log.debug("handleRequest() - Collecting inherited services.");
             Iterator i = inheritedServicesElement.getDescendants(new ElementFilter("service",THREDDS.NS));
-            HashMap<String, Element> inheritedServices = new HashMap<String, Element>();
+            HashMap<String, Element> inheritedServices = new HashMap<>();
             Element service;
             while(i.hasNext()){
                 service = (Element)i.next();
@@ -255,7 +238,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
 
                 for(Element inheritedService: inheritedServices.values()){
                     iServiceName = inheritedService.getAttributeValue("name");
-                    d_log.debug("handleRequest() - Inherited service has service '"+iServiceName+"' - Checking existing services...");
+                    d_log.debug("handleRequest() - Inherited service has service '{}' - Checking existing services... ",iServiceName);
 
                     Element existingService = existingServices.get(iServiceName);
 
@@ -267,7 +250,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
                         String eServiceBase = existingService.getAttributeValue("base");
 
                         if(!iServiceType.equalsIgnoreCase(eServiceType) || !iServiceBase.equals(eServiceBase)){
-                            d_log.warn("Removing conflicting service definition for service '"+iServiceName+"' from inherited services");
+                            d_log.warn("Removing conflicting service definition for service '{}' from inherited services",iServiceName);
                             inheritedService.detach();
                         }
 
@@ -300,7 +283,7 @@ public class BESThreddsDispatchHandler implements DispatchHandler {
      * modified time) we punt and return -1.
      *
      * @param req The request for which to get the last modified time.
-     * @return The last time the thing refered to in the request was modified.
+     * @return The last time the thing referred to in the request was modified.
      */
     public long getLastModified(HttpServletRequest req){
         String name = ReqInfo.getLocalUrl(req);

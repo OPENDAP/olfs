@@ -26,7 +26,6 @@
 package opendap.viewers;
 
 import opendap.PathBuilder;
-import opendap.coreServlet.ServletUtil;
 import opendap.services.WebServiceHandler;
 import org.jdom.Document;
 import org.jdom.Element;
