@@ -208,13 +208,6 @@
 
     </servlet>
 
-
-    <servlet>
-        <servlet-name>aggregation</servlet-name>
-        <servlet-class>opendap.aggregation.AggregationServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-
     <servlet>
         <servlet-name>viewers</servlet-name>
 
@@ -285,10 +278,6 @@
         <url-pattern>/docs/*</url-pattern>
     </servlet-mapping>
 
-    <servlet-mapping>
-        <servlet-name>aggregation</servlet-name>
-        <url-pattern>/aggregation/*</url-pattern>
-    </servlet-mapping>
   <!-- ==================== Default Session Configuration ================= -->
   <!-- You can set the default session timeout (in minutes) for all newly   -->
   <!-- created sessions by modifying the value below.                       -->

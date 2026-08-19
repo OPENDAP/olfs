@@ -123,11 +123,7 @@
     <logger name="opendap.hai" level="all">
         <appender-ref ref="stdout"/>
     </logger>
-    
-    <logger name="opendap.aggregation" level="all">
-        <appender-ref ref="stdout"/>
-    </logger>
-    
+
     <logger name="opendap.dap.Request"         level="all"/>
     
     <logger name="opendap.coreServlet.ReqInfo"            level="info"/>
@@ -175,9 +171,6 @@
              <appender-ref ref="stdout"/>
     </logger>
     
-    <logger name="opendap.aggregation" level="all">
-             <appender-ref ref="stdout"/>
-    </logger>
 
 
 
