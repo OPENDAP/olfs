@@ -432,7 +432,6 @@
             <classpath refid="olfs.compile.classpath"/>
 
             <test name="opendap.coreServlet.Scrub"/>
-            <test name="opendap.aggregation.AggregationParamsTest"/>
             <test name="opendap.auth.UrsIdPTest"/>
             <test name="opendap.bes.dap4Responders.Dap4ResponderTest"/>
             <test name="opendap.coreServlet.RequestIdTest"/>

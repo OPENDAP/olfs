@@ -200,12 +200,6 @@
     </servlet>
 
     <servlet>
-        <servlet-name>aggregation</servlet-name>
-        <servlet-class>opendap.aggregation.AggregationServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-
-    <servlet>
         <servlet-name>viewers</servlet-name>
 
         <servlet-class>opendap.viewers.ViewersServlet</servlet-class>
@@ -273,11 +267,6 @@
     <servlet-mapping>
         <servlet-name>docs_servlet</servlet-name>
         <url-pattern>/docs/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>aggregation</servlet-name>
-        <url-pattern>/aggregation/*</url-pattern>
     </servlet-mapping>
 
     <!-- ==================== Default Session Configuration ================= -->

@@ -149,9 +149,6 @@ This project is licensed under the GNU Lesser General Public License (LGPL) v2.1
 Additional references
 - Hyrax documentation and news: http://docs.opendap.org/index.php/Hyrax
 
-Deprecated/legacy components
-- Aggregation servlet in src/opendap/aggregation is likely no longer used but remains for reference; see its README and curl examples.
-
 TODOs / Open items
 - Document the exact Tomcat versions officially supported and any container-specific settings.
 - Provide a Docker-based quickstart if available (hyrax-docker is referenced in CI, but container details belong in that repo).
