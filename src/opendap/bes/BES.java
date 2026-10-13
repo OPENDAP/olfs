@@ -615,7 +615,9 @@ public class BES {
      * @throws opendap.ppt.PPTException  .
      */
     public OPeNDAPClient getClient() throws PPTException {
-        OPeNDAPClient besClient=null;
+        OPeNDAPClient besClient = null;
+        boolean success = false;
+
         clientCheckoutLock.lock();
         try {
             // Acquiring this semaphore is what limits the number
@@ -640,18 +642,24 @@ public class BES {
                     besClient = getNewClient();
                 }
             }
+            success = true;
             return besClient;
 
         } catch (InterruptedException e) {
-            log.error("Whoops! InterruptedException!: {}", e.getMessage());
-            if (besClient != null) {
-                log.error("Attempting to discard BES Client (id:{}) ", besClient.getID());
-                discardClient(besClient);
-            }
-            clientCheckOutFlag.release(); // Release the client permit because this client is hosed...
             Thread.currentThread().interrupt();
+            log.error("Whoops! InterruptedException caught during client checkout! message: {}", e.getMessage());
             throw new PPTException(e);
         } finally {
+            if (!success) {
+                if (besClient != null) {
+                    try {
+                        discardClient(besClient);
+                    } catch (Exception e) {
+                        log.error("Failed to discard client during cleanup", e);
+                    }
+                }
+                clientCheckOutFlag.release();
+            }
             clientCheckoutLock.unlock();
         }
     }
