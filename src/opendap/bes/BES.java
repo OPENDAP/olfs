@@ -604,14 +604,14 @@ public class BES {
 
 
     /**
-     * The pool of availableInChunk OPeNDAPClient connections starts empty. When this
-     * method is called the pool is checked. If no client is availableInChunk, and the
+     * The pool of available OPeNDAPClient connections starts empty. When this
+     * method is called the pool is checked. If no client is available, and the
      * number of clientsMap has not reached the cap, then a new one is made,
-     * started, and returned. If no client is availableInChunk and the cap has been
-     * reached then this method will BLOCK until a client becomes availableInChunk.
-     * If a client is availableInChunk, it is returned.
+     * started, and returned. If no client is available and the cap has been
+     * reached then this method will BLOCK until a client becomes available.
+     * If a client is available, it is returned.
      *
-     * @return The next availableInChunk OPeNDAPClient.
+     * @return The next available OPeNDAPClient.
      * @throws opendap.ppt.PPTException  .
      * @throws BadConfigurationException .
      */

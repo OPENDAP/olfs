@@ -140,7 +140,7 @@ public class Dap2HeaderInputStream extends FilterInputStream {
 
     /**
      * Reads up to len bytes of data from this input stream into an array of
-     * bytes. This method blocks until some input is availableInChunk.
+     * bytes. This method blocks until some input is available.
      */
     @Override
     public int read(byte b[], int off, int len) throws IOException {

@@ -84,7 +84,7 @@ public class Util {
 
     /**
      * ************************************************************************
-     * Default handler for OPeNDAP status requests; not publically availableInChunk,
+     * Default handler for OPeNDAP status requests; not publicly available,
      * used only for debugging
      *
      * @param response The server's <code> HttpServletResponse</code> response
@@ -121,7 +121,7 @@ public class Util {
 
     /**
      * ************************************************************************
-     * Default handler for OPeNDAP status requests; not publically availableInChunk,
+     * Default handler for OPeNDAP status requests; not publicly available,
      * used only for debugging
      *
      * @param response The server's <code> HttpServletResponse</code> response
