@@ -613,16 +613,11 @@ public class BES {
      *
      * @return The next availableInChunk OPeNDAPClient.
      * @throws opendap.ppt.PPTException  .
-     * @throws BadConfigurationException .
      */
-    public OPeNDAPClient getClient()
-            throws PPTException {
-
+    public OPeNDAPClient getClient() throws PPTException {
         OPeNDAPClient besClient=null;
-
         clientCheckoutLock.lock();
         try {
-
             // Acquiring this semaphore is what limits the number
             // of clientsMap that will be in the pool. The number of
             // semaphores available is set to MaxClients.
@@ -633,7 +628,6 @@ public class BES {
             if (clientQueue.isEmpty()) {
                 besClient = getNewClient();
             } else {
-
                 // Get a client from the client pool.
                 besClient = clientQueue.take();
                 log.debug("getClient() - Retrieved BES Client (id:{}) from Pool.", besClient.getID());
@@ -645,27 +639,23 @@ public class BES {
                     discardClient(besClient);
                     besClient = getNewClient();
                 }
-
-
-
             }
             return besClient;
 
         } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            log.error("Whoops! Thread Interrupted!: {}", e.getMessage());
+            log.error("Whoops! InterruptedException!: {}", e.getMessage());
             if (besClient != null) {
                 log.error("Attempting to discard BES Client (id:{}) ", besClient.getID());
                 discardClient(besClient);
-                clientCheckOutFlag.release(); // Release the client permit because this client is hosed...
             }
+            clientCheckOutFlag.release(); // Release the client permit because this client is hosed...
+            Thread.currentThread().interrupt();
             throw new PPTException(e);
         } finally {
             clientCheckoutLock.unlock();
         }
-
-
     }
+
 
     private OPeNDAPClient getNewClient() throws PPTException, InterruptedException  {
 
