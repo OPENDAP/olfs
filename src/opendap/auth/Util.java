@@ -36,7 +36,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.security.Principal;
 import java.util.Enumeration;
 import java.util.Map;
@@ -56,76 +61,47 @@ public class Util {
      * in which case it will be considered a POST request.
      *
      */
-    public static String submitHttpRequest( String url, Map<String, String> headers, String data )
+    public static String submitHttpRequest( String urlStr, Map<String, String> headers, String data )
         throws IOException
     {
         Logger log = LoggerFactory.getLogger("opendap.auth.Util");
         StringBuilder result = new StringBuilder();
         HttpURLConnection connection = null;
 
-        try
-        {
-            // Create a connection and build the request
-            connection = (HttpURLConnection) (new URL(url)).openConnection();
 
-            connection.setUseCaches(false);
-            connection.setDoInput(true);
-
+        try (HttpClient client = HttpClient.newHttpClient()) {
+            HttpRequest.Builder builder = HttpRequest.newBuilder();
+            builder.uri(URI.create(urlStr));
             for(Map.Entry<String, String> header: headers.entrySet()){
-                connection.setRequestProperty(header.getKey(), header.getValue());
+                builder.setHeader(header.getKey(), header.getValue());
             }
 
             // If data is provided, then convert it to a POST request.
-            if( data != null )
-            {
-                connection.setRequestMethod("POST");
-                connection.setDoOutput(true);
-
-                DataOutputStream out = new DataOutputStream(connection.getOutputStream());
-                out.writeBytes(data);
-                out.flush();
-                out.close();
+            if( data != null ) {
+                builder.POST(HttpRequest.BodyPublishers.ofString(data));
             }
-
-            int http_status = connection.getResponseCode();
-
-            try {
-                // Here we try to get the response body even if it is an error
-                // because the server may have sent back something useful in
-                // addition to the status.
-                InputStream is = connection.getInputStream();
-                // Extract the body of the response so we can return it.
-                // We always want this even if the http status is an error.
-                BufferedReader in = new BufferedReader(
-                        new InputStreamReader(is,HyraxStringEncoding.getCharset()));
-
-                String line;
-                while( (line = in.readLine()) != null ) result.append(line);
-                in.close();
-                is.close();
+            else {
+                builder.GET();
             }
-            catch(IOException e){
-                log.error("Caught {} message: {}",e.getClass().getName(),e.getMessage());
-            }
+            HttpRequest request = builder.build();
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            result.append(response.body());
 
             // Check the response to the request. We consider anything other than
             // 200 (OK) as an error, though it may be useful to be able to return
             // this value to the caller and let the caller decide.
-            if( http_status != 200 )
+            if(response.statusCode() != 200 )
             {
                 StringBuilder msg = new StringBuilder();
-                msg.append("HTTP request failed. status: ").append(http_status);
-                msg.append(" url: ").append(url);
-                msg.append(" message: ").append(result.toString());
+                msg.append("HTTP request failed. status: ").append(response.statusCode());
+                msg.append(" url: ").append(urlStr);
+                msg.append(" message: ").append(result);
                 throw new IOException(msg.toString());
             }
-
         }
-        finally
-        {
-            if( connection != null ) connection.disconnect();
+        catch(IOException | InterruptedException e){
+            log.error("Caught {} message: {}",e.getClass().getName(),e.getMessage());
         }
-
         return result.toString();
     }
 

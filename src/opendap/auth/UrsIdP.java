@@ -450,15 +450,10 @@ public class UrsIdP extends IdProvider{
             Timer.disable();
         }
 
-        log.debug("url {} returned contents: {}",url,contents);
-
-        JsonParser jparse = new JsonParser();
-        JsonObject profile = jparse.parse(contents).getAsJsonObject();
+        log.debug("The URL '{}' returned contents: '{}'", url, contents);
+        JsonObject profile = JsonParser.parseString(contents).getAsJsonObject();
         String uid = profile.get("uid").getAsString();
-
-
         log.debug("uid: {}",uid);
-
         return uid;
     }
 
@@ -574,8 +569,7 @@ public class UrsIdP extends IdProvider{
         String contents = edlGetToken(code, returnToUrl);
 
         // Parse the json to extract the token.
-        JsonParser jparse = new JsonParser();
-        JsonObject json = jparse.parse(contents).getAsJsonObject();
+        JsonObject json = JsonParser.parseString(contents).getAsJsonObject();
         EarthDataLoginAccessToken edlat = new EarthDataLoginAccessToken(json, getUrsClientAppId());
         log.debug("edlat.expiresIn(): {}",edlat.getExpiresIn());
         return edlat;
@@ -763,7 +757,7 @@ public class UrsIdP extends IdProvider{
     public void edlRevokeToken(String token) throws IOException {
         String postData = "token=" + token;
         String contents = edlApi(EDL_API_REVOKE, postData);
-        if (contents != null && !contents.equalsIgnoreCase("{}")) {
+        if (contents.isEmpty() || !contents.equalsIgnoreCase("{}")) {
             log.error("OUCH! Revocation of EDL Token may have failed!. Message: {}", contents);
         }
     }
@@ -802,7 +796,6 @@ public class UrsIdP extends IdProvider{
 
         String contents = Util.submitHttpRequest(url, headers, postData);
         log.info("EDL Response Body: {}", contents);
-
         return contents;
     }
 
