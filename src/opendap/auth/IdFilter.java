@@ -279,7 +279,7 @@ public class IdFilter implements Filter {
         return session;
     }
 
-    public void doFilter(ServletRequest sreq, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
+    public void doFilter(ServletRequest sreq, ServletResponse response, FilterChain filterChain) throws ServletException {
 
         // Ensure initialization has been accomplished
         if (!isInitialized) {
@@ -507,6 +507,10 @@ public class IdFilter implements Filter {
 
             log.debug("END (session: {} returnToUrl: {})",session.getId(),session.getAttribute(RETURN_TO_URL));
             ServletLogUtil.logServerAccessEnd(200,logName);
+        }
+        catch (Exception e) {
+            log.error("ERROR! Caught '{}' with message: '{}'", e.getClass().getName(), e.getMessage());
+            ServletLogUtil.logServerAccessEnd(666,logName);
         }
         finally {
             RequestCache.close();

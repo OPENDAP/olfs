@@ -81,8 +81,8 @@
     <property name="compile.debuglevel" value="lines,vars,source"/>
     <property name="compile.deprecation" value="on"/>
 
-    <property name="compile.TARGET" value="1.9"/>
-    <property name="compile.SOURCE" value="1.9"/>
+    <property name="compile.TARGET" value="1.8"/>
+    <property name="compile.SOURCE" value="1.8"/>
 
 
     <property name="modern.compiler" value="modern"/>

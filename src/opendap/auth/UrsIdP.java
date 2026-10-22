@@ -757,7 +757,7 @@ public class UrsIdP extends IdProvider{
     public void edlRevokeToken(String token) throws IOException {
         String postData = "token=" + token;
         String contents = edlApi(EDL_API_REVOKE, postData);
-        if (contents.isEmpty() || !contents.equalsIgnoreCase("{}")) {
+        if (!contents.equalsIgnoreCase("{}")) {
             log.error("OUCH! Revocation of EDL Token may have failed!. Message: {}", contents);
         }
     }
