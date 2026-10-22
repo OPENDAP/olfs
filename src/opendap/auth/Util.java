@@ -81,16 +81,16 @@ public class Util {
             {
                 connection.setRequestMethod("POST");
                 connection.setDoOutput(true);
-
                 DataOutputStream out = new DataOutputStream(connection.getOutputStream());
                 out.writeBytes(data);
                 out.flush();
                 out.close();
             }
 
-            int http_status = connection.getResponseCode();
+            int http_status = -1;
 
             try {
+                http_status= connection.getResponseCode();
                 // Here we try to get the response body even if it is an error
                 // because the server may have sent back something useful in
                 // addition to the status.
