@@ -511,7 +511,7 @@ public class IdFilter implements Filter {
             log.error("ERROR! Caught '{}' with message: '{}'", e.getClass().getName(), e.getMessage());
             boolean notifiedClient = true;
             HttpServletResponse httpResponse = (HttpServletResponse)response;
-            if (!response.isCommitted()) {
+            if (!httpResponse.isCommitted()) {
                 ServletLogUtil.logServerAccessEnd(666, logName);
                 try {
                     httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "There was a problem with user authentication.");
