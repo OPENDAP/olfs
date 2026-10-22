@@ -48,7 +48,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Enumeration;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static opendap.logging.ServletLogUtil.logEDLProfiling;
@@ -58,7 +57,6 @@ public class IdFilter implements Filter {
 
     private Logger log;
     private static final String logName = "AuthenticationLog";
-    private AtomicLong counter;
     private static final java.util.concurrent.locks.Lock initLock;
     static {
         initLock = new ReentrantLock();
@@ -181,8 +179,8 @@ public class IdFilter implements Filter {
     private String getServiceContextPath(){ return serviceContextPath; }
     /**
      *
-     * @throws IOException
-     * @throws JDOMException
+     * @throws IOException When the bad things happen
+     * @throws JDOMException When the bad things happen
      */
     private void init() throws IOException, JDOMException {
 
@@ -193,7 +191,6 @@ public class IdFilter implements Filter {
 
             serviceContextPath = Util.fullyQualifiedPath(filterConfig.getServletContext().getContextPath());
 
-            counter = new AtomicLong(0);
             ServletLogUtil.initLogging(filterConfig.getServletContext());
             log = LoggerFactory.getLogger(this.getClass());
             log.info("init() - Initializing IdFilter...");
@@ -279,7 +276,8 @@ public class IdFilter implements Filter {
         return session;
     }
 
-    public void doFilter(ServletRequest sreq, ServletResponse response, FilterChain filterChain) throws ServletException {
+    public void doFilter(ServletRequest sreq, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
+
 
         // Ensure initialization has been accomplished
         if (!isInitialized) {
@@ -294,9 +292,10 @@ public class IdFilter implements Filter {
             }
         }
 
-        try {
 
+        try {
             HttpServletRequest request = (HttpServletRequest) sreq;
+
             RequestCache.open(request);
             RequestId requestId = RequestCache.getRequestId();
 
@@ -510,7 +509,37 @@ public class IdFilter implements Filter {
         }
         catch (Exception e) {
             log.error("ERROR! Caught '{}' with message: '{}'", e.getClass().getName(), e.getMessage());
-            ServletLogUtil.logServerAccessEnd(666,logName);
+            boolean notifiedClient = true;
+            HttpServletResponse httpResponse = (HttpServletResponse)response;
+            if (!response.isCommitted()) {
+                ServletLogUtil.logServerAccessEnd(666, logName);
+                try {
+                    httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "There was a problem with user authentication.");
+                }
+                catch (IOException | IllegalStateException sendErrorEx) {
+                    log.warn("Failed to send error status code to client!. Caught '{}' message: '{}'", sendErrorEx.getClass().getName(), sendErrorEx.getMessage());
+
+                    if (true) {
+                        // Rethrowing the error here is a provisional addition
+                        // and may not be the correct choice.
+                        if (e instanceof ServletException) {
+                            throw (ServletException) e;
+                        } else if (e instanceof IOException) {
+                            throw (IOException) e;
+                        } else {
+                            throw new ServletException(e);
+                        }
+                    }
+                    else {
+                        notifiedClient = false;
+                    }
+                }
+            } else {
+                notifiedClient = false;
+            }
+            if (!notifiedClient) {
+                log.warn("Unable to transmit error to client!. Caught '{}' message: '{}'", e.getClass().getName(), e.getMessage());
+            }
         }
         finally {
             RequestCache.close();
@@ -582,13 +611,10 @@ public class IdFilter implements Filter {
      * Performs the user login operations.
      * This method does not actually generate any output. It performs a series
      * of redirects, depending upon the current state.
-     *
      * 1) If the user is already logged in, it just redirects them back to the
      *    home page.
-     *
      * 2) If no 'code' query parameter is found, it will redirect the user to URS
      *    to start the authentication process.
-     *
      * 3) If a 'code' query parameter is found, it assumes the call is a redirect
      *    from a successful URS authentication, and will attempt to perform the
      *    token exchange.
