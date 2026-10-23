@@ -96,7 +96,6 @@ public class Util {
             }
 
             int httpStatus = -1;
-            Exception badThingsHappened = null;
 
             try {
                 connection.connect();
@@ -117,29 +116,26 @@ public class Util {
                 is.close();
             }
             catch(IOException e){
-                badThingsHappened = e;
-                log.error("Caught {} message: {}",badThingsHappened.getClass().getName(),badThingsHappened.getMessage());
-            }
+                log.error("Caught {} message: {}",e.getClass().getName(),e.getMessage());
+                StringBuilder msg = new StringBuilder("Caught " + e.getClass().getName() + " message: " + e.getMessage() + "\n");
+                msg.append("url: ").append(urlStr).append("\n");
+                for( Map.Entry<String,String> hdr:requestHeaders.entrySet()) {
+                    msg.append(hdr.getKey()).append(": ").append(hdr.getValue()).append("\n");
+                }
+                msg.append("requestBody: ").append(requestBody).append("\n");
+                throw new IOException(msg.toString(),e);
 
+            }
             // Check the response to the request. We consider anything other than
             // 200 (OK) as an error, though it may be useful to be able to return
             // this value to the caller and let the caller decide.
-            if( badThingsHappened == null && httpStatus != 200 )
+            if( httpStatus != 200 )
             {
                 String msg = "HTTP request failed.\n" +
                         " httpStatus: " + httpStatus + "\n" +
                         "        url: " + urlStr + "\n" +
                         " resp. body: " + result + "\n";
                 throw new IOException(msg);
-            }
-            if (badThingsHappened != null) {
-                StringBuilder msg = new StringBuilder("Caught " + badThingsHappened.getClass().getName() + " message: " + badThingsHappened.getMessage() + "\n");
-                msg.append("url: ").append(urlStr).append("\n");
-                for( Map.Entry<String,String> hdr:requestHeaders.entrySet()) {
-                    msg.append(hdr.getKey()).append(": ").append(hdr.getValue()).append("\n");
-                }
-                msg.append("requestBody: ").append(requestBody).append("\n");
-                throw new IOException(msg.toString(),badThingsHappened);
             }
         }
         finally
