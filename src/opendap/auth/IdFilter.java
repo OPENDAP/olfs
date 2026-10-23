@@ -513,13 +513,11 @@ public class IdFilter implements Filter {
         }
         catch (Exception e) {
             log.error("ERROR! Caught '{}' with message: '{}'", e.getClass().getName(), e.getMessage());
-            boolean notifiedClient = false;
             HttpServletResponse httpResponse = (HttpServletResponse)response;
             if (!httpResponse.isCommitted()) {
                 ServletLogUtil.logServerAccessEnd(666, logName);
                 try {
                     httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "There was a problem with user authentication.");
-                    notifiedClient = true;
                 }
                 catch (IOException | IllegalStateException sendErrorEx) {
                     log.warn("Failed to send error status code to client!. Caught '{}' message: '{}'", sendErrorEx.getClass().getName(), sendErrorEx.getMessage());

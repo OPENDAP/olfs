@@ -119,10 +119,10 @@ public class Util {
                 log.error("Caught {} message: {}",e.getClass().getName(),e.getMessage());
                 StringBuilder msg = new StringBuilder("Caught " + e.getClass().getName() + " message: " + e.getMessage() + "\n");
                 msg.append("url: ").append(urlStr).append("\n");
-                for( Map.Entry<String,String> hdr:requestHeaders.entrySet()) {
-                    msg.append(hdr.getKey()).append(": ").append(hdr.getValue()).append("\n");
-                }
-                msg.append("requestBody: ").append(requestBody).append("\n");
+                //for( Map.Entry<String,String> hdr:requestHeaders.entrySet()) {
+                //    msg.append(hdr.getKey()).append(": ").append(hdr.getValue()).append("\n");
+                //}
+                //msg.append("requestBody: ").append(requestBody).append("\n");
                 throw new IOException(msg.toString(),e);
 
             }
