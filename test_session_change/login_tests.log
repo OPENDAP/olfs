@@ -1,0 +1,206 @@
+##############################################################################################
+# Running login_tests
+-rw-r--r--  1 ndp  staff  0 Sep 18 12:15 cjar-login-tests
+
+##############################################################################################
+# run_login_test() - Thu Sep 18 12:15:57 PDT 2025
+#
+#     cookie jar: cjar-login-tests
+#     user-agent: SecretAgentMan
+#       test_url: https://opendap.earthdata.nasa.gov/hyrax/data/nc/fnoc1.nc.dds
+#         req_id: LoginRequest-01
+#
+
+# request_id_hdr: -H a-api-request-uuid: LoginRequest-01
+> GET /hyrax/data/nc/fnoc1.nc.dds HTTP/2
+> Host: opendap.earthdata.nasa.gov
+< HTTP/2 302 
+* Added cookie JSESSIONID="96D3BF7BAA5F03C06103C6F61F64B7AA" for domain opendap.earthdata.nasa.gov, path /, expire 0
+< set-cookie: JSESSIONID=96D3BF7BAA5F03C06103C6F61F64B7AA; Path=/; Secure; HttpOnly
+* [HTTP/2] [3] [cookie: JSESSIONID=96D3BF7BAA5F03C06103C6F61F64B7AA]
+> GET /login/urs HTTP/2
+> Host: opendap.earthdata.nasa.gov
+> Cookie: JSESSIONID=96D3BF7BAA5F03C06103C6F61F64B7AA
+< HTTP/2 302 
+> GET /oauth/authorize?client_id=SSCATdwCtNkEWliH3_WzDw&response_type=code&redirect_uri=https://opendap.earthdata.nasa.gov/login/urs HTTP/1.1
+> Host: urs.earthdata.nasa.gov
+< HTTP/1.1 302 Found
+< Location: https://opendap.earthdata.nasa.gov/login/urs?code=V_T0qbqqXenzQBWtC5wiYuEBxkdjOubCvrJY1PatxLXmtVDsrJfxXLYieXoGgGqLc-JfqLVqvNDPGhHc3WBN5fqJdmxIlF9Z5Q8rMz8pAnI
+* [HTTP/2] [5] [cookie: JSESSIONID=96D3BF7BAA5F03C06103C6F61F64B7AA; urs_user_already_logged=yes]
+> GET /login/urs?code=V_T0qbqqXenzQBWtC5wiYuEBxkdjOubCvrJY1PatxLXmtVDsrJfxXLYieXoGgGqLc-JfqLVqvNDPGhHc3WBN5fqJdmxIlF9Z5Q8rMz8pAnI HTTP/2
+> Host: opendap.earthdata.nasa.gov
+> Cookie: JSESSIONID=96D3BF7BAA5F03C06103C6F61F64B7AA; urs_user_already_logged=yes
+< HTTP/2 302 
+* Replaced cookie JSESSIONID="705ABF34A6AE514A85DE14B790007540" for domain opendap.earthdata.nasa.gov, path /, expire 0
+< set-cookie: JSESSIONID=705ABF34A6AE514A85DE14B790007540; Path=/; Secure; HttpOnly
+* [HTTP/2] [7] [cookie: JSESSIONID=705ABF34A6AE514A85DE14B790007540; urs_user_already_logged=yes]
+> GET /hyrax/data/nc/fnoc1.nc.dds HTTP/2
+> Host: opendap.earthdata.nasa.gov
+> Cookie: JSESSIONID=705ABF34A6AE514A85DE14B790007540; urs_user_already_logged=yes
+< HTTP/2 200 
+Dataset {
+    Int16 u[time_a = 16][lat = 17][lon = 21];
+    Int16 v[time_a = 16][lat = 17][lon = 21];
+    Float32 lat[lat = 17];
+    Float32 lon[lon = 21];
+    Float32 time[time = 16];
+} fnoc1.nc;
+
+#---------------------------------------------------------------------------------------------
+# cookie jar (cjar-login-tests):
+
+#HttpOnly_opendap.earthdata.nasa.gov	FALSE	/	TRUE	0	JSESSIONID	705ABF34A6AE514A85DE14B790007540
+
+##############################################################################################
+
+##############################################################################################
+# run_login_test() - Thu Sep 18 12:16:25 PDT 2025
+#
+#     cookie jar: cjar-login-tests
+#     user-agent: SecretAgentMan
+#       test_url: https://opendap.earthdata.nasa.gov/hyrax/data/nc/fnoc1.nc.dds
+#         req_id: LoginRequest-02
+#
+
+# request_id_hdr: -H a-api-request-uuid: LoginRequest-02
+* [HTTP/2] [1] [cookie: JSESSIONID=705ABF34A6AE514A85DE14B790007540; urs_user_already_logged=yes]
+> GET /hyrax/data/nc/fnoc1.nc.dds HTTP/2
+> Host: opendap.earthdata.nasa.gov
+> Cookie: JSESSIONID=705ABF34A6AE514A85DE14B790007540; urs_user_already_logged=yes
+< HTTP/2 200 
+Dataset {
+    Int16 u[time_a = 16][lat = 17][lon = 21];
+    Int16 v[time_a = 16][lat = 17][lon = 21];
+    Float32 lat[lat = 17];
+    Float32 lon[lon = 21];
+    Float32 time[time = 16];
+} fnoc1.nc;
+
+#---------------------------------------------------------------------------------------------
+# cookie jar (cjar-login-tests):
+
+#HttpOnly_opendap.earthdata.nasa.gov	FALSE	/	TRUE	0	JSESSIONID	705ABF34A6AE514A85DE14B790007540
+
+##############################################################################################
+
+#---------------------------------------------------------------------------------------------
+#
+# login_tests() - Sleeping for 15 seconds
+# login_tests() - Continuing...
+#
+#---------------------------------------------------------------------------------------------
+
+##############################################################################################
+# run_login_test() - Thu Sep 18 12:16:40 PDT 2025
+#
+#     cookie jar: cjar-login-tests
+#     user-agent: SecretAgentMan
+#       test_url: https://opendap.earthdata.nasa.gov/hyrax/data/nc/fnoc1.nc.dds
+#         req_id: LoginRequest-03
+#
+
+# request_id_hdr: -H a-api-request-uuid: LoginRequest-03
+* [HTTP/2] [1] [cookie: JSESSIONID=705ABF34A6AE514A85DE14B790007540; urs_user_already_logged=yes]
+> GET /hyrax/data/nc/fnoc1.nc.dds HTTP/2
+> Host: opendap.earthdata.nasa.gov
+> Cookie: JSESSIONID=705ABF34A6AE514A85DE14B790007540; urs_user_already_logged=yes
+< HTTP/2 200 
+Dataset {
+    Int16 u[time_a = 16][lat = 17][lon = 21];
+    Int16 v[time_a = 16][lat = 17][lon = 21];
+    Float32 lat[lat = 17];
+    Float32 lon[lon = 21];
+    Float32 time[time = 16];
+} fnoc1.nc;
+
+#---------------------------------------------------------------------------------------------
+# cookie jar (cjar-login-tests):
+
+#HttpOnly_opendap.earthdata.nasa.gov	FALSE	/	TRUE	0	JSESSIONID	705ABF34A6AE514A85DE14B790007540
+
+##############################################################################################
+
+##############################################################################################
+# run_login_test() - Thu Sep 18 12:16:41 PDT 2025
+#
+#     cookie jar: cjar-login-tests
+#     user-agent: SecretAgentMan
+#       test_url: https://opendap.earthdata.nasa.gov/hyrax/data/nc/fnoc1.nc.dds
+#         req_id: LoginRequest-04
+#
+
+# request_id_hdr: -H a-api-request-uuid: LoginRequest-04
+* [HTTP/2] [1] [cookie: JSESSIONID=705ABF34A6AE514A85DE14B790007540; urs_user_already_logged=yes]
+> GET /hyrax/data/nc/fnoc1.nc.dds HTTP/2
+> Host: opendap.earthdata.nasa.gov
+> Cookie: JSESSIONID=705ABF34A6AE514A85DE14B790007540; urs_user_already_logged=yes
+< HTTP/2 200 
+Dataset {
+    Int16 u[time_a = 16][lat = 17][lon = 21];
+    Int16 v[time_a = 16][lat = 17][lon = 21];
+    Float32 lat[lat = 17];
+    Float32 lon[lon = 21];
+    Float32 time[time = 16];
+} fnoc1.nc;
+
+#---------------------------------------------------------------------------------------------
+# cookie jar (cjar-login-tests):
+
+#HttpOnly_opendap.earthdata.nasa.gov	FALSE	/	TRUE	0	JSESSIONID	705ABF34A6AE514A85DE14B790007540
+
+##############################################################################################
+
+##############################################################################################
+# run_login_test() - Thu Sep 18 12:16:41 PDT 2025
+#
+#     cookie jar: cjar-login-tests
+#     user-agent: GetSmart
+#       test_url: https://opendap.earthdata.nasa.gov/hyrax/data/nc/fnoc1.nc.dds
+#         req_id: LoginRequest-05
+#
+
+# request_id_hdr: -H a-api-request-uuid: LoginRequest-05
+* [HTTP/2] [1] [cookie: JSESSIONID=705ABF34A6AE514A85DE14B790007540; urs_user_already_logged=yes]
+> GET /hyrax/data/nc/fnoc1.nc.dds HTTP/2
+> Host: opendap.earthdata.nasa.gov
+> Cookie: JSESSIONID=705ABF34A6AE514A85DE14B790007540; urs_user_already_logged=yes
+< HTTP/2 302 
+* Replaced cookie JSESSIONID="75015ADDAE40ED65351E3462E9F7CD7C" for domain opendap.earthdata.nasa.gov, path /, expire 0
+< set-cookie: JSESSIONID=75015ADDAE40ED65351E3462E9F7CD7C; Path=/; Secure; HttpOnly
+* [HTTP/2] [3] [cookie: JSESSIONID=75015ADDAE40ED65351E3462E9F7CD7C; urs_user_already_logged=yes]
+> GET /login/urs HTTP/2
+> Host: opendap.earthdata.nasa.gov
+> Cookie: JSESSIONID=75015ADDAE40ED65351E3462E9F7CD7C; urs_user_already_logged=yes
+< HTTP/2 302 
+> GET /oauth/authorize?client_id=SSCATdwCtNkEWliH3_WzDw&response_type=code&redirect_uri=https://opendap.earthdata.nasa.gov/login/urs HTTP/1.1
+> Host: urs.earthdata.nasa.gov
+< HTTP/1.1 302 Found
+< Location: https://opendap.earthdata.nasa.gov/login/urs?code=sPOfVmzSWmnioCqQ3isTjZS6Fg2NASxC35DAhHKtHfAD2Ew-kHNb8JPU2PnpuB25UOrSrGyqJcnNXYfZ5KYHv02TeCu9OyRt86k3I-3eMS4
+* [HTTP/2] [5] [cookie: JSESSIONID=75015ADDAE40ED65351E3462E9F7CD7C; urs_user_already_logged=yes]
+> GET /login/urs?code=sPOfVmzSWmnioCqQ3isTjZS6Fg2NASxC35DAhHKtHfAD2Ew-kHNb8JPU2PnpuB25UOrSrGyqJcnNXYfZ5KYHv02TeCu9OyRt86k3I-3eMS4 HTTP/2
+> Host: opendap.earthdata.nasa.gov
+> Cookie: JSESSIONID=75015ADDAE40ED65351E3462E9F7CD7C; urs_user_already_logged=yes
+< HTTP/2 302 
+* Replaced cookie JSESSIONID="82084F2AEB9A9A123CA5515F30F46FB7" for domain opendap.earthdata.nasa.gov, path /, expire 0
+< set-cookie: JSESSIONID=82084F2AEB9A9A123CA5515F30F46FB7; Path=/; Secure; HttpOnly
+* [HTTP/2] [7] [cookie: JSESSIONID=82084F2AEB9A9A123CA5515F30F46FB7; urs_user_already_logged=yes]
+> GET /hyrax/data/nc/fnoc1.nc.dds HTTP/2
+> Host: opendap.earthdata.nasa.gov
+> Cookie: JSESSIONID=82084F2AEB9A9A123CA5515F30F46FB7; urs_user_already_logged=yes
+< HTTP/2 200 
+Dataset {
+    Int16 u[time_a = 16][lat = 17][lon = 21];
+    Int16 v[time_a = 16][lat = 17][lon = 21];
+    Float32 lat[lat = 17];
+    Float32 lon[lon = 21];
+    Float32 time[time = 16];
+} fnoc1.nc;
+
+#---------------------------------------------------------------------------------------------
+# cookie jar (cjar-login-tests):
+
+#HttpOnly_opendap.earthdata.nasa.gov	FALSE	/	TRUE	0	JSESSIONID	82084F2AEB9A9A123CA5515F30F46FB7
+
+##############################################################################################
+
+
