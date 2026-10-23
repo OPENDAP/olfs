@@ -79,6 +79,9 @@ public class IdFilter implements Filter {
     private static final long DEFAULT_MAX_SESSION_TIME_SECONDS = 60; // 60 seconds in milliseconds
     private double maxSessionTimeSeconds = DEFAULT_MAX_SESSION_TIME_SECONDS;
 
+    private static final String FILTER_THROWS_EXCEPTIONS_ELEM = "FilterThrowsExceptions";
+    private boolean filterThrowsExceptions = false;
+
     private String guestEndpoint;
     private boolean enableGuestProfile;
     private String serviceContextPath;
@@ -222,6 +225,12 @@ public class IdFilter implements Filter {
             e = config.getChild(SHOW_USER_INFO_ELEM);
             if(e!=null){
                 showUserProfileDetails = true;
+            }
+
+            //    <FilterThrowsExceptions />
+            e = config.getChild(FILTER_THROWS_EXCEPTIONS_ELEM);
+            if(e!=null){
+                filterThrowsExceptions = true;
             }
 
             e = config.getChild("EnableGuestProfile");
@@ -519,7 +528,7 @@ public class IdFilter implements Filter {
                 catch (IOException | IllegalStateException sendErrorEx) {
                     log.warn("Failed to send error status code to client!. Caught '{}' message: '{}'", sendErrorEx.getClass().getName(), sendErrorEx.getMessage());
 
-                    if (true) {
+                    if (filterThrowsExceptions) {
                         // Rethrowing the error here is a provisional addition
                         // and may not be the correct choice.
                         if (e instanceof ServletException) {
