@@ -51,16 +51,12 @@ public class Util {
 
     /**
      * Utility method used to submit an HTTP request.
+     *
      * This method will submit a GET request unless 'data' is non-null,
      * in which case it will be considered a POST request.
      *
-     * @param urlStr A String containing the URL to dereference.
-     * @param requestHeaders Request headers empty is fine, null is not.
-     * @param requestBody The request body for a POST request.
-     * @return The response body as a String
-     * @throws IOException When bad things happen
      */
-    public static String submitHttpRequest( String urlStr, Map<String, String> requestHeaders, String requestBody )
+    public static String submitHttpRequest( String url, Map<String, String> headers, String data )
         throws IOException
     {
         Logger log = LoggerFactory.getLogger("opendap.auth.Util");
@@ -69,38 +65,31 @@ public class Util {
 
         try
         {
-            URL url = new URL(urlStr);
-            // According to the javadoc, URL.openConnection() doesn't actually transmit the http request.
-            // javadoc:
-            // It should be noted that a URLConnection instance does not establish the
-            // actual network connection on creation. This will happen only when calling
-            // URLConnection.connect().
-            connection = (HttpURLConnection) url.openConnection();
+            // Create a connection and build the request
+            connection = (HttpURLConnection) (new URL(url)).openConnection();
 
             connection.setUseCaches(false);
             connection.setDoInput(true);
 
-            for(Map.Entry<String, String> header: requestHeaders.entrySet()){
+            for(Map.Entry<String, String> header: headers.entrySet()){
                 connection.setRequestProperty(header.getKey(), header.getValue());
             }
 
             // If data is provided, then convert it to a POST request.
-            if( requestBody != null )
+            if( data != null )
             {
                 connection.setRequestMethod("POST");
                 connection.setDoOutput(true);
+
                 DataOutputStream out = new DataOutputStream(connection.getOutputStream());
-                out.writeBytes(requestBody);
+                out.writeBytes(data);
                 out.flush();
                 out.close();
             }
 
-            int httpStatus = -1;
+            int http_status = connection.getResponseCode();
 
             try {
-                connection.connect();
-
-                httpStatus= connection.getResponseCode();
                 // Here we try to get the response body even if it is an error
                 // because the server may have sent back something useful in
                 // addition to the status.
@@ -117,31 +106,26 @@ public class Util {
             }
             catch(IOException e){
                 log.error("Caught {} message: {}",e.getClass().getName(),e.getMessage());
-                StringBuilder msg = new StringBuilder("Caught " + e.getClass().getName() + " message: " + e.getMessage() + "\n");
-                msg.append("url: ").append(urlStr).append("\n");
-                //for( Map.Entry<String,String> hdr:requestHeaders.entrySet()) {
-                //    msg.append(hdr.getKey()).append(": ").append(hdr.getValue()).append("\n");
-                //}
-                //msg.append("requestBody: ").append(requestBody).append("\n");
-                throw new IOException(msg.toString(),e);
-
             }
+
             // Check the response to the request. We consider anything other than
             // 200 (OK) as an error, though it may be useful to be able to return
             // this value to the caller and let the caller decide.
-            if( httpStatus != 200 )
+            if( http_status != 200 )
             {
-                String msg = "HTTP request failed.\n" +
-                        " httpStatus: " + httpStatus + "\n" +
-                        "        url: " + urlStr + "\n" +
-                        " resp. body: " + result + "\n";
-                throw new IOException(msg);
+                StringBuilder msg = new StringBuilder();
+                msg.append("HTTP request failed. status: ").append(http_status);
+                msg.append(" url: ").append(url);
+                msg.append(" message: ").append(result.toString());
+                throw new IOException(msg.toString());
             }
+
         }
         finally
         {
             if( connection != null ) connection.disconnect();
         }
+
         return result.toString();
     }
 
@@ -246,7 +230,7 @@ public class Util {
 
     /**
      *
-     * @param p The path
+     * @param p
      * @return Returns the string p with the assurance that the returned string will begin with a "/" character.
      */
     public static String fullyQualifiedPath(String p){
