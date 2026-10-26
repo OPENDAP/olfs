@@ -527,10 +527,8 @@ public class IdFilter implements Filter {
             if (filterThrowsExceptions) {
                 // Rethrowing the error here is a provisional addition
                 // and may not be the correct choice.
-                if (e instanceof ServletException) {
-                    throw (ServletException) e;
-                } else if (e instanceof IOException) {
-                    throw (IOException) e;
+                if (e instanceof ServletException || e instanceof IOException) {
+                    throw e;
                 } else {
                     throw new ServletException(e);
                 }
