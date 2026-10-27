@@ -48,7 +48,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Enumeration;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static opendap.logging.ServletLogUtil.logEDLProfiling;
@@ -58,7 +57,6 @@ public class IdFilter implements Filter {
 
     private Logger log;
     private static final String logName = "AuthenticationLog";
-    private AtomicLong counter;
     private static final java.util.concurrent.locks.Lock initLock;
     static {
         initLock = new ReentrantLock();
@@ -79,6 +77,9 @@ public class IdFilter implements Filter {
     private static final String UNITS_ATTR = "units";
     private static final long DEFAULT_MAX_SESSION_TIME_SECONDS = 60; // 60 seconds in milliseconds
     private double maxSessionTimeSeconds = DEFAULT_MAX_SESSION_TIME_SECONDS;
+
+    private static final String FILTER_THROWS_EXCEPTIONS_ELEM = "FilterThrowsExceptions";
+    private boolean filterThrowsExceptions = false;
 
     private String guestEndpoint;
     private boolean enableGuestProfile;
@@ -180,8 +181,8 @@ public class IdFilter implements Filter {
     private String getServiceContextPath(){ return serviceContextPath; }
     /**
      *
-     * @throws IOException
-     * @throws JDOMException
+     * @throws IOException When the bad things happen
+     * @throws JDOMException When the bad things happen
      */
     private void init() throws IOException, JDOMException {
 
@@ -192,7 +193,6 @@ public class IdFilter implements Filter {
 
             serviceContextPath = Util.fullyQualifiedPath(filterConfig.getServletContext().getContextPath());
 
-            counter = new AtomicLong(0);
             ServletLogUtil.initLogging(filterConfig.getServletContext());
             log = LoggerFactory.getLogger(this.getClass());
             log.info("init() - Initializing IdFilter...");
@@ -224,6 +224,12 @@ public class IdFilter implements Filter {
             e = config.getChild(SHOW_USER_INFO_ELEM);
             if(e!=null){
                 showUserProfileDetails = true;
+            }
+
+            //    <FilterThrowsExceptions />
+            e = config.getChild(FILTER_THROWS_EXCEPTIONS_ELEM);
+            if(e!=null){
+                filterThrowsExceptions = true;
             }
 
             e = config.getChild("EnableGuestProfile");
@@ -294,7 +300,6 @@ public class IdFilter implements Filter {
         }
 
         try {
-
             HttpServletRequest request = (HttpServletRequest) sreq;
             RequestCache.open(request);
             RequestId requestId = RequestCache.getRequestId();
@@ -315,11 +320,6 @@ public class IdFilter implements Filter {
             // Since the request may come from other deployment contexts we check the request for the context.
             String contextPath = Util.fullyQualifiedPath(hsReq.getContextPath());
 
-            // FIXME The following needs to be replaced with a mechanism that does not require the query
-            //  to be added to the request URL in order for the redirect to produce the target request.
-            //  Why? Because the query may be too large for a URL on many servers.
-            //  What do? Maybe we use a thread safe cache to hold the CE and replace it in the redirect
-            //  with the md5 hash of the query and then use that for a lookup down stream?
             String requestUrl = ReqInfo.getRequestUrlPath(hsReq);
             String query = ReqInfo.getConstraintExpression(hsReq);
             if(!query.isEmpty()) {
@@ -507,6 +507,29 @@ public class IdFilter implements Filter {
             log.debug("END (session: {} returnToUrl: {})",session.getId(),Util.stringFromJson( (String) session.getAttribute(RETURN_TO_URL)));
             ServletLogUtil.logServerAccessEnd(200,logName);
         }
+        catch (Exception e) {
+            log.error("ERROR! Caught '{}' with message: '{}'", e.getClass().getName(), e.getMessage());
+            HttpServletResponse httpResponse = (HttpServletResponse)response;
+            if (!httpResponse.isCommitted()) {
+                ServletLogUtil.logServerAccessEnd(666, logName);
+                try {
+                    httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "There was a problem with user authentication.");
+                }
+                catch (IOException | IllegalStateException sendErrorEx) {
+                    log.warn("Failed to send error status code to client!. Caught '{}' message: '{}'", sendErrorEx.getClass().getName(), sendErrorEx.getMessage());
+                }
+            }
+
+            if (filterThrowsExceptions) {
+                // Rethrowing the error here is a provisional addition
+                // and may not be the correct choice.
+                if (e instanceof ServletException || e instanceof IOException) {
+                    throw e;
+                } else {
+                    throw new ServletException(e);
+                }
+            }
+        }
         finally {
             RequestCache.close();
         }
@@ -578,13 +601,10 @@ public class IdFilter implements Filter {
      * Performs the user login operations.
      * This method does not actually generate any output. It performs a series
      * of redirects, depending upon the current state.
-     * <p>
      * 1) If the user is already logged in, it just redirects them back to the
      *    home page.
-     * <p>
      * 2) If no 'code' query parameter is found, it will redirect the user to URS
      *    to start the authentication process.
-     * <p>
      * 3) If a 'code' query parameter is found, it assumes the call is a redirect
      *    from a successful URS authentication, and will attempt to perform the
      *    token exchange.
