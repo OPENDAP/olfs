@@ -63,7 +63,6 @@ public class Util {
     public static String submitHttpRequest( String url, Map<String, String> headers, String postBody )
             throws IOException
     {
-        Logger log = LoggerFactory.getLogger("opendap.auth.Util");
         StringBuilder result = new StringBuilder();
         HttpURLConnection connection = null;
         InputStream is;
@@ -119,11 +118,10 @@ public class Util {
             // 200 (OK) as an error.
             if( http_status != 200 )
             {
-                StringBuilder msg = new StringBuilder();
-                msg.append("HTTP request failed. status: ").append(http_status);
-                msg.append(" url: ").append(url);
-                msg.append(" message: ").append(result);
-                throw new IOException(msg.toString());
+                String msg = "HTTP request failed. status: " + http_status +
+                        " url: " + url +
+                        " message: " + result;
+                throw new IOException(msg);
             }
 
         }
@@ -167,10 +165,10 @@ public class Util {
     /**
      * Here we make sure that request is really for something that the user would like to return to before we cache
      * the URL. Pretty much we are trying to el,inate page componets like java script, xsl, images, css, etc.
-     * @param session
-     * @param requestUrl
-     * @param requestURI
-     * @param contextPath
+     * @param session The session object
+     * @param requestUrl The request URL
+     * @param requestURI The request URI
+     * @param contextPath The context path for the deployment.
      */
     static void cacheRequestUrlAsNeeded(HttpSession session, String requestUrl, String requestURI, String contextPath){
         Logger log = LoggerFactory.getLogger("opendap.auth.Util");
@@ -236,7 +234,7 @@ public class Util {
 
     /**
      *
-     * @param p
+     * @param p The path to make fully qualified.
      * @return Returns the string p with the assurance that the returned string will begin with a "/" character.
      */
     public static String fullyQualifiedPath(String p){
