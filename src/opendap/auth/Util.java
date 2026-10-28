@@ -51,22 +51,29 @@ public class Util {
 
     /**
      * Utility method used to submit an HTTP request.
-     *
-     * This method will submit a GET request unless 'data' is non-null,
+     * This method will submit a GET request unless 'postBody' is non-null and not empty,
      * in which case it will be considered a POST request.
-     *
+     * @param url The target URL to dereference.
+     * @param headers The request headers (if any) to be included in the =HTTP request.
+     * @param postBody Data to be used as an HTTP POST body. If this is not null and not empty the
+     *                 request will be converted to a POST request.
+     * @return The response body as a String.
+     * @throws IOException When the bad things happen.
      */
-    public static String submitHttpRequest( String url, Map<String, String> headers, String data )
-        throws IOException
+    public static String submitHttpRequest( String url, Map<String, String> headers, String postBody )
+            throws IOException
     {
         Logger log = LoggerFactory.getLogger("opendap.auth.Util");
         StringBuilder result = new StringBuilder();
         HttpURLConnection connection = null;
+        InputStream is;
 
         try
         {
             // Create a connection and build the request
             connection = (HttpURLConnection) (new URL(url)).openConnection();
+            if(connection == null)
+                throw new IOException("ERROR - The method 'URL.openConnection()' returned a null value for: '"+url+"'");
 
             connection.setUseCaches(false);
             connection.setDoInput(true);
@@ -75,48 +82,47 @@ public class Util {
                 connection.setRequestProperty(header.getKey(), header.getValue());
             }
 
-            // If data is provided, then convert it to a POST request.
-            if( data != null )
+            // If postBody is provided, then convert request to a POST request.
+            if( postBody != null && !postBody.isEmpty())
             {
                 connection.setRequestMethod("POST");
                 connection.setDoOutput(true);
 
                 DataOutputStream out = new DataOutputStream(connection.getOutputStream());
-                out.writeBytes(data);
+                out.writeBytes(postBody);
                 out.flush();
                 out.close();
             }
 
             int http_status = connection.getResponseCode();
+            boolean succeeded = http_status < 400;
 
-            try {
-                // Here we try to get the response body even if it is an error
-                // because the server may have sent back something useful in
-                // addition to the status.
-                InputStream is = connection.getInputStream();
-                // Extract the body of the response so we can return it.
-                // We always want this even if the http status is an error.
-                BufferedReader in = new BufferedReader(
-                        new InputStreamReader(is,HyraxStringEncoding.getCharset()));
+            // Here we try to get the response body even if it is an error
+            // because the server may have sent back something useful in
+            // addition to the status.
+            if (succeeded)
+                is = connection.getInputStream();
+            else
+                is = connection.getErrorStream();
 
-                String line;
-                while( (line = in.readLine()) != null ) result.append(line);
-                in.close();
-                is.close();
-            }
-            catch(IOException e){
-                log.error("Caught {} message: {}",e.getClass().getName(),e.getMessage());
-            }
+            // Extract the body of the response so we can return it.
+            // We always want this even if the http status is an error.
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(is,HyraxStringEncoding.getCharset()));
 
-            // Check the response to the request. We consider anything other than
-            // 200 (OK) as an error, though it may be useful to be able to return
-            // this value to the caller and let the caller decide.
+            String line;
+            while( (line = in.readLine()) != null ) result.append(line);
+            in.close();
+            is.close();
+
+            // Check the HTTP status of the response. We consider anything other than
+            // 200 (OK) as an error.
             if( http_status != 200 )
             {
                 StringBuilder msg = new StringBuilder();
                 msg.append("HTTP request failed. status: ").append(http_status);
                 msg.append(" url: ").append(url);
-                msg.append(" message: ").append(result.toString());
+                msg.append(" message: ").append(result);
                 throw new IOException(msg.toString());
             }
 
