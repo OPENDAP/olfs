@@ -494,7 +494,7 @@ public class IdFilter implements Filter {
                         }
                     }
                     catch (Forbidden http_403){
-                        log.error("Unable to validate Authorization header. Message: "+http_403.getMessage());
+                        log.error("Unable to validate Authorization header. Message: {}",http_403.getMessage());
                     }
                 }
             }

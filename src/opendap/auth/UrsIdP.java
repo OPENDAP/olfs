@@ -426,6 +426,7 @@ public class UrsIdP extends IdProvider{
         String url = PathBuilder.pathConcat(getUrsUrl(),OAUTH_USER_ID_ENDPOINT_PATH);
 
         StringBuilder post_body= new StringBuilder();
+        post_body.append("client_id=").append(getUrsClientAppId()).append("&");
         post_body.append("token=").append(accessToken);
         String auth_header_value="Basic "+ getUrsClientAppAuthCode();
         headers.put("Authorization",auth_header_value);
@@ -512,11 +513,17 @@ public class UrsIdP extends IdProvider{
                         userProfile.setUID(uid);
                         foundValidAuthToken = true;
                     }
+                    log.debug("Local EDL token validation result: valid={}, uid={}", foundValidAuthToken, userProfile.getUID());
                 }
-                log.debug("Local EDL token validation result: valid={}, uid={}", foundValidAuthToken, userProfile.getUID());
+                else {
+                    log.error("{}Failed to locate UrsClientAppPublicKeys ", ERR_PREFIX);
+                }
 
-                // Fall back to the EDL endpoint on local failure or lack of local public keys
                 if (!foundValidAuthToken) {
+                    // Fall back to the EDL endpoint on local failure or lack of local public keys
+                    // Two reasons we might arrive here:
+                    //  - No UrsClientAppPublicKeys
+                    //  - No Failed to turn token into user id even with the UrsClientAppPublicKeys.
                     String uid = getEdlUserId(token);
                     userProfile.setUID(uid);
 
