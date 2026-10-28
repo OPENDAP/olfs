@@ -111,11 +111,8 @@ public class Util {
 
             boolean firstLine = true;
             String line;
-
             while( (line = in.readLine()) != null ) {
-                if(!firstLine) {
-                    result.append("\n");
-                }
+                if(!firstLine) { result.append("\n"); }
                 result.append(line);
                 firstLine=false;
             }
