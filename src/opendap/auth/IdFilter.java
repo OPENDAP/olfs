@@ -490,7 +490,7 @@ public class IdFilter implements Filter {
                         }
                     }
                     catch (Forbidden http_403){
-                        log.error("Unable to validate Authorization header. Message: "+http_403.getMessage());
+                        log.error("Unable to validate Authorization header. Message: {}",http_403.getMessage());
                     }
                 }
             }
@@ -508,21 +508,21 @@ public class IdFilter implements Filter {
             ServletLogUtil.logServerAccessEnd(200,logName);
         }
         catch (Exception e) {
-            log.error("ERROR! Caught '{}' with message: '{}'", e.getClass().getName(), e.getMessage());
+            log.error("ERROR! Caught '{}', Message: '{}'", e.getClass().getName(), e.getMessage());
             HttpServletResponse httpResponse = (HttpServletResponse)response;
             if (!httpResponse.isCommitted()) {
-                ServletLogUtil.logServerAccessEnd(666, logName);
                 try {
-                    httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "There was a problem with user authentication.");
+                    httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
                 }
-                catch (IOException | IllegalStateException sendErrorEx) {
-                    log.warn("Failed to send error status code to client!. Caught '{}' message: '{}'", sendErrorEx.getClass().getName(), sendErrorEx.getMessage());
+                catch (IOException | IllegalStateException e2) {
+                    log.warn("Failed to send error status code to client!. Caught '{}' message: '{}'", e2.getClass().getName(), e2.getMessage());
                 }
             }
+            ServletLogUtil.logServerAccessEnd(HttpServletResponse.SC_FORBIDDEN, logName);
 
             if (filterThrowsExceptions) {
-                // Rethrowing the error here is a provisional addition
-                // and may not be the correct choice.
+                // Rethrow this error only if the configuration says
+                // to (by including an <FilterThrowsExceptions /> element.
                 if (e instanceof ServletException || e instanceof IOException) {
                     throw e;
                 } else {
