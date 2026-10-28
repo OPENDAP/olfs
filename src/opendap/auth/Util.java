@@ -109,8 +109,16 @@ public class Util {
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(is,HyraxStringEncoding.getCharset()));
 
+            boolean firstLine = true;
             String line;
-            while( (line = in.readLine()) != null ) result.append(line);
+
+            while( (line = in.readLine()) != null ) {
+                if(!firstLine) {
+                    result.append("\n");
+                }
+                result.append(line);
+                firstLine=false;
+            }
             in.close();
             is.close();
 
