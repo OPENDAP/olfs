@@ -3,9 +3,9 @@ package opendap.http;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.*;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 import static org.junit.Assert.*;
@@ -105,6 +105,21 @@ public class RejectMatrixParametersFilterTest {
         public String getRequestURI() {
             return uri;
         }
+
+        @Override
+        public String getRequestId() {
+            return "";
+        }
+
+        @Override
+        public String getProtocolRequestId() {
+            return "";
+        }
+
+        @Override
+        public ServletConnection getServletConnection() {
+            return null;
+        }
     }
 
     private static class TestHttpServletResponse extends DummyHttpServletResponse {
@@ -125,6 +140,7 @@ public class RejectMatrixParametersFilterTest {
             this.errorCodeSent = sc;
         }
 
+
         @Override
         public String getHeader(String name) {
             return serverHeader;
@@ -140,9 +156,9 @@ public class RejectMatrixParametersFilterTest {
     }
 
     // Abstract dummy classes providing default no-op / null returns for unused Servlet interface methods
-    private abstract static class DummyHttpServletRequest implements HttpServletRequest {
+    private abstract static class DummyHttpServletRequest extends DummyServletRequest implements HttpServletRequest {
         public String getAuthType() { return null; }
-        public javax.servlet.http.Cookie[] getCookies() { return null; }
+        public jakarta.servlet.http.Cookie[] getCookies() { return null; }
         public long getDateHeader(String name) { return 0; }
         public String getHeader(String name) { return null; }
         public java.util.Enumeration<String> getHeaders(String name) { return null; }
@@ -160,8 +176,8 @@ public class RejectMatrixParametersFilterTest {
         public String getRequestURI() { return null; }
         public StringBuffer getRequestURL() { return null; }
         public String getServletPath() { return null; }
-        public javax.servlet.http.HttpSession getSession(boolean create) { return null; }
-        public javax.servlet.http.HttpSession getSession() { return null; }
+        public jakarta.servlet.http.HttpSession getSession(boolean create) { return null; }
+        public jakarta.servlet.http.HttpSession getSession() { return null; }
         public String changeSessionId() { return null; }
         public boolean isRequestedSessionIdValid() { return false; }
         public boolean isRequestedSessionIdFromCookie() { return false; }
@@ -170,9 +186,9 @@ public class RejectMatrixParametersFilterTest {
         public boolean authenticate(HttpServletResponse response) { return false; }
         public void login(String username, String password) {}
         public void logout() {}
-        public java.util.Collection<javax.servlet.http.Part> getParts() { return null; }
-        public javax.servlet.http.Part getPart(String name) { return null; }
-        public <T extends javax.servlet.http.HttpUpgradeHandler> T upgrade(Class<T> handlerClass) { return null; }
+        public java.util.Collection<jakarta.servlet.http.Part> getParts() { return null; }
+        public jakarta.servlet.http.Part getPart(String name) { return null; }
+        public <T extends jakarta.servlet.http.HttpUpgradeHandler> T upgrade(Class<T> handlerClass) { return null; }
         public Object getAttribute(String name) { return null; }
         public java.util.Enumeration<String> getAttributeNames() { return null; }
         public String getCharacterEncoding() { return null; }
@@ -212,8 +228,8 @@ public class RejectMatrixParametersFilterTest {
         public DispatcherType getDispatcherType() { return null; }
     }
 
-    private abstract static class DummyHttpServletResponse implements HttpServletResponse {
-        public void addCookie(javax.servlet.http.Cookie cookie) {}
+    private abstract static class DummyHttpServletResponse extends DummyServletResponse implements HttpServletResponse {
+        public void addCookie(jakarta.servlet.http.Cookie cookie) {}
         public boolean containsHeader(String name) { return false; }
         public String encodeURL(String url) { return null; }
         public String encodeRedirectURL(String url) { return null; }
@@ -250,6 +266,7 @@ public class RejectMatrixParametersFilterTest {
         public void reset() {}
         public void setLocale(java.util.Locale loc) {}
         public java.util.Locale getLocale() { return null; }
+        public void sendRedirect(String s, int i, boolean b) throws IOException { /* nothing needed here */ }
     }
 
     private static class DummyServletRequest implements ServletRequest {
@@ -290,6 +307,10 @@ public class RejectMatrixParametersFilterTest {
         public boolean isAsyncSupported() { return false; }
         public AsyncContext getAsyncContext() { return null; }
         public DispatcherType getDispatcherType() { return null; }
+        public String getRequestId() {return "";}
+        public String getProtocolRequestId() {return "";}
+        public ServletConnection getServletConnection() {return null;}
+
     }
 
     private static class DummyServletResponse implements ServletResponse {
