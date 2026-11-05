@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 public class RejectMatrixParametersFilterTest {
 
@@ -22,7 +23,9 @@ public class RejectMatrixParametersFilterTest {
     @Test
     public void testInitAndDestroyDoNotThrowException() throws ServletException {
         filter.init(null);
+        assertTrue("No exception was thrown by init()",true);
         filter.destroy();
+        assertTrue("No exception was thrown by destroy()",true);
     }
 
     @Test
