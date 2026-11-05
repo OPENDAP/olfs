@@ -221,9 +221,7 @@ public class ReqInfo {
         String requestPath=req.getPathInfo();
         if(requestPath == null){ // If the requestPath is null, then we are at the top level, or "/" as it were.
             requestPath = "/";
-
         }
-        Pattern pathFunctionSyntaxPattern = Pattern.compile(pathFunctionSyntaxRegEx, Pattern.CASE_INSENSITIVE);
         Matcher pathFunctionMatcher = pathFunctionSyntaxPattern.matcher(requestPath);
 
         boolean foundFunctionSyntax = false;

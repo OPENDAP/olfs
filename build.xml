@@ -437,6 +437,7 @@
             <test name="opendap.auth.UrsIdPTest"/>
             <test name="opendap.bes.dap4Responders.Dap4ResponderTest"/>
             <test name="opendap.coreServlet.RequestIdTest"/>
+            <test name="opendap.http.RejectMatrixParametersFilterTest"/>
 
         </junit>
     </target>
@@ -462,8 +463,6 @@
                 <!-- include all the java files -->
                 <include name="com/**"/>
                 <include name="opendap/**"/>
-                <include name="org/opendap/**"/>
-
             </fileset>
         </copy>
 
@@ -711,8 +710,9 @@
 
             <lib refid="hyrax-libs" />
 
-            <classes dir="${build.classes}"/>
-
+            <classes dir="${build.classes}">
+                <exclude name="**/*Test*.class"/>
+            </classes>
 
             <zipfileset dir="${build.hyrax.resources}" prefix="">
                 <include name="**/*"/>
@@ -751,7 +751,9 @@
 
             <lib refid="hyrax-libs" />
 
-            <classes dir="${build.classes}"/>
+            <classes dir="${build.classes}">
+                <exclude name="**/*Test*.class"/>
+            </classes>
 
             <zipfileset dir="${build.hyrax.resources}" prefix="">
                 <include name="WEB-INF/conf/olfs.xml"/>
@@ -892,7 +894,9 @@
 
             <lib dir="${build.ngap.resources}/lib"/>
 
-            <classes dir="${build.classes}"/>
+            <classes dir="${build.classes}">
+                <exclude name="**/*Test*.class"/>
+            </classes>
 
             <zipfileset dir="${build.hyrax.resources}" prefix="">
                 <include name="**/*"/>
