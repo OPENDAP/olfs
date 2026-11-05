@@ -512,10 +512,12 @@ public class IdFilter implements Filter {
             ServletLogUtil.logServerAccessEnd(200,logName);
         }
         catch (Exception e) {
-            log.error("ERROR! Caught '{}', Message: '{}'", e.getClass().getName(), e.getMessage());
+            String errorMessage = "ERROR! Caught '"+e.getClass().getName()+"', Message: '"+ e.getMessage()+"'";
+            log.error(errorMessage);
             HttpServletResponse httpResponse = (HttpServletResponse)response;
             if (!httpResponse.isCommitted()) {
                 try {
+                    OPeNDAPException.setCachedErrorMessage(errorMessage);
                     httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
                 }
                 catch (IOException | IllegalStateException e2) {

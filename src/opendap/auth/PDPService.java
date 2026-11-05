@@ -248,8 +248,10 @@ public class PDPService extends HttpServlet {
 
         if (REQUIRE_SECURE_TRANSPORT.get()) {
             if (!req.isSecure()) {
-                LOG.error("service() - Connection is NOT secure. Protocol: {}", req.getProtocol());
-                resp.sendError(403);
+                String errorMessage = "ERROR - Connection is NOT secure. Protocol: "+req.getProtocol();
+                LOG.error(errorMessage);
+                OPeNDAPException.setCachedErrorMessage(errorMessage);
+                resp.sendError(HttpServletResponse.SC_FORBIDDEN);
             } else {
                 LOG.debug("service() - Connection is secure. Protocol: {}", req.getProtocol());
             }
