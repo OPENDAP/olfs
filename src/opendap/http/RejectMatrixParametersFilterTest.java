@@ -256,7 +256,7 @@ public class RejectMatrixParametersFilterTest {
         public Object getAttribute(String name) { return null; }
         public java.util.Enumeration<String> getAttributeNames() { return null; }
         public String getCharacterEncoding() { return null; }
-        public void setCharacterEncoding(String env) {}
+        public void setCharacterEncoding(String env) { /* Not used in this test harness */ }
         public int getContentLength() { return 0; }
         public long getContentLengthLong() { return 0; }
         public String getContentType() { return null; }
@@ -272,8 +272,8 @@ public class RejectMatrixParametersFilterTest {
         public java.io.BufferedReader getReader() { return null; }
         public String getRemoteAddr() { return null; }
         public String getRemoteHost() { return null; }
-        public void setAttribute(String name, Object o) {}
-        public void removeAttribute(String name) {}
+        public void setAttribute(String name, Object o) { /* Not used in this test harness */ }
+        public void removeAttribute(String name) { /* Not used in this test harness */ }
         public java.util.Locale getLocale() { return null; }
         public java.util.Enumeration<java.util.Locale> getLocales() { return null; }
         public boolean isSecure() { return false; }
@@ -297,17 +297,17 @@ public class RejectMatrixParametersFilterTest {
         public String getContentType() { return null; }
         public ServletOutputStream getOutputStream() { return null; }
         public java.io.PrintWriter getWriter() { return null; }
-        public void setCharacterEncoding(String charset) {}
-        public void setContentLength(int len) {}
-        public void setContentLengthLong(long len) {}
-        public void setContentType(String type) {}
-        public void setBufferSize(int size) {}
+        public void setCharacterEncoding(String charset) { /* Not used in this test harness */ }
+        public void setContentLength(int len) { /* Not used in this test harness */ }
+        public void setContentLengthLong(long len) { /* Not used in this test harness */ }
+        public void setContentType(String type) {} /* Not used in this test harness */
+        public void setBufferSize(int size) { /* Not used in this test harness */ }
         public int getBufferSize() { return 0; }
-        public void flushBuffer() {}
-        public void resetBuffer() {}
+        public void flushBuffer() { /* Not used in this test harness */ }
+        public void resetBuffer() { /* Not used in this test harness */ }
         public boolean isCommitted() { return false; }
-        public void reset() {}
-        public void setLocale(java.util.Locale loc) {}
+        public void reset() { /* Not used in this test harness */ }
+        public void setLocale(java.util.Locale loc) { /* Not used in this test harness */ }
         public java.util.Locale getLocale() { return null; }
     }
 }
