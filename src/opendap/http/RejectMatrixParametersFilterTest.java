@@ -300,7 +300,7 @@ public class RejectMatrixParametersFilterTest {
         public void setCharacterEncoding(String charset) { /* Not used in this test harness */ }
         public void setContentLength(int len) { /* Not used in this test harness */ }
         public void setContentLengthLong(long len) { /* Not used in this test harness */ }
-        public void setContentType(String type) {} /* Not used in this test harness */
+        public void setContentType(String type) { /* Not used in this test harness */ }
         public void setBufferSize(int size) { /* Not used in this test harness */ }
         public int getBufferSize() { return 0; }
         public void flushBuffer() { /* Not used in this test harness */ }
