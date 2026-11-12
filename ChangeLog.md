@@ -1,5 +1,333 @@
 ##
 ## -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+## olfs-1.19.1 for (hyrax-1.18.1) November 12, 2026
+##
+
+2026-11-12  ndp  <ndp@opendap.org>
+	
+	Rename ChangeLog to ChangeLog.md
+	
+2026-11-12  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.1-0 
+2026-11-10T23:30:27+0000\nbes-3.22.1-0 2026-11-12T22:37:09+0000
+	
+2026-11-11  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.1-0 
+2026-11-10T23:30:27+0000\nbes-3.22.0-199 2026-11-11T14:47:30+0000
+	
+2026-11-10  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.1-0 
+2026-11-10T23:30:27+0000\nbes-3.22.0-197 2026-11-11T00:23:16+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-32 
+2026-11-04T17:17:05+0000\nbes-3.22.0-193 2026-11-10T22:37:40+0000
+	
+2026-11-09  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-32 
+2026-11-04T17:17:05+0000\nbes-3.22.0-186 2026-11-09T22:13:44+0000
+	
+2026-11-05  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-32 
+2026-11-04T17:17:05+0000\nbes-3.22.0-183 2026-11-05T20:53:19+0000
+	
+2026-11-05  Nathan Potter  <ndp@opendap.org>
+	
+	Reject HTTP Matrix Parameters  (#324)
+	* Added a filter to block requests that use HTTP matrix 
+	parameters.
+	* Cleaned up some sendError() stuff.
+	* Stop bundling test classes in the WAR files.
+	* Added a unit test class for the matrix parameter filter
+	
+2026-11-04  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-32 
+2026-11-04T17:17:05+0000\nbes-3.22.0-181 2026-11-04T18:05:31+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-31 
+2026-10-29T21:44:19+0000\nbes-3.22.0-179 2026-11-04T13:00:45+0000
+	
+2026-11-02  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-31 
+2026-10-29T21:44:19+0000\nbes-3.22.0-178 2026-11-03T06:14:08+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-31 
+2026-10-29T21:44:19+0000\nbes-3.22.0-173 2026-11-02T18:16:08+0000
+	
+2026-10-30  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-31 
+2026-10-29T21:44:19+0000\nbes-3.22.0-172 2026-10-30T23:07:01+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-31 
+2026-10-29T21:44:19+0000\nbes-3.22.0-169 2026-10-30T16:50:31+0000
+	
+2026-10-29  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-31 
+2026-10-29T21:44:19+0000\nbes-3.22.0-166 2026-10-29T22:28:32+0000
+	
+2026-10-28  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-30 
+2026-10-27T22:18:54+0000\nbes-3.22.0-161 2026-10-28T21:53:34+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-30 
+2026-10-27T22:18:54+0000\nbes-3.22.0-160 2026-10-28T20:38:57+0000
+	
+2026-10-28  Nathan Potter  <ndp@opendap.org>
+	
+	Patch for the get uid from token problem (#323)
+	* This adds the EDL Client Application Id to the request 
+	headers when asking for a token verification. While optional for an 
+	OAuth token it is required for a user token.
+	Also cleans up the logic so that missing UrsClientAppPublicKeys 
+	logs an error.
+	
+2026-10-27  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-30 
+2026-10-27T22:18:54+0000\nbes-3.22.0-159 2026-10-27T23:05:47+0000
+	
+	Trigger builds
+	
+2026-10-26  Nathan Potter  <ndp@opendap.org>
+	
+	Uncaught io exceptions (#322)
+	* Added general exception handling to auth/IdFilter.doFilter()
+	* By default it simply logs the error and tries to send a 403 
+	back to the user.
+	* A configuration change can be used to instruct it to throw 
+	the caught exceptions.
+	
+2026-10-23  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-16 
+2026-10-22T20:47:30+0000\nbes-3.22.0-147 2026-10-23T12:45:54+0000
+	
+2026-10-22  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-16 
+2026-10-22T20:47:30+0000\nbes-3.22.0-146 2026-10-22T21:42:33+0000
+	
+2026-10-20  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-7 
+2026-08-21T16:44:17+0000\nbes-3.22.0-142 2026-10-20T22:35:43+0000
+	
+2026-10-15  Nathan Potter  <ndp@opendap.org>
+	
+	Correct a problem in BES.getClient() which may cause the client 
+	semaphore list to drain abnormally (#320)
+	
+2026-10-14  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-7 
+2026-08-21T16:44:17+0000\nbes-3.22.0-137 2026-10-14T21:32:22+0000
+	
+2026-10-13  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-7 
+2026-08-21T16:44:17+0000\nbes-3.22.0-135 2026-10-13T21:23:48+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-7 
+2026-08-21T16:44:17+0000\nbes-3.22.0-132 2026-10-13T18:36:13+0000
+	
+2026-10-07  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-7 
+2026-08-21T16:44:17+0000\nbes-3.22.0-124 2026-10-07T20:53:50+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-7 
+2026-08-21T16:44:17+0000\nbes-3.22.0-122 2026-10-07T13:57:30+0000
+	
+2026-10-06  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-7 
+2026-08-21T16:44:17+0000\nbes-3.22.0-120 2026-10-06T23:07:42+0000
+	
+2026-09-28  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-7 
+2026-08-21T16:44:17+0000\nbes-3.22.0-103 2026-09-28T19:53:02+0000
+	
+2026-09-09  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-7 
+2026-08-21T16:44:17+0000\nbes-3.22.0-83 2026-09-09T18:03:39+0000
+	
+2026-09-08  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-7 
+2026-08-21T16:44:17+0000\nbes-3.22.0-80 2026-09-08T23:03:01+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-7 
+2026-08-21T16:44:17+0000\nbes-3.22.0-78 2026-09-08T20:09:22+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-7 
+2026-08-21T16:44:17+0000\nbes-3.22.0-77 2026-09-08T15:04:13+0000
+	
+2026-09-04  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-7 
+2026-08-21T16:44:17+0000\nbes-3.22.0-72 2026-09-04T22:56:04+0000
+	
+2026-09-03  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-7 
+2026-08-21T16:44:17+0000\nbes-3.22.0-66 2026-09-03T19:05:16+0000
+	
+2026-09-02  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-5 
+2026-08-18T15:43:24+0000\nbes-3.22.0-64 2026-09-02T21:06:37+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-7 
+2026-08-21T16:44:17+0000\nbes-3.22.0-63 2026-09-02T20:00:29+0000
+	
+2026-08-31  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-5 
+2026-08-18T15:43:24+0000\nbes-3.22.0-52 2026-08-31T22:50:25+0000
+	
+2026-08-26  ndp-opendap  <ndp@opendap.org>
+	
+	Rewinding BES from test-deploy versions in order to produce new 
+	dockers with updated tomcat
+	
+2026-08-24  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-5 
+2026-08-18T15:43:24+0000\nbes-3.22.0-47 2026-08-24T20:39:09+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-5 
+2026-08-18T15:43:24+0000\nbes-3.22.0-41 2026-08-24T13:45:59+0000
+	
+2026-08-19  Nathan Potter  <ndp@opendap.org>
+	
+	Retire the aggregation service. (#319)
+	
+2026-08-19  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-5 
+2026-08-18T15:43:24+0000\nbes-3.22.0-38 2026-08-19T22:11:20+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-5 
+2026-08-18T15:43:24+0000\nbes-3.22.0-37 2026-08-19T20:41:09+0000
+	
+2026-08-18  Nathan Potter  <ndp@opendap.org>
+	
+	Retire ncWMS integration (#317)
+	
+2026-08-11  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-4 
+2026-07-30T21:12:20+0000\nbes-3.22.0-29 2026-08-11T22:11:15+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-4 
+2026-07-30T21:12:20+0000\nbes-3.22.0-27 2026-08-11T19:36:02+0000
+	
+2026-08-06  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-4 
+2026-07-30T21:12:20+0000\nbes-3.22.0-23 2026-08-06T22:00:12+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-4 
+2026-07-30T21:12:20+0000\nbes-3.22.0-18 2026-08-06T19:49:12+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-4 
+2026-07-30T21:12:20+0000\nbes-3.22.0-17 2026-08-06T19:25:43+0000
+	
+2026-08-04  Nathan Potter  <ndp@opendap.org>
+	
+	Update badges in README.md (#314)
+	
+2026-07-30  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-4 
+2026-07-30T21:12:20+0000\nbes-3.22.0-5 2026-07-30T22:20:19+0000
+	
+2026-07-29  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-2 
+2026-07-29T21:20:36+0000\nbes-3.22.0-2 2026-07-30T02:01:16+0000
+	
+2026-07-24  Miguel Jimenez  <mjimenez@opendap.org>
+	    ndp-opendap  <ndp@opendap.org>
+	
+	Release PR for olfs-1.19.0 (#312)
+	* initial commit to release new version
+	* Moved NEWS to NEWS.md
+	* Update NEW with CVE
+	* update build offset numbers
+	* Numbers!
+	---------
+	
+2026-07-24  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-0 
+2026-07-23T21:46:16+0000\nbes-3.22.0-0 2026-07-24T17:57:41+0000
+	
+2026-07-23  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-0 
+2026-07-23T21:46:16+0000\nbes-3.21.1-1914 2026-07-23T22:45:42+0000
+##
+## -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 ## olfs-1.19.0
 ## hyrax-1.18.0
 ##
