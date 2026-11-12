@@ -10,36 +10,35 @@
 2026-11-12  The-Robot-Travis  <npotter@opendap.org>
 	
 	bes: Triggering OLFS build for snapshot production.\nBuild 
-	Version Matrix:\nlibdap4-3.22.1-0 
-2026-11-10T23:30:27+0000\nbes-3.22.1-0 2026-11-12T22:37:09+0000
+	Version Matrix:\nlibdap4-3.22.1-02026-11-10T23:30:27+0000\nbes-3.22.1-0 2026-11-12T22:37:09+0000
 	
 2026-11-11  The-Robot-Travis  <npotter@opendap.org>
 	
 	bes: Triggering OLFS build for snapshot production.\nBuild 
 	Version Matrix:\nlibdap4-3.22.1-0 
-2026-11-10T23:30:27+0000\nbes-3.22.0-199 2026-11-11T14:47:30+0000
+    2026-11-10T23:30:27+0000\nbes-3.22.0-199 2026-11-11T14:47:30+0000
 	
 2026-11-10  The-Robot-Travis  <npotter@opendap.org>
 	
 	bes: Triggering OLFS build for snapshot production.\nBuild 
 	Version Matrix:\nlibdap4-3.22.1-0 
-2026-11-10T23:30:27+0000\nbes-3.22.0-197 2026-11-11T00:23:16+0000
+    2026-11-10T23:30:27+0000\nbes-3.22.0-197 2026-11-11T00:23:16+0000
 	
 	bes: Triggering OLFS build for snapshot production.\nBuild 
 	Version Matrix:\nlibdap4-3.22.0-32 
-2026-11-04T17:17:05+0000\nbes-3.22.0-193 2026-11-10T22:37:40+0000
+    2026-11-04T17:17:05+0000\nbes-3.22.0-193 2026-11-10T22:37:40+0000
 	
 2026-11-09  The-Robot-Travis  <npotter@opendap.org>
 	
 	bes: Triggering OLFS build for snapshot production.\nBuild 
 	Version Matrix:\nlibdap4-3.22.0-32 
-2026-11-04T17:17:05+0000\nbes-3.22.0-186 2026-11-09T22:13:44+0000
+    2026-11-04T17:17:05+0000\nbes-3.22.0-186 2026-11-09T22:13:44+0000
 	
 2026-11-05  The-Robot-Travis  <npotter@opendap.org>
 	
 	bes: Triggering OLFS build for snapshot production.\nBuild 
 	Version Matrix:\nlibdap4-3.22.0-32 
-2026-11-04T17:17:05+0000\nbes-3.22.0-183 2026-11-05T20:53:19+0000
+    2026-11-04T17:17:05+0000\nbes-3.22.0-183 2026-11-05T20:53:19+0000
 	
 2026-11-05  Nathan Potter  <ndp@opendap.org>
 	
@@ -54,31 +53,31 @@
 	
 	bes: Triggering OLFS build for snapshot production.\nBuild 
 	Version Matrix:\nlibdap4-3.22.0-32 
-2026-11-04T17:17:05+0000\nbes-3.22.0-181 2026-11-04T18:05:31+0000
+    2026-11-04T17:17:05+0000\nbes-3.22.0-181 2026-11-04T18:05:31+0000
 	
 	bes: Triggering OLFS build for snapshot production.\nBuild 
 	Version Matrix:\nlibdap4-3.22.0-31 
-2026-10-29T21:44:19+0000\nbes-3.22.0-179 2026-11-04T13:00:45+0000
+    2026-10-29T21:44:19+0000\nbes-3.22.0-179 2026-11-04T13:00:45+0000
 	
 2026-11-02  The-Robot-Travis  <npotter@opendap.org>
 	
 	bes: Triggering OLFS build for snapshot production.\nBuild 
 	Version Matrix:\nlibdap4-3.22.0-31 
-2026-10-29T21:44:19+0000\nbes-3.22.0-178 2026-11-03T06:14:08+0000
+    2026-10-29T21:44:19+0000\nbes-3.22.0-178 2026-11-03T06:14:08+0000
 	
 	bes: Triggering OLFS build for snapshot production.\nBuild 
 	Version Matrix:\nlibdap4-3.22.0-31 
-2026-10-29T21:44:19+0000\nbes-3.22.0-173 2026-11-02T18:16:08+0000
+    2026-10-29T21:44:19+0000\nbes-3.22.0-173 2026-11-02T18:16:08+0000
 	
 2026-10-30  The-Robot-Travis  <npotter@opendap.org>
 	
 	bes: Triggering OLFS build for snapshot production.\nBuild 
 	Version Matrix:\nlibdap4-3.22.0-31 
-2026-10-29T21:44:19+0000\nbes-3.22.0-172 2026-10-30T23:07:01+0000
+    2026-10-29T21:44:19+0000\nbes-3.22.0-172 2026-10-30T23:07:01+0000
 	
 	bes: Triggering OLFS build for snapshot production.\nBuild 
 	Version Matrix:\nlibdap4-3.22.0-31 
-2026-10-29T21:44:19+0000\nbes-3.22.0-169 2026-10-30T16:50:31+0000
+    2026-10-29T21:44:19+0000\nbes-3.22.0-169 2026-10-30T16:50:31+0000
 	
 2026-10-29  The-Robot-Travis  <npotter@opendap.org>
 	

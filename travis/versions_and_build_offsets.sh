@@ -14,12 +14,12 @@ function loggy() {
 loggy "BEGIN $HR"
 
 # This is the offical OLFS version, sans build number.
-export OLFS_VERSION="1.19.0"
+export OLFS_VERSION="1.19.1"
 loggy "            OLFS_VERSION: ${OLFS_VERSION}" >&2
 
 # This is the TravisCI build number when the
 # last formal release was built.
-export TRAVIS_OLFS_BUILD_OFFSET=3256
+export TRAVIS_OLFS_BUILD_OFFSET=4063
 
 loggy "TRAVIS_OLFS_BUILD_OFFSET: ${TRAVIS_OLFS_BUILD_OFFSET}" >&2
 

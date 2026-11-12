@@ -1,5 +1,16 @@
 
 --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- 
+# OLFS Version 1.19.1 for hyrax-1.18.1 November 12,2026
+
+- **Security** Updated so that requests that attempt to use the unsupported 
+  HTTP matrix parameters are denied.
+- Updated EDL activities to support changes in the EDL web API.
+- Patched IdFilter so that all excpetions are correctly handled and not 
+  passed out to the Tomcat container.
+- Retired the aggregation service.
+- Retired the ncWMS service integration.
+
+--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- 
 # OLFS Version 1.19.0 (24 July 2026)
 
 - **Security**: This release includes changes that resolve **_CVE-2026-16637_**
