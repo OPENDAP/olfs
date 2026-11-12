@@ -1,0 +1,15748 @@
+##
+## -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+## olfs-1.19.1 for (hyrax-1.18.1) November 12, 2026
+##
+
+2026-11-12  ndp  <ndp@opendap.org>
+	
+	Rename ChangeLog to ChangeLog.md
+	
+2026-11-12  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.1-02026-11-10T23:30:27+0000\nbes-3.22.1-0 2026-11-12T22:37:09+0000
+	
+2026-11-11  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.1-0 
+    2026-11-10T23:30:27+0000\nbes-3.22.0-199 2026-11-11T14:47:30+0000
+	
+2026-11-10  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.1-0 
+    2026-11-10T23:30:27+0000\nbes-3.22.0-197 2026-11-11T00:23:16+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-32 
+    2026-11-04T17:17:05+0000\nbes-3.22.0-193 2026-11-10T22:37:40+0000
+	
+2026-11-09  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-32 
+    2026-11-04T17:17:05+0000\nbes-3.22.0-186 2026-11-09T22:13:44+0000
+	
+2026-11-05  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-32 
+    2026-11-04T17:17:05+0000\nbes-3.22.0-183 2026-11-05T20:53:19+0000
+	
+2026-11-05  Nathan Potter  <ndp@opendap.org>
+	
+	Reject HTTP Matrix Parameters  (#324)
+	* Added a filter to block requests that use HTTP matrix 
+	parameters.
+	* Cleaned up some sendError() stuff.
+	* Stop bundling test classes in the WAR files.
+	* Added a unit test class for the matrix parameter filter
+	
+2026-11-04  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-32 
+    2026-11-04T17:17:05+0000\nbes-3.22.0-181 2026-11-04T18:05:31+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-31 
+    2026-10-29T21:44:19+0000\nbes-3.22.0-179 2026-11-04T13:00:45+0000
+	
+2026-11-02  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-31 
+    2026-10-29T21:44:19+0000\nbes-3.22.0-178 2026-11-03T06:14:08+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-31 
+    2026-10-29T21:44:19+0000\nbes-3.22.0-173 2026-11-02T18:16:08+0000
+	
+2026-10-30  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-31 
+    2026-10-29T21:44:19+0000\nbes-3.22.0-172 2026-10-30T23:07:01+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-31 
+    2026-10-29T21:44:19+0000\nbes-3.22.0-169 2026-10-30T16:50:31+0000
+	
+2026-10-29  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-31 
+2026-10-29T21:44:19+0000\nbes-3.22.0-166 2026-10-29T22:28:32+0000
+	
+2026-10-28  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-30 
+2026-10-27T22:18:54+0000\nbes-3.22.0-161 2026-10-28T21:53:34+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-30 
+2026-10-27T22:18:54+0000\nbes-3.22.0-160 2026-10-28T20:38:57+0000
+	
+2026-10-28  Nathan Potter  <ndp@opendap.org>
+	
+	Patch for the get uid from token problem (#323)
+	* This adds the EDL Client Application Id to the request 
+	headers when asking for a token verification. While optional for an 
+	OAuth token it is required for a user token.
+	Also cleans up the logic so that missing UrsClientAppPublicKeys 
+	logs an error.
+	
+2026-10-27  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-30 
+2026-10-27T22:18:54+0000\nbes-3.22.0-159 2026-10-27T23:05:47+0000
+	
+	Trigger builds
+	
+2026-10-26  Nathan Potter  <ndp@opendap.org>
+	
+	Uncaught io exceptions (#322)
+	* Added general exception handling to auth/IdFilter.doFilter()
+	* By default it simply logs the error and tries to send a 403 
+	back to the user.
+	* A configuration change can be used to instruct it to throw 
+	the caught exceptions.
+	
+2026-10-23  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-16 
+2026-10-22T20:47:30+0000\nbes-3.22.0-147 2026-10-23T12:45:54+0000
+	
+2026-10-22  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-16 
+2026-10-22T20:47:30+0000\nbes-3.22.0-146 2026-10-22T21:42:33+0000
+	
+2026-10-20  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-7 
+2026-08-21T16:44:17+0000\nbes-3.22.0-142 2026-10-20T22:35:43+0000
+	
+2026-10-15  Nathan Potter  <ndp@opendap.org>
+	
+	Correct a problem in BES.getClient() which may cause the client 
+	semaphore list to drain abnormally (#320)
+	
+2026-10-14  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-7 
+2026-08-21T16:44:17+0000\nbes-3.22.0-137 2026-10-14T21:32:22+0000
+	
+2026-10-13  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-7 
+2026-08-21T16:44:17+0000\nbes-3.22.0-135 2026-10-13T21:23:48+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-7 
+2026-08-21T16:44:17+0000\nbes-3.22.0-132 2026-10-13T18:36:13+0000
+	
+2026-10-07  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-7 
+2026-08-21T16:44:17+0000\nbes-3.22.0-124 2026-10-07T20:53:50+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-7 
+2026-08-21T16:44:17+0000\nbes-3.22.0-122 2026-10-07T13:57:30+0000
+	
+2026-10-06  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-7 
+2026-08-21T16:44:17+0000\nbes-3.22.0-120 2026-10-06T23:07:42+0000
+	
+2026-09-28  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-7 
+2026-08-21T16:44:17+0000\nbes-3.22.0-103 2026-09-28T19:53:02+0000
+	
+2026-09-09  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-7 
+2026-08-21T16:44:17+0000\nbes-3.22.0-83 2026-09-09T18:03:39+0000
+	
+2026-09-08  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-7 
+2026-08-21T16:44:17+0000\nbes-3.22.0-80 2026-09-08T23:03:01+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-7 
+2026-08-21T16:44:17+0000\nbes-3.22.0-78 2026-09-08T20:09:22+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-7 
+2026-08-21T16:44:17+0000\nbes-3.22.0-77 2026-09-08T15:04:13+0000
+	
+2026-09-04  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-7 
+2026-08-21T16:44:17+0000\nbes-3.22.0-72 2026-09-04T22:56:04+0000
+	
+2026-09-03  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-7 
+2026-08-21T16:44:17+0000\nbes-3.22.0-66 2026-09-03T19:05:16+0000
+	
+2026-09-02  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-5 
+2026-08-18T15:43:24+0000\nbes-3.22.0-64 2026-09-02T21:06:37+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-7 
+2026-08-21T16:44:17+0000\nbes-3.22.0-63 2026-09-02T20:00:29+0000
+	
+2026-08-31  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-5 
+2026-08-18T15:43:24+0000\nbes-3.22.0-52 2026-08-31T22:50:25+0000
+	
+2026-08-26  ndp-opendap  <ndp@opendap.org>
+	
+	Rewinding BES from test-deploy versions in order to produce new 
+	dockers with updated tomcat
+	
+2026-08-24  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-5 
+2026-08-18T15:43:24+0000\nbes-3.22.0-47 2026-08-24T20:39:09+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-5 
+2026-08-18T15:43:24+0000\nbes-3.22.0-41 2026-08-24T13:45:59+0000
+	
+2026-08-19  Nathan Potter  <ndp@opendap.org>
+	
+	Retire the aggregation service. (#319)
+	
+2026-08-19  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-5 
+2026-08-18T15:43:24+0000\nbes-3.22.0-38 2026-08-19T22:11:20+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-5 
+2026-08-18T15:43:24+0000\nbes-3.22.0-37 2026-08-19T20:41:09+0000
+	
+2026-08-18  Nathan Potter  <ndp@opendap.org>
+	
+	Retire ncWMS integration (#317)
+	
+2026-08-11  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-4 
+2026-07-30T21:12:20+0000\nbes-3.22.0-29 2026-08-11T22:11:15+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-4 
+2026-07-30T21:12:20+0000\nbes-3.22.0-27 2026-08-11T19:36:02+0000
+	
+2026-08-06  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-4 
+2026-07-30T21:12:20+0000\nbes-3.22.0-23 2026-08-06T22:00:12+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-4 
+2026-07-30T21:12:20+0000\nbes-3.22.0-18 2026-08-06T19:49:12+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-4 
+2026-07-30T21:12:20+0000\nbes-3.22.0-17 2026-08-06T19:25:43+0000
+	
+2026-08-04  Nathan Potter  <ndp@opendap.org>
+	
+	Update badges in README.md (#314)
+	
+2026-07-30  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-4 
+2026-07-30T21:12:20+0000\nbes-3.22.0-5 2026-07-30T22:20:19+0000
+	
+2026-07-29  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-2 
+2026-07-29T21:20:36+0000\nbes-3.22.0-2 2026-07-30T02:01:16+0000
+	
+2026-07-24  Miguel Jimenez  <mjimenez@opendap.org>
+	    ndp-opendap  <ndp@opendap.org>
+	
+	Release PR for olfs-1.19.0 (#312)
+	* initial commit to release new version
+	* Moved NEWS to NEWS.md
+	* Update NEW with CVE
+	* update build offset numbers
+	* Numbers!
+	---------
+	
+2026-07-24  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-0 
+2026-07-23T21:46:16+0000\nbes-3.22.0-0 2026-07-24T17:57:41+0000
+	
+2026-07-23  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.22.0-0 
+2026-07-23T21:46:16+0000\nbes-3.21.1-1914 2026-07-23T22:45:42+0000
+##
+## -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+## olfs-1.19.0
+## hyrax-1.18.0
+##
+
+2026-07-20  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.
+	Build Version Matrix:
+	libdap4-3.21.1-499 
+2026-07-20T19:46:59+0000\nbes-3.21.1-1884 2026-07-20T20:42:46+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-496 
+2026-07-20T11:07:06+0000\nbes-3.21.1-1883 2026-07-20T11:58:06+0000
+	
+2026-07-17  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-492 
+2026-07-17T16:14:33+0000\nbes-3.21.1-1882 2026-07-17T17:06:39+0000
+	
+2026-07-14  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-481 
+2026-06-04T16:29:45+0000\nbes-3.21.1-1877 2026-07-14T20:39:39+0000
+	
+2026-07-09  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-481 
+2026-06-04T16:29:45+0000\nbes-3.21.1-1793 2026-07-09T12:19:48+0000
+	
+2026-07-08  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-481 
+2026-06-04T16:29:45+0000\nbes-3.21.1-1757 2026-07-08T18:34:24+0000
+	
+2026-07-07  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-481 
+2026-06-04T16:29:45+0000\nbes-3.21.1-1721 2026-07-07T22:24:23+0000
+	
+2026-07-02  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-481 
+2026-06-04T16:29:45+0000\nbes-3.21.1-1705 2026-07-02T18:21:34+0000
+	
+2026-07-01  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-481 
+2026-06-04T16:29:45+0000\nbes-3.21.1-1689 2026-07-01T18:39:10+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-481 
+2026-06-04T16:29:45+0000\nbes-3.21.1-1685 2026-07-01T15:26:29+0000
+	
+2026-06-30  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-481 
+2026-06-04T16:29:45+0000\nbes-3.21.1-1683 2026-06-30T22:39:36+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-481 
+2026-06-04T16:29:45+0000\nbes-3.21.1-1679 2026-06-30T17:11:57+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-481 
+2026-06-04T16:29:45+0000\nbes-3.21.1-1678 2026-06-30T14:57:29+0000
+	
+2026-06-29  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-481 
+2026-06-04T16:29:45+0000\nbes-3.21.1-1671 2026-06-29T16:02:34+0000
+	
+2026-06-26  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-481 
+2026-06-04T16:29:45+0000\nbes-3.21.1-1663 2026-06-26T17:02:34+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-481 
+2026-06-04T16:29:45+0000\nbes-3.21.1-1660 2026-06-26T09:38:52+0000
+	
+2026-06-25  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-481 
+2026-06-04T16:29:45+0000\nbes-3.21.1-1658 2026-06-26T03:30:06+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-481 
+2026-06-04T16:29:45+0000\nbes-3.21.1-1649 2026-06-25T16:03:19+0000
+	
+2026-06-24  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-481 
+2026-06-04T16:29:45+0000\nbes-3.21.1-1640 2026-06-24T17:42:56+0000
+	
+2026-06-22  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-481 
+2026-06-04T16:29:45+0000\nbes-3.21.1-1624 2026-06-22T20:48:55+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-481 
+2026-06-04T16:29:45+0000\nbes-3.21.1-1609 2026-06-22T15:36:46+0000
+	
+2026-06-15  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-481 
+2026-06-04T16:29:45+0000\nbes-3.21.1-1586 2026-06-15T16:28:30+0000
+	
+2026-06-15  Nathan Potter  <ndp@opendap.org>
+	
+	Retired the cloudwatch-logback-appender jar file (#304)
+	* Retired the cloudwatch-logback-appender jar file
+	
+2026-06-12  Nathan Potter  <ndp@opendap.org>
+	
+	Retire gateway (#308)
+	* Retired Hyrax Gateway WebUI and API
+	
+2026-06-11  Nathan Potter  <ndp@opendap.org>
+	
+	Dropped echo-token comments (#306)
+	
+2026-06-11  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-481 
+2026-06-04T16:29:45+0000\nbes-3.21.1-1583 2026-06-11T17:44:00+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-481 
+2026-06-04T16:29:45+0000\nbes-3.21.1-1582 2026-06-11T15:41:02+0000
+	
+2026-06-10  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-481 
+2026-06-04T16:29:45+0000\nbes-3.21.1-1576 2026-06-10T17:06:14+0000
+	
+2026-06-08  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-481 
+2026-06-04T16:29:45+0000\nbes-3.21.1-1561 2026-06-08T21:11:55+0000
+	
+2026-06-04  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-481 
+2026-06-04T16:29:45+0000\nbes-3.21.1-1557 2026-06-04T21:11:37+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-481 
+2026-06-04T16:29:45+0000\nbes-3.21.1-1555 2026-06-04T17:18:00+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-480 2026-06-03T18:52:36+0000 
+	test-deploy\nbes-3.21.1-1553 2026-06-04T15:51:42+0000
+	
+2026-06-03  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-480 2026-06-03T18:52:36+0000 
+	test-deploy\nbes-3.21.1-1540 2026-06-03T19:44:57+0000
+	
+2026-06-02  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-478 
+2026-06-01T22:05:22+0000\nbes-3.21.1-1536 2026-06-03T03:36:45+0000
+	
+2026-06-01  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-478 
+2026-06-01T22:05:22+0000\nbes-3.21.1-1532 2026-06-01T22:52:23+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-474 
+2026-05-19T04:59:56+0000\nbes-3.21.1-1530 2026-06-01T21:23:53+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-474 
+2026-05-19T04:59:56+0000\nbes-3.21.1-1528 2026-06-01T20:03:31+0000
+	
+2026-05-29  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-474 
+2026-05-19T04:59:56+0000\nbes-3.21.1-1525 2026-05-29T18:22:49+0000
+	
+2026-05-27  Nathan Potter  <ndp@opendap.org>
+	
+	Dap4 package purge (#287)
+	* Removing unneeded cruft from older WCS work.
+	* Updating build.gradle
+	* Clean up commented out production rules.
+	
+2026-05-27  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-474 
+2026-05-19T04:59:56+0000\nbes-3.21.1-1518 2026-05-27T19:45:10+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-474 
+2026-05-19T04:59:56+0000\nbes-3.21.1-1517 2026-05-27T16:42:19+0000
+	
+2026-05-26  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-474 
+2026-05-19T04:59:56+0000\nbes-3.21.1-1509 2026-05-26T11:34:31+0000
+	
+2026-05-21  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-474 
+2026-05-19T04:59:56+0000\nbes-3.21.1-1508 2026-05-21T22:05:37+0000
+	
+2026-05-21  Nathan Potter  <ndp@opendap.org>
+	
+	Fixing RequestCache init issues in the hyrax jsp pages. (#303)
+	* Fixing RequestCache init issues in the jsp opages.
+	* Add newline to the end of jsp files.
+	
+2026-05-21  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-474 
+2026-05-19T04:59:56+0000\nbes-3.21.1-1507 2026-05-21T18:10:34+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-474 
+2026-05-19T04:59:56+0000\nbes-3.21.1-1506 2026-05-21T16:11:50+0000
+	
+2026-05-20  Nathan Potter  <ndp@opendap.org>
+	
+	Init for the RequestCache in robots.jsp (#302)
+	
+2026-05-20  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-474 
+2026-05-19T04:59:56+0000\nbes-3.21.1-1501 2026-05-20T19:14:03+0000
+	
+2026-05-19  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-474 
+2026-05-19T04:59:56+0000\nbes-3.21.1-1495 2026-05-19T23:19:51+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-474 
+2026-05-19T04:59:56+0000\nbes-3.21.1-1493 2026-05-19T19:15:35+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-472 
+2026-05-14T21:48:13+0000\nbes-3.21.1-1492 2026-05-19T16:25:45+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-474 
+2026-05-19T04:59:56+0000\nbes-3.21.1-1489 2026-05-19T15:50:15+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-472 
+2026-05-14T21:48:13+0000\nbes-3.21.1-1486 2026-05-19T14:08:22+0000
+	
+2026-05-18  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-474 
+2026-05-19T04:59:56+0000\nbes-3.21.1-1483 2026-05-19T05:43:16+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-472 
+2026-05-14T21:48:13+0000\nbes-3.21.1-1474 2026-05-18T20:03:41+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-472 
+2026-05-14T21:48:13+0000\nbes-3.21.1-1472 2026-05-18T15:37:32+0000
+	
+2026-05-13  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-471 
+2026-05-08T12:05:37+0000\nbes-3.21.1-1433 2026-05-13T17:01:07+0000
+	
+2026-05-12  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-471 
+2026-05-08T12:05:37+0000\nbes-3.21.1-1430 2026-05-12T17:17:13+0000
+	
+2026-05-11  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-471 
+2026-05-08T12:05:37+0000\nbes-3.21.1-1427 2026-05-11T21:51:25+0000
+	
+2026-05-08  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-471 
+2026-05-08T12:05:37+0000\nbes-3.21.1-1422 2026-05-09T01:06:17+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-471 
+2026-05-08T12:05:37+0000\nbes-3.21.1-1419 2026-05-08T19:39:11+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-471 
+2026-05-08T12:05:37+0000\nbes-3.21.1-1418 2026-05-08T12:46:23+0000
+	
+2026-05-06  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-467 
+2026-04-21T18:21:48+0000\nbes-3.21.1-1411 2026-05-06T20:43:40+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-467 
+2026-04-21T18:21:48+0000\nbes-3.21.1-1410 2026-05-06T19:40:19+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-467 
+2026-04-21T18:21:48+0000\nbes-3.21.1-1407 2026-05-06T16:09:00+0000
+	
+2026-05-05  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-467 
+2026-04-21T18:21:48+0000\nbes-3.21.1-1400 2026-05-05T20:30:28+0000
+	
+2026-05-04  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-467 
+2026-04-21T18:21:48+0000\nbes-3.21.1-1395 2026-05-04T16:49:12+0000
+	
+2026-04-28  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-467 
+2026-04-21T18:21:48+0000\nbes-3.21.1-1383 2026-04-28T18:32:10+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-467 
+2026-04-21T18:21:48+0000\nbes-3.21.1-1382 2026-04-28T16:46:21+0000
+	
+2026-04-27  Nathan Potter  <ndp@opendap.org>
+	
+	Request cache init bug (#301)
+	* Remove HAI_DEBUG_LOGGER log appender (retired)
+	* Add error logging to RequestCache.getRequestId()
+	
+2026-04-24  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-467 
+2026-04-21T18:21:48+0000\nbes-3.21.1-1377 2026-04-24T19:31:43+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-467 
+2026-04-21T18:21:48+0000\nbes-3.21.1-1376 2026-04-24T18:49:31+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-467 
+2026-04-21T18:21:48+0000\nbes-3.21.1-1374 2026-04-24T17:38:45+0000
+	
+2026-04-23  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-467 
+2026-04-21T18:21:48+0000\nbes-3.21.1-1367 2026-04-23T19:11:22+0000
+	
+2026-04-22  Dan Holloway  <d.holloway@opendap.org>
+	    dh-opendap  <dholloway@opendap.org>
+	
+	HYRAX-2096 Replicate request-log information into response-log 
+	to facilitate troubleshooting. (#298)
+	* For NGAP, add request info to response log, collectionId & 
+	query_string added to CloudWatchResponseLogAppender pattern
+	* Mirroring CloudWatchRequestLogAppender pattern into 
+	CloudWatchResponseLogAppender
+	---------
+	
+2026-04-22  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-467 
+2026-04-21T18:21:48+0000\nbes-3.21.1-1357 2026-04-22T14:40:52+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-467 
+2026-04-21T18:21:48+0000\nbes-3.21.1-1355 2026-04-22T14:17:26+0000
+	
+2026-04-21  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-467 
+2026-04-21T18:21:48+0000\nbes-3.21.1-1354 2026-04-22T00:14:01+0000
+	
+2026-04-21  Nathan Potter  <ndp@opendap.org>
+	
+	Creates a json encoded olfs log. (#297)
+	* Adding logback Converter implementation to encode the log 
+	message as a json string.
+	* Added OLFS JsonLog appender that utilizes the 
+	LogMessageToJsonConverter to logback configuration files.
+	
+2026-04-21  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-467 
+2026-04-21T18:21:48+0000\nbes-3.21.1-1349 2026-04-21T21:49:37+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-467 
+2026-04-21T18:21:48+0000\nbes-3.21.1-1347 2026-04-21T19:42:16+0000
+	
+2026-04-21  Nathan Potter  <ndp@opendap.org>
+	
+	Retire w10n Service (#296)
+	Al thing w10n in the bin
+	
+	Add the HTTP response header "Server" to the responses (#295)
+	* Added the HTTP response header "Server" with the values like 
+	the Apache Web Server format: Hyrax/1.17.1-1356
+	
+2026-04-20  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-465 
+2026-04-20T21:17:12+0000\nbes-3.21.1-1334 2026-04-20T22:02:30+0000
+	
+2026-04-16  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-455 
+2026-04-10T18:30:27+0000\nbes-3.21.1-1323 2026-04-16T18:47:33+0000
+	
+2026-04-15  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-455 
+2026-04-10T18:30:27+0000\nbes-3.21.1-1313 2026-04-15T19:52:51+0000
+	
+2026-04-13  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-455 
+2026-04-10T18:30:27+0000\nbes-3.21.1-1311 2026-04-13T20:13:24+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-455 
+2026-04-10T18:30:27+0000\nbes-3.21.1-1307 2026-04-13T19:22:02+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-455 
+2026-04-10T18:30:27+0000\nbes-3.21.1-1299 2026-04-13T15:37:05+0000
+	
+2026-04-10  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-455 
+2026-04-10T18:30:27+0000\nbes-3.21.1-1278 2026-04-10T19:16:25+0000
+	
+2026-04-09  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-439 
+2026-04-03T16:31:01+0000\nbes-3.21.1-1272 2026-04-09T22:47:56+0000
+	
+2026-04-06  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-439 
+2026-04-03T16:31:01+0000\nbes-3.21.1-1268 2026-04-06T19:44:06+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-439 
+2026-04-03T16:31:01+0000\nbes-3.21.1-1263 2026-04-06T14:26:55+0000
+	
+2026-04-03  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-439 
+2026-04-03T16:31:01+0000\nbes-3.21.1-1261 2026-04-03T22:04:55+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-439 
+2026-04-03T16:31:01+0000\nbes-3.21.1-1256 2026-04-03T19:34:18+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-420 
+2026-03-25T00:36:16+0000\nbes-3.21.1-1250 2026-04-03T16:10:22+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-420 
+2026-03-25T00:36:16+0000\nbes-3.21.1-1251 2026-04-03T16:04:43+0000
+	
+2026-04-02  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-420 
+2026-03-25T00:36:16+0000\nbes-3.21.1-1242 2026-04-02T18:47:42+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-420 
+2026-03-25T00:36:16+0000\nbes-3.21.1-1241 2026-04-02T17:37:07+0000
+	
+2026-04-01  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-420 
+2026-03-25T00:36:16+0000\nbes-3.21.1-1233 2026-04-01T21:38:43+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-420 
+2026-03-25T00:36:16+0000\nbes-3.21.1-1230 2026-04-01T19:16:54+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-420 
+2026-03-25T00:36:16+0000\nbes-3.21.1-1225 2026-04-01T17:35:46+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-420 
+2026-03-25T00:36:16+0000\nbes-3.21.1-1223 2026-04-01T16:20:25+0000
+	
+2026-03-31  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-420 
+2026-03-25T00:36:16+0000\nbes-3.21.1-1220 2026-03-31T22:02:07+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-420 
+2026-03-25T00:36:16+0000\nbes-3.21.1-1209 2026-03-31T16:43:56+0000
+	
+2026-03-30  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-420 
+2026-03-25T00:36:16+0000\nbes-3.21.1-1202 2026-03-30T21:56:11+0000
+	
+2026-03-26  ndp-opendap  <ndp@opendap.org>
+	
+	Trigger CICD
+	
+2026-03-26  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-420 
+2026-03-25T00:36:16+0000\nbes-3.21.1-1195 2026-03-26T13:37:10+0000
+	
+2026-03-25  Nathan Potter  <ndp@opendap.org>
+	
+	Fix webui version strings (#293)
+	* This commit fixes the Hyrax version for the dap4 "contents" 
+	pages - the catalog webui that Hyrax presents to users.
+	* This patches the GatewayForm to interrogate the HyraxVersion 
+	class for the version string and inject it into the form page.
+	* Retired OSX build assets.
+	
+2026-03-25  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-420 
+2026-03-25T00:36:16+0000\nbes-3.21.1-1191 2026-03-25T18:03:56+0000
+	
+2026-03-25  Nathan Potter  <ndp@opendap.org>
+	
+	This commitnfixes the Hyrax version for the dap4 "contents" 
+	pages - the catalog webui that Hyrax presents to users. (#291)
+	
+2026-03-25  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-420 
+2026-03-25T00:36:16+0000\nbes-3.21.1-1190 2026-03-25T11:23:50+0000
+	
+2026-03-23  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-417 
+2026-03-16T16:26:41+0000\nbes-3.21.1-1189 2026-03-23T20:56:40+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-417 
+2026-03-16T16:26:41+0000\nbes-3.21.1-1187 2026-03-23T20:08:44+0000
+	
+2026-03-19  Nathan Potter  <ndp@opendap.org>
+	
+	Sonar fixie time (#289)
+	
+2026-03-19  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-417 
+2026-03-16T16:26:41+0000\nbes-3.21.1-1172 2026-03-19T20:06:26+0000
+	
+2026-03-18  Nathan Potter  <ndp@opendap.org>
+	
+	Hyrax version refactor 2 (#286)
+	* Refactored Hyrax and OLFS version determination.
+	* Stop adding Hyrax version numbers to the OLFS code and drop 
+	them from the hyrax-docker build recippes
+	
+2026-03-18  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-417 
+2026-03-16T16:26:41+0000\nbes-3.21.1-1162 2026-03-18T13:33:16+0000
+	
+2026-03-17  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-417 
+2026-03-16T16:26:41+0000\nbes-3.21.1-1159 2026-03-17T22:34:45+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-417 
+2026-03-16T16:26:41+0000\nbes-3.21.1-1155 2026-03-17T16:57:20+0000
+	
+2026-03-16  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-417 
+2026-03-16T16:26:41+0000\nbes-3.21.1-1148 2026-03-16T18:41:32+0000
+	
+2026-03-13  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-410 
+2026-03-11T04:15:36+0000\nbes-3.21.1-1142 2026-03-13T17:07:55+0000
+	
+2026-03-12  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-410 
+2026-03-11T04:15:36+0000\nbes-3.21.1-1137 2026-03-12T22:12:47+0000
+	
+2026-03-11  Nathan Potter  <ndp@opendap.org>
+	
+	Refactored Hyrax and OLFS version determination. (#284)
+	* Refactored Hyrax and OLFS version determination.
+	
+2026-03-11  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-410 
+2026-03-11T04:15:36+0000\nbes-3.21.1-1123 2026-03-11T16:36:07+0000
+	
+2026-03-10  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-410 
+2026-03-11T04:15:36+0000\nbes-3.21.1-1121 2026-03-11T05:18:11+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-408 
+2026-03-10T20:12:30+0000\nbes-3.21.1-1116 2026-03-10T21:24:41+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-405 
+2026-03-10T17:19:22+0000\nbes-3.21.1-1112 2026-03-10T18:18:19+0000
+	
+2026-03-06  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-390 
+2026-03-04T03:14:01+0000\nbes-3.21.1-1106 2026-03-06T17:35:36+0000
+	
+2026-03-05  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-390 
+2026-03-04T03:14:01+0000\nbes-3.21.1-1101 2026-03-05T17:25:18+0000
+	
+2026-03-05  Nathan Potter  <ndp@opendap.org>
+	
+	Remove wcs (#281)
+	* Retired WCS code and resources
+	
+2026-03-04  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-390 
+2026-03-04T03:14:01+0000\nbes-3.21.1-1096 2026-03-04T23:14:34+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-390 
+2026-03-04T03:14:01+0000\nbes-3.21.1-1093 2026-03-04T13:22:30+0000
+	
+2026-03-03  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-389 
+2026-03-03T16:40:28+0000\nbes-3.21.1-1092 2026-03-04T00:25:54+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-389 
+2026-03-03T16:40:28+0000\nbes-3.21.1-1090 2026-03-03T18:32:30+0000
+	
+2026-03-02  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-385 
+2026-03-02T22:10:58+0000\nbes-3.21.1-1088 2026-03-02T23:13:55+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-383 
+2026-03-02T18:07:16+0000\nbes-3.21.1-1087 2026-03-02T19:09:35+0000
+	
+2026-02-26  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-374 
+2026-02-24T20:49:46+0000\nbes-3.21.1-1072 2026-02-26T17:00:10+0000
+	
+2026-02-25  ndp-opendap  <ndp@opendap.org>
+	
+	Updating hyrax-docker commit message to include TARGET_OS
+	
+2026-02-24  ndp-opendap  <ndp@opendap.org>
+	
+	bump build number
+	
+2026-02-24  Nathan Potter  <ndp@opendap.org>
+	
+	Fixing a sin of omission (#280)
+	
+	enabling multi os travis build for hyrax-docker (#279)
+	
+2026-02-23  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-366 
+2026-01-27T19:58:24+0000\nbes-3.21.1-1065 2026-02-23T20:47:04+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-366 
+2026-01-27T19:58:24+0000\nbes-3.21.1-1063 2026-02-23T18:12:22+0000
+	
+2026-02-20  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-366 
+2026-01-27T19:58:24+0000\nbes-3.21.1-1060 2026-02-20T17:37:46+0000
+	
+2026-02-19  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-366 
+2026-01-27T19:58:24+0000\nbes-3.21.1-1058 2026-02-19T21:34:54+0000
+	
+2026-02-18  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-366 
+2026-01-27T19:58:24+0000\nbes-3.21.1-1054 2026-02-18T15:09:22+0000
+	
+2026-02-16  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-366 
+2026-01-27T19:58:24+0000\nbes-3.21.1-1049 2026-02-16T17:33:01+0000
+	
+2026-02-12  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-366 
+2026-01-27T19:58:24+0000\nbes-3.21.1-1044 2026-02-12T18:22:22+0000
+	
+2026-02-11  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-366 
+2026-01-27T19:58:24+0000\nbes-3.21.1-1040 2026-02-11T19:03:53+0000
+	
+2026-02-04  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-366 
+2026-01-27T19:58:24+0000\nbes-3.21.1-1037 2026-02-04T20:27:38+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-366 
+2026-01-27T19:58:24+0000\nbes-3.21.1-1034 2026-02-04T18:30:37+0000
+	
+2026-02-03  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-366 
+2026-01-27T19:58:24+0000\nbes-3.21.1-1018 2026-02-03T20:01:35+0000
+	
+2026-02-02  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-366 
+2026-01-27T19:58:24+0000\nbes-3.21.1-1011 2026-02-02T21:07:46+0000
+	
+2026-01-28  ndp-opendap  <ndp@opendap.org>
+	
+	Fixed copypasta
+	
+	Added TOMCAT_MAJOR_VERSION to cicd amd transmitted to 
+	hyrax-docker
+	
+2026-01-28  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-366 
+2026-01-27T19:58:24+0000\nbes-3.21.1-1003 2026-01-28T17:26:11+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-366 
+2026-01-27T19:58:24+0000\nbes-3.21.1-1001 2026-01-28T16:29:21+0000
+	
+2026-01-27  ndp-opendap  <ndp@opendap.org>
+	
+	Trigger cicd build.
+	
+	Trigger cicd build.
+	
+	Retargeting hyrax-docker for better build semantics
+	
+	Turning on el9 builds
+	
+2026-01-27  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-357 
+2026-01-22T18:18:53+0000\nbes-3.21.1-989 2026-01-27T13:35:55+0000
+	
+2026-01-26  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-357 
+2026-01-22T18:18:53+0000\nbes-3.21.1-988 2026-01-27T00:00:46+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-357 
+2026-01-22T18:18:53+0000\nbes-3.21.1-987 2026-01-26T22:58:18+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-357 
+2026-01-22T18:18:53+0000\nbes-3.21.1-983 2026-01-26T18:51:43+0000
+	
+2026-01-24  ndp-opendap  <ndp@opendap.org>
+	
+	- Streamlined update_tracking_branch.sh - Comments in 
+	.travis.yml
+	
+2026-01-23  ndp-opendap  <ndp@opendap.org>
+	
+	More ant file fooling
+	
+2026-01-23  Nathan Potter  <ndp@opendap.org>
+	
+	Refactored the show target and it's usage in our Ant production 
+	rules. (#277)
+	
+2026-01-22  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-357 
+2026-01-22T18:18:53+0000\nbes-3.21.1-973 2026-01-22T21:09:47+0000
+	
+2026-01-22  Nathan Potter  <ndp@opendap.org>
+	
+	Fixing issue for updating a tracking branch (#276)
+	
+2026-01-22  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-357 
+2026-01-22T18:18:53+0000\nbes-3.21.1-971 2026-01-22T18:54:31+0000
+	
+2026-01-22  ndp-opendap  <ndp@opendap.org>
+	
+	Fixing issue from merge
+	
+	Fixing issue from merge
+	
+	Fixing issue from merge
+	
+	Fixing issue from merge
+	
+2026-01-21  ndp-opendap  <ndp@opendap.org>
+	
+	Fixing issue from merge
+	
+	Fixing issue from merge
+	
+	Fixing issue from merge
+	
+2026-01-21  Nathan Potter  <ndp@opendap.org>
+	
+	Add auto merge for tracking branches (#275)
+	* Failure messaging update
+	
+2026-01-21  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-354 
+2026-01-06T22:45:49+0000\nbes-3.21.1-965 2026-01-21T21:53:57+0000
+	
+2026-01-20  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-354 
+2026-01-06T22:45:49+0000\nbes-3.21.1-957 2026-01-20T23:31:27+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-354 
+2026-01-06T22:45:49+0000\nbes-3.21.1-951 2026-01-20T15:29:31+0000
+	
+2026-01-16  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-354 
+2026-01-06T22:45:49+0000\nbes-3.21.1-939 2026-01-16T18:12:36+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-354 
+2026-01-06T22:45:49+0000\nbes-3.21.1-933 2026-01-16T16:25:37+0000
+	
+2026-01-14  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-354 
+2026-01-06T22:45:49+0000\nbes-3.21.1-922 2026-01-14T15:37:30+0000
+	
+2026-01-13  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-354 
+2026-01-06T22:45:49+0000\nbes-3.21.1-918 2026-01-13T17:23:52+0000
+	
+2026-01-08  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-354 
+2026-01-06T22:45:49+0000\nbes-3.21.1-912 2026-01-08T18:24:19+0000
+	
+2026-01-06  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-354 
+2026-01-06T22:45:49+0000\nbes-3.21.1-906 2026-01-06T23:24:10+0000
+	
+2025-12-30  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-350 
+2025-12-30T18:33:33+0000\nbes-3.21.1-900 2025-12-30T19:08:28+0000
+	
+2025-12-29  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-336 
+2025-12-23T00:14:47+0000\nbes-3.21.1-899 2025-12-29T19:02:13+0000
+	
+2025-12-24  Nathan Potter  <ndp@opendap.org>
+	
+	Adding support for tracking test deployments. (#267)
+	
+	Admin cleanup (#273)
+	 - Dropped admin and hai from UrlRewrite expression.
+	- Added the 'js' suffix to the list of things that do not 
+	require auth in default user-access.xml
+	
+2025-12-23  Nathan Potter  <ndp@opendap.org>
+	
+	Rerewind admin retirement (#271)
+	* Revert "Allow javascript files to be a returnToUrl target. 
+	(#269)" (This reverts commit e0f8959b4838c11e1c89beb0627ea5f6d703a3fc.)
+	* Revert "Rewind admin removal (#268)" (This reverts commit 
+1718f57d598c4955e39db32d464b9647c851487a.)
+	
+2025-12-22  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-336 
+2025-12-23T00:14:47+0000\nbes-3.21.1-896 2025-12-23T00:45:11+0000
+	
+2025-12-18  Nathan Potter  <ndp@opendap.org>
+	
+	Allow javascript files to be a returnToUrl target. (#269)
+	
+	Rewind admin removal (#268)
+	* Revert "Dropping adminPort reference (#264)" This reverts 
+	commit a80ac7d715df0be41f82e93f1e585ff1a9a0516a.
+	* Revert "Retire The Hyrax Admin Interface (#263)" This reverts 
+	commit 4669fc130d470f22822054569fbb1d9259cf9e65.
+	
+2025-12-18  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-332 
+2025-12-02T00:11:15+0000\nbes-3.21.1-879 2025-12-18T17:59:03+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-332 
+2025-12-02T00:11:15+0000\nbes-3.21.1-878 2025-12-18T17:36:58+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-332 
+2025-12-02T00:11:15+0000\nbes-3.21.1-876 2025-12-18T16:55:17+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-332 
+2025-12-02T00:11:15+0000\nbes-3.21.1-875 2025-12-18T15:00:00+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-332 
+2025-12-02T00:11:15+0000\nbes-3.21.1-872 2025-12-18T12:49:45+0000
+	
+2025-12-11  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-332 
+2025-12-02T00:11:15+0000\nbes-3.21.1-845 2025-12-11T16:46:36+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-332 
+2025-12-02T00:11:15+0000\nbes-3.21.1-844 2025-12-11T16:19:38+0000
+	
+2025-12-10  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-332 
+2025-12-02T00:11:15+0000\nbes-3.21.1-841 2025-12-10T22:26:08+0000
+	
+2025-12-08  ndp-opendap  <ndp@opendap.org>
+	
+	Trigger CI/CD
+	
+2025-12-04  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-332 
+2025-12-02T00:11:15+0000\nbes-3.21.1-823 2025-12-04T23:56:59+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-332 
+2025-12-02T00:11:15+0000\nbes-3.21.1-822 2025-12-04T19:11:17+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-332 
+2025-12-02T00:11:15+0000\nbes-3.21.1-819 2025-12-04T18:05:53+0000
+	
+2025-11-26  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-326 
+2025-11-19T16:10:32+0000\nbes-3.21.1-791 2025-11-26T12:16:18+0000
+	
+2025-11-25  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-331 
+2025-11-25T18:21:17+0000\nbes-3.21.1-792 2025-11-25T21:55:37+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-331 
+2025-11-25T18:21:17+0000\nbes-3.21.1-784 2025-11-25T19:00:23+0000
+	
+2025-11-21  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-329 
+2025-11-22T00:15:17+0000\nbes-3.21.1-780 2025-11-22T00:43:59+0000
+	
+2025-11-21  Nathan Potter  <ndp@opendap.org>
+	
+	Dropping adminPort reference (#264)
+	
+	Retire The Hyrax Admin Interface (#263)
+	* Retiring the Hyrax Administrator Interface (HAI)
+	* Dropped web.xml stuff used by the HAI
+	* Dropped admin activity logs
+	
+2025-11-19  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-326 
+2025-11-19T16:10:32+0000\nbes-3.21.1-762 2025-11-19T19:09:45+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-326 
+2025-11-19T16:10:32+0000\nbes-3.21.1-758 2025-11-19T16:36:15+0000
+	
+2025-11-18  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-323 
+2025-11-18T20:28:10+0000\nbes-3.21.1-757 2025-11-18T22:18:16+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-313 
+2025-11-13T00:48:28+0000\nbes-3.21.1-755 2025-11-18T19:57:40+0000
+	
+2025-11-17  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-313 
+2025-11-13T00:48:28+0000\nbes-3.21.1-748 2025-11-18T00:50:31+0000
+	
+2025-11-14  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-313 
+2025-11-13T00:48:28+0000\nbes-3.21.1-734 2025-11-14T21:39:46+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-313 
+2025-11-13T00:48:28+0000\nbes-3.21.1-731 2025-11-14T16:35:34+0000
+	
+2025-11-14  James Gallagher  <jgallagher@opendap.org>
+	
+	Merge remote-tracking branch 'origin/master'
+	
+	Removed gov't shutdown banner
+	
+2025-11-13  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-313 
+2025-11-13T00:48:28+0000\nbes-3.21.1-728 2025-11-13T23:09:13+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-313 
+2025-11-13T00:48:28+0000\nbes-3.21.1-726 2025-11-13T21:46:54+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-313 
+2025-11-13T00:48:28+0000\nbes-3.21.1-723 2025-11-13T13:56:08+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-313 
+2025-11-13T00:48:28+0000\nbes-3.21.1-722 2025-11-13T08:16:41+0000
+	
+2025-11-12  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-313 
+2025-11-13T00:48:28+0000\nbes-3.21.1-720 2025-11-13T07:46:11+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-313 
+2025-11-13T00:48:28+0000\nbes-3.21.1-719 2025-11-13T07:37:54+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-313 
+2025-11-13T00:48:28+0000\nbes-3.21.1-718 2025-11-13T07:07:54+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-313 
+2025-11-13T00:48:28+0000\nbes-3.21.1-717 2025-11-13T01:16:50+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-312 
+2025-11-12T22:49:03+0000\nbes-3.21.1-716 2025-11-12T23:18:59+0000
+	
+2025-11-11  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-309 
+2025-11-10T17:26:31+0000\nbes-3.21.1-709 2025-11-11T18:51:27+0000
+	
+2025-11-10  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-309 
+2025-11-10T17:26:31+0000\nbes-3.21.1-707 2025-11-10T18:25:14+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-307 
+2025-11-07T17:14:58+0000\nbes-3.21.1-706 2025-11-10T17:00:29+0000
+	
+2025-11-05  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-299 
+2025-11-05T13:31:39+0000\nbes-3.21.1-695 2025-11-05T21:12:04+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-299 
+2025-11-05T13:31:39+0000\nbes-3.21.1-694 2025-11-05T15:09:46+0000
+	
+2025-11-04  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-291 
+2025-10-31T17:05:48+0000\nbes-3.21.1-690 2025-11-04T23:04:26+0000
+	
+2025-10-31  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-291 
+2025-10-31T17:05:48+0000\nbes-3.21.1-680 2025-10-31T17:32:40+0000
+	
+2025-10-30  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-285 
+2025-10-29T11:59:18+0000\nbes-3.21.1-678 2025-10-30T12:17:42+0000
+	
+2025-10-27  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-278 
+2025-10-27T17:53:28+0000\nbes-3.21.1-666 2025-10-27T18:26:53+0000
+	
+2025-10-23  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-277 
+2025-10-23T14:08:15+0000\nbes-3.21.1-665 2025-10-23T14:33:41+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-276 
+2025-10-23T12:14:48+0000\nbes-3.21.1-664 2025-10-23T12:44:05+0000
+	
+2025-10-22  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-275 
+2025-10-22T20:28:27+0000\nbes-3.21.1-663 2025-10-22T20:57:44+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-274 
+2025-10-22T18:30:05+0000\nbes-3.21.1-662 2025-10-22T19:00:20+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-273 
+2025-10-21T23:35:57+0000\nbes-3.21.1-661 2025-10-22T18:15:57+0000
+	
+2025-10-21  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-273 
+2025-10-21T23:35:57+0000\nbes-3.21.1-653 2025-10-22T00:05:09+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-269 
+2025-10-21T18:50:40+0000\nbes-3.21.1-651 2025-10-21T19:30:30+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-269 
+2025-10-21T18:50:40+0000\nbes-3.21.1-650 2025-10-21T19:22:18+0000
+	
+2025-10-20  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-258 
+2025-10-14T23:06:17+0000\nbes-3.21.1-647 2025-10-20T19:44:06+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-258 
+2025-10-14T23:06:17+0000\nbes-3.21.1-645 2025-10-20T18:23:47+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-258 
+2025-10-14T23:06:17+0000\nbes-3.21.1-641 2025-10-20T12:53:16+0000
+	
+2025-10-17  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-258 
+2025-10-14T23:06:17+0000\nbes-3.21.1-636 2025-10-17T19:17:11+0000
+	
+2025-10-17  Nathan Potter  <ndp@opendap.org>
+	
+	Check the query string for client submitted request id (#243)
+	
+2025-10-16  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-258 
+2025-10-14T23:06:17+0000\nbes-3.21.1-626 2025-10-16T21:35:47+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-258 
+2025-10-14T23:06:17+0000\nbes-3.21.1-623 2025-10-16T20:07:25+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-258 
+2025-10-14T23:06:17+0000\nbes-3.21.1-621 2025-10-16T20:00:22+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-258 
+2025-10-14T23:06:17+0000\nbes-3.21.1-617 2025-10-16T16:42:48+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-258 
+2025-10-14T23:06:17+0000\nbes-3.21.1-616 2025-10-16T16:25:08+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-258 
+2025-10-14T23:06:17+0000\nbes-3.21.1-615 2025-10-16T13:15:50+0000
+	
+2025-10-14  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-258 
+2025-10-14T23:06:17+0000\nbes-3.21.1-611 2025-10-14T23:57:59+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-257 
+2025-10-14T15:41:40+0000\nbes-3.21.1-609 2025-10-14T23:21:53+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-257 
+2025-10-14T15:41:40+0000\nbes-3.21.1-604 2025-10-14T17:29:14+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-257 
+2025-10-14T15:41:40+0000\nbes-3.21.1-602 2025-10-14T16:27:41+0000
+	
+2025-10-13  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-242 
+2025-08-08T22:26:27+0000\nbes-3.21.1-601 2025-10-13T23:35:49+0000
+	
+2025-10-10  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-242 
+2025-08-08T22:26:27+0000\nbes-3.21.1-594 2025-10-10T17:15:38+0000
+	
+2025-10-08  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-242 
+2025-08-08T22:26:27+0000\nbes-3.21.1-591 2025-10-08T23:45:03+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-242 
+2025-08-08T22:26:27+0000\nbes-3.21.1-586 2025-10-08T20:30:57+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-242 
+2025-08-08T22:26:27+0000\nbes-3.21.1-585 2025-10-08T19:25:52+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-242 
+2025-08-08T22:26:27+0000\nbes-3.21.1-581 2025-10-08T17:49:00+0000
+	
+2025-10-08  Nathan Potter  <ndp@opendap.org>
+	
+	Fix  a logout redirects issue when running in the ROOT context. 
+	(#245)
+	* Candidate fix foe logout redirect to nowhere issue when 
+	running in ROOT context.
+	* Config parameter for post logout redirect target
+	
+2025-10-08  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-242 
+2025-08-08T22:26:27+0000\nbes-3.21.1-579 2025-10-08T16:25:45+0000
+	
+2025-10-07  Nathan Potter  <ndp@opendap.org>
+	
+	Transmit edl applciation client id to bes is competed. (#257)
+	
+2025-10-07  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-242 
+2025-08-08T22:26:27+0000\nbes-3.21.1-576 2025-10-07T20:41:17+0000
+	
+2025-10-07  Hannah Robertson  <hannahilea@users.noreply.github.com>
+	    Hannah Robertson  
+	<1076701+hannahilea@users.noreply.github.com>
+	
+	switch interactive tutorials link to nasa tutorials (#255)
+	
+2025-10-06  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-242 
+2025-08-08T22:26:27+0000\nbes-3.21.1-570 2025-10-06T21:15:45+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-242 
+2025-08-08T22:26:27+0000\nbes-3.21.1-569 2025-10-06T16:12:48+0000
+	
+2025-10-02  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-242 
+2025-08-08T22:26:27+0000\nbes-3.21.1-566 2025-10-02T18:25:00+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-242 
+2025-08-08T22:26:27+0000\nbes-3.21.1-565 2025-10-02T17:51:01+0000
+	
+2025-10-01  James Gallagher  <jgallagher@opendap.org>
+	
+	HYRAX-1889: Added gov't shutdown banner (#253)
+	We had to add a banner about the government shutdown.
+	
+2025-10-01  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-242 
+2025-08-08T22:26:27+0000\nbes-3.21.1-560 2025-10-01T19:56:38+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-242 
+2025-08-08T22:26:27+0000\nbes-3.21.1-558 2025-10-01T18:11:32+0000
+	
+2025-09-29  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-242 
+2025-08-08T22:26:27+0000\nbes-3.21.1-554 2025-09-29T22:09:12+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-242 
+2025-08-08T22:26:27+0000\nbes-3.21.1-552 2025-09-29T20:10:56+0000
+	
+2025-09-26  Hannah Robertson  <hannahilea@users.noreply.github.com>
+	    Hannah Robertson  
+	<1076701+hannahilea@users.noreply.github.com>
+	
+	[HYRAX-1877] Do not write profiling log "edl token validation" 
+	when no token exists to be validated (#251)
+	* Skip logging edl token validation when no token existed to be 
+	validated
+	* Check auth header not userid for nullness
+	---------
+	
+	[HYRAX-1875] Use EDL token to get user id instead of calling 
+	EDL directly (#249)
+	* Skip call to EDL if not necessary
+	* fix error message
+	---------
+	
+2025-09-26  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-242 
+2025-08-08T22:26:27+0000\nbes-3.21.1-548 2025-09-26T17:44:30+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-242 
+2025-08-08T22:26:27+0000\nbes-3.21.1-545 2025-09-26T16:14:36+0000
+	
+2025-09-25  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-242 
+2025-08-08T22:26:27+0000\nbes-3.21.1-541 2025-09-25T15:14:18+0000
+	
+2025-09-17  Hannah Robertson  <hannahilea@users.noreply.github.com>
+	    Hannah Robertson  
+	<1076701+hannahilea@users.noreply.github.com>
+	
+	[HYRAX-1863] Add profiling logs to support service-chain 
+	profiling (#239)
+	* Add LogAppender for CloudWatch profiling
+	* Add instrumentation for token authentication start and end
+	* More EDL instrumentation
+	* Move edl instrumentation
+	* Pull log function into helper function
+	* Make appender reporting leaner
+	* only log if cloudwatch logs are enabled
+	* additional instrumentation wip
+	* tweak messaging
+	* remove debug line
+	* clean up
+	* Update logGroup
+	* rename
+	* wip fix format of log
+	* refactor profiling checkpoints
+	* clean up
+	* Add additional checkpoint
+	* tweak wording
+	* Update logging message
+	* Update log statement
+	* Fix requestId setting
+	* fix cache id fetch
+	---------
+	
+2025-09-17  Nathan Potter  <ndp@opendap.org>
+	
+	Improved Session Management  (#240)
+	* New sesh after auth
+	* Check client info
+	* Added session time out code from the landing page branch.
+	* check x-foward-from request header for client ip addr.
+	* Made stringToTimeUnits() more lenient. Added warning for when 
+	the default is utilized.
+	* Token revocation on logout.
+	* Added landing page content control.
+	* Update web.xml files to version to 4.0
+	
+2025-09-11  Nathan Potter  <ndp@opendap.org>
+	
+	Checksum transmission bug (#244)
+	* Always send the dap4_checksums context so that previous bes 
+	context state does not persist across requests
+	* Same fix in NgapBesApi
+	
+2025-09-09  Nathan Potter  <ndp@opendap.org>
+	
+	[HYRAX-1868] Turn Checksums on all the time the NGAP service. 
+	(#242)
+	* Checksums on all the time for NGAP service.
+	
+2025-09-09  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-242 
+2025-08-08T22:26:27+0000\nbes-3.21.1-540 2025-09-09T16:15:46+0000
+	
+2025-08-29  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-242 
+2025-08-08T22:26:27+0000\nbes-3.21.1-530 2025-08-29T14:20:37+0000
+	
+2025-08-28  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-242 
+2025-08-08T22:26:27+0000\nbes-3.21.1-528 2025-08-28T21:51:02+0000
+	
+2025-08-22  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-242 
+2025-08-08T22:26:27+0000\nbes-3.21.1-527 2025-08-22T19:07:26+0000
+	
+2025-08-21  Hannah Robertson  <hannahilea@users.noreply.github.com>
+	    Hannah Robertson  
+	<1076701+hannahilea@users.noreply.github.com>
+	
+	Downgrade Travis's gradle version back to 8.14.3 (#238)
+	* Specify gradle version as 8.14.3 in .travis.yml
+	* add success badge to only post if command succeeded
+	* undo multiline
+	* Also force downgrade gradle for gradle sonarscan job
+	---------
+	
+2025-08-21  ndp-opendap  <ndp@opendap.org>
+	
+	Merge branch 'master' of https://github.com/opendap/olfs
+	
+	Changed gradle java source compatibility level to 1.9
+	
+2025-08-21  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-242 
+2025-08-08T22:26:27+0000\nbes-3.21.1-523 2025-08-21T18:31:54+0000
+	
+2025-08-18  Nathan Potter  <ndp@opendap.org>
+	
+	Fixing banner issues in jsp documents (#236)
+	* Fixing banner issues in jsp documents
+	* Updated help.jsp for DAP4
+	
+2025-08-15  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-242 
+2025-08-08T22:26:27+0000\nbes-3.21.1-506 2025-08-15T15:20:58+0000
+	
+2025-08-08  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-242 
+2025-08-08T22:26:27+0000\nbes-3.21.1-503 2025-08-08T23:06:43+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-241 
+2025-08-07T21:40:36+0000\nbes-3.21.1-501 2025-08-08T20:37:47+0000
+	
+2025-08-07  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-241 
+2025-08-07T21:40:36+0000\nbes-3.21.1-497 2025-08-07T22:28:03+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-239 
+2025-08-07T16:24:35+0000\nbes-3.21.1-496 2025-08-07T22:17:31+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-239 
+2025-08-07T16:24:35+0000\nbes-3.21.1-495 2025-08-07T17:05:57+0000
+	
+2025-08-05  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-237 
+2025-08-05T23:55:19+0000\nbes-3.21.1-492 2025-08-06T02:14:03+0000
+	
+2025-07-31  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-222 
+2025-07-31T22:16:19+0000\nbes-3.21.1-477 2025-07-31T22:56:45+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-220 
+2025-07-30T23:11:51+0000\nbes-3.21.1-476 2025-07-31T16:55:06+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-220 
+2025-07-30T23:11:51+0000\nbes-3.21.1-475 2025-07-31T16:39:34+0000
+	
+2025-07-30  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-220 
+2025-07-30T23:11:51+0000\nbes-3.21.1-471 2025-07-30T23:58:46+0000
+	
+2025-07-21  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-209 
+2025-07-21T21:41:23+0000\nbes-3.21.1-470 2025-07-21T22:21:27+0000
+	
+2025-07-20  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-199 
+2025-07-21T05:34:56+0000\nbes-3.21.1-467 2025-07-21T06:14:51+0000
+	
+2025-07-18  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-197 
+2025-07-18T16:10:28+0000\nbes-3.21.1-462 2025-07-18T18:59:03+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-197 
+2025-07-18T16:10:28+0000\nbes-3.21.1-461 2025-07-18T16:54:40+0000
+	
+2025-07-17  Nathan Potter  <ndp@opendap.org>
+	
+	Optional dap4 data responses with checksums (#235)
+	* First pass at accepting dap4.checksum query parameter and
+	passing it's state to the BES via a setContext command.
+	
+2025-07-17  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-193 
+2025-07-17T18:17:26+0000\nbes-3.21.1-456 2025-07-17T19:13:29+0000
+	
+2025-07-16  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-178 
+2025-07-16T15:04:20+0000\nbes-3.21.1-451 2025-07-16T15:46:11+0000
+	
+2025-07-15  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-169 
+2025-07-10T19:10:49+0000\nbes-3.21.1-449 2025-07-15T18:58:08+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-169 
+2025-07-10T19:10:49+0000\nbes-3.21.1-446 2025-07-15T13:42:20+0000
+	
+2025-07-10  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-169 
+2025-07-10T19:10:49+0000\nbes-3.21.1-440 2025-07-10T19:51:21+0000
+	
+2025-07-09  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-150 
+2025-06-30T22:58:06+0000\nbes-3.21.1-439 2025-07-09T21:16:38+0000
+	
+2025-07-02  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-150 
+2025-06-30T22:58:06+0000\nbes-3.21.1-431 2025-07-02T16:39:57+0000
+	
+2025-07-01  Nathan Potter  <ndp@opendap.org>
+	
+	Adds dap4:Enum to the list of things not compatible with 
+	netcdf-3 (#234)
+	
+2025-07-01  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-150 
+2025-06-30T22:58:06+0000\nbes-3.21.1-424 2025-07-01T16:07:50+0000
+	
+2025-06-30  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-150 
+2025-06-30T22:58:06+0000\nbes-3.21.1-423 2025-06-30T23:38:54+0000
+	
+2025-06-27  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-145 
+2025-06-24T21:29:06+0000\nbes-3.21.1-421 2025-06-27T21:22:21+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-145 
+2025-06-24T21:29:06+0000\nbes-3.21.1-419 2025-06-27T16:13:57+0000
+	
+2025-06-25  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-145 
+2025-06-24T21:29:06+0000\nbes-3.21.1-415 2025-06-25T19:58:18+0000
+	
+2025-06-24  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-145 
+2025-06-24T21:29:06+0000\nbes-3.21.1-412 2025-06-24T22:28:08+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-145 
+2025-06-24T21:29:06+0000\nbes-3.21.1-410 2025-06-24T22:14:25+0000
+	
+2025-06-23  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-99 
+2025-05-28T16:46:20+0000\nbes-3.21.1-408 2025-06-23T19:25:28+0000
+	
+2025-06-20  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-99 
+2025-05-28T16:46:20+0000\nbes-3.21.1-405 2025-06-20T16:02:06+0000
+	
+2025-06-18  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-99 
+2025-05-28T16:46:20+0000\nbes-3.21.1-402 2025-06-18T21:07:05+0000
+	
+2025-06-18  Hannah Robertson  <hannahilea@users.noreply.github.com>
+	    Hannah Robertson  
+	<1076701+hannahilea@users.noreply.github.com>
+	
+	Remove branch var from non-PR sonar job (#232)
+	
+	Fix sonarqube's pull request interop (#230)
+	* Update gradle's sonarqube version to latest
+	* fix same package classes are always implicitly imported
+	* set sonar verbosity
+	* undo gradle verbose
+	* use sonar.token instead of sonar.login to fix warning
+	* skip build stage for now
+	* skip build steps for now
+	* Use pull request variables
+	* Fix flag
+	* revert commented out yml
+	* Update .travis.yml
+	---------
+	
+2025-06-17  Nathan Potter  <ndp@opendap.org>
+	    Hannah Robertson  
+	<1076701+hannahilea@users.noreply.github.com>
+	
+	Or or Or? (#229)
+	* Or or Or?
+	* wip
+	* support sonarcloud on master branch
+	* do not echo sad cry
+	---------
+	
+2025-06-17  ndp-opendap  <ndp@opendap.org>
+	
+	smellz-wip
+	
+2025-06-17  Hannah Robertson  <hannahilea@users.noreply.github.com>
+	    Hannah Robertson  
+	<1076701+hannahilea@users.noreply.github.com>
+	
+	Fix sonar scanner configuration (#228)
+	* attempt to fix branch name issue
+	* attempt to fix branch name issue
+	* revert build.gradle change
+	* add new travis step for raw scan
+	* whoops
+	* temporarily comment out unused builds
+	* add branch property
+	* move name param out of build.gradle
+	* fix travis env var name
+	* make sonarqube mad
+	* revert uncomment travis
+	* remove junk comment
+	---------
+	
+2025-06-17  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-99 
+2025-05-28T16:46:20+0000\nbes-3.21.1-400 2025-06-17T16:05:59+0000
+	
+2025-06-16  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-99 
+2025-05-28T16:46:20+0000\nbes-3.21.1-397 2025-06-16T15:44:48+0000
+	
+2025-06-13  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-99 
+2025-05-28T16:46:20+0000\nbes-3.21.1-396 2025-06-13T18:31:22+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-99 
+2025-05-28T16:46:20+0000\nbes-3.21.1-394 2025-06-13T16:41:39+0000
+	
+2025-06-12  Hannah Robertson  <hannahilea@users.noreply.github.com>
+	
+	Merge pull request #226 from OPENDAP/hr/remove-stale-gson-dep
+	Remove stale gson-2.3.1 dep
+	
+	Merge pull request #225 from 
+	OPENDAP/hr/HYRAX-1729-EDL-token-self-validatiion
+	[HYRAX-1729] EDL token self validation (WIP)
+	
+2025-06-12  Hannah Robertson  
+	<1076701+hannahilea@users.noreply.github.com>
+	
+	remove unused stale gson-2.3.1 dep
+	
+	Move null check down into getEdlUserIdFromToken
+	
+2025-06-11  Hannah Robertson  
+	<1076701+hannahilea@users.noreply.github.com>
+	
+	check for null token
+	
+2025-06-11  Hannah Robertson  <hannahilea@users.noreply.github.com>
+	
+	Update src/opendap/auth/UrsIdP.java
+	
+2025-06-11  Hannah Robertson  
+	<1076701+hannahilea@users.noreply.github.com>
+	
+	remove unneeded imports
+	
+	Tidy error messages
+	
+	Add tests for GetEdlUserIdFromToken
+	
+	Add tests for getPublicKeyForId
+	
+	Add tests for getStringValueFromEncodedJson
+	
+	Add test stub for UrsIdP unit tests
+	
+	clean up
+	
+	Clean up cases
+	
+	Refactor ctd
+	
+	Refactor logic flow
+	
+	WIP end-to-end verification sketch works
+	
+	Add dependency on jwks-rsa
+	
+	Pull public key out of JWKS string
+	
+	wip key validation: up to key id
+	
+	Add UrsClientPublicKeys support to pull in new config field
+	
+	Fix exceptions in ursidp
+	
+	add java-jwt dependency, for both ant and gradle
+	
+	Implement `getEdlUserIdFromToken` and skeleton for local EDL 
+	token validation.
+	
+2025-06-11  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-99 
+2025-05-28T16:46:20+0000\nbes-3.21.1-387 2025-06-11T21:07:23+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-99 
+2025-05-28T16:46:20+0000\nbes-3.21.1-385 2025-06-11T18:01:01+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-99 
+2025-05-28T16:46:20+0000\nbes-3.21.1-383 2025-06-11T16:01:49+0000
+	
+2025-06-11  Nathan Potter  <ndp@opendap.org>
+	
+	Adds dmr++ retrieval support for the ngap module. (#221)
+	* First Draft of get dmr++ document
+	* 2nd Draft of get dmr++ document
+	* Refactor our character encoding class.
+	* Added configuration control for the display of dmr++ response 
+	links.
+	* Cleaned up needless duplicate setContext
+	
+2025-06-09  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-99 
+2025-05-28T16:46:20+0000\nbes-3.21.1-380 2025-06-09T20:38:20+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-99 
+2025-05-28T16:46:20+0000\nbes-3.21.1-375 2025-06-09T17:28:13+0000
+	
+2025-06-06  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-99 
+2025-05-28T16:46:20+0000\nbes-3.21.1-367 2025-06-06T18:25:06+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-99 
+2025-05-28T16:46:20+0000\nbes-3.21.1-365 2025-06-06T17:47:51+0000
+	
+2025-06-05  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-99 
+2025-05-28T16:46:20+0000\nbes-3.21.1-361 2025-06-05T19:41:57+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-99 
+2025-05-28T16:46:20+0000\nbes-3.21.1-358 2025-06-05T17:38:34+0000
+	
+2025-06-04  ndp-opendap  <ndp@opendap.org>
+	
+	Merge branch 'master' of https://github.com/opendap/olfs
+	
+	Unretired RDF xsl file.
+	
+2025-06-03  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-99 
+2025-05-28T16:46:20+0000\nbes-3.21.1-345 2025-06-03T20:17:27+0000
+	
+2025-06-02  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-99 
+2025-05-28T16:46:20+0000\nbes-3.21.1-343 2025-06-03T00:02:13+0000
+	
+2025-05-28  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-99 
+2025-05-28T16:46:20+0000\nbes-3.21.1-332 2025-05-28T17:30:53+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-92 
+2025-05-20T15:47:44+0000\nbes-3.21.1-331 2025-05-28T12:28:41+0000
+	
+2025-05-22  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-92 
+2025-05-20T15:47:44+0000\nbes-3.21.1-326 2025-05-22T22:18:57+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-92 
+2025-05-20T15:47:44+0000\nbes-3.21.1-324 2025-05-22T20:46:34+0000
+	
+2025-05-21  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-92 
+2025-05-20T15:47:44+0000\nbes-3.21.1-321 2025-05-21T21:39:56+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-92 
+2025-05-20T15:47:44+0000\nbes-3.21.1-313 2025-05-21T20:16:24+0000
+	
+2025-05-20  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-92 
+2025-05-20T15:47:44+0000\nbes-3.21.1-306 2025-05-20T16:32:57+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-85 
+2025-05-13T16:35:47+0000\nbes-3.21.1-305 2025-05-20T16:01:15+0000
+	
+2025-05-14  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-85 
+2025-05-13T16:35:47+0000\nbes-3.21.1-300 2025-05-14T10:28:50+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-85 
+2025-05-13T16:35:47+0000\nbes-3.21.1-301 2025-05-14T10:14:05+0000
+	
+2025-05-13  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-85 
+2025-05-13T16:35:47+0000\nbes-3.21.1-297 2025-05-13T17:20:24+0000
+	
+2025-05-09  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-80 
+2025-05-08T23:48:04+0000\nbes-3.21.1-292 2025-05-09T12:14:27+0000
+	
+2025-05-08  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-73 
+2025-05-02T21:17:04+0000\nbes-3.21.1-291 2025-05-08T21:13:10+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-73 
+2025-05-02T21:17:04+0000\nbes-3.21.1-288 2025-05-08T19:37:28+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-73 
+2025-05-02T21:17:04+0000\nbes-3.21.1-287 2025-05-08T18:54:48+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-73 
+2025-05-02T21:17:04+0000\nbes-3.21.1-285 2025-05-08T16:24:46+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-73 
+2025-05-02T21:17:04+0000\nbes-3.21.1-284 2025-05-08T16:20:41+0000
+	
+2025-05-05  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-73 
+2025-05-02T21:17:04+0000\nbes-3.21.1-279 2025-05-05T20:36:45+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-73 
+2025-05-02T21:17:04+0000\nbes-3.21.1-276 2025-05-05T18:38:41+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-73 
+2025-05-02T21:17:04+0000\nbes-3.21.1-272 2025-05-05T14:37:05+0000
+	
+2025-05-02  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-72 
+2025-04-22T12:52:30+0000\nbes-3.21.1-271 2025-05-02T21:11:22+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-72 
+2025-04-22T12:52:30+0000\nbes-3.21.1-270 2025-05-02T20:59:19+0000
+	
+2025-05-01  Nathan Potter  <ndp@opendap.org>
+	
+	Retire build_dmrpp service. (#222)
+	
+2025-04-30  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-72 
+2025-04-22T12:52:30+0000\nbes-3.21.1-267 2025-04-30T22:55:12+0000
+	
+2025-04-29  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-72 
+2025-04-22T12:52:30+0000\nbes-3.21.1-259 2025-04-29T19:22:21+0000
+	
+2025-04-24  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-72 
+2025-04-22T12:52:30+0000\nbes-3.21.1-254 2025-04-24T13:09:34+0000
+	
+2025-04-23  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-72 
+2025-04-22T12:52:30+0000\nbes-3.21.1-249 2025-04-23T17:02:16+0000
+	
+2025-04-22  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-69 
+2025-04-16T16:22:20+0000\nbes-3.21.1-245 2025-04-22T17:41:51+0000
+	
+2025-04-21  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-69 
+2025-04-16T16:22:20+0000\nbes-3.21.1-243 2025-04-21T20:11:43+0000
+	
+2025-04-17  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-69 
+2025-04-16T16:22:20+0000\nbes-3.21.1-229 2025-04-17T15:33:49+0000
+	
+2025-04-10  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-64 
+2025-04-10T23:04:53+0000\nbes-3.21.1-220 2025-04-10T23:45:41+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-62 
+2025-04-10T20:44:16+0000\nbes-3.21.1-219 2025-04-10T21:24:16+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-52 
+2025-04-09T12:39:04+0000\nbes-3.21.1-218 2025-04-10T19:58:40+0000
+	
+2025-04-09  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-52 
+2025-04-09T12:39:04+0000\nbes-3.21.1-211 2025-04-09T13:21:25+0000
+	
+2025-04-08  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-44 
+2025-03-25T15:28:33+0000\nbes-3.21.1-209 2025-04-08T16:08:17+0000
+	
+2025-03-31  ndp-opendap  <ndp@opendap.org>
+	
+	Moved olfs.adoc to retired (now it lives in the documentation 
+	project, documentation/technical [skip ci]
+	
+	Fixed anchor conflict [skip ci]
+	
+	Fixed numbered list [skip ci]
+	
+	wip [skip ci]
+	
+	wip [skip ci]
+	
+	wip [skip ci]
+	
+	wip [skip ci]
+	
+2025-03-29  ndp-opendap  <ndp@opendap.org>
+	
+	wip [skip ci]
+	
+	wip [skip ci]
+	
+	wip [skip ci]
+	
+	wip [skip ci]
+	
+	wip
+	
+	Retired unused xslt
+	
+	wip [skip ci]
+	
+2025-03-28  ndp-opendap  <ndp@opendap.org>
+	
+	wip [skip-ci]
+	
+	Merge branch 'master' of https://github.com/opendap/olfs
+	
+	wip
+	
+2025-03-28  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-44 
+2025-03-25T15:28:33+0000\nbes-3.21.1-202 2025-03-28T13:18:53+0000
+	
+2025-03-27  ndp-opendap  <ndp@opendap.org>
+	
+	wip
+	
+	wip
+	
+	wip
+	
+	wip
+	
+	TravisCI is broken, trying to fix
+	
+	TravisCI is broken, trying to fix
+	
+	wip
+	
+	type
+	
+	wip
+	
+	wip
+	
+2025-03-26  ndp-opendap  <ndp@opendap.org>
+	
+	wip
+	
+	wip
+	
+	Typo correction.
+	
+	Retired unused classes.
+	
+	Retired unused classes.
+	
+	Merge branch 'master' of https://github.com/opendap/olfs
+	
+	clean-up
+	
+2025-03-26  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-44 
+2025-03-25T15:28:33+0000\nbes-3.21.1-196 2025-03-26T11:16:39+0000
+	
+2025-03-21  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-37 
+2025-03-18T22:49:40+0000\nbes-3.21.1-190 2025-03-21T18:13:00+0000
+	
+2025-03-20  ndp-opendap  <ndp@opendap.org>
+	
+	Merge branch 'master' of https://github.com/opendap/olfs
+	
+	clean-up
+	
+2025-03-19  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-37 
+2025-03-18T22:49:40+0000\nbes-3.21.1-187 2025-03-19T23:48:26+0000
+	
+2025-03-19  Nathan Potter  <ndp@opendap.org>
+	
+	Protect the request, response, and bes application logs from 
+	duplicate request ids (#214)
+	* Refactored the way the request id is handle by adding a new 
+	RequestID class that pairs each new request-id with a new uuid so that 
+	we can protect our logs from duplicate request ids
+	* Change service to utilize this object to create log records 
+	and to pass its  content to the BES.
+	* Add unit test for RequestId
+	* Updated junit to 4.13.2 and added hamcrest-all-1.3
+	
+2025-03-19  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-37 
+2025-03-18T22:49:40+0000\nbes-3.21.1-184 2025-03-19T22:07:33+0000
+	
+2025-03-18  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-37 
+2025-03-18T22:49:40+0000\nbes-3.21.1-177 2025-03-18T23:31:36+0000
+	
+2025-03-14  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-33 
+2025-03-13T11:01:43+0000\nbes-3.21.1-167 2025-03-14T15:34:29+0000
+	
+2025-03-13  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-33 
+2025-03-13T11:01:43+0000\nbes-3.21.1-164 2025-03-13T17:57:36+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-33 
+2025-03-13T11:01:43+0000\nbes-3.21.1-160 2025-03-13T16:48:46+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-33 
+2025-03-13T11:01:43+0000\nbes-3.21.1-159 2025-03-13T14:45:49+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-33 
+2025-03-13T11:01:43+0000\nbes-3.21.1-156 2025-03-13T11:45:12+0000
+	
+2025-03-12  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-32 
+2025-03-07T16:22:22+0000\nbes-3.21.1-155 2025-03-12T22:02:50+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-32 
+2025-03-07T16:22:22+0000\nbes-3.21.1-154 2025-03-12T21:52:39+0000
+	
+2025-03-12  Nathan Potter  <ndp@opendap.org>
+	
+	Query2request log (#212)
+	* Adds query_string to the CloudWatch Request logs
+	
+	Reqid (#213)
+	* Normalizes the use of requestId across the code base. Adds 
+	bes client id and
+	 client command count as attributes in the BES command root 
+	element (request)
+	
+2025-03-12  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-32 
+2025-03-07T16:22:22+0000\nbes-3.21.1-150 2025-03-12T17:24:07+0000
+	
+2025-03-07  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-32 
+2025-03-07T16:22:22+0000\nbes-3.21.1-116 2025-03-07T18:25:06+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-32 
+2025-03-07T16:22:22+0000\nbes-3.21.1-114 2025-03-07T17:02:35+0000
+	
+2025-03-06  Dan Holloway  <d.holloway@opendap.org>
+	
+	Merge pull request #211 from OPENDAP/doug-newman-landing-page
+	Changed LandingPage NASA official to Douglas Newman
+	
+2025-03-06  dh-opendap  <dholloway@opendap.org>
+	
+	Changed LandingPage NASA official to Douglas Newman
+	
+2025-03-06  ndp-opendap  <ndp@opendap.org>
+	
+	Revert "Disentangles the users request id and the id of the 
+	bes_client in the olfs."
+	This reverts commit d4a5a911053ea3f6ce7ac8a3d0e1887e955ee6f9.
+	
+	Merge branch 'master' of https://github.com/opendap/olfs
+	
+	Disentangles the users request id and the id of the bes_client 
+	in the olfs.
+	
+2025-03-06  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-31 
+2025-03-06T13:08:57+0000\nbes-3.21.1-108 2025-03-06T13:55:04+0000
+	
+2025-03-05  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-30 
+2025-03-05T18:00:41+0000\nbes-3.21.1-107 2025-03-05T18:43:18+0000
+	
+2025-03-04  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-29 
+2025-02-18T21:51:10+0000\nbes-3.21.1-105 2025-03-04T20:00:36+0000
+	
+2025-02-21  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-29 
+2025-02-18T21:51:10+0000\nbes-3.21.1-97 2025-02-21T18:07:18+0000
+	
+2025-02-20  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-29 
+2025-02-18T21:51:10+0000\nbes-3.21.1-93 2025-02-20T16:44:20+0000
+	
+2025-02-19  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-29 
+2025-02-18T21:51:10+0000\nbes-3.21.1-88 2025-02-19T21:34:22+0000
+	
+2025-02-18  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-29 
+2025-02-18T21:51:10+0000\nbes-3.21.1-85 2025-02-18T22:30:09+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-22 
+2025-02-11T23:24:09+0000\nbes-3.21.1-83 2025-02-18T16:44:52+0000
+	
+2025-02-17  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-22 
+2025-02-11T23:24:09+0000\nbes-3.21.1-78 2025-02-17T16:10:06+0000
+	
+2025-02-14  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-22 
+2025-02-11T23:24:09+0000\nbes-3.21.1-77 2025-02-14T19:26:25+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-22 
+2025-02-11T23:24:09+0000\nbes-3.21.1-74 2025-02-14T17:27:03+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-22 
+2025-02-11T23:24:09+0000\nbes-3.21.1-72 2025-02-14T12:42:19+0000
+	
+2025-02-10  Nathan Potter  <ndp@opendap.org>
+	
+	Tropics03 (#210)
+	* Possible fix for the NNVAP issue on the DAP4 Request form.
+	
+2025-02-10  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-20 
+2025-02-10T20:04:18+0000\nbes-3.21.1-61 2025-02-10T21:01:06+0000
+	
+2025-02-05  Nathan Potter  <ndp@opendap.org>
+	
+	Reordering the DAP POST handlers! (#209)
+	* Reordering the DAP POST handlers so NgapDispatchHandler 
+	preceeds BesDapDispatchHandler in order of evaluation.
+	
+2025-02-04  Nathan Potter  <ndp@opendap.org>
+	
+	First pass at sending a value of -1 to indicate unknown 
+	output_size (#208)
+	* Now using a value of -1 to indicate unknown output_size in 
+	the logs.
+	
+2025-02-03  Nathan Potter  <ndp@opendap.org>
+	
+	Dropping units from response_size in logs (#207)
+	* Dropping units from response_size in logs
+	* Dropped quotes from the now numeric output_size value
+	
+2025-02-03  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-5 
+2025-01-28T19:05:28+0000\nbes-3.21.1-44 2025-02-03T19:05:16+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-5 
+2025-01-28T19:05:28+0000\nbes-3.21.1-42 2025-02-03T17:38:39+0000
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-5 
+2025-01-28T19:05:28+0000\nbes-3.21.1-41 2025-02-03T16:53:51+0000
+	
+2025-01-31  Nathan Potter  <ndp@opendap.org>
+	
+	Small changes to the request_log record format for NGAP mterics 
+	(#206)
+	
+2025-01-30  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production.\nBuild 
+	Version Matrix:\nlibdap4-3.21.1-5 
+2025-01-28T19:05:28+0000\nbes-3.21.1-36 2025-01-30T22:40:41+0000
+	
+2025-01-29  Nathan Potter  <ndp@opendap.org>
+	
+	Redisson update (#205)
+	* Switching to redisson-3.22.0
+	* Retired old redisson in favor of 3.22.0
+	
+2025-01-29  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production. Build 
+	Version Matrix: libdap4-3.21.1-5 2025-01-28T19:05:28+0000 bes-3.21.1-26 
+2025-01-29T19:46:40+0000
+	
+2025-01-29  Nathan Potter  <ndp@opendap.org>
+	
+	Updated production rules for build_dmrpp to exclude pending 
+	redisson changes (#204)
+	
+2025-01-28  Nathan Potter  <ndp@opendap.org>
+	
+	Update Redisson jars, but don't use the new ones yet. (#203)
+	* Adding slf4j-simple-2.0.13.jar as required by version 2.x
+	* Attribution comments
+	* Retired:
+	* logback-classic-1.2.9.jar
+	* logback-classic-1.5.6.jar
+	* logback-core-1.2.9.jar
+	* logback-core-1.5.6.jar
+	* slf4k-api-1.7.32.jar
+	* slf4k-api-1.7.36.jar
+	* slf4k-api-2.0.13.jar
+	* slf4k-simple-2.0.13.jar
+	Adding:
+	* logback-classic-1.5.16.jar
+	* logback-core-1.51.6.jar
+	* slf4k-api-2.0.16.jar
+	* Added various  redisson-3.22.0 files but changed production 
+	rules in gradle and ant to ignore them for now.
+	
+2025-01-28  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production. Build 
+	Version Matrix: libdap4-3.21.1-5 2025-01-28T19:05:28+0000 bes-3.21.1-21 
+2025-01-28T19:50:13+0000
+	
+	bes: Triggering OLFS build for snapshot production. Build 
+	Version Matrix: libdap4-3.21.1-3 2025-01-28T17:34:25+0000 bes-3.21.1-20 
+2025-01-28T19:38:21+0000
+	
+	bes: Triggering OLFS build for snapshot production. Build 
+	Version Matrix: libdap4-3.21.1-3 2025-01-28T17:34:25+0000 bes-3.21.1-18 
+2025-01-28T18:31:28+0000
+	
+2025-01-25  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production. Build 
+	Version Matrix: libdap4-3.21.1-0 2025-01-13T22:50:55+0000 bes-3.21.1-15 
+2025-01-25T20:21:29+0000
+	
+2025-01-23  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production. Build 
+	Version Matrix: libdap4-3.21.1-0 2025-01-13T22:50:55+0000 bes-3.21.1-11 
+2025-01-23T21:09:46+0000
+	
+2025-01-22  Dan Holloway  <d.holloway@opendap.org>
+	
+	Add files via upload
+	Adding redisson-3.22.0 jars to resources/ngap/lib.
+	
+2025-01-22  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production. Build 
+	Version Matrix: libdap4-3.21.1-0 2025-01-13T22:50:55+0000 bes-3.21.1-9 
+2025-01-22T17:03:01+0000
+	
+	bes: Triggering OLFS build for snapshot production. Build 
+	Version Matrix: libdap4-3.21.1-0 2025-01-13T22:50:55+0000 bes-3.21.1-8 
+2025-01-22T16:46:46+0000
+	
+2025-01-21  ndp-opendap  <ndp@opendap.org>
+	
+	Merge branch 'master' of https://github.com/opendap/olfs
+	
+	Update memcached to tomcat 9
+	
+2025-01-15  Mikejmnez  <mjimenez@opendap.org>
+	
+	update README and build_offsets for new version
+	
+	olfs: update olfs version and release files to version 1.81.15
+	
+2025-01-15  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production. Build 
+	Version Matrix: libdap4-3.21.1-0 2025-01-13T22:50:55+0000 bes-3.21.1-0 
+2025-01-15T17:49:45+0000
+	
+	bes: Triggering OLFS build for snapshot production. Build 
+	Version Matrix: libdap4-3.21.1-0 2025-01-13T22:50:55+0000 bes-3.21.1-4 
+2025-01-15T14:11:03+0000
+	
+2025-01-14  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production. Build 
+	Version Matrix: libdap4-3.21.1-0 2025-01-13T22:50:55+0000 
+	bes-3.21.0-754 2025-01-15T00:09:45+0000
+	
+	bes: Triggering OLFS build for snapshot production. Build 
+	Version Matrix: libdap4-3.21.1-0 2025-01-13T22:50:55+0000 bes-3.21.1-0 
+2025-01-14T21:29:39+0000
+	
+	bes: Triggering OLFS build for snapshot production. Build 
+	Version Matrix: libdap4-3.21.1-0 2025-01-13T22:50:55+0000 
+	bes-3.21.0-753 2025-01-14T21:21:58+0000
+	
+	bes: Triggering OLFS build for snapshot production. Build 
+	Version Matrix: libdap4-3.21.1-0 2025-01-13T22:50:55+0000 bes-3.21.1-2 
+2025-01-14T20:57:35+0000
+	
+2025-01-13  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production. Build 
+	Version Matrix: libdap4-3.21.1-0 2025-01-13T22:50:55+0000 
+	bes-3.21.0-748 2025-01-13T23:31:14+0000
+	
+	bes: Triggering OLFS build for snapshot production. Build 
+	Version Matrix: libdap4-3.21.1-1 2025-01-13T22:31:46+0000 
+	bes-3.21.0-747 2025-01-13T23:28:08+0000
+	
+	bes: Triggering OLFS build for snapshot production. Build 
+	Version Matrix: libdap4-3.21.0-143 2024-12-31T18:22:54+0000 
+	bes-3.21.0-746 2025-01-13T16:12:59+0000
+	
+2025-01-10  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production. Build 
+	Version Matrix: libdap4-3.21.0-143 2024-12-31T18:22:54+0000 
+	bes-3.21.0-742 2025-01-10T16:38:28+0000
+	
+2025-01-09  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production. Build 
+	Version Matrix: libdap4-3.21.0-143 2024-12-31T18:22:54+0000 
+	bes-3.21.0-740 2025-01-09T17:44:31+0000
+	
+2025-01-08  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production. Build 
+	Version Matrix: libdap4-3.21.0-143 2024-12-31T18:22:54+0000 
+	bes-3.21.0-736 2025-01-08T20:46:51+0000
+	
+2025-01-07  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production. Build 
+	Version Matrix: libdap4-3.21.0-143 2024-12-31T18:22:54+0000 
+	bes-3.21.0-731 2025-01-08T00:39:19+0000
+	
+2025-01-06  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production. Build 
+	Version Matrix: libdap4-3.21.0-143 2024-12-31T18:22:54+0000 
+	bes-3.21.0-727 2025-01-06T23:08:30+0000
+	
+2025-01-03  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production. Build 
+	Version Matrix: libdap4-3.21.0-143 2024-12-31T18:22:54+0000 
+	bes-3.21.0-725 2025-01-03T19:40:47+0000
+	
+2025-01-02  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes: Triggering OLFS build for snapshot production. Build 
+	Version Matrix: libdap4-3.21.0-143 2024-12-31T18:22:54+0000 
+	bes-3.21.0-718 2025-01-03T02:56:37+0000
+
+## -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+## olfs-1.18.15
+## hyrax-1.17.1
+##
+	
+2024-12-16  Nathan Potter  <ndp@opendap.org>
+	
+	Logo update (#201)
+	* First draft with new logo. Using svg ftw.
+	* Retired old opendap logo image file.
+	* Switched logo.png to logo.svg as needed.
+	* Removed uneeded width attribute from svg declarations. Used 
+	svg group to set letter colors.
+	* Tweaks to blue logo.svg
+	
+
+2024-12-11  Nathan Potter  <ndp@opendap.org>
+	
+	Changed MDC key names to better reflect their meaning (#199)
+	
+	Fix NGAP CloudWatch metric  data types (numbers are numbers) 
+	(#195)
+	* Fixed ngap CloudWatch metric format so that the numbers are, 
+	infact, numbers. Dropped krufty formating.
+	* More fixing of the types
+
+	
+2024-11-12  James Gallagher  <jgallagher@opendap.org>
+	
+	New text from Miguel (#198)
+	
+	Addressed issue 1 and 2 from HYRAX-1561 (#197)
+	This edit improves the server's landing page in NGAP.
+	Addressed issue 1 and 2 from HYRAX-1561
+	Added bit about Pydap.
+	Updated/fixed Panoply description to use dap4: URL protocol.
+	Updated text and image for the PyDAP/PACE example.
+	
+	
+2024-07-08  ndp-opendap  <ndp@opendap.org>
+	
+	Fixing format issues in logback files
+	
+	Fixing format issues in logback files
+	
+2024-07-08  James Gallagher  <jgallagher@opendap.org>
+	    Samuel Lloyd  <sawerlloyd7@gmail.com>
+	    Kodi Neumiller  <kneumiller@mtech.edu>
+	    ndp-opendap  <ndp@opendap.org>
+	
+	Cw logs v 2 aws 1 (#194)
+	Added cloudwatch-appender and call to our appender in 
+	resources/hyrax/WEB-INF/conf/logback.xml
+	Added copy of the cloudwatchlogbackappender sources to 
+	build/src.
+	See the ant build.xml section about preprocessing the source 
+	files.
+	Added sources jar
+	Added copy of 'com/j256/cloudwatchappender' to build.xml
+	---------
+
+2024-07-02  ndp-opendap  <ndp@opendap.org>
+	
+	Filter workflow patch
+	
+2024-07-02  Nathan Potter  <ndp@opendap.org>
+	
+	BotFilter (#192)
+	* Retired BotBlocker
+	* Created BotFilter which utilizes the same
+	default configuration as BotBlocker but
+	implements the javax.servlet.Filter
+	interface instead of the
+	opendap.corServlet.DispatchHandler interface
+	* JSON output for blocked log
+	
+2024-06-27  Nathan Potter  <ndp@opendap.org>
+	
+	Added User-Agent header to the things that can be utilized by 
+	BotBlocker (#191)
+	
+	Fixing configuration bug and simplified evaluation of the block 
+	status (#190)
+	
+2024-06-26  Nathan Potter  <ndp@opendap.org>
+	
+	Fixing broken bot blocker (#189)
+	* Fixing broken bot blocker
+	
+2024-06-13  Nathan Potter  <ndp@opendap.org>
+	
+	Fix the missing build_dmrpp landing page. (#185)
+	* Fixed build_Dmrpp landing page
+	* Added new code to better manage RequestCache and RequestID
+
+	
+2024-05-21  Nathan Potter  <ndp@opendap.org>
+	
+	Refactored RequestCache for request id support. (#184)
+	* Refactored RequestCache for request id support.
+	* Normalized the use of RequestCache.close(), comments.
+	
+
+2024-03-26  Nathan Potter  <ndp@opendap.org>
+	
+	Updated http methods. (#183)
+	
+	
+2024-03-22  Nathan Potter  <ndp@opendap.org>
+	
+	Refactored BESError handling or the new HttpError returned by 
+	the BES. (#182)
+	* Refactored BESError handling for the new HttpError returned 
+	by the BES.
+	* Trapped a nullptr issue in Timer.
+	* Restored BESError state check methods.
+
+	
+2024-02-14  ndp-opendap  <ndp@opendap.org>
+	
+	Merge branch 'master' of https://github.com/opendap/olfs
+	
+	Fixed typo in NGAP landing page.
+	
+
+## -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+##  olfs-1.18.13-25
+##  hyrax-1.16.8-25
+##
+
+2022-09-01  ndp-opendap  <ndp@opendap.org>
+	
+	Merge branch 'master' of https://github.com/opendap/olfs
+	
+	Added convenient script for pushing to our ngap s3 documents 
+	bucket
+	
+2022-09-01  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.13-51 2022-09-01T16:32:23+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-09-01  ndp-opendap  <ndp@opendap.org>
+	
+	Updated CloudFront 504 page with Jame's input
+	
+	Refining commit message format
+	
+	Reformatted automated commit message for hyrax-docker build 
+	trigger.
+	
+2022-08-31  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.13-50 2022-09-01T04:27:04+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.13-49 2022-09-01T03:34:00+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.13-48 2022-09-01T03:15:52+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-08-31  ndp-opendap  <ndp@opendap.org>
+	
+	Formatting of commit message continues.
+	
+	Updated git commit message for trigger to include build 
+	inventory
+	
+	this is a test
+	
+	This is a test commit.
+	
+	added 504 page (cloudfront) and associated template to the ngap 
+	resources
+	
+2022-08-25  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.13-44 2022-08-25T21:54:43+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-08-22  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.13-33 2022-08-22T23:42:36+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-08-19  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.13-30 2022-08-19T13:54:26+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-08-18  ndp-opendap  <ndp@opendap.org>
+	
+	Merge branch 'master' of https://github.com/opendap/olfs
+	
+	Updating github credentials for travis-ci-opendap
+	
+2022-08-17  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.13-28 2022-08-18T00:48:16+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.13-27 2022-08-18T00:30:06+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-08-15  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.13-22 2022-08-15T17:10:20+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-08-12  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.13-19 2022-08-12T19:02:00+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-08-09  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.13-16 2022-08-09T19:53:00+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.13-14 2022-08-09T18:22:49+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-08-03  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.13-10 2022-08-03T16:14:10+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-08-01  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.13-7 2022-08-01T18:32:55+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-07-29  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.13-4 2022-07-29T19:05:43+0000 - Triggering OLFS build 
+	for snapshots.
+	
+ 
+## -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+## olfs-1.18.13
+## hyrax-1.16.8
+##
+
+2022-07-22  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.13-0 2022-07-22T14:41:58+0000 - Triggering OLFS build for snapshots.
+
+2022-07-21  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.12-15 2022-07-22T00:24:34+0000 - Triggering OLFS build for snapshots.
+
+	bes-3.20.12-14 2022-07-21T23:51:20+0000 - Triggering OLFS build for snapshots.
+
+2022-07-21  ndp-opendap  <ndp@opendap.org>
+
+	Switched to templated Enumeration declration
+
+	Formatting those missing links.
+
+2022-07-21  Nathan Potter  <ndp@opendap.org>
+
+	Ncwms refit (#154)
+	* Retiring various XSLT stuff
+	* Fixed dap4Contents.xsl so that the viewers link works, and  migrated the schema.org annotations from the node_contents.xsl
+	* Fixed Updated schema.org links to https.
+	Removed commented out code.
+	* Fixed page formating with new css type
+
+2022-07-19  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.12-13 2022-07-19T16:35:54+0000 - Triggering OLFS build for snapshots.
+
+2022-07-14  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.12-11 2022-07-14T17:17:56+0000 - Triggering OLFS build for snapshots.
+
+	bes-3.20.12-6 2022-07-14T14:57:54+0000 - Triggering OLFS build for snapshots.
+
+2022-07-12  ndp-opendap  <ndp@opendap.org>
+
+	Lets go Travis!
+
+2022-07-11  ndp-opendap  <ndp@opendap.org>
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+
+	Added Attributes with DAP4 types to the "No NetCDF-3 Downloads For You" feature.
+
+2022-07-09  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.12-1 2022-07-09T19:05:19+0000 - Triggering OLFS build for snapshots.
+
+2022-07-07  ndp-opendap  <ndp@opendap.org>
+
+	Setting BES timeOut to 55 seconds (thanks CloudFront) for the NGAP deployment
+
+## -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+## olfs-1.18.12
+## hyrax-1.16.7
+##
+
+2022-07-06  ndp-opendap  <ndp@opendap.org>
+
+	Update build offset for hyrax-1.16.7
+
+2022-07-06  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.12-0 2022-07-06T18:20:59+0000 - Triggering OLFS build for snapshots.
+
+	bes-3.20.11-1 2022-07-06T16:55:01+0000 - Triggering OLFS build for snapshots.
+
+2022-07-05  ndp-opendap  <ndp@opendap.org>
+
+	olfs: Updating olfs version and release files to version 1.18.11
+
+2022-07-05  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.11-0 2022-07-05T17:58:43+0000 - Triggering OLFS build for snapshots.
+
+	bes-3.20.10-503 2022-07-05T17:18:27+0000 - Triggering OLFS build for snapshots.
+
+## -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+## olfs-1.18.11
+## hyrax-1.16.6
+##
+
+2022-07-05  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.11-0 2022-07-05T17:58:43+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.10-503 2022-07-05T17:18:27+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-07-01  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-501 2022-07-01T21:52:45+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-500 2022-07-01T19:47:24+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-497 2022-07-01T13:39:06+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-06-29  Nathan Potter  <ndp@opendap.org>
+	
+	Dap4 types remove nc3 button (#153)
+	* First pass at removing the Get As NetCDF3 button based on the 
+	presence of incompatible DAP4 types.
+	* Second pass at conditionally available  response buttons.
+	* Second pass at conditionally available  response buttons.
+	
+2022-06-27  ndp-opendap  <ndp@opendap.org>
+	
+	Merge branch 'master' of https://github.com/opendap/olfs
+	
+	Adding memcached-session-manager-tc9-2.3.2.jar for Tomcat 9
+	
+2022-06-27  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-495 2022-06-27T17:33:27+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-494 2022-06-27T16:58:03+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-06-21  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-490 2022-06-21T21:58:17+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-487 2022-06-21T08:33:33+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-06-20  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-486 2022-06-21T01:00:20+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-482 2022-06-20T23:37:59+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-06-20  ndp-opendap  <ndp@opendap.org>
+	
+	Merge branch 'master' of https://github.com/opendap/olfs
+	
+	Dropped awscli from travis host, add gnupg
+	
+2022-06-19  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-480 2022-06-19T14:03:36+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-478 2022-06-19T11:05:00+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-06-19  Nathan Potter  <ndp@opendap.org>
+	
+	Jaxb and javax update (#151)
+	* Add jaxb-runtime and javax-annotations to dependencies
+	* Adding javax-activation to lib and gradle
+	
+2022-06-17  ndp-opendap  <ndp@opendap.org>
+	
+	Unwinding jaxb failed jaxb stuff
+	
+	Merge branch 'master' of https://github.com/opendap/olfs
+	
+	Added jaxb-runtime-2.3.6 to libs, build.xml, and gradle.build
+	
+2022-06-17  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-475 2022-06-17T11:11:46+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-06-16  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-471 2022-06-16T17:40:36+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-468 2022-06-16T16:36:53+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-06-14  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-462 2022-06-14T18:52:56+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-06-14  ndp-opendap  <ndp@opendap.org>
+	
+	Switching sonarscan to gradle build...
+	
+	Setting sonar.log.level to DEBUG and sonar.ws.timeout to 2700
+	
+	Making ServletUtil changes JDK7
+	
+	Updating sonar scan library, new methods for ServletUtil
+	
+	Increased sonar.qualitygate.timeout to 2700 seconds(45 minutes) 
+	(doubt this helps)
+	
+	Increased travis_wait from 30 minutes to 45 minutes (doubt this 
+	helps)
+	
+	Merge branch 'master' of https://github.com/opendap/olfs
+	
+	Trying a bigger memory space for ant sonarscan
+	
+2022-06-13  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-461 2022-06-13T21:55:09+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-06-13  ndp-opendap  <ndp@opendap.org>
+	
+	Moving snapshots off openjdk8 to openjdk11
+	
+	Merge branch 'master' of https://github.com/opendap/olfs
+	
+	Disabling JDK8 build stage
+	
+2022-06-12  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-460 2022-06-13T01:37:39+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-06-10  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-435 2022-06-10T20:09:18+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-06-06  ndp-opendap  <ndp@opendap.org>
+	
+	Dropped DISTRO dependency on "check" target as that invokes 
+	JUnit tests which no linger work in TravisCI
+	
+2022-06-04  ndp-opendap  <ndp@opendap.org>
+	
+	Dropping junit stuff because "focal" does not seem to  have it.
+	
+	Switching build machine to "focal" from "trusty"
+	
+	Disabled JDK8 and JDK11 JUnit tests because TravisCI appears to 
+	have dropped support for JUnit with no warning. Nice change control 
+	TravisCI
+	
+	Back to "trusty", disabled JDK JUnit tests
+	
+2022-06-03  ndp-opendap  <ndp@opendap.org>
+	
+	Debugging apt ant/junit installation
+	
+	Debugging apt  junit installation
+	
+	Trying to add junit and ant to apt packages, switch to focal
+	
+	Trying to add junit to apt packages
+	
+	Switching TravisCI build to "bionic" from "focal"
+	
+	Switching TravisCI build to "focal" from "trusty"
+	
+	Switching TravisCI build back to "trusty"
+	
+2022-06-02  ndp-opendap  <ndp@opendap.org>
+	
+	Swtiching TravisCI to 'bionic'
+	
+	Merge branch 'master' of https://github.com/opendap/olfs
+	
+	Switching TravisCI build to "focal" from "trusty"
+	
+2022-06-02  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-414 2022-06-02T20:53:06+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-413 2022-06-02T19:52:45+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-05-31  ndp-opendap  <ndp@opendap.org>
+	
+	Merge branch 'master' of https://github.com/opendap/olfs
+	
+	Repaired HyraxAccessLog appender fileNamePattern so that rolled 
+	up log files have the correct name and end up in the correct location.
+	
+2022-05-27  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-409 2022-05-27T21:08:20+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-408 2022-05-27T20:58:18+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-05-26  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-402 2022-05-26T23:41:25+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-400 2022-05-26T19:49:04+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-394 2022-05-26T15:47:54+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-05-25  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-390 2022-05-25T21:55:55+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-05-24  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-386 2022-05-24T16:44:12+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-05-23  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-385 2022-05-23T20:14:18+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-384 2022-05-23T20:02:07+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-05-18  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-374 2022-05-18T19:57:52+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-05-17  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-371 2022-05-17T20:39:35+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-370 2022-05-17T18:47:04+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-05-13  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-368 2022-05-13T20:16:55+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-05-11  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-362 2022-05-11T21:51:45+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-05-09  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-347 2022-05-09T20:43:34+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-05-07  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-344 2022-05-07T12:03:46+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-05-06  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-342 2022-05-06T22:45:41+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-05-02  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-302 2022-05-02T20:03:56+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-300 2022-05-02T17:22:19+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-298 2022-05-02T16:33:07+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-04-29  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-290 2022-04-29T18:02:31+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-04-27  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-281 2022-04-27T19:28:12+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-279 2022-04-27T18:17:42+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-277 2022-04-27T17:23:24+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-04-26  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-275 2022-04-27T00:55:55+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-273 2022-04-26T19:21:13+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-04-25  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-271 2022-04-25T19:59:33+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-269 2022-04-25T17:27:15+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-04-19  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-248 2022-04-19T16:04:52+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-04-13  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-241 2022-04-13T21:34:53+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-238 2022-04-13T19:19:34+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-236 2022-04-13T15:48:59+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-04-12  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-235 2022-04-12T21:54:25+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-234 2022-04-12T21:27:24+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-232 2022-04-12T14:09:32+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-04-11  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-230 2022-04-11T12:02:44+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-04-08  Nathan Potter  <ndp@opendap.org>
+	
+	Apparently FileDispatchHandler is not actually ready to be 
+	deprecated. (#149)
+	
+2022-04-08  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-226 2022-04-08T19:21:14+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-225 2022-04-08T18:43:03+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-223 2022-04-08T15:57:58+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-04-06  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-216 2022-04-06T21:07:06+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-04-04  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-210 2022-04-04T20:10:11+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-04-01  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-207 2022-04-01T23:48:01+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-03-31  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-200 2022-03-31T19:15:49+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-198 2022-03-31T16:41:57+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-03-30  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-190 2022-03-30T19:57:34+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-03-29  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-184 2022-03-30T00:12:46+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-03-24  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-168 2022-03-24T23:06:19+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-166 2022-03-24T22:19:06+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-03-22  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-152 2022-03-22T17:12:06+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-03-18  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-148 2022-03-19T00:42:31+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-03-17  Nathan Potter  <ndp@opendap.org>
+	
+	Resetting jdk11 builds, dropping workaround (#147)
+	
+2022-03-14  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-144 2022-03-14T16:37:52+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-03-10  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-138 2022-03-10T19:26:15+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-03-10  Kodi Neumiller  <kneumiller@mtech.edu>
+	
+	Fixed kayako feedback link
+	
+2022-03-09  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-135 2022-03-10T00:40:41+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-03-09  ndp-opendap  <ndp@opendap.org>
+	
+	Adding trav_wait 30 to gradlescan
+	
+2022-03-09  Nathan Potter  <ndp@opendap.org>
+	
+	Adding a travis_wait 30 call to sonarscan (#146)
+	
+2022-03-09  Kodi Neumiller  <kneumiller@mtech.edu>
+	
+	Merge pull request #144 from OPENDAP/kayako_feedback
+	Added Kayako feedback link in footer of landing page
+	
+	Merge new changes from master
+	
+2022-03-09  ndp-opendap  <ndp@opendap.org>
+	
+	Upping sonarscan timeout to 30 minutes
+	
+2022-03-09  Nathan Potter  <ndp@opendap.org>
+	
+	Adding constraint expression to the history_json request_url 
+	field (#143)
+	* Adding constraint expression to the history_json request_url 
+	field
+	* URLDecode CE string before adding it to the request_url
+	* Removed URLDecode of CE string when adding it to the
+	history_json.request_url so that it matches what is
+	written to the CF history attribute.
+	* TravisCI hack for jdk-11
+	* TravisCI hack for jdk-11
+	* Removing jdk11 keys from .travis.yml as part of bad jdk11 
+	patch
+	* Removing jdk11 keys from .travis.yml as part of bad jdk11 
+	patch
+	* Removing jdk11 keys from .travis.yml as part of bad jdk11 
+	patch
+	* Adding ant targets to TravisCI build stage for sonarscan to 
+	see more infos
+	* Adding calls to the ant 'show' target for builds to verify 
+	jdk in use
+	* More TravisCI hackery for java 11
+	* Added decoded_constraint to history_json parameters
+	* Set sonarscan timeout to 9.5 minutes.
+	
+2022-03-08  Kodi Neumiller  <kneumiller@mtech.edu>
+	
+	Merge branch 'master' into kayako_feedback
+	
+2022-03-08  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-129 2022-03-08T17:25:27+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-03-07  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-127 2022-03-08T00:49:23+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-03-06  Kodi Neumiller  <kneumiller@mtech.edu>
+	
+	Add kayako feedback link
+	
+2022-03-04  ndp-opendap  <ndp@opendap.org>
+	
+	Merge remote-tracking branch 'origin/master'
+	
+	Moving Gradle scan into "gradlescan" stage to prevent a race 
+	condition in sonarcloud.io when two scans are being run at the same 
+	time.
+	
+2022-03-04  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-125 2022-03-04T21:34:28+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-123 2022-03-04T20:27:15+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-122 2022-03-04T20:00:37+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-120 2022-03-04T19:20:50+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-119 2022-03-04T19:09:05+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-03-04  ndp-opendap  <ndp@opendap.org>
+	
+	Merge remote-tracking branch 'origin/master'
+	
+	Moving Gradle scan into "scan" stage
+	
+2022-03-04  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-117 2022-03-04T14:18:02+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-03-03  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-115 2022-03-04T01:38:28+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-03-02  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-113 2022-03-02T19:55:28+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-112 2022-03-02T18:48:52+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-03-01  ndp-opendap  <ndp@opendap.org>
+	
+	force build
+	
+	Force build
+	
+	Merge branch 'master' of https://github.com/opendap/olfs
+	
+	Toned down the logging of unanticipated Authorization headers
+	
+	Toned down the logging of unanticipated Authorization headers
+	
+2022-02-25  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-102 2022-02-25T21:35:43+0000 - Triggering OLFS 
+	build for snapshots.
+	
+2022-02-24  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-100 2022-02-24T19:20:34+0000 - Triggering OLFS 
+	build for snapshots.
+	
+	bes-3.20.10-98 2022-02-24T16:52:37+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-02-24  ndp-opendap  <ndp@opendap.org>
+	
+	Dropped "Get As DAP2 Binary Object" button from the DAP4 Data 
+	Request Form because it is: - Not a compatible data model - Too much 
+	hacking to support the two request CE   syntax verions
+	
+2022-02-23  ndp-opendap  <ndp@opendap.org>
+	
+	Trying to undo the broken Version.java.in trick because it is 
+	breaking our deplyments.
+	
+2022-02-22  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-96 2022-02-22T17:43:52+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-02-20  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-94 2022-02-20T23:03:05+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-02-18  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-91 2022-02-18T20:53:03+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-02-17  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-90 2022-02-17T21:48:03+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-02-17  Nathan Potter  <ndp@opendap.org>
+	
+	Patching redirect loop from unexpected authorization header 
+	(#142)
+	* Patching redirect loop from unexpected authorization header
+	* SPelling correction
+	* Reworked EDL Auth token detetion logic
+	* Updated log message
+	* Refining usopported authorization schee rejection
+	* Updating key for unsupported authorization scheme rejection
+	* Updating key for unsupported authorization scheme rejection
+	* Fixing mangled URS auth keys
+	* Sorting out bad refactor of EDL token content.
+	* Switched 403 response for RejectUnsupportedAuthzSchemes
+	from a simple response.sendError() to throwing a Forbidden
+	exception which shuold allow for custom message content.
+	* Updated bad auth rejection message.
+	
+2022-02-17  ndp-opendap  <ndp@opendap.org>
+	
+	Merge branch 'master' of https://github.com/opendap/olfs
+	
+	Trying a hack to the minimum description length in json-ld
+	
+2022-02-16  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-89 2022-02-17T01:19:38+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.10-88 2022-02-16T23:37:18+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.10-86 2022-02-16T22:34:02+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.10-85 2022-02-16T18:25:55+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-02-15  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-84 2022-02-16T01:53:35+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.10-82 2022-02-15T22:30:38+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-02-14  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-79 2022-02-14T18:52:56+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-02-13  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-77 2022-02-13T19:09:42+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-02-13  Nathan Potter  <ndp@opendap.org>
+	
+	Detect client protcol change (#141)
+	* Updated RequInfo.getRequestUrlPath() so that it utilizes
+	the request headers:
+	- "CloudFront-Forwarded-Proto"
+	- "X-Forwarded-Proto"
+	- "X-Forwarded-Port"
+	In reconstructing the "request url" dereferenced by the
+	initiating client. This means the if some upstream entity
+	rewrites the URL (Like CloudFront does when it drops the
+	https protcol in favor of http for internal access) it
+	can be detected and links built by the server and returned
+	to the client as links be correct.
+	* Renamed ForceDataRequestFormLinkToHttps to ForceLinksToHttps
+	which is more in the spirit of the action.
+	* Added explanatory comment/reference for
+	javax.servlet.forward.* stuff
+	* Small bug fixes and copyright update on affected files
+	* TravisCI tweak to snapshot and trigger downstream builds.
+	* Trying deploy regex
+	* Trying complex stage conditionals
+	* Trying complex stage conditionals
+	* Trying complex stage conditionals
+	* Trying complex stage conditionals
+	* Trying complex stage conditionals
+	* Trying complex stage conditionals
+	* Hacking conditional deploy
+	* Hacking conditional deploy, v2
+	* Documentation comments in config file templates.
+	* Push for build
+	
+2022-02-11  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-76 2022-02-12T05:19:35+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.10-75 2022-02-12T04:48:26+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.10-74 2022-02-12T03:13:01+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.10-73 2022-02-12T02:21:27+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.10-66 2022-02-11T21:06:11+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-02-10  Sam Lloyd  <slloyd@opendap.org>
+	    ndp-opendap  <ndp@opendap.org>
+	
+	added gradle build to travis (#138)
+	* added gradle build to travis
+	* Dropped java 11
+	* added gradle build to travis
+	* Adding java11
+	* Add java11 to sonarscan
+	* removed extra blank lines
+	* removed duplicate scripts calls
+	* Build with gradle and java-11
+	* refactored scan acitvity
+	* first pass at gradle sonar scan code
+	* possible junit-jupiter-apr fix
+	* source and target compatibility change
+	* revert source and target compatibility change
+	* gradle and travis file changes
+	* gradle and travis file changes
+	* sonar testing
+	* sonar testing
+	* sonar testing
+	* sonar testing
+	* sonar testing
+	* clean up
+	* sonar.qualitygate.wait=true added
+	* small travis changes
+	
+2022-02-08  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-63 2022-02-09T00:45:30+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.10-61 2022-02-08T18:04:58+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-02-07  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-59 2022-02-07T18:55:36+0000 - Triggering OLFS build 
+	for snapshots.
+
+2022-02-03  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-54 2022-02-03T21:20:22+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.10-53 2022-02-03T21:10:35+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-02-03  ndp-opendap  <ndp@opendap.org>
+	
+	Hacking a localhost exception for HTTPS forcing of EDL returnTo 
+	URLs
+	
+	Hacking a localhost exception for HTTPS forcing of EDL returnTo 
+	URLs
+	
+	Testing for CloudFront-Forwarded-Proto headers. Force https is 
+	on only for Dataset URL in Forms.
+	
+2022-02-03  Nathan Potter  <ndp@opendap.org>
+	
+	Trying gradle builds with jdk11 (#140)
+	* Trying gradle build with jdk11
+	* Trying gradle build with jdk11
+	* Trying snyk with jdk11
+	
+2022-02-03  ndp-opendap  <ndp@opendap.org>
+	
+	Added jaxb-api.2.3.1 to Gradle files.
+	
+	Disabling ForceLinksToHttps to see if that is causing test 
+	failures in NGAP Bamboo build
+	
+2022-02-02  ndp-opendap  <ndp@opendap.org>
+	
+	Fixing Version.java template values
+	
+	Dropping sshpass
+	
+2022-02-02  Nathan Potter  <ndp@opendap.org>
+	
+	Fixing return to link for EDL so that it too is governed by 
+	ForceLinks (#139)
+	* Fixing return to link for EDL so that it too is governed by 
+	ForceLinks
+	* Fixing the travis mess
+	* Trying to fix sonarscan target
+	* Trying to fix sonarscan target
+	* Trying to fix sonarscan target
+	* Trying to fix sonarscan target - created jdk11 stage to
+	better understand jdk11 compile errors
+	* Added jaxb-api-2.3.1.jar to libs
+	* Added jaxb-api-2.3.1.jar for jdk11 build.
+	Turned on verbose ant invocation for jdk11 build
+	* Sonar Fixes. TravisCI adjustment.
+	* Sonar Fixes.
+	* Sonar unfixing to trigger failure
+	* Sonar unfixing to trigger failure
+	* Sonar fixing unfix
+	* Sonar fixing unfix
+	* Sonar fixing unfix
+	* Sorting Gradle targets
+	* Sorting Gradle targets
+	* Dropping redundant assignment.
+	
+2022-02-02  ndp-opendap  <ndp@opendap.org>
+	
+	Triggering travisci build
+	
+2022-01-31  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-52 2022-02-01T05:11:45+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-01-30  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-51 2022-01-31T01:32:38+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.10-50 2022-01-31T00:08:22+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-01-27  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-48 2022-01-27T23:18:33+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-01-26  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-43 2022-01-26T19:59:57+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.10-41 2022-01-26T15:13:35+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-01-25  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-40 2022-01-25T23:05:31+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-01-24  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-39 2022-01-24T20:10:03+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-01-19  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-34 2022-01-19T23:07:28+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.10-30 2022-01-19T18:33:32+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-01-13  James Gallagher  <jgallagher@opendap.org>
+	    Samuel Lloyd  <slloyd@opendap.org>
+	    The-Robot-Travis  <npotter@opendap.org>
+	
+	Gradle build (#128)
+	* first commit
+	* simplifing the ant_convert_build.gradle file
+	* Hacks...
+	* simplifing the ant_convert_build.gradle file
+	* simplifing the ant_convert_build.gradle file
+	* Moved Slav''s gradle file to 'build-for-synk' and hacked on 
+	build.gradle
+	gradle compileJava at least does not fail outright. WIP
+	* Added sourceSet for resources - WIP
+	The resources do not yet wind up in the war file.
+	* Added info
+	* Removed deprecated jcenter() from repositories{}
+	* Removed gradle_local_repo in favor of using 'lib'
+	* simplifing the ant_convert_build.gradle file
+	* simplifing the ant_convert_build.gradle file
+	* simplifing the ant_convert_build.gradle file
+	* Mods to the build.gradle file
+	* build.gradle changes
+	* build.gradle changes
+	* Took the filtering code and moved it around. Still a WIP
+	The war file looks OK, modulo the known issues
+	* filtering WIP
+	* more on the filtering; still a WIP since the war file does 
+	not work
+	* Hack for templated java source
+	* WIP - resolving the runtime classpath
+	* More work on the class cast error
+	The error is org.slf4j.impl.SimpleLoggerFactory cannot be cast 
+	to
+	ch.qos.logback.classic.LoggerContext
+	* Gradle file that builds a working opendap.war file
+	* Added wcs resources
+	* Correct libraries set for opendap.war - may not be minimal, 
+	however.
+	* Hacked the build.gradle. It now makes a runnable war file.
+	* checkpoint
+	* Added simple gradle build to Travis
+	* debug gradle build
+	* Added gradlew and switched to using that in travis
+	* Added gradle cache control and added opendap/bes/Version.java 
+	so the ant build works
+	* The jdk7 gradle build does not work - dropped
+	* checkpoint
+	* Gradle build and setting *_VESION on the cmd line works
+	* build.gradle changes
+	* build.gradle changes
+	* build.gradle changes
+	* build.gradle changes
+	* build.gradle changes
+	* build.gradle changes
+	* build.gradle changes
+	* build.gradle changes
+	* small fixes to previous push
+	* first pass at adding gradle scan to travis
+	* first pass at adding gradle scan to travis
+	* first pass at adding gradle scan to travis
+	* added gradle build to travis
+	
+2022-01-11  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-17 2022-01-11T17:07:29+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-01-08  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-16 2022-01-08T18:44:27+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-01-07  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-14 2022-01-07T23:16:30+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2022-01-06  ndp-opendap  <ndp@opendap.org>
+	
+	update
+	
+	Merge branch 'master' of https://github.com/opendap/olfs
+	
+	 Adding ant_targets, updating NEWS typo
+	
+2022-01-05  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-12 2022-01-05T21:45:47+0000 - Triggering OLFS build 
+	for snapshots.
+
+## -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+## hyrax-1.16.5
+## olfs-1.18.10
+##
+
+2021-12-30  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.10-0 2021-12-30T20:42:12+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.9-125 2021-12-30T16:58:03+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.9-124 2021-12-30T13:22:33+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-12-29  ndp-opendap  <ndp@opendap.org>
+	
+	Merge branch 'master' of https://github.com/opendap/olfs
+	
+	Dropped link to the (no longer supported) old data request form
+	
+2021-12-27  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-113 2021-12-27T19:51:47+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-12-21  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-108 2021-12-21T21:59:20+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-12-21  ndp-opendap  <ndp@opendap.org>
+	
+	Updated gradle.build for new SLF4J and Logback
+	
+2021-12-21  Nathan Potter  <ndp@opendap.org>
+	
+	Updating slf4j and logback libs (#135)
+	* Updating slf4j and logback libs
+	* Updating SLF4J and Logback loib refs in alternate build files
+	* Updated scrubbydubby
+	* Code Formatting
+	* Code formatting
+	* Dropping older Logback and SLF4J libs
+	
+2021-12-20  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-106 2021-12-21T03:01:16+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-12-17  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-105 2021-12-18T00:07:36+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-12-17  Nathan Potter  <ndp@opendap.org>
+	
+	Cleaning urlrewrite config and logging comments to reflect 
+	current implementaion (#134)
+	
+	Scrub client User-Agent string
+	Added Scrub step to client submitted User-Agent string prior to 
+	logging
+	
+2021-12-10  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-103 2021-12-10T05:55:34+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-12-09  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-99 2021-12-10T01:49:18+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-12-08  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-98 2021-12-09T02:54:47+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-12-01  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-91 2021-12-02T02:46:59+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-11-30  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-90 2021-11-30T18:11:10+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-11-24  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-89 2021-11-24T07:49:14+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.9-87 2021-11-24T05:59:42+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-11-23  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-86 2021-11-24T00:45:45+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-11-17  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-76 2021-11-18T01:49:59+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-11-16  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-74 2021-11-16T20:45:19+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-11-15  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-73 2021-11-15T23:37:37+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-11-10  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-68 2021-11-10T19:21:32+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.9-66 2021-11-10T07:15:33+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-11-08  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-61 2021-11-09T03:43:18+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.9-59 2021-11-09T00:20:04+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-11-04  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-58 2021-11-05T00:26:51+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.9-56 2021-11-04T22:00:14+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.9-55 2021-11-04T16:51:23+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-11-03  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-53 2021-11-03T23:09:23+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-11-03  ndp-opendap  <ndp@opendap.org>
+	
+	Oops. Adding new gson-2.8.9.jar file now
+	
+	Merge branch 'master' of https://github.com/opendap/olfs
+	
+	Upgraded gson-2.3.1 to gson-2.8.9
+	
+2021-11-03  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-52 2021-11-03T19:44:54+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-11-02  Nathan Potter  <ndp@opendap.org>
+	
+	Patch for bug in BES.trimPrefix() where the passed string was 
+	not (#133)
+	checked to see if it actually began with the prefix
+	
+2021-11-02  ndp-opendap  <ndp@opendap.org>
+	
+	Merge branch 'master' of https://github.com/opendap/olfs
+	
+2021-11-01  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-45 2021-11-02T00:47:26+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-11-01  ndp-opendap  <ndp@opendap.org>
+	
+	Cleaning up code and normalizing (some) member variable names.
+	
+2021-10-29  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-40 2021-10-29T22:16:33+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.9-38 2021-10-29T21:06:50+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.9-36 2021-10-29T17:11:02+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-10-28  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-32 2021-10-28T23:18:22+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.9-29 2021-10-28T19:24:01+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-10-27  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-28 2021-10-28T01:03:37+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.9-27 2021-10-27T20:42:17+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-10-22  Nathan Potter  <ndp@opendap.org>
+	
+	HTTPS always for the data request form URL (#130)
+	* First draft of forcing the datarequest fomr URL to https
+	* Updated default olfs.xml and ngap/olfs.xml with 
+	ForceDataRequestFormLinkToHttps elements
+	
+2021-10-22  ndp-opendap  <ndp@opendap.org>
+	
+	Merge branch 'master' of https://github.com/opendap/olfs
+	
+	Fixed incorrect redirect URL construction in FileAccess
+	
+2021-10-21  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-20 2021-10-22T01:30:59+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-10-21  Nathan Potter  <ndp@opendap.org>
+	
+	First pass at dataset_url management via redirects. (#129)
+	* First pass at dataset_url management via redirects.
+	* Updated olfs.xml cpmments and the ngap version of same
+	* More documentation work.
+	* More documentation work.
+	* More documentation work.
+	
+2021-10-18  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-15 2021-10-19T00:07:15+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-10-15  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-11 2021-10-16T00:46:14+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-10-14  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-8 2021-10-14T16:58:22+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-09-23  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-6 2021-09-23T19:51:52+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-09-23  dh-opendap  <dholloway@opendap.org>
+	
+	Updated to Version 1.18.9
+	
+2021-09-21  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-5 2021-09-21T17:07:01+0000 - Triggering OLFS build 
+	for snapshots.
+	
+	bes-3.20.9-4 2021-09-21T15:50:41+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-09-20  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-3 2021-09-20T19:38:32+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-09-17  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.9-2 2021-09-17T21:22:59+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-09-16  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.8-304 2021-09-16T21:14:51+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-09-15  The-Robot-Travis  <npotter@opendap.org>
+	
+	bes-3.20.8-303 2021-09-16T00:05:19+0000 - Triggering OLFS build 
+	for snapshots.
+	
+2021-09-15  dh-opendap  <dholloway@opendap.org>
+	
+	Updated on 2021-09-15
+2021-09-02  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-301 2021-09-02T22:39:38+0000 - Triggering OLFS build for snapshots.
+
+2021-08-30  ndp-opendap  <ndp@opendap.org>
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+
+	Cleaningup [skip-ci]
+
+2021-08-27  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-298 2021-08-27T23:30:28+0000 - Triggering OLFS build for snapshots.
+
+2021-08-27  Nathan Potter  <ndp@opendap.org>
+
+	Agg file changes (#127)
+	* aggfile changes
+
+	* Renamed opendap.logging.LogUtil to
+	opendap.logging.logging.ServletLogUtil because that's what it
+	actually is, and I need the LogUtil name for logging specific
+	code.
+
+	* Refactored logging utils to seperate Servlet specific
+	loggin control code from general. This allows
+	us to limit the source used to in the prodution
+	of non servlet applications.
+
+	* Cleanup ant for fr dmrpp aggregator.
+
+	* More log util refactoring
+
+	* Updating slf4j
+
+	* Retired slf4j-api-1.6.1.jar
+
+	* Added trust URLs switch.
+
+	* Found problem with java.net.URL and file protocol urls, abandoning
+
+	* Cleaning up aggregator
+
+	* Hacking an error handling issue
+
+	* Hacking an error handling issue
+
+	* Made raw BESError output conditional on logging state
+
+	* Added log output supression for opendap.xml.Util
+
+	Co-authored-by: Samuel Lloyd <slloyd@opendap.org>
+
+2021-08-19  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-292 2021-08-20T02:39:52+0000 - Triggering OLFS build for snapshots.
+
+	bes-3.20.8-290 2021-08-19T18:11:30+0000 - Triggering OLFS build for snapshots.
+
+2021-08-18  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-288 2021-08-19T00:05:20+0000 - Triggering OLFS build for snapshots.
+
+	bes-3.20.8-287 2021-08-18T23:24:39+0000 - Triggering OLFS build for snapshots.
+
+2021-08-18  ndp-opendap  <ndp@opendap.org>
+
+	Added travis-ci-opendap token
+
+2021-08-17  ndp-opendap  <ndp@opendap.org>
+
+	Added opendap target to build.xml for integration woth downstream Dcker tasks
+
+2021-08-12  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-282 2021-08-12T21:03:57+0000 - Triggering OLFS build for snapshots.
+
+2021-08-06  Nathan Potter  <ndp@opendap.org>
+
+	Fixed bug in computation of dimension sizes in the dap4 ifh xsl. (#126)
+
+2021-08-04  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-266 2021-08-04T22:41:55+0000 - Triggering OLFS build for snapshots.
+
+	bes-3.20.8-267 2021-08-04T22:31:55+0000 - Triggering OLFS build for snapshots.
+
+2021-08-04  Nathan Potter  <ndp@opendap.org>
+
+	Parts of the OLFS get retired. (#125)
+	* Retired SiteMapToCatalog command line class and build file.
+
+	* Updated aggregation-build.xml so that t compiles correcty.
+
+	* Mass retirement of build files and related stuff.
+
+	* Fixed pdpservice-build.xml so that oit compiles.
+
+	* Comments
+
+	* Retired the remaining code from the noaa s3 experiment
+
+	* Retired the remaining code from the noaa s3 experiment
+
+	* Updated robots.xml so that is compiles correctly.
+
+	* Simplified build.xml.z Retired robots.xml as that target is well covered in build.xml
+
+	* Retired the OSX mkPackage script
+
+	* Comments
+
+	* More comments and debugging
+
+2021-07-30  Nathan Potter  <ndp@opendap.org>
+
+	DSR shenanigans (#124)
+	* Dropped DSR response for just the dataset_url. Still works for .dsr suffix
+
+	* I think this fixes the DSR response so that
+	dap2 Data request form works as before, the dataset URL will return the file or 403
+	and is the <UseDAP2ResourceUrlResponse /> config param is not present then
+	<dataset_url>,html will return the DSR.
+
+	* Separated the DSR response fir dataset URL from the type of Data Request
+	Form that the server provides links to in the directory this allows us
+	have both forms working aat the same time, although it means a less
+	conformant DAP4 service stack for the dataset endpoint.
+
+	* Switched ngap config to be dap2 dataset url response and dap4 catalog forms
+
+	* Turned ye ol' bes www interface back on...
+
+	* Finished implementing the configuration ingest for the new
+	DataRequestForm parameter.
+
+2021-07-29  Nathan Potter  <ndp@opendap.org>
+
+	Dropped DSR response for just the dataset_url.  (#123)
+	* Dropped DSR response for just the dataset_url. Still works for .dsr suffix
+
+	* I think this fixes the DSR response so that
+	dap2 Data request form works as before, the dataset URL will return the file or 403
+	and is the <UseDAP2ResourceUrlResponse /> config param is not present then
+	<dataset_url>,html will return the DSR.
+
+2021-07-28  Nathan Potter  <ndp@opendap.org>
+
+	Redis libs (#122)
+	* In order to resolve start-up conflicts in
+	the OLFS/NGAP java libs I did the following:
+	- Retired reddis-all-3.11.6.jar and replaced with reddis-3.11.6.jar
+	- retired xercesImpl-2.12.0.jar and replaced with xercesImpl-2.12.1.jar
+	- removed xalan-2.7.2.jar from resources/ngap/lib (duplicate)
+
+	* Readme for retired.
+
+2021-07-28  ndp-opendap  <ndp@opendap.org>
+
+	Refactoring libraries to remove conflicts
+
+2021-07-27  ndp-opendap  <ndp@opendap.org>
+
+	Undoing xerces libs
+
+	Sorting out library issues
+
+	added logs subdir to gitignore
+
+	This commits blocks the loading of the various session manager jars because they are causing conflicts and need sorted.
+
+2021-07-23  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-265 2021-07-23T23:11:52+0000 - Triggering OLFS build for snapshots.
+
+	bes-3.20.8-262 2021-07-23T20:12:14+0000 - Triggering OLFS build for snapshots.
+
+	bes-3.20.8-260 2021-07-23T18:55:50+0000 - Triggering OLFS build for snapshots.
+
+	bes-3.20.8-259 2021-07-23T16:17:28+0000 - Triggering OLFS build for snapshots.
+
+2021-07-23  Slav Korolev  <slav.korolev@nasa.gov>
+
+	Hyrax 507 (#120)
+	* HYRAX-507: Fixed gradle dependancies according snyk scan.
+
+	* HYRAX-507: Updated Snyk token.
+
+	* HYRAX-507: Added reflectasm-1.11.9.jar and updated nvm version to 12.13.0
+
+	* HYRAX-507: Updated Snyk token.
+
+	* HYRAX-507: Corrected build.xml.
+
+2021-07-22  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-257 2021-07-23T03:38:14+0000 - Triggering OLFS build for snapshots.
+
+2021-07-21  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-251 2021-07-22T01:41:10+0000 - Triggering OLFS build for snapshots.
+
+2021-07-06  ndp-opendap  <ndp@opendap.org>
+
+	Fixed broken json error output
+
+2021-07-01  ndp-opendap  <ndp@opendap.org>
+
+	Added distributable to ngap web.xml
+
+	Readding Session Manager jats
+
+	Dropping memcached jars
+
+2021-06-30  ndp-opendap  <ndp@opendap.org>
+
+	Test commit
+
+	Updated production rules to include session manager code in the ngap application build.
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+
+	Added session manager jars to ngap resources
+
+2021-06-28  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-233 2021-06-28T23:21:44+0000 - Triggering OLFS build for snapshots.
+
+2021-06-28  Nathan Potter  <ndp@opendap.org>
+
+	Hyrax 434 (#119)
+	* HYRAX-434: Initial change.
+
+	* HYRAX-434: Used simple json lib in getHistoryJsonEntry.
+
+	* HYRAX-434: Corrected getHistoryJsonEntry.
+
+	* HYRAX-434: Made history_json output as JSONArray.
+
+	* Cleanup some oversights and added debugging to ReqInfo.getHistoryJsonEntry()
+
+	* dropping array wrapper from history_json value
+
+	* HYRAX-434: Cleaned code.
+
+	Co-authored-by: Slav Korolev <slav.korolev@nasa.gov>
+
+	Hyrax 434 (#118)
+	* HYRAX-434: Initial change.
+
+	* HYRAX-434: Used simple json lib in getHistoryJsonEntry.
+
+	* HYRAX-434: Corrected getHistoryJsonEntry.
+
+	* HYRAX-434: Made history_json output as JSONArray.
+
+	* Cleanup some oversights and added debugging to ReqInfo.getHistoryJsonEntry()
+
+	* dropping array wrapper from history_json value
+
+	* HYRAX-434: Cleaned code.
+
+	Co-authored-by: Slav Korolev <slav.korolev@nasa.gov>
+
+2021-06-25  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-231 2021-06-25T20:19:06+0000 - Triggering OLFS build for snapshots.
+
+2021-06-23  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-225 2021-06-23T21:01:51+0000 - Triggering OLFS build for snapshots.
+
+2021-06-22  ndp-opendap  <ndp@opendap.org>
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+
+	Disabling authentication on master branch (oops)
+
+2021-06-22  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-223 2021-06-22T22:43:56+0000 - Triggering OLFS build for snapshots.
+
+2021-06-22  Nathan Potter  <ndp@opendap.org>
+
+	Session serialization (#86)
+	* Trying to make our session content serializable
+
+	* Trying to make our session content serializable
+
+	* Trying to make our session content serializable
+
+	* Fiddling with Travis
+
+	* trying to run just scan
+
+	* trying to run just scan
+
+	* trying to run just scan
+
+	* makeing UserProfile serializable
+
+	* Making EarthDataLoginAccessToken serializable.
+
+	* Making EarthDataLoginAccessToken serializable.
+
+	* More fiddling with the serilization
+
+	* Trying tagging with @serial
+
+	* Trying tagging with @serial
+
+	* Removing unneeded annotations for serializable
+
+	* Missed an annotation
+
+	* Fixed REquestCache management in IdFilter and PEPFilter
+
+	* Comments shifting
+
+	* Added transient keyword of JsonObject in UserProfile
+
+	* Added transient keyword of JsonObject in UserProfile
+
+	* Enabled hyrax auth for session_serialization
+
+	* Fixing bad Appender ref.
+
+	* Fixing More AUth appender repirs and a refinment in LogUtil
+
+	* Fixing More AUth appender repirs and a refinment in LogUtil
+
+	* IdFilter debugging.
+
+	Co-authored-by: The-Robot-Travis <npotter@opendap.org>
+
+	Udates to error response managemtn (#117)
+
+2021-06-22  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-221 2021-06-22T19:14:58+0000 - Triggering OLFS build for snapshots.
+
+2021-06-16  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-211 2021-06-16T23:44:48+0000 - Triggering OLFS build for snapshots.
+
+2021-06-15  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-209 2021-06-15T15:05:41+0000 - Triggering OLFS build for snapshots.
+
+2021-06-14  Kodi Neumiller  <kneumiller@mtech.edu>
+
+	Merge pull request #116 from OPENDAP/landingPage
+	Landing page updates
+
+	Changed the link on the main page to the Quickstart guide
+	For now it is set to the Quickstart guide, it should be updated to the tutorial videos/page.
+
+2021-06-10  Kodi Neumiller  <kneumiller@mtech.edu>
+
+	Changed link/title to home page
+	The nasa meatball works as a sort of "home" button. So clicking on it should send the user back to the landing page.
+
+	Changed the nasa meatball link and title
+
+2021-06-09  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-207 2021-06-09T20:41:38+0000 - Triggering OLFS build for snapshots.
+
+	bes-3.20.8-204 2021-06-09T11:53:36+0000 - Triggering OLFS build for snapshots.
+
+2021-06-08  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-195 2021-06-08T17:32:36+0000 - Triggering OLFS build for snapshots.
+
+2021-06-08  ndp-opendap  <ndp@opendap.org>
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+
+	Changed the broken naming pattern for the PPT strings.
+
+	Added documentation for the FORMAT used in logback.xml
+
+2021-06-06  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-190 2021-06-07T02:23:04+0000 - Triggering OLFS build for snapshots.
+
+2021-06-04  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-189 2021-06-04T21:17:03+0000 - Triggering OLFS build for snapshots.
+
+	bes-3.20.8-187 2021-06-04T15:12:33+0000 - Triggering OLFS build for snapshots.
+
+2021-06-03  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-183 2021-06-03T21:34:27+0000 - Triggering OLFS build for snapshots.
+
+	bes-3.20.8-177 2021-06-03T17:59:20+0000 - Triggering OLFS build for snapshots.
+
+2021-06-02  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-173 2021-06-02T20:42:41+0000 - Triggering OLFS build for snapshots.
+
+2021-06-02  ndp-opendap  <ndp@opendap.org>
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+
+	Added UNIX time to OLFS logs in NGAP
+
+2021-05-31  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-164 2021-05-31T14:15:37+0000 - Triggering OLFS build for snapshots.
+
+2021-05-28  ndp-opendap  <ndp@opendap.org>
+
+	Fixed bad logback.xmk for ngap service
+
+2021-05-28  Nathan Potter  <ndp@opendap.org>
+
+	Added file size and last modified headers to flat file transfer (#115)
+
+2021-05-28  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-161 2021-05-28T17:39:51+0000 - Triggering OLFS build for snapshots.
+
+	bes-3.20.8-160 2021-05-28T15:37:53+0000 - Triggering OLFS build for snapshots.
+
+2021-05-27  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-159 2021-05-27T21:13:24+0000 - Triggering OLFS build for snapshots.
+
+2021-05-27  Nathan Potter  <ndp@opendap.org>
+
+	Enabled ChunkedInputStream debugging and cleaned up the messages in support of stream pollution problem  (#114)
+	* Dropping kruft block.
+
+	* Added debugging details to ChunkedInputStream
+
+2021-05-26  Slav Korolev  <slav.korolev@nasa.gov>
+
+	HYRAX-402: Removed question mark from history output when there is no… (#112)
+	* HYRAX-402: Removed question mark from history output when there is no constraint expression.
+
+	* HYRAX-402: Restored timestamp format.
+
+	* Update ReqInfo.java
+
+	Co-authored-by: Nathan Potter <ndp@opendap.org>
+
+2021-05-26  Nathan Potter  <ndp@opendap.org>
+
+	Fixing broken css and deployment context links construction in DSR HTML page (#113)
+
+2021-05-25  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-153 2021-05-25T23:19:32+0000 - Triggering OLFS build for snapshots.
+
+2021-05-25  ndp-opendap  <ndp@opendap.org>
+
+	Production rules for ngap builds
+
+	More travis grooming
+
+	More travis grooming
+
+	Working on travis.ym issues
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+
+	Made DAP4 default request form. Updated DAP4 Request Form title. Fixed broken numerical version build for ngap.
+
+2021-05-25  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-148 2021-05-25T17:01:28+0000 - Triggering OLFS build for snapshots.
+
+2021-05-24  ndp-opendap  <ndp@opendap.org>
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+
+	Added auth.log independant of debug log.
+
+2021-05-24  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-146 2021-05-24T07:04:04+0000 - Triggering OLFS build for snapshots.
+
+2021-05-20  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-142 2021-05-20T21:55:24+0000 - Triggering OLFS build for snapshots.
+
+2021-05-20  ndp-opendap  <ndp@opendap.org>
+
+	Dropping stdout from the list of NGAP log appenders
+
+2021-05-19  Nathan Potter  <ndp@opendap.org>
+
+	Ifh dimensions (#111)
+	* Dimension handling mostly fixed by creating a map object with the fqn values as
+	keys and the Dimension objects as values. Fixed broken FQN computation.
+
+	* Fixed duplicate Dimension rows.
+
+	* Updated comments
+
+	* Adds collapsible functionality to the Global Attributes.
+
+	* Repaired many broken things in the dap4Contents catalog nav page.
+
+2021-05-18  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-141 2021-05-19T01:29:11+0000 - Triggering OLFS build for snapshots.
+
+	bes-3.20.8-140 2021-05-18T20:23:06+0000 - Triggering OLFS build for snapshots.
+
+	bes-3.20.8-137 2021-05-18T17:21:42+0000 - Triggering OLFS build for snapshots.
+
+2021-05-17  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-136 2021-05-17T23:38:10+0000 - Triggering OLFS build for snapshots.
+
+2021-05-15  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-135 2021-05-15T23:59:52+0000 - Triggering OLFS build for snapshots.
+
+2021-05-14  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-133 2021-05-14T23:36:37+0000 - Triggering OLFS build for snapshots.
+
+2021-05-14  ndp-opendap  <ndp@opendap.org>
+
+	Build trigger
+
+2021-05-14  The-Robot-Travis  <npotter@opendap.org>
+
+	Added Scrub to query string content before writing to log.
+
+	Added Try blocks for exception handling in doHead()
+
+	Fixinf file layout to accommodate the weakness of SonarCloud
+
+	Added garbage removal to the BesError ingest. This may be covering for a bug in the way tht PPTClinet handles error chunks so we should look at this again
+
+2021-05-13  The-Robot-Travis  <npotter@opendap.org>
+
+	More with the the BesError fails.
+
+	Cleaned up BesError and improved error handling messsaging.
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+
+	Made UserProfile serializable
+
+2021-05-12  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-129 2021-05-12T21:10:41+0000 - Triggering OLFS build for snapshots.
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+
+	Adding dap2 and dap4 netcdf-4 responder to ngap debug.log
+
+	bes-3.20.8-127 2021-05-12T18:36:22+0000 - Triggering OLFS build for snapshots.
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+
+	Fixed bug (typo) introduced into UrsIdp
+
+	bes-3.20.8-125 2021-05-12T12:46:39+0000 - Triggering OLFS build for snapshots.
+
+2021-05-11  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-122 2021-05-11T19:36:31+0000 - Triggering OLFS build for snapshots.
+
+2021-05-08  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-108 2021-05-08T19:54:52+0000 - Triggering OLFS build for snapshots.
+
+2021-05-06  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-103 2021-05-06T17:58:47+0000 - Triggering OLFS build for snapshots.
+
+2021-05-04  The-Robot-Travis  <npotter@opendap.org>
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+
+	Making changes to enable the UserProfile object to be serialized.
+
+2021-05-03  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-98 2021-05-04T00:22:51+0000 - Triggering OLFS build for snapshots.
+
+2021-04-30  The-Robot-Travis  <npotter@opendap.org>
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+
+	POST Handler Patch For The NGAP Service.
+
+2021-04-29  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-96 2021-04-30T01:06:10+0000 - Triggering OLFS build for snapshots.
+
+	More HTTP debuggin
+
+	Loggin details
+
+2021-04-26  The-Robot-Travis  <npotter@opendap.org>
+
+	Headers, headers, headers
+
+2021-04-23  Nathan Potter  <ndp@opendap.org>
+
+	First pass at patching POST request handling (#109)
+	* First pass at patching POST request handling
+	with the ce in the POST body. The auth stack isn't doing it right.
+	and we'll need to do more. Appending the POST body CE to the URL
+	defeats the point of using the POST body CE which can be bigger
+	than a URL query in length.
+
+	* Comments
+
+	Co-authored-by: The-Robot-Travis <npotter@opendap.org>
+
+2021-04-20  The-Robot-Travis  <npotter@opendap.org>
+
+	Unwinding change to rewrite rules that is breaking ngap
+
+2021-04-20  Nathan Potter  <ndp@opendap.org>
+
+	Fixed broken attempts counting in BES.besTransaction() (#108)
+	* Fixed broken attempts counting in BES.besTransaction()
+
+	* COmments
+
+	* Added the ngap prefix for the list of redirects... Not sure if this will fix Owens issues but we'll give it a whirl.
+
+	* Trying a rewrite change for the ngap service
+
+	Co-authored-by: The-Robot-Travis <npotter@opendap.org>
+
+2021-04-15  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-88 2021-04-15T11:37:45+0000 - Triggering OLFS build for snapshots.
+
+2021-04-09  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-86 2021-04-10T03:19:32+0000 - Triggering OLFS build for snapshots.
+
+	bes-3.20.8-84 2021-04-10T00:58:38+0000 - Triggering OLFS build for snapshots.
+
+2021-04-08  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-79 2021-04-08T18:12:48+0000 - Triggering OLFS build for snapshots.
+
+2021-04-07  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-77 2021-04-08T00:29:02+0000 - Triggering OLFS build for snapshots.
+
+	bes-3.20.8-76 2021-04-07T20:51:16+0000 - Triggering OLFS build for snapshots.
+
+2021-04-02  The-Robot-Travis  <npotter@opendap.org>
+
+	Remove snapshot.time - was confused. The file belongs in hyrax-docker [skip ci]
+
+2021-04-02  James Gallagher  <jgallagher@opendap.org>
+
+	Basically a revert of the .travis.yml
+	Changes introduce on teh build-numbers branch were
+	temporary. These (un)edits don't change the build.
+	[skip ci]
+
+	Merge branch 'build-numbers'
+
+	Added blank 'snapshot.time' file
+
+	Modified location of the snaphot.time
+	This is used to trigger the docker container build of
+	hyrax (five different containers are built and pusehed
+	to Dockerhub).
+
+2021-04-01  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-62 2021-04-02T00:57:08+0000 - Triggering OLFS build for snapshots.
+
+	Fixing build version for ngap snaps
+
+	Setting up build versioned WAR files for OLFS CI builds.
+
+2021-03-30  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-3.20.8-48 2021-03-30T21:38:07+0000 - Triggering OLFS build for snapshots.
+
+2021-03-29  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-<version.build> 2021-03-30T01:59:44+0000 - Triggering OLFS build for snapshots.
+
+	bes-<version.build> 2021-03-30T00:19:52+0000 - Triggering OLFS build for snapshots.
+
+	bes-<version.build> 2021-03-29T23:53:39+0000 - Triggering OLFS build for snapshots.
+
+	bes-3.20.8-32 2021-03-29T22:22:09+0000 - Triggering OLFS build for snapshots.
+
+	bes-3.20.8-33 2021-03-29T21:48:35+0000 - Triggering OLFS build for snapshots.
+
+	3.20.8-31 2021-03-29T19:46:55+0000 - Triggering OLFS build for snapshots.
+
+	#!bin/bash OLFS_VERSION=1.18.8 TRAVIS_OLFS_BUILD_OFFSET=800 HYRAX_VERSION=1.16.3 TRAVIS_HYRAX_BUILD_OFFSET=830 2021-03-29T19:08:27+0000 - Triggering OLFS build for snapshots.
+
+2021-03-26  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-<version.build> 2021-03-26T21:06:28+0000 - Triggering OLFS build for snapshots.
+
+2021-03-25  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-<version.build> 2021-03-25T23:49:41+0000 - Triggering OLFS build for snapshots.
+
+2021-03-24  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-<version.build> 2021-03-24T18:11:58+0000 - Triggering OLFS build for snapshots.
+
+2021-03-23  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-<version.build> 2021-03-24T03:05:56+0000 - Triggering OLFS build for snapshots.
+
+	Teaking snapshot file
+
+	Fixing build tags
+
+	Fixing Typo
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+
+	Working on build versioning
+
+2021-03-22  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-<version.build> 2021-03-22T22:06:54+0000 - Triggering OLFS build for snapshots.
+
+	bes-<version.build> 2021-03-22T19:10:57+0000 - Triggering OLFS build for snapshots.
+
+2021-03-19  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-<version.build> 2021-03-19T20:23:30+0000 - Triggering OLFS build for snapshots.
+
+	bes-<version.build> 2021-03-19T16:08:55+0000 - Triggering OLFS build for snapshots.
+
+	bes-<version.build> 2021-03-19T13:14:42+0000 - Triggering OLFS build for snapshots.
+
+2021-03-18  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-<version.build> 2021-03-18T23:57:43+0000 - Triggering OLFS build for snapshots.
+
+2021-03-17  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-<version.build> 2021-03-17T23:38:57+0000 - Triggering OLFS build for snapshots.
+
+	bes-<version.build> 2021-03-17T21:49:06+0000 - Triggering OLFS build for snapshots.
+
+2021-03-16  The-Robot-Travis  <npotter@opendap.org>
+
+	Typo in landing page fix.
+
+2021-03-15  The-Robot-Travis  <npotter@opendap.org>
+
+	Added .svg files to universal access
+
+	Stopped filtering the png files.
+
+	Cleared docs for all access
+
+	Added hyrax name to version tag
+
+	Travis
+
+	Added build based versioning for Hyrax, filtering of ngap assests, and version injection into NGAP landing page.
+
+	More travis build numbers
+
+	Added build number and version to travis build.
+
+	picking up orphaned changes
+
+	footer links for ngap landing page
+
+2021-03-15  Nathan Potter  <ndp@opendap.org>
+
+	Remote thredds datasets (#107)
+	* Incremental checkin for (still) bnroken remote thredds dataset access.
+
+	* Formatting
+
+	* path adjustmens for landing page
+
+	* Fixed ngap lander
+
+	Co-authored-by: The-Robot-Travis <npotter@opendap.org>
+
+2021-03-15  The-Robot-Travis  <npotter@opendap.org>
+
+	Merge branch 'master' into remoteThreddsDatasets
+
+	Fixed ngap lander
+
+	path adjustmens for landing page
+
+2021-03-13  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-<version.build> 2021-03-13T23:21:05+0000 - Triggering OLFS build for snapshots.
+
+	bes-<version.build> 2021-03-13T06:43:17+0000 - Triggering OLFS build for snapshots.
+
+2021-03-12  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-<version.build> 2021-03-12T22:45:54+0000 - Triggering OLFS build for snapshots.
+
+	bes-<version.build> 2021-03-12T14:40:07+0000 - Triggering OLFS build for snapshots.
+
+2021-03-11  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-<version.build> 2021-03-12T02:15:25+0000 - Triggering OLFS build for snapshots.
+
+	Formatting
+
+	Merge branch 'master' into remoteThreddsDatasets
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+
+	Inspecting Travis env vars
+
+2021-03-10  The-Robot-Travis  <npotter@opendap.org>
+
+	bes-<version.build> 2021-03-11T04:00:21+0000 - Triggering OLFS build for snapshots.
+
+	bes-<version.build> 2021-03-11T03:28:19+0000 - Triggering OLFS build for snapshots.
+
+	Cleaning up travis.yml, w00t
+
+	Adding dedicated stage for hyrax-docker build trigger.
+
+	Switching to stages to sort out trigger for hyrax-docker
+
+	Switching to stages to sort out trigger for hyrax-docker
+
+	Adding after_script
+
+	Adding after_success
+
+	Adding after_success
+
+	Adding after_success
+
+	Adding control tio limit pushes to hyrax-docker
+
+	Adding control tio limit pushes to hyrax-docker
+
+	Adding control tio limit pushes to hyrax-docker
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+
+	Adding control tio limit pushes to hyarx-docker
+
+	bes-<version.build> 2021-03-10T18:31:19+0000 - Triggering OLFS build for snapshots.
+
+	BES-<version.build> 2021-03-10T16:03:13+0000 - Triggering OLFS build for snapshots.
+
+	More snapshot chain grooming [skip ci]
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+
+	build change commit grooming [skip ci]
+
+2021-03-09  The-Robot-Travis  <npotter@opendap.org>
+
+	 Triggering OLFS build for snapshots.
+
+	 Triggering OLFS build for snapshots.
+
+	 Triggering OLFS build for snapshots.
+
+	Made script for hyrax-docker trigger
+
+	Adding BES snapshot build trigger file. [skip ci]
+
+	Fixed egregious type
+
+	Added rewrite rule to route "/" and "/index.html" to the NGAP Landing Page.
+
+	Dropped unneeded redirect to landing page code.
+
+	Localized paths to external local resources.
+
+2021-03-08  Nathan Potter  <ndp@opendap.org>
+
+	New landing page for NGAP service (#106)
+	* Fixed an issue where UTF-8 content was not being handled correctly in
+	the docs servlet. By using getWriter() instead of getOutputStream() for
+	text files the problem is resolved
+
+	* Added landing page content to build process by copying content to a
+	 subdirectory of docs.
+
+	* Added redirect to new landing page with a fall back to the simple
+	auto-gen landing page.
+
+	* Adding NGAP landing page files
+
+	* Update ngap.html
+
+	Co-authored-by: The-Robot-Travis <npotter@opendap.org>
+
+2021-03-08  The-Robot-Travis  <npotter@opendap.org>
+
+	More stage nmames for olfs
+
+	Added names to olfs build stages
+
+2021-02-24  ndp-opendap  <ndp@opendap.org>
+
+	Merge branch 'master' into remoteThreddsDatasets
+
+2021-02-24  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #105 from OPENDAP/robots-base
+	Robots base
+
+2021-02-24  ndp-opendap  <ndp@opendap.org>
+
+	Incremental checkin for (still) bnroken remote thredds dataset access.
+
+	Merge branch 'master' into robots-base
+
+	Set ContentType header for NGAP landing page.
+
+2021-02-17  ndp-opendap  <ndp@opendap.org>
+
+	Updated variable name in BesSiteMap.java
+
+2021-02-16  ndp-opendap  <ndp@opendap.org>
+
+	Minor changes and comments
+
+	Unfixed a misunderstanding fix.
+
+	Added a Disallow for w10n/RemoteResources/
+
+	Updates to robots.txt capitalization
+
+	Updates to nascent robots.base file
+
+	Added robots.base to olfs config
+
+2021-02-12  ndp-opendap  <ndp@opendap.org>
+
+	Added rewrite rule for /robots.txt
+
+2021-02-11  ndp-opendap  <ndp@opendap.org>
+
+	Added Content-Tye headers to robots.txt and sitemap responses. Changed NGAP landing page formatting.
+
+	Added Content-Tye headers to robots.txt and sitemap responses. Changed NGAP landing page formatting.
+
+2020-12-30  ndp-opendap  <ndp@opendap.org>
+
+	Updates for olfs-1.18.8 release
+
+2020-12-29  ndp-opendap  <ndp@opendap.org>
+
+	Retired hyrax_tests as they have been migrated to the hyrax_regression_tests project.
+
+2020-11-30  James Gallagher  <jgallagher@opendap.org>
+
+	Merge pull request #103 from OPENDAP/HYRAX-292
+	HYRAX-292. Corrected build.gradle and updated build.xml
+
+2020-11-25  Slav Korolev  <slav.korolev@nasa.gov>
+
+	HYRAX-292. Corrected build.gradle and updated build.xml
+
+2020-11-20  James Gallagher  <jgallagher@opendap.org>
+
+	Removed .gradle/
+	[skip ci]
+
+2020-11-20  Slav Korolev  <slav.korolev@nasa.gov>
+
+	Merge pull request #101 from OPENDAP/HYRAX-314
+	Hyrax 314
+
+	Merge branch 'master' into HYRAX-314
+
+	HYRAX-314. Corrected run-snyk script.
+
+2020-11-20  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #102 from OPENDAP/json_ld_patch
+	Json ld patch loooooooks gooooooood
+
+2020-11-20  ndp-opendap  <ndp@opendap.org>
+
+	Added dap4 to patch
+
+	Added over length control to description
+
+	Second pass at description heuristic
+
+	Draft of a heuristic to grab a description string from top level metadata.
+
+2020-11-20  Slav Korolev  <slav.korolev@nasa.gov>
+
+	HYRAX-314. Changed permission to execute run-snyk.sh script.
+
+	HYRAX-314. Added run-snyk.sh script.
+
+2020-11-19  ndp-opendap  <ndp@opendap.org>
+
+	Test patch for missing description field.
+
+	Test patch for missing description field.
+
+2020-11-18  Slav Korolev  <slav.korolev@nasa.gov>
+
+	HYRAX-314. Corrected xerces version.
+
+	HYRAX-314. Corrected .travis.yml.
+
+2020-11-17  Slav Korolev  <slav.korolev@nasa.gov>
+
+	HYRAX-314. Fixed the versions for high vulnerability libraries proposed by Snyk.
+
+2020-11-16  Slav Korolev  <slav.korolev@nasa.gov>
+
+	HYRAX-314. Added gradle files.
+
+	HYRAX-314. Corrected build.gradle.
+
+	HYRAX-314. Add Gradle.
+
+	HYRAX-314. Added gradle server build.
+
+	HYRAX-289. Test travis with gradle and snyk.
+
+2020-11-10  Slav Korolev  <slav.korolev@nasa.gov>
+
+	HYRAX-289. Test travis with gradle and snyk.
+
+2020-10-31  ndp-opendap  <ndp@opendap.org>
+
+	Correcting mistaken commit of web.xml
+
+2020-10-30  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #99 from OPENDAP/edl_change_debug
+	Add info to error message from failed http GET/PUT requests
+
+2020-10-30  ndp-opendap  <ndp@opendap.org>
+
+	Refining http client use for the auth code.
+
+2020-10-28  ndp-opendap  <ndp@opendap.org>
+
+	Minor message content changes.
+
+	Adding mor informationl error message to submitHttpRequest()
+
+2020-10-27  ndp-opendap  <ndp@opendap.org>
+
+	Fixing Ngap and Gateway BESApi implementations so that they correctly request dap4 data when asked for it.
+
+2020-10-21  ndp-opendap  <ndp@opendap.org>
+
+	Adding uid to NGAP requests
+
+2020-09-25  ndp-opendap  <ndp@opendap.org>
+
+	Relaxing the no HEAD rule for testing. Need a more comlete implementation in th eDisoatchHandlers
+
+	Added a default implmentation of doHead() to the DispatchServlet that returns an HTTP 405 Method Not Allowed status.
+
+	-405
+
+	405
+
+2020-09-18  ndp-opendap  <ndp@opendap.org>
+
+	Added some explanation and examples of how to configure the log file roll over interval to the logback.xml file
+
+2020-09-17  ndp-opendap  <ndp@opendap.org>
+
+	Problems with image - adding more debug.
+
+2020-09-17  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #98 from OPENDAP/edl_token_to_uid
+	Convereted EDL token to uid conversion from
+
+	Merge pull request #97 from OPENDAP/edl_token_to_uid
+	Edl token to uid
+
+2020-09-17  ndp-opendap  <ndp@opendap.org>
+
+	Convereted EDL token to uid conversion from passing EDL client app id to passing the base 64 encoded EDLClientAuth code.
+
+	disabled atuh be defauklt.
+
+	dded code to determine user id from the edl auth token.
+
+2020-09-16  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #96 from OPENDAP/take_tokens
+	Take tokens
+
+2020-09-16  ndp-opendap  <ndp@opendap.org>
+
+	Typo fixing
+
+	Change a var name for clarity. Clean up for merge.
+
+2020-09-15  ndp-opendap  <ndp@opendap.org>
+
+	Null pointer handling in UserProfile.
+
+2020-09-14  ndp-opendap  <ndp@opendap.org>
+
+	Null pointer handling in UserProfile. API changes for GuestProfile
+
+	Seems to be working correctly after a basic mod to the access
+
+	Merge branch 'HYRAX-222' into take_tokens
+
+	Mergeed stash changes
+
+	Docs...
+
+2020-09-11  ndp-opendap  <ndp@opendap.org>
+
+	First (kind of broken) effort for acccepting tokens.
+
+2020-09-01  ndp-opendap  <ndp@opendap.org>
+
+	Triggering TravisCI
+
+	Adding comments to NgapBesApi
+
+2020-08-31  ndp-opendap  <ndp@opendap.org>
+
+	Sorting out EDL auth and Echo tokens for BES
+
+2020-08-24  ndp-opendap  <ndp@opendap.org>
+
+	Fixing a string literal
+
+2020-08-19  Samuel Lloyd  <slloyd@opendap.org>
+
+	8/19/20 - HYRAX-222 - added 2nd edl header to NgapBesApi
+
+2020-06-24  ndp-opendap  <ndp@opendap.org>
+
+	Set the besTransaction retry limit to the number of connections plus 2
+
+2020-06-16  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #95 from OPENDAP/try-it-again
+	Try it again
+
+2020-06-16  ndp-opendap  <ndp@opendap.org>
+
+	removing incorrect debug statement.
+
+	Added some debug logging.
+
+	olfs: Modified BES.besTRansaction() implementations to make a second attempt if the beslistener returns either a fatal error, atimeout error, or if the transaction encounters a PPTException..
+
+2020-06-16  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #94 from OPENDAP/client-disconnect
+	Client disconnect
+
+2020-06-11  ndp-opendap  <ndp@opendap.org>
+
+	olfs: Fixing message construction and error handling issues in anyExceptionHandler() code.
+
+2020-06-10  ndp-opendap  <ndp@opendap.org>
+
+	olfs: Fixing message construction issue in anyExceptionHandler() code.
+
+	olfs: Fixing message construction issue in anyExceptionHandler() code.
+
+	Revert "Fixing message construction issue in anyExceptionHandler() code"
+	This reverts commit 2d6965dd5890f940151baf9b8b0720a151fc7258.
+
+	Fixing message construction issue in anyExceptionHandler() code
+
+2020-06-03  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #93 from OPENDAP/new-disconnect
+	New socket closure proceedings.
+
+2020-06-01  ndp-opendap  <ndp@opendap.org>
+
+	olfs: Small cleanups.
+
+2020-05-30  ndp-opendap  <ndp@opendap.org>
+
+	olfs: Added more fine grained application of try/catch blocks in the readChunkedMessage() code. This should provide somewhat better instrumentation and hopefully understanding of some of the socket and io stream issues we've been seeing.
+
+2020-05-22  ndp-opendap  <ndp@opendap.org>
+
+	New socket closure proceedings.
+
+2020-05-07  ndp-opendap  <ndp@opendap.org>
+
+	olfs: Repairs an annoying double "/" problem in the construction of URS redirect URLs
+
+2020-05-06  ndp-opendap  <ndp@opendap.org>
+
+	olfs: HYRAX-137
+
+	olfs: Session debugging instrumentation.
+
+2020-05-05  ndp-opendap  <ndp@opendap.org>
+
+	olfs: Session debugging instrumentation.
+
+	olfs: Session debugging instrumentation.
+
+2020-05-04  ndp-opendap  <ndp@opendap.org>
+
+	olfs: Adding new logback config to ngap snapshot.
+
+	olfs: Adding new logback config to ngap snapshot.
+
+	More ngap configuration adjustments.
+
+	olfs: Making the ngap version of logback.xml (formerly known as logback-ngap.xml) be deployed in the ngap bundle.
+
+2020-04-22  ndp-opendap  <ndp@opendap.org>
+
+	Added DOI tag to README.md [skip ci]
+
+	olfs: Updating olfs version and release files to version 1.18.7
+
+	olfs: Fixes a hard coded deployment context in FileAccess.java.
+
+	Cleaning up retired code
+
+2020-04-16  ndp-opendap  <ndp@opendap.org>
+
+	olfs: This commit refines the output scrubbing in the mailto link content and disallows autocomplete in the HAI password field.
+
+	olfs: Added auto refresh to NGAP landing page.
+
+2020-04-14  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #92 from OPENDAP/scrubby
+	Scrubby
+
+2020-04-14  ndp-opendap  <ndp@opendap.org>
+
+	olfs: Makes jsp error pages more consistent w.r.t. message handling and user support email inclusion.
+
+	olfs: This commit drops multiple html encoding (ouch) and also special encoding calls for text/plain error responses (DAP2 errors) and CSV responses.
+
+	olfs: Added an informational comment...
+
+	olfs: This adds error message scrubbing/encoding to the jsp error pages.
+
+	 DAP2/4 error responses and to the requested resourceId transmitted  in the mailto links.
+
+	olfs: This commit makes the LogUtil.init() method thread safe and run once per deployment.
+
+	olfs: This commit retires the (ancient) error.html.proto file in lieu of the newer centrial error handling that relays on the OPeNDAPException.anyExceptionHandler() and the various error---.jsp files to build error responses.
+
+	olfs: This commit retires the (ancient) error.html.proto file in lieu of the newer centrial error handling that relays on the OPeNDAPException.anyExceptionHandler() and the various error---.jsp files to build error responses.
+
+	olfs: This commit retires the (ancient) error.html.proto file in lieu of the newer centrial error handling that relays on the OPeNDAPException.anyExceptionHandler() and the various error---.jsp files to build error responses.
+
+	olfs: This commit repairs a boot strapping problem in which the BESSiteMapService failed to install the default configuration in a newly available local location prior to attemting to read the configuration from said location.
+
+	olfs: This commit retires a number of unused xsl files.
+
+2020-04-14  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #91 from OPENDAP/log_config
+	Logging Configuration Repairs.
+
+2020-04-13  ndp-opendap  <ndp@opendap.org>
+
+	olfs: This commit returns log configuration priority to the logback.xml instead of the logback-test.xml file. It makes the software correctly locate the logback files by first checking in the current configuration directory, and if neither Logback file is found there then the default configuration directory:     $CATALINA_HOME/webapps/DEPLOYMENT_CONTEXT/WEB-INF/conf Is searched for the two files.
+
+2020-04-11  ndp-opendap  <ndp@opendap.org>
+
+	tweaking for travis
+
+2020-04-09  ndp-opendap  <ndp@opendap.org>
+
+	olfs:  This commit fixes a problem in wcs response formats where being listed in arbitrary order, breaking regression tests. Yay for ConcurrentSkipListMap!
+
+	olfs:  This commit fixes a problem in which WCS library dependencies were not being correctly included in the war files for the servers. Most of the change is in moving said libs onto the main lib dir.
+
+2020-04-08  ndp-opendap  <ndp@opendap.org>
+
+	olfs: Switched NGAP landing page to html
+
+	olfs: formatting output
+
+	olfs: Add simple hit counter to ngap service endpoint.
+
+	olfs: Added a bare bones bgap service endpoint page for health check clients.
+
+2020-04-07  ndp-opendap  <ndp@opendap.org>
+
+	olfs: Adding favicon.ico to list of things not to return to in an auth process.
+
+	olfs: Fixed bad FORMAT foe debug logging.
+
+	olfs: Mapped an ngap specific logback config into the logback-test.xml
+
+	olfs: Fixed bug in Log init path determination.
+
+	olfs: Debug grooming.
+
+2020-04-07  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #90 from OPENDAP/auth_logging
+	Auth logging
+
+2020-04-07  ndp-opendap  <ndp@opendap.org>
+
+	Adding logback-ngap.xml file to ngap package
+
+	olfs: Repairing race condition in logging initialization. Fixing auth filters so they correctly init logging.
+
+2020-04-03  ndp-opendap  <ndp@opendap.org>
+
+	Making the default ngap deployment context be named ngap (i.e. ngap.war)
+
+2020-04-02  ndp-opendap  <ndp@opendap.org>
+
+	Switch NGAP deployment context back to opendap from ROOT
+
+2020-04-01  ndp-opendap  <ndp@opendap.org>
+
+	olfs: Added customized olfs.xml to ngap resources.
+
+	olfs: Templated EDL information in user-access.xml
+
+2020-03-31  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #89 from OPENDAP/ngap-production
+	Ngap production - merging to master to see if deploy works. Couldn't get it to ignore the no deploy form PR rule.
+
+2020-03-31  ndp-opendap  <ndp@opendap.org>
+
+	olfs: Can't get past the pull request block on deploy. Setting rules to normative set and now I'm a gonna merge to master.
+
+	Tweaking travisCI to build a snapshot for this branch
+
+	Tweaking travisCI to build a snapshot for this branch
+
+	Tweaking travisCI to build a snapshot for this branch
+
+	Tweaking travisCI to build a snapshot for this branch
+
+	Tweaking travisCI to build a snapshot for this branch
+
+	Added new travis snappah stage for ngap., should deploy to S3
+
+	Added ngap-dist build target
+
+2020-03-31  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #88 from OPENDAP/ngap-only
+	Ngap only
+
+2020-03-31  ndp-opendap  <ndp@opendap.org>
+
+	olfs: Tidy. So tidy,
+
+	Reduced redundancy in build.xml while also creating a single source of truth for hyrax lib dependencies.
+
+	Fixed! This check-in adds: - Customized web.xml for NGAP that be default enables authentication. - A customized urlrewrite.xml that routes all traffic not specifcally   destined for on of the various service endpoints (hyrax, wcs, etc)   to the NGAP service endpoint - A new build target for the NGAP service that utlizes the above to   build a ROOT.war file for deployment into the root (aka /) context   for Tomcat.
+
+2020-03-30  ndp-opendap  <ndp@opendap.org>
+
+	Adding NgapServlet
+
+2020-03-23  ndp-opendap  <ndp@opendap.org>
+
+	Turning full Travis back on
+
+2020-03-21  ndp-opendap  <ndp@opendap.org>
+
+	Updated default Hyrax page with links and names and goodness.
+
+	olfs: Fixes poor logo display style in index.jsp
+
+	olfs: This change makes the default index.html file redirect to the jsp/index.jsp file by using a relative path, "../jsp/infex.jsp" rather than previosuly which baked the context name into the path like: "/opendap/jsp/index.jsp"
+
+	olfs: Fixing brojken reference to logo. This code was still using logo.gif and everything should have transitioned to logo.png by now."
+
+	olfs: This small change allows the FileService links to be properly constructed on the viewers page when the hyrax application is running in the ROOT context (aka default, or "", or the context with no name)
+
+	olfs: This small change allows the WCS links to be properly constructed on the viewers page when the hyrax application is running in the ROOT (aka default, or "", or the context with no name)
+
+	olfs: Dropping unused code copied from gateway.
+
+2020-03-20  ndp-opendap  <ndp@opendap.org>
+
+	Dropped redundant output from profile page
+
+2020-03-20  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #85 from OPENDAP/ngap-service
+	Ngap service
+
+2020-03-20  ndp-opendap  <ndp@opendap.org>
+
+	olfs: Added code to produce and inject the uid and EDL auth tokens to the BES DAP requests in NgapBesApi.java.
+
+2020-03-18  ndp-opendap  <ndp@opendap.org>
+
+	The ngap code now transmits the uid and EDL auth token if they are available
+
+2020-03-17  ndp-opendap  <ndp@opendap.org>
+
+	Merge branch 'master' into ngap-service
+
+2020-03-06  ndp-opendap  <ndp@opendap.org>
+
+	Fixing Error page in aggservlet
+
+2020-03-01  ndp-opendap  <ndp@opendap.org>
+
+	dropped NgapServlet because using it will create issues downstream. Primarily it will be hard to turn it on and off and by Adding it to the collaction of DispatchHandlers instantiated by opendap.coreServlet.Dispatch servlet we can add configuration canges to switch it on/off.
+
+	olfs: Added code to initialize the NgapDispatchHandler
+
+	Filenames, removing unused
+
+2020-03-01  danh_opendap  <dholloway@opendap.org>
+
+	Added ngap service end-point
+
+	Added ngap service
+
+	Added ngap service end-point
+
+	Initial source file upload.
+
+2020-02-12  ndp-opendap  <ndp@opendap.org>
+
+	Removed offending copy from buid.xml
+
+	Fixed packaging redundancy that was breaking docker builds.
+
+2020-02-11  ndp-opendap  <ndp@opendap.org>
+
+	olfs: Dropped unused imports
+
+2020-02-07  ndp-opendap  <ndp@opendap.org>
+
+	Updating version in release files, ChangeLog etc.
+
+2020-02-04  ndp-opendap  <ndp@opendap.org>
+
+	olfs: MOre serialization management
+
+	olfs: Dropped Serializable interface from auth objects.
+
+	olfs: SonarCloud reverting failed changes
+
+	olfs: SonarCloud 07
+
+2020-02-03  ndp-opendap  <ndp@opendap.org>
+
+	olfs: SonarCloud w00t 007
+
+	olfs: SonarCloud w00t 06
+
+	olfs: SonarCloud w00t 05
+
+	olfs: SonarCLoud w00t 05
+
+	olfs: SonarCloud w00t 04
+
+	olfs: SonarCloud w00t 03
+
+	olfs: SonarCloud w00t
+
+	olfs: SonarCloud w00t
+
+2020-02-01  ndp-opendap  <ndp@opendap.org>
+
+	olfs: Added uid to dap2 bes request docs.
+
+	olfs: Removed redundant cast.
+
+2020-01-30  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #84 from OPENDAP/ngap-53
+	Ngap 53
+
+2020-01-30  ndp-opendap  <ndp@opendap.org>
+
+	olfs: Reducing variable access.
+
+	olfs: Renames OAuthAccessToken to OAuth2Access token, plus ripple effects. Also first pass at transmitting session data to the bes
+
+	olfs: Renames OAuthAccessToken to OAuth2Access token, plus ripple effects. Also first pass at transmitting session data to the bes
+
+	olfs: Added the User object to the bulk of the BesApi calls. This had wide spread effects with more the 50 class affected. This commit passes all of the regression tests against the current bes/libdap  master branches.
+
+	olfs: Added the User object to the bulk of the BesApi calls. This had wide spread effects with more the 50 class affected. This commit passes all of the regression tests against the current bes/libdap  master branches.
+
+	olfs: Renamed opendap.auth.User to opendap.auth.AuthUser  and opendap.auth.Group to opendap.auth.AuthGroup to distinguish them  other components in the ecosystem.
+
+2020-01-29  ndp-opendap  <ndp@opendap.org>
+
+	olfs: Worked on UserProfile and OAuth2AccessToken. added an optional instance of the latter to the former. The toString() methods in both are update to produce json.
+
+2020-01-09  ndp-opendap  <ndp@opendap.org>
+
+	updating aws keys for travis
+
+	updating aws keys for travis
+
+2019-12-16  The-Robot-Travis  <npotter@opendap.org>
+
+	Typo
+
+	Typo
+
+	tweaks
+
+	Typo
+
+2019-12-04  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #83 from OPENDAP/selection_required
+	Selection required
+
+2019-12-03  The-Robot-Travis  <npotter@opendap.org>
+
+	Updated baselines so that the output represents enforce user selection disabled.
+
+	Updated baselines for HTML DataREquest Forms to reflect changes caused by the user selection required configuration activity.
+
+	Merge branch 'master' into selection_required
+
+	olfs: Consolidated the implementation of the various "Get As X" buttons in the IFHs so that there is a single underlying javascript method to service the lot of them, and not unique ones for every single button.
+
+	olfs: First draft of a configuration control to toggle the Data Request Forms requirement that the user select one or more variables for download before using the "Get As ..." buttons.
+
+	olfs: First draft of a configuration control to toggle the Data Request Forms requirement that the user select one or more variables for download before using the "Get As ..." buttons.
+
+2019-12-02  James Gallagher  <jgallagher@opendap.org>
+
+	Removed the source push to www.o.o
+
+	Key update
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+
+2019-11-29  James Gallagher  <jgallagher@opendap.org>
+
+	travis.yml syntax fix
+
+2019-11-28  James Gallagher  <jgallagher@opendap.org>
+
+	Updated AWS keys
+
+2019-11-27  James Gallagher  <jgallagher@opendap.org>
+
+	New Aws Keys
+
+2019-11-12  The-Robot-Travis  <npotter@opendap.org>
+
+	Updated baselines for IFH pages (dropped beta designation from title)
+
+2019-11-09  The-Robot-Travis  <npotter@opendap.org>
+
+	Switching to human readable snapshot time
+
+	Dropping beta label from IFH
+
+2019-10-30  James Gallagher  <jgallagher@opendap.org>
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+
+	Minor edit to NEWS to trigger a travis build
+
+2019-10-03  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #82 from OPENDAP/combined_log
+	Combined log
+
+2019-10-03  The-Robot-Travis  <npotter@opendap.org>
+
+	Merge branch 'master' into combined_log
+
+	Updates to root olfs.xml
+
+2019-10-03  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #81 from OPENDAP/combined_log
+	Combined log
+
+2019-10-03  The-Robot-Travis  <npotter@opendap.org>
+
+	Merge branch 'master' into combined_log
+
+	Updating git ignore to skip private keys
+
+2019-10-02  The-Robot-Travis  <npotter@opendap.org>
+
+	Combined logging step 2, the format
+
+	First pass at combining OLFS and BES logs.
+
+	Revert "First pass at combining OLFS and BES logs."
+	This reverts commit e811432198c3ae591ebcf341e625c790ee9cead3.
+
+	First pass at combining OLFS and BES logs.
+
+2019-09-20  The-Robot-Travis  <npotter@opendap.org>
+
+	cleaning up - builds are working and prdocts are being pushed.
+
+	cleaning up - builds are working and prdocts are being pushed.
+
+	cleaning up - builds are working and prdocts are being pushed.
+
+	Adding encrypted woo creds for snapshot push
+
+	Adding encrypted woo creds for snapshot push
+
+	Adding encrypted woo creds for snapshot push
+
+	Adding encrypted woo creds for snapshot push
+
+	Adding encrypted woo creds for snapshot push
+
+	Adding encrypted woo creds for snapshot push
+
+	Adding encrypted woo creds for snapshot push
+
+	Adding encrypted woo creds for snapshot push
+
+	Adding encrypted woo creds for snapshot push
+
+	Adding encrypted woo creds for snapshot push
+
+	Adding encryooted woo creds for snapshot push
+
+2019-09-17  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #80 from OPENDAP/no_nav
+	No navigation "feature" w00t! Here ya go Brooks!
+
+2019-09-17  The-Robot-Travis  <npotter@opendap.org>
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Wrestling scp
+
+	Added snapshot push to www.o.o/pub/olfs
+
+	Added snapshot push to www.o.o/pub/olfs
+
+	olfs: Comments etc
+
+2019-09-16  The-Robot-Travis  <npotter@opendap.org>
+
+	dropping file
+
+	olfs: Adding a trail configuration parameter <NoDynamicNavigation /> that shuts off all of the dynamically generated catalog/navigation pages. When enable the user must either supply and maintain THREDDS catalogs to be read by the server, or they have to provide their own system of navigation and discovery.
+
+	olfs: Adding a trail configuration parameter <NoDynamicNavigation /> that shuts off all of the dynamically generated catalog/navigation pages. When enable the user must either supply and maintain THREDDS catalogs to be read by the server, or they have to provide their own system of navigation and discovery.
+
+2019-09-11  The-Robot-Travis  <npotter@opendap.org>
+
+	Drop snapshot branch form docker construction
+
+2019-09-05  Nathan Potter  <ndp@opendap.org>
+
+	Working out commit trigger for docker builds.
+
+	Working out commit trigger for docker builds.
+
+2019-09-04  Nathan Potter  <ndp@opendap.org>
+
+	Trying to get travis to build
+
+	Trying to get travis to build
+
+	Trying to get travis to build
+
+	Trying to get travis to build
+
+	Trying to get travis to build
+
+	Trying to get travis to build
+
+	Trying to get travis to build
+
+	Trying to get travis to build
+
+	Trying to get travis to build
+
+	Trying to get travis to build
+
+	Trying to get travis to build
+
+	Trying to get travis to build
+
+	Trying to get travis to build
+
+	Trying to get travis to build
+
+	Trying to get travis to build
+
+	Trying to get travis to build
+
+	Trying to get travis to build
+
+	Trying to get travis to build
+
+	Trying to get travis to build
+
+	Trying to get travis to build
+
+	Trying to get travis to build
+
+	more ci faffing
+
+	more ci faffing
+
+2019-09-03  Nathan Potter  <ndp@opendap.org>
+
+	more ci faffing
+
+	more ci faffing
+
+	more ci faffing
+
+	more ci faffing
+
+	more ci faffing
+
+	more ci issues
+
+	Tyring to get the CI to run now.
+
+	more ci
+
+	more ci
+
+	more ci
+
+	More dockertime
+
+	More dockertime
+
+	More dockertime
+
+	More dockertime
+
+	More dockertime
+
+	More dockertime
+
+	More dockertime
+
+	New crednentials
+
+	New crednentials
+
+2019-08-30  Nathan Potter  <ndp@opendap.org>
+
+	issues...
+
+	issues...
+
+	issues...
+
+	issues...
+
+	issues...
+
+	issues...
+
+2019-08-29  Nathan Potter  <ndp@opendap.org>
+
+	issues...
+
+	issues...
+
+	issues...
+
+	issues...
+
+	issues...
+
+	issues...
+
+	issues...
+
+	issues...
+
+	issues...
+
+	issues...
+
+	issues...
+
+	issues...
+
+	issues...
+
+	issues...
+
+	issues...
+
+	issues...
+
+	issues...
+
+	issues...
+
+	issues...
+
+	issues...
+
+	Adding docker build for olfs to CO.
+
+2019-08-28  Nathan Potter  <ndp@opendap.org>
+
+	Working up Docker container build in .travis.yml
+
+	updating aws keys
+
+2019-08-27  Nathan Potter  <ndp@opendap.org>
+
+	Thrashing the snapshot thing. Added aws cli
+
+	Thrashing the snapshot thing. Added aws cli
+
+	Thrashing the snapshot thing. Added aws cli
+
+	Adding snapshot priduction to CI rules.
+
+	Adding snapshot priduction to CI rules.
+
+	Adding snapshot priduction to CI rules.
+
+	Adding snapshot priduction to CI rules.
+
+	Adding snapshot priduction to CI rules.
+
+	Adding snapshot priduction to CI rules.
+
+	Adding snapshot priduction to CI rules.
+
+	Adding snapshot priduction to CI rules.
+
+	Adding snapshot priduction to CI rules.
+
+	Adding snapshot priduction to CI rules.
+
+2019-08-22  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #79 from OPENDAP/hk-458
+	Hk 458
+
+	Updated test baselines gor changes made to IFH
+
+	w00t! And now it's working for dap4.
+
+	w00t! Works for DAP2
+
+	w00t! Works for DAP2
+
+	Seems like it might be working
+
+	checkpoint
+
+2019-08-21  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Debugging variable naming issue in IFH
+
+	olfs: Debugging variable naming issue in IFH
+
+2019-07-30  Nathan Potter  <ndp@opendap.org>
+
+	Updated README with DOI's for latest release.
+
+2019-07-10  Nathan Potter  <ndp@opendap.org>
+
+	olfs: More out content for json-ld.md
+
+	olfs: More out content for json-ld.md
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+
+	olfs: More out content for json-ld.md
+
+2019-07-10  James Gallagher  <jgallagher@opendap.org>
+
+	Update json-ld.md
+	more edits
+	[skip ci]
+
+	Update json-ld.md
+	minor edits
+	[skip ci]
+
+	Update json-ld.md
+	minor edits
+	[skip ci]
+
+	Update json-ld.md
+	Minor edits
+
+2019-07-10  Nathan Potter  <ndp@opendap.org>
+
+	olfs: More out content for json-ld.md
+
+	olfs: More out content for json-ld.md
+
+	olfs: More out content for json-ld.md
+
+	olfs: More out content for json-ld.md
+
+	olfs: - fleshing out json-ld.md
+
+	Adding json-ld.md plceholder. Fixes to mkDistro
+
+2019-07-09  Nathan Potter  <ndp@opendap.org>
+
+	Added mkDistro script. Updated default bes location in mkWorkingDist
+
+	olfs: Updating olfs version and release files to OLFS-1.18.5, Hyrax-1.16.0
+
+	Dropping accidental file.
+
+	Dropping accidental file.
+
+2019-07-01  Nathan Potter  <ndp@opendap.org>
+
+	Updated ChangeLog
+
+2019-06-27  Nathan Potter  <ndp@opendap.org>
+
+	olfs: - Added explanatory key for the varoius format fields used by the loggin appenders.
+
+2019-06-26  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #78 from OPENDAP/sonar
+	Sonar
+
+2019-06-25  Nathan Potter  <ndp@opendap.org>
+
+	more sonar issues
+
+	more sonar issues
+
+	Resolving logging indormation management issues.
+
+	olfs: - Removed identical subexpression cruft from dmr++ aggregation code.
+
+	Merge pull request #77 from OPENDAP/hk-338
+	Hk 338
+
+	Merge pull request #76 from OPENDAP/json-ld-baselines
+	Patching regresion test baselines for changes caused by a change in t…
+
+	Patching regresion test baselines for changes caused by a change in the JSON-LD encoding.
+
+	Added path_concat function to the threddsCatalogPresentation.xsl and threddsDatasetDetail.xsl in order to drop instances of multiple consecutive '/' characters in page link URLs.
+
+	Merge branch 'master' into hk-338
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+
+	Misspelling: [skip ci]
+
+	Update README.md
+
+	Updated sonarcube-ant-task to version 2.6.0.1426
+
+2019-06-24  Nathan Potter  <ndp@opendap.org>
+
+	Switched travis dist to trusty
+
+2019-06-21  Nathan Potter  <ndp@opendap.org>
+
+	Minor debug configuratoin change + code comments
+
+2019-05-28  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #75 from OPENDAP/dmrpp_agg
+	Dmrpp agg
+
+	olfs: - Added private default constructor to Timer class. - Added Timer calls to the XML parsing in the Util class
+
+2019-05-23  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #74 from OPENDAP/json-ld
+	Json ld
+
+2019-05-21  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Reworked, again, the JSON-LD string encoding. Dropped the suprisingly broken OWASP encoder in favor of Gson.
+
+	Switched to owasp encoder 1.2.2 add deubgging
+
+2019-05-20  Nathan Potter  <ndp@opendap.org>
+
+	SYnc commit. Problems not features.
+
+2019-05-16  Nathan Potter  <ndp@opendap.org>
+
+	olfs: comments
+
+	olfs: Copyright.
+
+	olfs: First full joinNew dmr++ agregator. w00t!
+
+2019-05-15  Nathan Potter  <ndp@opendap.org>
+
+	First pass at dmrpp aggregation. JoinNew appears to work...
+
+2019-04-19  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #73 from OPENDAP/ifh_var_names
+	Added filter to make javascript variables
+
+2019-04-18  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Dropped now unused jsonEncodeString() method.
+
+	Update baselines for change in IFH form content.
+
+	olfs: Made the generated javascript variable names in the DAP2/4 IFH egneric. Basically var_1, var_2, etc. This removes the collision between DAP Variable and Attribute names and the allowed character space for javascript variable names which we had previously.
+
+	olfs: Fixed bug in DAP4 IFH where Attribute values being added to the JSON-LD content was not correctly dual encoded - first to json and then to HTML. Now this mimics the DAP2 IFH.
+
+2019-04-16  Nathan Potter  <ndp@opendap.org>
+
+	Updated baselines for IFH responses accessing gsodock.dat. These were affected by the changes made to IFH javascript generation.
+
+	Added filter to make javascript variables names safe from crazy DAP var names.
+
+	Merge pull request #72 from OPENDAP/httpd_catalog_bug
+	olfs: Fixing bug that was breaking the httpd_catalog.
+
+2019-04-04  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Fixing bug that was breaking the httpd_catalog.
+
+2019-03-25  Nathan Potter  <ndp@opendap.org>
+
+	Fixed incorrect comment
+
+2019-03-21  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Updated DOI in README.md
+
+	olfs: Updated DOI in README.md
+
+	Updated default log configuration to include WCS access.
+
+	Updating .gitignore to ignore devloper cruft
+
+	HYRAX-1.15.4, OLFS-1.18.4
+
+	olfs: sonar
+
+2019-03-19  James Gallagher  <jgallagher@opendap.org>
+
+	Merge pull request #71 from OPENDAP/travis-test
+	Test change to travis build file.
+
+	Worked; added comments.
+	[skip ci]
+
+	Test change to travis build file.
+	Based on info from Travis HQ, I removed the jdk:... lines that apply
+	to the complete build and used the jdk: values set in the stages/jobs
+	part of the yaml file.
+
+2019-03-19  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #69 from OPENDAP/dap3.2
+	Dap3.2
+
+	Merge branch 'master' into dap3.2
+
+	Merge pull request #70 from OPENDAP/wcs_redux
+	Wcs redux
+
+2019-03-18  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Copyright injection
+
+	olfs: Added the rest of the atomic types for WCS (yeesh...)
+
+	olfs: Added the rest of the atomic types for WCS (yeesh...)
+
+	merged master to dap3.2
+
+	Merge branch 'master' into hk-338
+
+	Merge branch 'master' into hk-338
+
+2019-03-18  James Gallagher  <jgallagher@opendap.org>
+
+	Merge pull request #67 from OPENDAP/travis-sonar-scan
+	Travis sonar scan
+
+2019-03-18  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Adding cache dir to conf profile.
+
+2019-03-18  James Gallagher  <jgallagher@opendap.org>
+
+	Merge branch 'master' into travis-sonar-scan
+
+2019-03-18  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #66 from OPENDAP/bes_node_cache
+	Bes node cache
+
+	olfs: Documentation. destroy methods.
+
+2019-03-16  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Documentation. destroy methods.
+
+2019-03-15  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Cleaned up BesNodeCache API. Made sure the BesNodeCache can be disabled by omitting its configuration element from the olfs.xml file Simplified NodeTransaction
+
+	olfs: Comments to new sections of olfs.xml Reduced default refresh interval for BesNodeCache to 60 seconds
+
+	olfs: Retired old BesNodeCache and NodeTransaction. Renamed new NodeCache to BesNodeCache Reduced size of locked block in (Bes)NodeTransaction. Dropped unused code from NodeTransaction.
+
+	olfs: Simplified locking strategy
+
+	olfs: Reimplmented BesNodeCache using a modified LinkedHashMap with LRU ejection.
+
+	olfs: Reimplmented BesNodeCache using a modified LinkedHashMap with LRU ejection.
+
+2019-03-14  Nathan Potter  <ndp@opendap.org>
+
+	sync
+
+	olfs: More problems with dual list management.
+
+2019-03-14  James Gallagher  <jgallagher@opendap.org>
+
+	Done - leaving the extra tests in here - will hear from travis HQ soon
+
+	Done for now - only run the scan on the master branch
+
+	Still cannot get rid of the extra tests - I asked travis support
+
+2019-03-14  Nathan Potter  <ndp@opendap.org>
+
+	olfs: More problems with dual list management.
+
+2019-03-14  James Gallagher  <jgallagher@opendap.org>
+
+	more travis hacking
+
+2019-03-14  Nathan Potter  <ndp@opendap.org>
+
+	olfs: More problems with dual list management.
+
+	olfs: More problems with dual list management.
+
+2019-03-14  James Gallagher  <jgallagher@opendap.org>
+
+	Another try
+
+	another try
+
+2019-03-14  Nathan Potter  <ndp@opendap.org>
+
+	olfs: More problems with dual list management.
+
+2019-03-14  James Gallagher  <jgallagher@opendap.org>
+
+	YATH
+
+	hack travis; no default script for java
+
+2019-03-14  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Problem with dual list management.
+
+2019-03-14  James Gallagher  <jgallagher@opendap.org>
+
+	More travis hackery - use the default script 'ant test' to run the tests
+
+	attempt to fix the errant 'ant test' default script for Travis
+
+2019-03-14  Nathan Potter  <ndp@opendap.org>
+
+	olfs: More fiddling with the locks...
+
+	olfs: More fiddling with the locks...
+
+2019-03-14  James Gallagher  <jgallagher@opendap.org>
+
+	Must build the code before running sonar scan
+
+	Merge branch 'master' into travis-sonar-scan
+
+	Modify the travis.yml to run the scan for a PR
+
+	Added the sonar build
+	Modified build.xml and .travis.yml
+
+2019-03-14  Nathan Potter  <ndp@opendap.org>
+
+	olfs: test target change
+
+	olfs: Concurrency bug patch for cache purge activity.
+
+	More node request grinding
+
+2019-03-13  James Gallagher  <jgallagher@opendap.org>
+
+	Syntax fix in travis.yml
+
+	Partially-complete update to .travis.yml
+	Needs password info and to be merged with a branch that has the ant
+	target for sonar.
+
+2019-03-13  Nathan Potter  <ndp@opendap.org>
+
+	Merge branch 'master' into bes_node_cache
+
+	olfs: Change method name of readability/clarity
+
+	olfs: Cleaning up logging output for understandability.
+
+	olfs: Cleaning up logging output for understandability.
+
+	olfs: Cleaning up logging output for understandability.
+
+	updating nodecache test harness
+
+	olfs: Dropping jsp file back to Java 7
+
+	olfs: Comments.
+
+	olfs: Fixed BesNodeCache so it self initializes with default values if its init() method(s) have not been run.
+
+	olfs: Renamed BESSiteMap to (the more conformant) BesSiteMap
+
+	olfs: Updated default olfs.xml file with default/example configuration elements for BesNodeCache and BESSiteMap
+
+	olfs: Updated the configuration code for BESSiteMap and BesNodeCache so that they are "immune" to the configuration omitting their respective configuration parameters
+
+2019-03-12  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Changed BESManager.config() API so that the ServletContext is passed into the configuration method. This was needed to allow the BESManager to determine the location of the configuration directory.
+
+	olfs: Added directive to robots.jsp to trim leading whitespace from response document.
+
+	olfs: Revised locking strategy fo rBesNodeCache.
+
+2019-03-11  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Sync check in. Code is working but lock usage is sloppy and requires refactor. This code appears to be working correctly (surpising, actually...)
+
+	olfs: Test harness improvements: - Save robots.txt - Check for http errors when asking for catalogs and datasets.
+
+	olfs: Fixed robots.jsp to correctly condition teh SiteMap.
+
+	olfs: Fixed problem with .gitignore that was causing parts of the hyrax web application resources to be excluded from git management.
+
+	olfs: Fleshing out tests code for BesNodeCache
+
+	olfs: Converted BESSiteMap to use Read/Write locks for higher throughput and a more sensible locking strategy.
+
+	olfs: Consolidated exception catching in robots.jsp
+
+2019-03-08  Nathan Potter  <ndp@opendap.org>
+
+	dropping gsoc adoc that jhrg didn't like
+
+	olfs: More updates to GSOC proposal
+
+	sync
+
+2019-03-08  James Gallagher  <jgallagher@opendap.org>
+
+	Update ifh.adoc
+
+	Update ifh.md
+
+2019-03-08  Nathan Potter  <ndp@opendap.org>
+
+	olfs: More updates to GSOC proposal
+
+	olfs: Drafting test script for BesNodeCache
+
+	olfs: Comments and javadoc in BesNodeCache code.
+
+2019-03-07  Nathan Potter  <ndp@opendap.org>
+
+	fixed syntax issue and spelling.
+
+	Fixed broken link syntax in ifh.md
+
+2019-03-07  James Gallagher  <jgallagher@opendap.org>
+
+	Added md version so links will work
+
+	Update ifh.adoc
+
+	Update ifh.adoc
+
+	Update ifh.adoc
+
+	Update ifh.adoc
+
+	Update ifh.adoc
+
+	Update ifh.adoc
+
+	Update ifh.adoc
+
+2019-03-07  Nathan Potter  <ndp@opendap.org>
+
+	olfs: GSOC 2019 1st draft
+
+	olfs: Javadoc, scope changes, etc.
+
+	olfs: Made the BesNodeCache self-contained with a single public method  "getNode()" (Well the "init()" methods are also public but...) Calling  getNode() does all of the lifting of retrieving, caching, and otherwise  managing the BES showNode command activity. In doing so some of the  simple doument production methods in BesAPI had to become static as well  as the getBES() method.
+
+2019-03-06  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Removed excessive whitespace from Timer class
+
+	olfs: Added initialization call to BesNodeCache to BESManager. Reworked BESManager to be a true singleton. Modified various users of BESManager to reflect these changes.
+
+	olfs: Added NodeCache configuration element to olfs.xml
+
+	olfs: Retired CatalogCacheUpdater (too much thread fuss)
+
+	olfs: Re-retired BesResponseCache
+
+	olfs: Retired BesCatalogCache
+
+	olfs: Updated BEsAPI by removing dperecated getCatalog() method and adding calls to BesNodeCache to the getNode() method.
+
+	olfs: First functional draft of an in memory cache for BES node responses
+
+2019-03-05  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #65 from OPENDAP/respponse_logging_2
+	Respponse logging 2
+
+	olfs: Reworked logging so that it's easier to control what goes into the various logs based on the component services. Added log IDs to LogUtil, and added log appenders to the logback.xml for default access logging (no LastModified logging) and all appenders to logback-test.xml
+
+	olfs: Added response size logging to the DAP i INFO response (missed it earlier)
+
+	olfs: Fixed logback.xml and logback-test.xml to correct a missed change
+
+	Merge pull request #64 from OPENDAP/response_size_logging
+	Response size logging
+
+	olfs: Added response size logging to DAP4 metadata responses.
+
+	olfs: Added response size logging to DAP2 metadata responses.
+
+	olfs: Improved RequestCache.closeThreadCache() by adding code to explicitly wipe the Thread's cache item content.
+
+	olfs: Added response size reporting to DAP4 data responses.
+
+	olfs: Updated logback configuration with  response size output.
+
+	olfs: Added cleanup code for the log4j MDC object which prevents stale values from leaking across requests. Add LogUtil.setResponseSize() method to assist in response size reporting.
+
+	olfs: Added cleanup code for the log4j MDC object which prevents stale values from leaking accross requests. Add LogUtil.setResponseSize() method to assist in response size reporting.
+
+	olfs: Simplified response size API usage.
+
+2019-03-04  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Added response size reporting to SiteMap activity
+
+	olfs: Added code to capture size of response and add it to the HraxAccess log. All DAP2 data responses
+
+	olfs: Adding https as a viable thredds:catalogRef@href protocol to the opendap.thredds.CatalogManager"
+
+	Merge branch 'master' into response_size_logging
+
+	olfs: This commit repairs the broken HyraxAccess log by changing the name back to what the downstream code expects.
+
+	Merge branch 'master' into response_size_logging
+
+	Merge pull request #63 from OPENDAP/lazy_admin_info_retrieval
+	Lazy admin info retrieval
+
+	olfs: Renamed private member variables. Initialized uninitialized memeber variable.
+
+	Merge branch 'master' into response_size_logging
+
+2019-03-03  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Improved thread synchronization in the assignment of AdminInfo and SupportEmail member variables.
+
+	olfs: Refactored the way that AdministratorInformation and SupportEmail values are retrieved. Before this every time and error page or directory page was built the underlying BES was queired for these values. I moved this activity in to the BES object and made them lazy evaluations: The first time either is requested (for a given BES) the value is retrieved from the BES and cached in the BES object. Subsequent requests are fulfilled using the in-memory cached values. This limits the querying activity to a single pass for each BES until Tomcat is restarted.
+
+2019-03-02  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Switched non-error related calls to log.error() to log.debug()
+
+	olfs: Dropped method from non-debug logging format because they can create performance degradation.
+
+	olfs: Updated logging format to include method names
+
+	olfs: Added total bytes per message counter and log result statement to ChunkedInputStream
+
+	Merge branch 'master' into response_size_logging
+
+2019-03-01  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Removed unused (and logically empty) file
+
+	olfs: Cleaned up configuration processing logic.
+
+	olfs: Cleaned up configuration processing logic.
+
+	olfs: Deprecated unused code.
+
+	olfs: Dropped fired employee from .travis.yml notifications list.
+
+2019-02-23  Nathan Potter  <ndp@opendap.org>
+
+	Fixed typo in README.md
+
+	Update README.md with release DOI and correctional edits.
+
+2019-02-20  Nathan Potter  <ndp@opendap.org>
+
+	Merge branch 'master' into hk-338
+
+	Fixed typos in NEWS
+
+2019-02-19  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Updating olfs version and release files to version 1.18.3
+
+	olfs: Updating olfs version and release files to version 1.18.3
+
+	olfs: Cleaned up code and exception handling. Added main to experiment with the java.nio.file.* package.
+
+2019-02-15  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #61 from OPENDAP/sonar
+	Sonar
+
+	Retired semantic engine and wcs-1.1.2 code as it is unused.
+
+	olfs: Removed unused imports. Logging cleanup. Annotations. Migrated to ArrayList from Vector.
+
+	olfs: Added private constructor to namespace classes.
+
+	olfs: Log messages and added @Override to init()
+
+	olfs: Oops. Arguments to ConcurrentHashMap.putIfAbsent() still require templates in Java7.
+
+	olfs: Groom the log calls.
+
+	olfs: Added call to Thread.currentThread().interrupt() when handling InterruptedException . This call does not throw an exception but rather resets the Threads state to Interrupted. Also moved to a more generic SortedMap from TreeMap
+
+	olfs: Cleaned up BES exception handling. Replaced Vector with ArrayList. Other stuff, ripple effects to BESManager, BESConfig, and besctl.jsp
+
+	olfs: Fixed concurrency issues. Made member variables static final.
+
+	olfs: Fixed Thread state issues. Consolidated exception handling
+
+	olfs: Added logging output to test code, fixed Thread state issues.
+
+2019-02-14  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Added logging output to test code, fixed Thread state issues.
+
+	olfs: Cleaned up member variables, protected init() method from thrad contentions.
+
+	olfs: Cleaned up member variables, protected init() method from thrad contentions.
+
+	olfs: Fixed null pointer issue.
+
+	olfs: Fixed null pointer issue in tests. Made many static members final.
+
+	olfs: Fixed math round off issue.
+
+	olfs: Repaired potential null pointer issue.
+
+	olfs: Repair manner in which collections are updated and how the success of the update is evaluated.
+
+	olfs: Fixed logging, LMT response. Made Servlet's member variables private static final. Some ripple effect.
+
+	olfs: Fixed logging, LMT response. Made Servlet's member variables private static final. Some ripple effect.
+
+	olfs: Fixed logging messages. Fixed LMT response
+
+	olfs: Changed Servlet member variables to static final. Added lock on Servlet initialization. Ripple effects...
+
+	olfs: Improved logging. Altered scope of member variables to reflect the singleton nature of the Servlet implementation.
+
+	olfs: Improved error handling. Removed cruft code. Improved LastModified response.
+
+	olfs: Fixed logging of http status.
+
+	olfs: Improved error handleing.
+
+	olfs: Made private member variables and added accessor methods. (ripple effect of previous commit)
+
+	olfs: Made private member variables and added accessor methods.
+
+	olfs: General cleanup. Made member variables provate static and final when appropriate. Improved exception management.
+
+	olfs: Utilized more specific BadConfigurationException class in lieu of the parent Exception
+
+	olfs: Fixed awkward static assignment.
+
+	olfs: Fixed bug in error handling.
+
+	olfs: Fixed javadoc, imprved logging message for init.
+
+	olfs: Reduced use of System.err. Improved logging initialization.
+
+	olfs: Made public static member variable private.
+
+	olfs: Made public static member variable final.
+
+2019-02-13  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Error handling, member variable scope, etc.
+
+	olfs: made member variable private.
+
+	olfs: Minor logging change.
+
+	olfs: Improved error handling and member variable naming conformance
+
+	olfs: Improved naming convention conformance for public static final variables in BesApi.java, some ripple effect
+
+	olfs: Improved size computations by eliminating integer operations.
+
+	olfs: Retired unused class ConcurrentRing.java
+
+	olfs: Repaired minor usage issue.
+
+	olfs: Repaired error handling issues.
+
+2019-02-11  Nathan Potter  <ndp@opendap.org>
+
+	Merged master branch into sonar branch
+
+	Merge pull request #62 from OPENDAP/aws
+	Aws
+
+	Merged master into aws. Tests pass. Woot.
+
+	Syntax and logging cleanup.
+
+2019-02-08  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Repaired numerous problems with logging and
+
+	olfs: Repaired potential null pointer issue.
+
+	olfs: Repaired issues and added @Override annotations where needed.
+
+	olfs: Repaired minor problems
+
+2019-02-07  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Repaired numerous problems with logging and exception handling.
+
+	olfs: Repaired bad exception handling.
+
+	olfs: Repaired numerous problems with logging instance variables  scope/lifecycle.
+
+	olfs: Migrated to Entity indifferent XML parsers instances.
+
+	olfs: So. Many. Issues.
+
+	olfs: SmtPArser was unused and broken. Retired...
+
+	olfs: Repaired various problems. Added methods for generating Entity indifferent XML parsers for use in the code base.
+
+2019-02-06  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Abandoned use of environment variables to locate configuration directory.
+
+	olfs: More cleanup in w10n api.
+
+	olfs: Dropped unused parameter to Version.setOpendapMimeHeaders(). This had broad effects in the code base and while I was doing all that I dumped a bunch of excessive whitespace from the code.
+
+	olfs: Cleaned many small issues with logging, variable/method  visibility, and strings literals.
+
+	olfs: Promote byte to unsigned byte, aded Override annotations to appropriate methods.
+
+	olfs: Fixed mismatched parameter list for log call.
+
+	olfs: Added aws and noaa_s3 packages to sonar exclusions (for now).
+
+	olfs: Closed unclosed stream.
+
+	Fixed issues with PathBuilder
+
+2019-02-05  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #60 from OPENDAP/support_emails_links
+	olfs: Added support email links to IFH pages and HTML catalog pages.
+
+	olfs: Fixed default support email value
+
+	Patched test baselines broken by adding aupport mailto to link to IsFH
+
+	olfs: Added support email links to IFH pages and HTML catalog pages. Modified the OPeNDAPException.getSupportMailtoLink() to produce mailto links so that email text for errors is different than for simple questions about the service.
+
+2019-02-04  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #59 from OPENDAP/hk-340
+	cleanup
+
+	cleanup
+
+	Merge pull request #58 from OPENDAP/hk-340
+	This repairs the Viewers servlet so that it correctly URL decodes the passed query parameters.
+
+	Fixed..
+
+2019-02-01  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #57 from OPENDAP/remote_thredds_presentation
+	Remote thredds presentation
+
+	Added path_concat() function to threddsCatalogPresentation.xsl The function is not yet utilized, but will be to solve this bug. Look at node_catalog.xsl for usage.
+
+	Privatization of internal varibes.
+
+	More thredds dataset detail cleanup.
+
+	Added dialog box to both IFH stacks that asks users to select variables before accessing data.
+
+	Testing forced selection in DAP2 IFH
+
+	Dropped data response links from broker because they are suboptimal with out a CE.
+
+	Mover Hover text
+
+2019-01-31  Nathan Potter  <ndp@opendap.org>
+
+	First draft of threddsDatasetDetail.xsl presentation overhaul.
+
+2019-01-30  Nathan Potter  <ndp@opendap.org>
+
+	Added code to compute BES response size. Logged result to class log (could be change to something better)
+
+2019-01-29  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #56 from OPENDAP/support_email
+	Support email
+
+2019-01-28  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Fixed a path issue in the site map service.
+
+	olfs: Switched to BES SupportEmail key to populate the support links in the error pages.
+
+2019-01-22  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #55 from OPENDAP/hk-323
+	Ticket HK-323
+
+	Fixed by adding configuration parameter to the ROOT servlet web.xml that shows the expected location of the DAP service.
+
+2019-01-08  Nathan Potter  <ndp@opendap.org>
+
+	Made the siteMap service in the base Hyrax service enabled by default. This will be reachable at http://server/opendap/siteMap
+
+2018-12-27  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #53 from OPENDAP/port_patch
+	Port patch
+
+	merged master to port_patch
+
+	Merge pull request #54 from OPENDAP/support-email-link
+	Support email link
+
+	Patched baselines affected by change in  mailto: links
+
+2018-12-26  Nathan Potter  <ndp@opendap.org>
+
+	olfs code cleanup.
+
+	olfs code cleanup.
+
+	olfs code cleanup.
+
+	Refining the text in the support email link.
+
+2018-12-18  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #52 from OPENDAP/ifh-attr-disp
+	Fixed the attribute value presentation in the IFHs
+
+	Fixed regression test baselines to reflect new attribute value presentation.
+
+	Added comma and space between the attribute values in the IFH.
+
+	Merge pull request #51 from OPENDAP/covjson-mime-type
+	Repaired incorrect CovJson Content-Type headers.
+
+2018-12-17  Nathan Potter  <ndp@opendap.org>
+
+	Repaired incorrect COvJson Content-Type headers.
+
+	Repaired incorrect COvJson Content-Type headers.
+
+	Merge pull request #50 from OPENDAP/tomcat-6
+	Fixed IFH on CentOS-6
+
+	Dropped IFH from ServletAPI-3.0 to ServletAPI-2.5 for compatibility with CentOS-6
+
+2018-12-13  Nathan Potter  <ndp@opendap.org>
+
+	Merge branch 'support-email'
+
+	Merge pull request #48 from OPENDAP/support-email
+	Added a useful support email body to out JSP error pages
+
+	Merge pull request #49 from OPENDAP/server-admin
+	olfs: Created AdminInfo class
+
+2018-12-12  Nathan Potter  <ndp@opendap.org>
+
+	Added olfs.xml to the ROOT.war distro
+
+2018-12-11  Nathan Potter  <ndp@opendap.org>
+
+	Added inbstrumentation to sit map acquisition
+
+2018-12-10  Nathan Potter  <ndp@opendap.org>
+
+	Docs
+
+	olfs: Documentation.
+
+	olfs: Created AdminInfo class to deal with BES server admin information. woot.
+
+	olfs: Added support email body to every mailto link in our JSP error pages. woot.
+
+2018-12-07  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Added support email body to every mailto link in our JSP error pages. woot.
+
+2018-12-06  James Gallagher  <jgallagher@opendap.org>
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+	[skip ci]
+
+	Added DOI to the README.md
+	[skip ci]
+
+2018-12-06  Nathan Potter  <ndp@opendap.org>
+
+	ChangeLog update
+
+	Switched war file read me to a copy of README.md Deleted old warFileReadme file.
+
+	Added bes DOI to olfs README
+
+	olfs: Changing WCS version key to match opther version keys. Was WCS_SOFTWARE_VERSION now it's WcsSoftwareVersion
+
+	Revert "olfs: Adding DOI injection to production rules."
+	This reverts commit 639b5ccb3a381866568227e6faa0a2c444dc63b4.
+
+	olfs: Adding DOI injection to production rules.
+
+2018-12-05  Nathan Potter  <ndp@opendap.org>
+
+	Editing files for olfs-1.18.2 release
+
+	Updating release files.
+
+	Merge pull request #47 from OPENDAP/robots
+	Robots
+
+	Simplified build target for robots and hyrax war files
+
+	added index.html to robots service. dropped robots.txt for robots.jsp which gets moved to robots.txt by the ant production rules.
+
+2018-12-04  Nathan Potter  <ndp@opendap.org>
+
+	Creation time added as an attribute of BESSiteMap. Production rules 'robots' and 'robots-dist' added to build.xml
+
+2018-12-03  Nathan Potter  <ndp@opendap.org>
+
+	updated robots.txt
+
+	olfs: Dropping back to JSP for JAva-6.
+
+	olfs: robots.txt service and site maps are working.
+
+	Another pass at robots.txt
+
+	Starting robots service
+
+2018-11-28  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #46 from OPENDAP/sitemap
+	Sitemap
+
+	Merged master to sitemap branch
+
+	Merge pull request #45 from OPENDAP/json-ld-admin
+	Json ld admin
+
+	Fixed regression tests to accomodate DAS responses with empty variable containers
+
+	olfs: Docs and refinements.
+
+	Rigged it so that multiple BES's get polled into the sitemap
+
+	Rigged it so that multiple BES's get polled into the sitemap
+
+	olfs: Docs and refinements.
+
+	Added on demand sitemap generation
+
+2018-11-21  Nathan Potter  <ndp@opendap.org>
+
+	Updated affected test baselines
+
+	olfs: Added code to retrieve a Map object stored in a multi=valued BES key. USed this to retrieve Server administrator information and inject that into the JSON-LD output.
+
+2018-11-09  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Cleaning up default config.
+
+2018-11-05  Nathan Potter  <ndp@opendap.org>
+
+	Improvements to  request url generation
+
+	Improvements to  request url generation
+
+	Fixing redunant port issue
+
+2018-10-23  Nathan Potter  <ndp@opendap.org>
+
+	Added bit to ensure that getBesNode() always submits a suitable (leading slashed) path
+
+2018-10-16  Nathan Potter  <ndp@opendap.org>
+
+	olfs: And dropped back to using XML as the output type to keep compatibility with newer Saxon transformers.
+
+2018-10-15  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Updated HTML version produced by the IFH XSL code to 4.01 from 1.0
+
+2018-10-12  Nathan Potter  <ndp@opendap.org>
+
+	Fixed poorly formed request URL for fileout netcdf4 on the dap2ifh.
+
+2018-10-01  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Deprecated old HTML form responder..
+
+2018-09-26  Nathan Potter  <ndp@opendap.org>
+
+	Release docs (again).
+
+	Merge pull request #44 from OPENDAP/gateway_get_node
+	woot. fixed.
+
+	olfs: Fixing BesGatewayApi implementation so that getBesNode() returns a dummy node/item.
+
+	olfs: Fixing BesGatewayApi implementation so that getBesNode() returns a dummy node/item.
+
+2018-09-25  Nathan Potter  <ndp@opendap.org>
+
+	Adding overridden GatewayBesApi.getBesNode()
+
+2018-09-18  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Updating olfs version and release files to version 1.18.0
+
+	Repaired Dataset list in the json-ld dataCatalog conent. Broken because of switch to showNode
+
+	Revert "Repaired Dataset list in the json-ld dataCatalogs"
+	This reverts commit 8ffd47ff81daad44bfd10d22193c391e8fab2f2a.
+
+	Repaired Dataset list in the json-ld dataCatalogs
+
+	Patching bad baselines.
+
+	Test fixy
+
+	Test fixy
+
+2018-09-18  James Gallagher  <jgallagher@opendap.org>
+
+	Merge remote-tracking branch 'origin/test-macro-fixes' into hyrax-1.15
+
+	Macro fixes - first round. The REMOVE_DATE_TIME macro is noise, maybe
+	I think REMOVE_DATE_TIME was copied over from the BES generic macro
+	file and was never used. It then was modified, but those modifications
+	used Java/Perl regex features (or maybe special GNU sed extensions).
+	Either way, it should probably be removed unless it's really needed.
+	If it is needed it should be fixed.
+
+	Minor edits to the OLFS test macros. I 'fixed' a date/time regex.
+	The regex used \d and \D whcih are supported by Java, perl, etc.,
+	but not by sed.
+
+2018-09-17  James Gallagher  <jgallagher@opendap.org>
+
+	Modified mkWorkingDist so it uses '.' by default
+
+2018-09-16  Nathan Potter  <ndp@opendap.org>
+
+	more regex hackery
+
+	Fixing regex for date time
+
+	olfs: Repairing intolernat regular expression in tests that fails to  correctly match timezones expressed in the +00000 format. Also  applied similar improvement the to node_catalog.xsl patch for THREDDS catalog clients that only understand Z.
+
+	olfs: BAseline patches for encoding order cnage in json-ld.
+
+2018-09-15  Nathan Potter  <ndp@opendap.org>
+
+	Merge branch 'hyrax-1.15' of https://github.com/opendap/olfs into hyrax-1.15
+
+	olfs: Order of encoding change for json-ld strings. It was doing this Encode.forJavaScript(Encode.forHtml()) switched to this Encode.forHtml(Encode.forJavaScript()).
+
+2018-09-14  Nathan Potter  <ndp@opendap.org>
+
+	Fixed encoding bug in the dap2_ifh that was allowing incorrectly excape content into the document.
+
+2018-09-14  James Gallagher  <jgallagher@opendap.org>
+
+	Addd --besdev=yes|no to hyraxTest
+	This enables the tests to pass with both development and production
+	builds of the BES.
+
+2018-09-14  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Fixed bug in node_contents.xml that was producing incorrect Viewers links. Improved the formatting of the 403 response page. Fixed the FileDispatchHandler so that it correctly identifies the ".file" requests from the DAP4 model and strips the suffx before transmitting the request to the BES.
+
+2018-09-13  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Fixing broken CURL commands on CenOS-7.
+
+	olfs: Added an on//off switch for remote catalog traversal. Migrated catalog retrieval from jav Http client to BES gateway module which applies the Whitelist.
+
+	olfs: Added an on//off switch for remote catalog traversal. Migrated catalog retrieval from jav Http client to BES gateway module which applies the Whitelist.
+
+2018-09-12  Nathan Potter  <ndp@opendap.org>
+
+	Improved patch for thredds catalg time zone bugin java-netcdf
+
+2018-09-11  Nathan Potter  <ndp@opendap.org>
+
+	Applied a worked around to accomodate the java-netcdf problem with timezones other than Z
+
+	Whitespace formatting yo.
+
+	Fixing btests...
+
+2018-09-10  Nathan Potter  <ndp@opendap.org>
+
+	Dropped uneeded call
+
+	Fixed curl test for incompatible media-type errors by removing the Date header value
+
+	small changes
+
+	Dropping unneded comment in XSLT result.
+
+	Ensured that toplevel dataset name values do not wnd in slash
+
+	Dropping traiuling slash from path_concat results
+
+	Refining xslt function
+
+	olfs: Wrote an XSLT path_concat() function to assist with path construction in the transform. This should eliminate both duplicate and missing "/" characters appearing in the ouput.
+
+2018-09-09  Nathan Potter  <ndp@opendap.org>
+
+	OLFS regression test baseline updates for the Data Acces REquest Form
+
+2018-09-08  James Gallagher  <jgallagher@opendap.org>
+
+	Fixed the PATCH_HYRAX_RELEASE macro in curl_test_macro.m4
+
+2018-09-08  Nathan Potter  <ndp@opendap.org>
+
+	Merge branch 'master' into hyrax-1.15
+
+	baseline
+
+	Impl,ented and applied a simple path_concat function in node_catalog.xml
+
+	BAseline update...
+
+2018-09-06  Nathan Potter  <ndp@opendap.org>
+
+	oops
+
+	Changed name of IFH page to something more mundane
+
+	Fixed probelsm with missing slash chars in THREDDS catalog path building.
+
+	olfs: Dropping besPrefix element from thredds catalogs.. Step one.
+
+	olfs: Dropping besPrefix element from thredds catalogs.. Step one.
+
+2018-09-05  Nathan Potter  <ndp@opendap.org>
+
+	updating olfs.xml file
+
+	One new, and very perplexing, baseline
+
+2018-09-04  Nathan Potter  <ndp@opendap.org>
+
+	olfs: This commit adds URI encoding to w10n links that contain the '[' and ']' characters
+
+	olfs: Small textual changes
+
+	olfs: This commit make the new IFH form the default data request form (with links to the old form) the default data request form for Hyrax.
+
+	Revert "olfs: This commit makes the new IFH the default data request form,"
+	This reverts commit cb08515aa23e4ab5b40f066809dbd8e0a18bf00f.
+
+	olfs: This commit makes the new IFH the default data request form,  with links to the old version.
+
+	olfs: Undoing change to catalog pages that added ifh links to the dataset listsings.
+
+2018-09-04  James Gallagher  <jgallagher@opendap.org>
+
+	Merge pull request #42 from OPENDAP/hyrax-1.15
+	Last minute changes for hyrax-1.15
+
+2018-09-01  Nathan Potter  <ndp@opendap.org>
+
+	Trying changes for IFH integraion into catalog UI
+
+2018-08-24  Nathan Potter  <ndp@opendap.org>
+
+	Updated baselines for dap4 data request form json-ld
+
+	Fixed problem with the JSON-LD for dap4:Dimension objects
+
+	Merge pull request #41 from OPENDAP/jsonld-dap4
+	olfs: JSON-LD For DAP4 Dat Request forms
+
+	More concurrency
+
+	olfs: JSON-LD For DAP4 Dat Request forms
+
+	More session concurrency twiddling
+
+2018-08-23  Nathan Potter  <ndp@opendap.org>
+
+	Reset default catalog name to 'catalog'
+
+	More concurrency. Scanned.
+
+	Fixes for scanned issues.
+
+	More concurrency
+
+	More concurrency changes
+
+	um... locks? threads? meh
+
+2018-08-22  Nathan Potter  <ndp@opendap.org>
+
+	Merge branch 'cmr'
+
+	Merge pull request #40 from OPENDAP/cmr
+	showNode support, authentication controls for Dap2 and DAP4 IFH
+
+	olfs: Trying to sort out a concurrency issue identified in code review.
+
+	olfs: Formatting
+
+	olfs: Added authentication controls to the DAP2 and DAP4 IFH pages.
+
+2018-08-17  Nathan Potter  <ndp@opendap.org>
+
+	Updating display code
+
+2018-08-16  Nathan Potter  <ndp@opendap.org>
+
+	Dropping debugging output
+
+	Fixed double path separator issue in node_contents.xsl
+
+2018-08-15  Nathan Potter  <ndp@opendap.org>
+
+	Code annotation etc.
+
+	Retiring code, reorganizing retired assetes.
+
+	Continuing migration to showNode from showCatalog
+
+2018-08-14  Nathan Potter  <ndp@opendap.org>
+
+	Switched Hyrax THREDDS catalog production from the BES showCatalog command to the BES showNode command. So far so good...
+
+	Switched Hyrax THREDDS catalog production from the BES showCatalog command to the BES showNode command. So far so good...
+
+	Fixed the way that the node/item content is handled in BesApi.showNode()
+
+2018-08-13  Nathan Potter  <ndp@opendap.org>
+
+	BESResource now utilizes the showNode and not the showCatalog BES commands
+
+2018-08-03  Nathan Potter  <ndp@opendap.org>
+
+	Merge branch 'olfs_dispatch_reorg' into cmr
+
+	Cloneable
+
+	Merge branch 'master' into olfs_dispatch_reorg
+
+	Patched test beaselines affacted by the addition of the CovKSON button to the data request form page.
+
+	Reorganized request dispatch and created HyraxService class.
+
+2018-07-30  Nathan Potter  <ndp@opendap.org>
+
+	The contents.html pages are now being built using bes::showNode
+
+2018-07-26  Nathan Potter  <ndp@opendap.org>
+
+	Repaired log content
+
+2018-07-12  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #39 from OPENDAP/covjson
+	Covjson
+
+	Merged master to covjson
+
+	Merge pull request #35 from RiverHendriksen/master
+	CoverageJSON Response Handler for OPeNDAP Project - OLFS
+
+	Added 'Get as CoverageJSON' button to both dap2 and dap4 IFH pages. Disabled it in dap4 because there is no dap4 transmitter for covjson.
+
+	Made dap4 response suffic for covjson '.covjson'
+
+	olfs: Repaired covjson response so that the response suffix is now '.covjson'
+
+	Merge branch 'master' into covjson
+
+2018-07-10  Ubuntu  <ubuntu@ip-172-31-41-75.us-east-2.compute.internal>
+
+	Merge branch 'master' of git://github.com/OPENDAP/olfs
+	Updating latest from master repo
+
+2018-07-09  Nathan Potter  <ndp@opendap.org>
+
+	Merged master to aws branch, on small conflict in dap4_ifh.xsl
+
+	Merge pull request #38 from OPENDAP/error_refactoring
+	Updated baselines to reflect changes in BES error system
+
+	Updated baselines to reflect changes in BES error system
+
+	Merge pull request #37 from OPENDAP/json-ld
+	JSON-LD Support For Catalogs and the IFH
+
+2018-06-22  Nathan Potter  <ndp@opendap.org>
+
+	Fixed a bunch of tests in the OLFS regression tests that broke because: 1) We flattened the DAS everywhere. 2) We added encodeURI() calls to our javascript buttons so that they work    with modern Tomcat where the server won't accept unencoded URL content. 3) Fixed a number of tests so that the curl calls properly encode the request URI There are outsanding issue for which I will make tickets
+
+2018-06-18  Riley Rimer  <rrimer07@gmail.com>
+
+	Merge remote-tracking branch 'upstream/master'
+
+2018-06-18  Nathan Potter  <ndp@opendap.org>
+
+	Merge branch 'master' into json-ld
+
+	Merge pull request #36 from OPENDAP/sitemap2thredds
+	Sitemap2thredds
+
+2018-06-15  Nathan Potter  <ndp@opendap.org>
+
+	sunc
+
+2018-06-11  Nathan Potter  <ndp@opendap.org>
+
+	Added A0 links if A2 is found
+
+	sync
+
+	Eject button
+
+	More formatting
+
+	olfs: Fixed gateway so that it responds correctly to links generated by the BES catalog.
+
+	And more formatting
+
+	More fromatting of html
+
+	refining html output from SiteMapToCatalog
+
+2018-06-10  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Added index.html generation to dataset tree build.
+
+2018-06-08  Nathan Potter  <ndp@opendap.org>
+
+	Bug fix
+
+	Renames SimpleSiteMapCatalogFactory to SiteMapToCatalog. Addes commandline options to SiteMapToCatalog. Adds ANT build file that builds executable jars and runs the application directly
+
+	Working through bugs in sitemap processing
+
+	olfs: Debugging additions.
+
+2018-06-06  Riley Rimer  <rrimer07@gmail.com>
+
+	Merge remote-tracking branch 'upstream/master'
+
+2018-06-06  Nathan Potter  <ndp@opendap.org>
+
+	baseline fix + formating
+
+	olfs: First pass at converting an "extended" site map file to a set of THREDDS catalogs. By "extended" I mean that each line of the file contains 3 things: 1) The file last modified time as an ISO-8601 formatted date in UTC. 2) The size of the file in bytes 3) The path, realative to the BES data root, of the file.
+	Example:
+
+	2018-06-06T12:22:41Z 40800 data/hdf5/grid_1_2d.h5
+
+2018-06-01  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Added @Override tags where missing.
+
+2018-05-30  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Utilized showBesKey() to acquire the BES TypeMatch and the utilized it to build intelligent Broker links.
+
+2018-05-29  Nathan Potter  <ndp@opendap.org>
+
+	Merge branch 'master' into json-ld
+
+	Merge pull request #33 from OPENDAP/getBesKey
+	Add BesApi calls for the BES showBesKey command.
+
+2018-05-25  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Fixed both IFH java script stacks to use encodeURI() on on every URL that is dereferenced.
+
+	getBesKey command added to BesApi
+
+2018-05-15  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Dropped unnecessary passed parameter.
+
+2018-05-14  Nathan Potter  <ndp@opendap.org>
+
+	New filter graphic
+
+2018-05-12  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Added graphic indicator to use to indicate when a selection (filter) clause is acitve.
+
+2018-05-11  Nathan Potter  <ndp@opendap.org>
+
+	Added selection highlighting to make it easier to see when a filter expression is being utilize.
+
+	olfs: Fixed Debug button, which in turn fixed a bunch broken javascript.
+
+	Comsmetic changes
+
+	Minor correction to selection construction
+
+2018-05-10  Riley Rimer  <rrimer07@gmail.com>
+
+	Merge pull request #4 from RiverHendriksen/covjson
+	Covjson implementation merge
+
+2018-05-10  Nathan Potter  <ndp@opendap.org>
+
+	Fixed sequences in the DAP4 IFH. woot.
+
+	Fixed DAP2 Sequence UI in the IFH. Switched to a new method, we may want to switch current uses of collapsibleList to the new collapse code
+
+2018-05-09  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Formatting, it's everything really.
+
+	olfs: Formatting, it's everything really.
+
+	olfs: Fixed links in remote cata browsing.
+
+2018-05-07  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Patched JSON-LD output for  well-formedness.
+
+	Updated JSON-LD value escaping
+
+2018-05-02  Nathan Potter  <ndp@opendap.org>
+
+	Fixed size and date display in browseDataset. Fixed position in document counting error...
+
+	another patch to allow remote https catalogs.
+
+	Added https to remoteAccess
+
+	Changed BES returnAs from cov_json to covjson
+
+	Formtting
+
+2018-05-02  Ubuntu  <ubuntu@ip-172-31-41-75.us-east-2.compute.internal>
+
+	changed cov_json to covjson in besapi
+
+2018-04-30  Nathan Potter  <ndp@opendap.org>
+
+	Fixed several link generation bugs and display challenges.
+
+2018-04-29  Ubuntu  <ubuntu@ip-172-31-41-75.us-east-2.compute.internal>
+
+	hopefully pushing to remote repo
+
+2018-04-28  Ubuntu  <ubuntu@ip-172-31-41-75.us-east-2.compute.internal>
+
+	Renamed extension from cjson to covjson
+
+2018-04-28  Nathan Potter  <ndp@opendap.org>
+
+	Switched gateway form to use the StringToHex.js instead of embedding the functions. SSoT and all that.
+
+2018-04-27  Nathan Potter  <ndp@opendap.org>
+
+	Inital implmentation of brokered data links.
+
+2018-04-26  Nathan Potter  <ndp@opendap.org>
+
+	Working on THREDDS rendering an service links
+
+	Fix access links
+
+	fixed broken javascript include
+
+	Dropped supriously thrown exception
+
+	Revert "Revert "Renabled remote thredds catalog eval""
+	This reverts commit adf33dbca32434524a76596d878fbf6b74f682fa.
+
+	Revert "Renabled remote thredds catalog eval"
+	This reverts commit 38f60c29b9ec317b49007025387d1405f9df696a.
+
+	Renabled remote thredds catalog eval
+
+2018-04-23  Nathan Potter  <ndp@opendap.org>
+
+	Added DAP4 CovJson data response.
+
+	Added support for cov-json response. Needs work.
+
+2018-04-18  Nathan Potter  <ndp@opendap.org>
+
+	Trying to sort out multivalued attributes.
+
+	Trying to sort out multivalued attributes.
+
+	Trying to sort out multivalued attributes.
+
+	Trying to sort out multivalued attributes.
+
+	Changed dataset name in Properties list to be the access URL
+
+	Moved dataset metadata into variableMeasured list (ew...)
+
+2018-04-11  Nathan Potter  <ndp@opendap.org>
+
+	Dumped use of xdap_accept from OLFS although a fixed value of 3.2 is sent t the bes with each DAP2 request.
+
+2018-03-30  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Patched JSON-LD output for  well-formedness.
+
+	Functional reification - now DAP2 IFH works about as well as DAP4 IFH
+
+	Functional reification
+
+	Functional reification
+
+	Functional reification
+
+	Functional reification
+
+	Functional reification
+
+	Formatting reification
+
+2018-03-29  Nathan Potter  <ndp@opendap.org>
+
+	Formatting reification
+
+	Formatting reification
+
+	Formatting reification
+
+	Formatting reification
+
+	Reformatting an dropping unsed parameters
+
+	Patched sameAs link in includedInDataCatalog object
+
+2018-03-28  Nathan Potter  <ndp@opendap.org>
+
+	JSON-LD formatting
+
+	olfs: The new IFH is evolved. JSON-LD prototype added.
+
+	olfs: Adding new DAP2 Data Request Form responder. This code builds the Data Request form by processing the DDX response with an XSLT.
+
+	olfs: Adding new DAP2 Data Request Form responder. This code builds the Data Request form by processing the DDX response with an XSLT.
+
+2018-03-26  Nathan Potter  <ndp@opendap.org>
+
+	olfs: adding prototype dap2 data request form from DDX generating stylesheet.
+
+2018-03-20  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Fixed small error in json-ld, copyrights, and new code.
+
+2018-03-09  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Added fully qualified URLs to sameAs values.
+
+	olfs: First pass at DataCatalog JSON-LD in the contents.html and catalog.html responses. Still pretty much a template and we will need to work through where the publishers information will be held and how it will get into the XSLT. Based on the ERDDAP output we also need to provide full qualified URLs for the @sameAs links, but this may not actually be the case so I'll look into it.
+
+2018-03-03  Nathan Potter  <ndp@opendap.org>
+
+	Merge branch 'master' into aws
+
+2018-03-03  Riley Rimer  <rrimer07@gmail.com>
+
+	Merge remote-tracking branch 'upstream/master'
+
+2018-03-03  James Gallagher  <jgallagher@opendap.org>
+
+	Merge pull request #32 from OPENDAP/w10n-patch
+	W10n patch
+
+	Fixed the hyraxTest tests so they no longer depend on a specific server version number
+	I adopted the same fix I use in the BES for date/time stamps: use sed to look for
+	a specific regex and replace it with something that won't vary. In this case I
+	look for 'OPeNDAP Hyrax (.*)' and replace it with 'OPeNDAP Hyrax (Not.A.Release).'
+	This means the exsiting baselines will work (I added the fix in for building new
+	baselines as well). I did not look for the OLFS version string.
+
+2018-03-02  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Changing name of showPathInfo to showW10nPathInfo
+
+	Trying small change to preserve w10n functionality.
+
+	Added more nuanced return_to_url filtering, Spaelling corrections
+
+2018-03-02  Riley Rimer  <rrimer07@gmail.com>
+
+	Merge remote-tracking branch 'upstream/master'
+
+2018-03-02  Nathan Potter  <ndp@opendap.org>
+
+	Merge branch 'master' into aws
+
+	Added a 2nd default configuration location, /usr/share/olfs which, based on testing, should work in an SELinux environment for bootstrapping the OLFS local configuration install.
+
+	Revert "olfs: Added a 2nd default confoguration location, /usr/share/olfs"
+	This reverts commit 290741b03973d9567c661f4b284ffc94daa948cd.
+
+2018-03-01  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Added a 2nd default confoguration location, /usr/share/olfs which based on testing should work in an SELinux environment for bootstrapping the OLFS local configuration install.
+
+	block docs stuff from return URL
+
+	WHitespace removal. Added original request url to not logged in page.
+
+	olfs: Made the Hyrax Version number in the Web UI a link to the combined version response.
+
+2018-02-27  Riley Rimer  <rrimer07@gmail.com>
+
+	Outdated comment removed
+
+2018-02-27  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Improved error handling and user messages.
+
+	olfs: Added version response to list of non-authenticated accessible items
+
+	olfs: Added Oauth (URS to be clear) information to user session and display of profile information.
+
+	olfs: Enabled authentication by default.
+
+2018-02-26  Nathan Potter  <ndp@opendap.org>
+
+	Mereged branch 'master' to 'aws'
+
+	Dropping unused .INIT file from conf
+
+2018-02-25  Nathan Potter  <ndp@opendap.org>
+
+	Merge branch 'master' into aws
+
+	Merge pull request #29 from OPENDAP/myOLFS
+	This branch contains authentication and authorization updates for URS
+
+2018-02-23  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #31 from OPENDAP/aws-s3-tests
+	Add new baselines
+
+2018-02-22  Nathan Potter  <ndp@opendap.org>
+
+	More minor changes
+
+	Improved profile page and fixed a null pointer problem in UrsIdP.java
+
+	Disabling auth for now
+
+	Picking up urs-check branch changes
+
+	Dropping .project again
+
+	Merge pull request #28 from OPENDAP/foo
+	Reverting checkins made in error
+
+	Undoing the mess
+
+	Revert "Ticket #581. Fixed minor misspelling."
+	This reverts commit c8354ac5336102d53b312d7d2b707902761855c3.
+
+	Revert "Dropping .project from git"
+	This reverts commit 79680c25ecc3cf056967057d0ba14fd0888ec74a.
+
+2018-02-21  Nathan Potter  <ndp@opendap.org>
+
+	Cleanup
+
+	Dropping .project from git
+
+	olfs: The names have been changed to protect the innocent...
+
+	olfs: Copyright
+
+	olfs: Consolidated configuration for user authentication and access. Added IdpManager for multiple IdPs. Reorganized configuration content for to impove information organization/associations.
+
+	olfs: Consolidated configuration for user authentication and access. Added IdpManager for multiple IdPs. Reorganized configuration content for to impove information organization/associations.
+
+2018-02-20  Nathan Potter  <ndp@opendap.org>
+
+	Merge branch 'master' into AuthAndAccess
+
+	Updating test baselines to reflect change in Data Request Form HELP button URL
+
+	Updated test baselines for change from logo.gif to logo.png
+
+	Merge branch 'master' into AuthAndAccess
+
+	Replaced logo.gif with (transparent) logo.png. woot.
+
+	olfs: More changes for auth
+
+	olfs: Working regex for users and authContext (I think...)
+
+2018-02-19  Nathan Potter  <ndp@opendap.org>
+
+	Incremental progess on auth/authz changes to support multiple IdPs and regex patterns of users
+
+2018-02-18  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Code reformatting
+
+	olfs: Reworked IdFiler and PEPFiler new install configuration behavior to conform to standard practice elsewhere in the OLFS.
+
+	olfs: Updated use of collection constructors to more modern pattern.
+
+	olfs: Improved code comments
+
+2018-02-17  Nathan Potter  <ndp@opendap.org>
+
+	olfs: - Guest Profile is now optional. - Authentication controls are now controlled through   IdFilter config. - The PEPFilter config has a new option to enable the use of a default   login end point. If enabled when a unauthenticated client asks for    a protected resource it is redirected to the default login    endpoint. In the case of URS (or other SOS IdPs) this will result    in the client being sent to the SOS provider for authentication.
+
+2018-02-16  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Repaired the caching of the request URL that the client will be returned to after the authentication process.
+
+2018-02-15  Nathan Potter  <ndp@opendap.org>
+
+	Adding conf/logs/.gitignore
+
+	olfs: Added logs dir to conf dir.
+
+	olfs: Added user name to install fail message.
+
+	Merge branch 'myOLFS' of https://github.com/opendap/olfs into myOLFS
+
+	olfs: Repaired bootstrap code for Authentication and Authorization filters so that their initialization may be postponed until after the server has started, thus allowing for the main servlets to install the default configuration as needed.
+
+2018-02-02  Slav Korolev  <slav.korolev@nasa.gov>
+
+	Ticket #581. Fixed minor misspelling.
+
+2018-02-01  Nathan Potter  <ndp@opendap.org>
+
+	Including opendap/auth package in ant build
+
+	Improved error message for 403
+
+	Fixed default login banner. Dropped quotes from the display of login names
+
+	Updated the name of EDL
+
+	URS working, error messages sorted
+
+	Fixed Guest Login machinery
+
+2018-02-01  Slav Korolev  <slav.korolev@nasa.gov>
+
+	Ticket 581. My OLFS version for test.
+
+2018-01-29  Nathan Potter  <ndp@opendap.org>
+
+	Merge branch 'master' into aws
+
+	olfs: Comment corrections
+
+	olfs: Confined utilization of ConcurrentHashMap API to the Map interface to fix a java-7 runtime issue.
+
+	PAtched ise of ConcurrentHashMap to confie to Java 7 API for said class
+
+2018-01-23  Uday Kari  <ukari@opendap.org>
+
+	Add new baselines
+
+2018-01-22  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #26 from OPENDAP/aws-update
+	Aws update
+
+	Dropped confusing commment
+
+2018-01-21  Nathan Potter  <ndp@opendap.org>
+
+	Whitespace removal and cleanup
+
+	Whitespace removal and cleanup
+
+	Configuration file ingest and whitespace removal.
+
+2018-01-21  ndp-opendap  <ndp@opendap.org>
+
+	S3 config can now be read from file
+
+	S3 config can now be read from file
+
+2018-01-21  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Modify links in catalog presentation page
+
+2018-01-20  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Turned on DAP2 URL behavior (hard coded). Added DAP service links to the catalog presentation page.
+
+	merged master to the temp branch aws-update
+
+2018-01-12  Nathan Potter  <ndp@opendap.org>
+
+	Completed blue-bar format an added version number to ateway form
+
+2018-01-11  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #25 from OPENDAP/gateway_dap4
+	Gateway dap4 - This is good to go (I tested the merge locally and all tests pass)
+
+	Merge branch 'master' into gateway_dap4
+
+2018-01-09  Nathan Potter  <ndp@opendap.org>
+
+	Gateway form now has DAP4 buttons and DAP4 responses.
+
+2018-01-08  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Cleaned up source file, added comments.
+
+2018-01-05  Nathan Potter  <ndp@opendap.org>
+
+	Small bug in path creation in the DSR responders.
+
+	Repaired bug in pathConcat()
+
+	This looks like a fix for all of the DAP4 responses in the gateway (and in the default catalog) when the server is in DAP2 Dataset URL mode.
+
+2018-01-04  Nathan Potter  <ndp@opendap.org>
+
+	Patched default olfs.xml so the gateway uses DAP2 resource URL responses by default.
+
+2017-12-29  ndp-opendap  <ndp@opendap.org>
+
+	Patched broken dap2 data response in gateway service. Other responses (all dap4 and the dap date request form) remain broken.
+
+2017-12-28  ndp-opendap  <ndp@opendap.org>
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+
+	Fixed bug in gateway
+
+2017-12-22  James Gallagher  <jgallagher@opendap.org>
+
+	Update README.md
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+
+	Added a new copy/version of the README that uses markdown.
+
+	Update README
+
+2017-12-06  ndp-opendap  <ndp@opendap.org>
+
+	PAtched tests
+
+	typo'd
+
+	Started migrating from Scrub To Encode
+
+	Started migrating from Scrub To Encode
+
+2017-10-30  Nathan Potter  <ndp@opendap.org>
+
+	Patched drift in PersistentContentHAndler. Added testbed-13 to s3 test defaults.
+
+	Updated WCS code to utilize AWS branch modified BesApi
+
+2017-10-30  ndp-opendap  <ndp@opendap.org>
+
+	Merged master to aws branch
+
+2017-10-24  ndp-opendap  <ndp@opendap.org>
+
+	Worked on utilization and display of the JSON user profile information receoved from URS.
+
+	Added auth package to build
+
+	Fully disabled BESCatalogCache
+
+	Patched code that reads the GSON from the URS service. Looks like it's working now
+
+2017-10-20  James Gallagher  <jgallagher@opendap.org>
+
+	Merge pull request #24 from OPENDAP/encoded-tests
+	Upgraded tests to work with Tomcat 8.5.x
+
+2017-10-19  ndp-opendap  <ndp@opendap.org>
+
+	Added tags to the reqID attribute values to uniquely identify each beslistener connection in the logs
+
+2017-10-19  James Gallagher  <jgallagher@opendap.org>
+
+	Merge branch 'master' into encoded-tests
+
+2017-10-18  James Gallagher  <jgallagher@opendap.org>
+
+	More hacks to testGrind
+
+	Added more features to testGrind
+
+2017-10-18  Nathan Potter  <ndp@opendap.org>
+
+	added test time
+
+2017-10-18  ndp-opendap  <ndp@opendap.org>
+
+	Added all DAP4 data and DMR tests to the testGrind
+
+2017-10-18  James Gallagher  <jgallagher@opendap.org>
+
+	Merge branch 'master' into encoded-tests
+
+	Hacked testzgrind so it work when catalina_home is not set
+
+	Fixed a syntax error in testGrind
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+
+2017-10-17  Nathan Potter  <ndp@opendap.org>
+
+	mods
+
+	mods
+
+	mods
+
+	Improved testGrind
+
+2017-10-17  ndp-opendap  <ndp@opendap.org>
+
+	Added shell script to help grind through testing issues
+
+2017-10-17  udayopen  <ukari@opendap.org>
+
+	Merge branch 'master' into encoded-tests
+
+2017-10-17  ndp-opendap  <ndp@opendap.org>
+
+	Corrected a bug in the time conversion in which local timezones where being utilized instead of UTC.
+
+	Fixed incorrect baseline.
+
+2017-10-16  udayopen  <ukari@opendap.org>
+
+	Truncate HTTP Header after status code
+
+2017-10-13  James Gallagher  <jgallagher@opendap.org>
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+
+2017-10-13  udayopen  <ukari@opendap.org>
+
+	Encode test URL parameters to be allowable by Tomcat instances patched for CVE-2016-6816
+
+	Encode URL parameters per CVE-2016-6816 noted in Tomcat server
+
+2017-10-12  udayopen  <ukari@opendap.org>
+
+	fix url encode in dap2_ssfunc
+
+	tests 69-79 fixed for URLEncoding
+
+	tests 59 thru 68: rest of ff/1998-6-avhrr.dat_RelationalConstraint01.*
+
+	Test 58 Encoded correctly
+
+2017-10-12  ndp-opendap  <ndp@opendap.org>
+
+	olfs: Updating olfs version and release files to version 1.17.0
+
+	Smal production rules changes
+
+2017-10-11  ndp-opendap  <ndp@opendap.org>
+
+	minor
+
+	Fixed bug in TemporalDimensionSubset in which the DAP variable name ws not being used to construct the DAP request.
+
+	Reformat
+
+	Stopped the uopdateSequence attribute in the Capabilities document from constantly changing so we can test. We can reneable this when the tests get better?
+
+	Fixed bug in the assignmet of _max
+
+	Reformat
+
+	Added siple regression tests for WCS operating on coads_climatology.nc
+
+2017-10-10  ndp-opendap  <ndp@opendap.org>
+
+	Added wcs stuff to debug output
+
+	Shutting off broken tests on master until they get fixed.
+
+	Added new JUnit tests to production and they are failing.
+
+	Droped unused var
+
+	Patched some potential null de-refs and character encoding issues.
+
+2017-10-10  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #23 from OPENDAP/wcs-tests
+	Wcs tests
+
+2017-10-10  ndp-opendap  <ndp@opendap.org>
+
+	added fixme
+
+	Merge branch 'master' into wcs-tests
+
+	COmments
+
+2017-10-10  James Gallagher  <jgallagher@opendap.org>
+
+	Merge branch 'master' of https://github.com/opendap/olfs.git
+	Conflicts:
+		.gitignore
+
+2017-10-06  ndp-opendap  <ndp@opendap.org>
+
+	Formatting
+
+	Undid use of 'transient' needs more thought. TEsting atomicity issue in WCS
+
+2017-10-05  ndp-opendap  <ndp@opendap.org>
+
+	Made transient those things that cannot be written.
+
+	Nullville
+
+	lifecycle mods
+
+	Small change to manage object lifecycle.
+
+	Formatting
+
+	trigger scan
+
+	dropping unused cod
+
+	Cleaned up loop iteration and variable scope.
+
+2017-10-04  ndp-opendap  <ndp@opendap.org>
+
+	Fixed default encoding issue.
+
+2017-10-04  udayopen  <ukari@opendap.org>
+
+	Unit Tests for Dynamic Coverage Description
+
+2017-10-04  ndp-opendap  <ndp@opendap.org>
+
+	Nullville, The Ressurection.
+
+	Nullville Revisited.
+
+	Nullville
+
+	Nullville
+
+	Nullville
+
+2017-10-03  ndp-opendap  <ndp@opendap.org>
+
+	Nullville
+
+2017-10-03  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #21 from OPENDAP/wcs-release
+	Wcs release
+
+2017-10-03  ndp-opendap  <ndp@opendap.org>
+
+	Documenation. Formatting.
+
+2017-10-02  ndp-opendap  <ndp@opendap.org>
+
+	Moved disk caching code out of the way (not deleted but unused). Now service is truly dynamic: BES and HTTP(S) responses are pulled into memory and used from there. RequestCache is now employed for DMR Element and CoverageDescription objects.
+
+	Comments and version display changes.
+
+	Dropped unused code block.
+
+2017-09-30  udayopen  <ukari@opendap.org>
+
+	DMR XML dataset 01 for opendap.dap4.DatasetTest
+
+	Retire Unused WCS 2.0 classes
+
+	Read DMR XML from file system
+
+2017-09-30  udayopen  <ideaesb@gmail.com>
+
+	(1) Read DMR XML from file system (2) retired unused source in opendap.wcs.v2_0 to retired_source/opendap/wcs/v2_0
+
+2017-09-30  ideaesb  <ideaesb@gmail.com>
+
+	(1) Read DMR XML from file system (2) retired unused source in opendap.wcs.v2_0 to retired_source/opendap/wcs/v2_0
+
+	(1) Read DMR XML from file system (2) retired unused source in opendap.wcs.v2_0 to retired_source/opendap/wcs/v2_0
+
+	(1) Read DMR XML from file system (2) retired unused source in opendap.wcs.v2_0 to retired_source/opendap/wcs/v2_0
+
+2017-09-29  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #22 from OPENDAP/fix-ds-defs
+	Fix ds defs
+
+2017-09-29  ndp-opendap  <ndp@opendap.org>
+
+	Changed DynamicService defintion so that the user must supply either an 'href' attribute or a 'pathMatch' attribute but never both.
+	- A 'pathMatch' attribute tells the DynamicService to use the BES and to
+	generate links for this WCS service when the dataset path matches the
+	regular expression contained in the value of the 'pathMatch' attribute.
+
+	- An 'href' attribute tells the DynamicService to utilize a remote Hyrax
+	instance to supply the DAP metadata and data responses required by the
+	WCS.
+
+	Changed DynamicService defintion so that the user must supply either an 'href' attribute or a 'pathMatch' attribute but never both.
+	- A 'pathMatch' attribute tells the DynamicService to use the BES and to
+	generate links for this WCS service when the dataset path matches the
+	regular expression contained in the value of the 'pathMatch' attribute.
+
+	- An 'href' attribute tells the DynamicService to utilize a remote Hyrax
+	instance to supply the DAP metadata and data responses required by the
+	WCS.
+
+	formatting
+
+	formatting
+
+	Rescued viewer.xml entry for WcsService
+
+2017-09-29  ideaesb  <ideaesb@gmail.com>
+
+	DynamicCoverageDescriptionTest
+
+2017-09-28  udayopen  <ukari@opendap.org>
+
+	DynamicCoverageDescriptionTest
+
+2017-09-28  ndp-opendap  <ndp@opendap.org>
+
+	More unintended changes dropped
+
+	Dropped unused commented out code from old impl.
+
+	Fixed some mistaken changes.
+
+	build script update
+
+	Production rules, generified default WCS ServiceProvider content.
+
+	Production rules, generified default WCS ServiceProvider content.
+
+	More configuration twekd
+
+	more configuration tuning
+
+	More service adjustments
+
+	sync
+
+	Production rules sync...
+
+	Dumped whitespace.
+
+	Changed Hyrax production rules to build with integrated WCS support.
+
+	Fixed logging that was leaking debug output into the error log.
+
+	Added FIXME regarding controlling cache size.
+
+2017-09-28  udayopen  <ukari@opendap.org>
+
+	DynamicCoverageDescriptionTest
+
+2017-09-27  udayopen  <ukari@opendap.org>
+
+	DynamicCoverageDescriptionTest
+
+	DatasetTest.java
+
+	DynamicCoverageDescriptionTest
+
+	put CDCTest in correct package...ughgit status
+
+	Empty DynamicCoverageDescriptionTest
+
+	test checkin
+
+2017-09-27  ndp-opendap  <ndp@opendap.org>
+
+	REworked the WCS service definitions so that WCS is configured using the entries in our friend wcs_service.xml, simplifying configuration and thus making at least me happy.
+
+	Dropping unintended change.
+
+	Dumped 1 space indentation for 4 spaces because that's how it is at OPeNDAP
+
+	PRoto service def
+
+2017-09-26  udayopen  <ukari@opendap.org>
+
+	test commit
+
+2017-09-26  ndp-opendap  <ndp@opendap.org>
+
+	Worked on default configuration taht gets sent with a release. Provided a working example of the configuration that should correctly serve our friend coads_climatology.nc via WCS.
+
+	Added a DummyCatalog to allow support if not catalog definitions in the wcs_service.xml file. Dropped ConcurrentHashMap for the probably much less expensive CopyOnWriteArrayList, goven that it is only written to at start up and all that.
+
+2017-09-26  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #20 from OPENDAP/testbed-13
+	Testbed 13
+
+2017-09-26  ndp-opendap  <ndp@opendap.org>
+
+	Merge branch 'master' into testbed-13
+
+2017-09-26  James Gallagher  <jgallagher@opendap.org>
+
+	Remove oracle jdks from travis build matrix
+
+2017-09-26  udayopen  <ukari@opendap.org>
+
+	Merge pull request #19 from OPENDAP/wcs-junit-13
+	Wcs junit 13
+
+2017-09-26  James Gallagher  <jgallagher@opendap.org>
+
+	Added unit tests to travi.yml
+
+	Merge branch 'testbed-13' of https://github.com/opendap/olfs into testbed-13
+
+	Fixes in comments
+
+2017-09-26  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #18 from OPENDAP/wcs-bes
+	Wcs bes
+
+2017-09-26  ndp-opendap  <ndp@opendap.org>
+
+	Removed successful BES initialization as a startup requirement for WCS. Added checks to prevent running without a BESManager from causing null-pointer issues.
+
+	Removed successful BES initialization as a startup requirement for WCS. Added checks to prevent running without a BESManager from causing null-pointer issues.
+
+	Made BESManager init() a thread-safe endeavour
+
+	Added support for conditional BES initialization
+
+	Hooked up various response types in WCS for both http and bes generated responses
+
+2017-09-25  ndp-opendap  <ndp@opendap.org>
+
+	WCs service making direct calls to BES, take 1
+
+2017-09-25  udayopen  <ukari@opendap.org>
+
+	unit tests added to Dataset
+
+2017-09-25  ndp-opendap  <ndp@opendap.org>
+
+	Running but broken WCS with hyrax integration.
+
+2017-09-22  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #17 from OPENDAP/wcs-mc2
+	Wcs mc2
+
+2017-09-22  ndp-opendap  <ndp@opendap.org>
+
+	Merge branch 'testbed-13' into wcs-mc2
+
+	copyright
+
+	making service def broader
+
+	config changes, sync
+
+	config changes, sync
+
+	config changes, sync
+
+	config changes, sync
+
+	sync
+
+	Fixing small issues, dropped deprecated calss.
+
+	Changed class name for naming scheme consistency
+
+	Changed class name for naming scheme consistency
+
+	Documentation. Small problem repairs
+
+	Renamed ServiceManager to WcsServiceManager for readability
+
+2017-09-22  ideaesb  <ideaesb@gmail.com>
+
+	Adding tests
+
+2017-09-22  ndp-opendap  <ndp@opendap.org>
+
+	Dropped unused import
+
+	Multi catalog WCS, first pass
+
+2017-09-22  ideaesb  <ideaesb@gmail.com>
+
+	Adding tests
+
+2017-09-21  James Gallagher  <jgallagher@opendap.org>
+
+	Added an empty coverity model file
+
+2017-09-21  ndp-opendap  <ndp@opendap.org>
+
+	copyright
+
+2017-09-20  ndp-opendap  <ndp@opendap.org>
+
+	Dropped unused variable.
+
+	Optimized imports
+
+2017-09-20  udayopen  <ukari@opendap.org>
+
+	opendap.dap4.DatasetTest added
+
+2017-09-20  ndp-opendap  <ndp@opendap.org>
+
+	Dropped unused member variable.
+
+	Added authentication stack to both LocalFileCatalog and to DynamicServiceCatalog so that they may get things from places that require auth. woot.
+
+	Added a stripQuotes method to the names of Fields and Coverages that are submitted by the user to DescribeCoverage and GetCoverage requests.
+
+	Added a stripQuotes method to the names of Fields and Coverages that are submitted by the user to DescribeCoverage and GetCoverage requests.
+
+	Fixed problem with DAP constraint production in the GetCoverageRequestProcessor
+
+2017-09-19  ndp-opendap  <ndp@opendap.org>
+
+	dropped lon:lat dataset
+
+	AWS Sync
+
+	AWS Sync
+
+	AWS Sync
+
+	AWS Sync
+
+	AWS Sync
+
+	AWS Sync
+
+	AWS Sync
+
+	AWS Sync
+
+	AWS Sync
+
+	AWS Sync
+
+	AWS Sync
+
+	AWS Sync
+
+	AWS Sync
+
+	AWS Sync
+
+	AWS Sync
+
+	AWS Sync
+
+	AWS Sync
+
+	AWS Sync
+
+	Fix dependency issue
+
+	AWS Sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	sync
+
+	Added GPM collection to download
+
+	Added QC for DomainCoordinates and SRS axisLabels to configurtion ingest.
+
+	Download scripts for collections
+
+2017-09-18  ndp-opendap  <ndp@opendap.org>
+
+	Fixed SRS and DOmainCoordinate ingest to detect bad configuration
+
+	Dropped unused test
+
+2017-09-18  James Gallagher  <jgallagher@opendap.org>
+
+	more comment hacking
+
+	Comment hack
+
+2017-09-18  ndp-opendap  <ndp@opendap.org>
+
+	Merge branch 'testbed-13' of https://github.com/opendap/olfs into testbed-13
+
+	comments
+
+2017-09-18  James Gallagher  <jgallagher@opendap.org>
+
+	Merge branch 'testbed-13' of https://github.com/opendap/olfs into testbed-13
+
+	Resolved conflicts
+
+	Resolved conflicts
+
+2017-09-18  ndp-opendap  <ndp@opendap.org>
+
+	commnets etc.
+
+	commnets etc.
+
+	commnets etc.
+
+	commnets etc.
+
+	commnets etc.
+
+2017-09-18  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #16 from OPENDAP/dcd13
+	Dcd13
+
+	Merge pull request #15 from OPENDAP/qcvars
+	Qcvars
+
+2017-09-18  ndp-opendap  <ndp@opendap.org>
+
+	Added FIXME remarks for authentication
+
+	if the var name is not an ncname then I check for a supplied default name to use before falling back to scrubbing the variable name.
+
+	More authentication related changes.
+
+	More authentication related changes.
+
+	seperation of concerns work - consolidated HTTP calls so that we can more easily utilize authentication when required.
+
+2017-09-17  ndp-opendap  <ndp@opendap.org>
+
+	Minor edits.
+
+	Small edits
+
+	Small edits
+
+	Added NCNAME conversion for field names. Reogranized calls and changed method names to reflect methods actual semantics.
+
+	Add BoundedBy fall back to an Envelope without time of time can't be sorted
+
+2017-09-16  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #14 from OPENDAP/envelopewithtime
+	Generation of EnvelopeWithTimePeriod has been rebuilt.
+
+2017-09-16  ndp-opendap  <ndp@opendap.org>
+
+	woot - EnvelopeAndTimePeriod generation working correctly.
+
+	Error handle, formatting
+
+	Error handle, formatting
+
+	clean-up
+
+	MAssive overhaul to fix problems in how the semantics of the DAP/CF/WCS were being intermingled making it very hard to discern what was happening.
+
+2017-09-15  ndp-opendap  <ndp@opendap.org>
+
+	Reorged code so it's easier to find stuff and to perform an intial read through.
+
+	Small edits
+
+	Merge branch 'dcd13' of https://github.com/opendap/olfs into dcd13
+
+	docs
+
+2017-09-15  James Gallagher  <jgallagher@opendap.org>
+
+	Merge branch 'dcd13' of https://github.com/opendap/olfs into dcd13
+
+2017-09-15  ndp-opendap  <ndp@opendap.org>
+
+	Repaired WCS-2.0 prduction rules
+
+2017-09-15  James Gallagher  <jgallagher@opendap.org>
+
+	Merge branch 'dcd13' of https://github.com/opendap/olfs into dcd13
+	Conflicts: src/opendap/wcs/v2_0/DynamicCoverageDescription.java
+
+	Spelling in a comment
+
+2017-09-15  ndp-opendap  <ndp@opendap.org>
+
+	Added failure checking and default values to swe:Field generation.
+
+	Second crack at coordinating multiple DynamicService instance
+
+	Merge branch 'dcd13' of https://github.com/opendap/olfs into dcd13
+
+	Added support for multiple WCS services in the OLFS. Using a regex they will advertise themselves where they find a match. THis support the DynamicService paradigm in the Wcs implmentation.
+
+2017-09-14  udayopen  <ukari@opendap.org>
+
+	revert Variable to Dim only...Dimensions scoped for Variable Groups, and dataset as a whole
+
+	look for all instances of Dimensions in Dataset, not just root
+
+2017-09-14  ndp-opendap  <ndp@opendap.org>
+
+	small change
+
+	comments etc
+
+	First cut at default backed and automated domainCoordinate processing.
+
+	First cut at default backed and automated domainCoordinate processing.
+
+	First cut at default backed and automated domainCoordinate processing.
+
+2017-09-14  udayopen  <ukari@opendap.org>
+
+	tightened usesCfConventions in opendap.dap4.Dataset
+
+	tightened usesCfConventions in opendap.dap4.Dataset
+
+2017-09-14  ndp-opendap  <ndp@opendap.org>
+
+	More cleanup, dropped uneeded try{} block.
+
+	More cleanup, dropped uneeded try{} block.
+
+2017-09-14  udayopen  <ukari@opendap.org>
+
+	fleshed out findVariableWithCfStandardName in class opendap.wcs.v2_0.DynamicCoverageDescription
+
+	fleshed out method findVariableWithCfStandardName in opendap.wcs.v2_0.DynamicCoverageDescription    /**      * Returns the Dap 4 variable with CF compliant standard name.  The standard name is actually a      * value of an attribute named standard_name.  This method will lookl for this whether or not      * the underlying DMR Dataset is CF compliant      *      * @param opendap.dap4.Dataset dataset - a JAXB representation of the DMR response      * @param String standard_name      * @return opendap.dap4.Variable      * @throws WcsException throw any exception is handling the dataset      */     public Variable findVariableWithCfStandardName(Dataset dataset, String standard_name) throws WcsException {         if(!dataset.usesCfConventions())             _log.warn("Dataset does not appear conform to the CF convention. Dataset: {}",this.getDapDatasetUrl());
+	        // proceed to look for it anyway, returning null if not found
+	        try {
+	          for (Variable v: dataset.getVariables()) {
+	            if (Objects.equals(standard_name, v.getAttributeValue("standard_name"))) {
+	              _log.debug("Found variable with standard name ", standard_name, v.getName());
+	              return v;
+	            }
+	          }
+	        }
+	        catch (Exception e)
+	        {
+	          throw new WcsException("Failed to process DMR dataset "+dataset.getName() + ", when looking for standard_name " + standard_name +
+	              " , msg: "+e.getMessage(),WcsException.NO_APPLICABLE_CODE);
+	        }
+
+	        return null;
+	    }
+
+	fleshed out findVariableWithCfStandardName in class opendap.wcs.v2_0.DynamicCoverageDescription
+
+	findVariableWithCfStandardName
+
+2017-09-14  Nathan Potter  <ndp@opendap.org>
+
+	fix getSizeOfDomainCoordinateVariable() and started utilizing it.
+
+2017-09-14  ndp-opendap  <ndp@opendap.org>
+
+	Merge branch 'dcd13' of https://github.com/opendap/olfs into dcd13
+
+	Found issue in the code that checks for the conventions attribute
+
+2017-09-14  udayopen  <ukari@opendap.org>
+
+	Fix method getVariable in opendap.dap4.Variable to return null if variable not found
+
+2017-09-14  ndp-opendap  <ndp@opendap.org>
+
+	modddys
+
+	Added getSizeOfDomainCoordinate()
+
+2017-09-14  udayopen  <ukari@opendap.org>
+
+	HYRAX-493, and also return first match, not last :wq Merge branch 'dcd13' of https://github.com/OPENDAP/olfs into dcd13
+
+	HYRAX-493, and also return first match, not last
+
+2017-09-14  ndp-opendap  <ndp@opendap.org>
+
+	added CF flag to dataset
+
+	added CF flag to dataset
+
+	added CF flag to dataset
+
+	added CF flag to dataset
+
+	added CF flag to dataset
+
+	added CF flag to dataset
+
+	added CF flag to dataset
+
+	DynamicService installed. Fails to run due to other issues
+
+	mereged and modularized
+
+	Template style configuration step 3
+
+2017-09-14  udayopen  <ukari@opendap.org>
+
+	HYRAX 493, 494, 496, 498, 499
+
+2017-09-13  ndp-opendap  <ndp@opendap.org>
+
+	DynamicService coverage defaults step 2
+
+	Merge branch 'dcd13' of https://github.com/opendap/olfs into dcd13
+
+	Template style configuration step 1
+
+2017-09-13  udayopen  <ukari@opendap.org>
+
+	HYRAX 493, 494, 496, 498, 499
+
+2017-09-13  ndp-opendap  <ndp@opendap.org>
+
+	added ingestDomainCoorindates() method
+
+	Merge branch 'testbed-13' into dcd13
+
+2017-09-12  ndp-opendap  <ndp@opendap.org>
+
+	Fixed single-source-of-truth issue with the way that the WCS service was advertising and processing the response format ecosystem.
+
+	Fixed single-source-of-truth issue with the way that the WCS service was advertising and processing the response format ecosystem.
+
+	Fixed single-source-of-truth issue with the way that the WCS service was advertising and processing the response format ecosystem.
+
+	Fixed single-source-of-truth issue with the way that the WCS service was advertising and processing the response format ecosystem.
+
+2017-09-12  udayopen  <ukari@opendap.org>
+
+	HYRAX-492: Compute Domain Coordinates from DMR
+
+2017-09-12  ndp-opendap  <ndp@opendap.org>
+
+	Fixed single-source-of-truth issue with the way that the WCS service was advertising and processing the response format ecosystem.
+
+2017-09-12  udayopen  <ukari@opendap.org>
+
+	HYRAX 485, 486: compute DataRecord.Field
+
+	HYRAX-486: Add dimension matching logic to select DMR dataset variables to be included in Coverage Description
+
+	Add dimension matching logic to select DMR dataset variables to be included in Coverage Description
+
+2017-09-11  ndp-opendap  <ndp@opendap.org>
+
+	Move string centric Util class from wcs.v2_0 to dap4 package to preserve build independence. Mpved WCS libs to resources/WCS/2.0/lib
+
+2017-09-11  udayopen  <ukari@opendap.org>
+
+	fixed bug: com.sun.javafx.util.Utils dependency in Dataset as noted by James
+
+2017-09-11  ndp-opendap  <ndp@opendap.org>
+
+	Sync
+
+	Sync
+
+	Firxed Dataset.getVars()
+
+	Minor Readablity update.
+
+2017-09-11  udayopen  <ukari@opendap.org>
+
+	HYRAX-485: Adding swe:Field List
+
+2017-09-10  udayopen  <ukari@opendap.org>
+
+	HYRAX-484 Compute Rectified Grid Origins and Offsets
+
+	HYRAX-483 Compute Grid Envelope
+
+2017-09-09  udayopen  <ukari@opendap.org>
+
+	HYRAX-481: Compute Envelope With Time Period
+
+2017-09-09  ndp-opendap  <ndp@opendap.org>
+
+	Dropped Fields list from CD
+
+	Dropped Fields list from CD
+
+	Added cf detection to Dataset
+
+	Added cf detection to Dataset
+
+	Added cf detection to Dataset
+
+	Added cf detection to Dataset
+
+	Added cf detection to Dataset
+
+	Added getVars() to Dataset
+
+	Added getVars() to Dataset
+
+	Process order adjuestment.
+
+	I felt that passing the envelope into the hardwired() method was an error. I moved the code that adds the envelope to the CD up out of the hardwired function to just below where the CD is instantiated. If you would continue this pattern we will slowly empty the hardwired() method as the dynamic CD creation is implmented. Thanks. N
+
+2017-09-09  udayopen  <ukari@opendap.org>
+
+	HYRAX-481: Compute Envelope With Time Period
+
+2017-09-08  ndp-opendap  <ndp@opendap.org>
+
+	Added default SRS configuration.
+
+	Added default SRS configuration.
+
+	Added default SRS configuration.
+
+	Added default SRS configuration.
+
+	Adding configuration information for default SRS.
+
+	Hardwired version gets data.
+
+	bugs and hardwiring
+
+	Reorg of code in DynamicCoverageDescription.
+
+	sync
+
+2017-09-08  James Gallagher  <jgallagher@opendap.org>
+
+	Merge branch 'testbed-13' of https://github.com/opendap/olfs into testbed-13
+
+	Formatting modified:   src/opendap/dap4/Dataset.java modified:   src/opendap/wcs/v2_0/DynamicCoverageDescription.java
+
+2017-09-08  ndp-opendap  <ndp@opendap.org>
+
+	Merge branch 'testbed-13' of https://github.com/opendap/olfs into testbed-13
+
+	Comments
+
+2017-09-08  James Gallagher  <jgallagher@opendap.org>
+
+	Merge branch 'testbed-13' of https://github.com/opendap/olfs into testbed-13
+	# Conflicts:
+	#	src/opendap/wcs/v2_0/DynamicCoverageDescription.java
+	#	src/opendap/wcs/v2_0/WcsMarshaller.java
+
+	Spelling in a comment modified:   src/opendap/dap4/Dataset.java
+
+2017-09-08  ndp-opendap  <ndp@opendap.org>
+
+	Fixed tortured list iteration with simpler for() syntax. Added default constuctors to the various invloved class to ensure that getter mathods never return null.
+
+	Transfered WcsMarshaller functionality inthe DynamicCoverageDescription. Removed all calls to System.exit(). Removed all calls to System.out and System.err and replaced all instrumentation with logging framework. Made Exception handling meaningful in the context of the server.
+
+	Added calls to set Field Id but to no avial, commented them out and left them in place.
+
+	Fixed API probelms in CoverageDescription so that setters and getters are available for key member variables. Also added simpler constructores for DomainCoordinate and Field
+
+2017-09-07  ndp-opendap  <ndp@opendap.org>
+
+	Fixed UOM
+
+	Moved test DMR targets from authentcated NASA to test.o.o
+
+	Added ant target to run DynamicCoverageDescription.
+
+	Merge branch 'testbed-13' of https://github.com/opendap/olfs into testbed-13
+
+	Added WcsMarshaller target to wcs2-build.xml in order to facilitate easy running of said class.
+
+2017-09-07  James Gallagher  <jgallagher@opendap.org>
+
+	Merge branch 'testbed-13' of https://github.com/opendap/olfs into testbed-13
+	Conflicts:
+	src/opendap/wcs/v2_0/DynamicCoverageDescription.java
+	src/opendap/wcs/v2_0/WcsMarshaller.java
+
+	Formatting and FIXME/TODO comments
+	modified:   src/opendap/wcs/v2_0/DynamicCoverageDescription.java
+	modified:   src/opendap/wcs/v2_0/WcsMarshaller.java
+
+2017-09-07  ndp-opendap  <ndp@opendap.org>
+
+	Repaired inconsistent/broken time envelope
+
+	Updated main() to utilize non-deprecated constructor
+
+	Dropped broken Saxon transform from code
+
+	Fixed auth issues for main()
+
+2017-09-07  James Gallagher  <jgallagher@opendap.org>
+
+	Merge branch 'testbed-13' of https://github.com/opendap/olfs into testbed-13
+
+2017-09-07  ndp-opendap  <ndp@opendap.org>
+
+	Repairing naming issue
+
+	Fixed naming issue
+
+2017-09-07  James Gallagher  <jgallagher@opendap.org>
+
+	Merge branch 'testbed-13' of https://github.com/opendap/olfs into testbed-13
+
+	Formatting WcsMarshaller.java
+
+2017-09-07  ndp-opendap  <ndp@opendap.org>
+
+	Repairing production rules for WCS
+
+	Added null check for WcsMarshaller content
+
+2017-09-07  James Gallagher  <jgallagher@opendap.org>
+
+	Merge branch 'testbed-13' of https://github.com/opendap/olfs into testbed-13
+
+2017-09-07  ndp-opendap  <ndp@opendap.org>
+
+	Added null check for WcsMarshaller content
+
+	Merge branch 'testbed-13' of https://github.com/opendap/olfs into testbed-13
+
+	Hooked up WcsMarshaller to DynamicServiceCatalog in DynamicCoverage. Added comments
+
+2017-09-07  James Gallagher  <jgallagher@opendap.org>
+
+	Formatting for WcsMarshaller and CoverageDescription in WCS/v2_0
+
+2017-09-06  ndp-opendap  <ndp@opendap.org>
+
+	Small edits
+
+	Small edits
+
+	Small edits
+
+	Merged dap4dmr
+
+2017-08-30  ndp-opendap  <ndp@opendap.org>
+
+	Cheking in a none developer mode web.xml
+
+	Updating HAI for use in a developer mode.
+
+2017-08-28  James Gallagher  <jgallagher@opendap.org>
+
+	Merge branch 'testbed-13' of https://github.com/opendap/olfs into testbed-13
+
+	Added files to gitignore
+
+2017-08-25  ndp-opendap  <ndp@opendap.org>
+
+	Added WCS service and links to Hyrax generated THREDDS catalogs.
+
+	Hooked-up default behavior for WCS Web Service in Hyrax.
+
+2017-08-22  ndp-opendap  <ndp@opendap.org>
+
+	Merge branch 'testbed-13' into DynamicServiceWcsCatalog
+
+2017-08-21  ndp-opendap  <ndp@opendap.org>
+
+	Sync for buildout
+
+	Sync
+
+2017-08-20  ndp-opendap  <ndp@opendap.org>
+
+	Merge branch 'testbed-13' into DynamicServiceWcsCatalog
+
+	changes
+
+	Implemented RangeSubset field lists by range concept.
+
+	Added simple range subsetting
+
+	First pass at DynamicService implementation. GetCapabilities and DescribeCoverage work. GetCoverage needs a more fully functional CoverageDescription object to funtion.
+
+2017-08-18  James Gallagher  <jgallagher@opendap.org>
+
+	Merge branch 'master' of https://github.com/opendap/olfs.git
+	Conflicts:
+		.gitignore
+
+	Added to gitignore
+
+2017-08-15  ndp-opendap  <ndp@opendap.org>
+
+	Merge branch 'master' into testbed-13
+
+2017-08-10  Nathan Potter  <ndp@opendap.org>
+
+	More bug oatchy
+
+	Repaired broken bits in ViewersServlet
+
+2017-08-09  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Updating olfs version and release files to version 1.16.4
+
+2017-08-08  Nathan Potter  <ndp@opendap.org>
+
+	Updated libs for wcs2-build.xml
+
+	Increads default response side and added instrumetation.
+
+2017-08-08  ndp-opendap  <ndp@opendap.org>
+
+	patch
+
+	pathed
+
+	seperate result LFC files
+
+	oops. fixed it.
+
+	Adding new collection processing for daily precip and temperature - seperate coverages
+
+2017-08-04  ndp-opendap  <ndp@opendap.org>
+
+	Scripts for ingesting new MERRA2 content complete. Now this needs to be run on our servce and hand integrated into the exisiting service.
+
+	Adding new merra2 collection ingest scripts for MERRA2_200.statD_2d_slv_Nx
+
+2017-07-25  ndp-opendap  <ndp@opendap.org>
+
+	Repaired a typo (or maybe a random deletion) that corrupted the name of a crucila XSL file.
+
+2017-07-19  ndp-opendap  <ndp@opendap.org>
+
+	Minor updtes
+
+2017-07-18  ndp-opendap  <ndp@opendap.org>
+
+	Dropped duplicate code block
+
+	Changing method names to better match their function...
+
+	Editing ThreddsCatalogUtil for clarity.
+
+	Merge branch 'master' into testbed-13
+
+	Updating code
+
+	library updates
+
+	Updating apache componetes client
+
+	more changes
+
+	Merge branch 'master' into testbed-13
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+
+	Updated ThreddsCatalogUtil to authenicate against NASA servers.
+
+2017-07-11  James Gallagher  <jgallagher@opendap.org>
+
+	Formatting for the AggregationServlet
+
+2017-07-10  udayopen  <ukari@opendap.org>
+
+	Merge pull request #12 from OPENDAP/lfc-marshaller
+	Lfc marshaller
+
+2017-07-09  udayopen  <ukari@opendap.org>
+
+	Add EOCoverages and DataSeries to LfcMarshaller
+
+2017-07-07  udayopen  <ukari@opendap.org>
+
+	One WCSCoverage Element Being Marshalled by LfcMarshaller
+
+2017-07-06  udayopen  <ukari@opendap.org>
+
+	Add Package Info File: most elegant place to specify LFC namespace
+
+2017-06-23  Nathan Potter  <ndp@opendap.org>
+
+	More templating for large merra2 colection
+
+	scripts and templates
+
+	Cleaning up WCS-2.0 resources directory
+
+	Cleaning up WCS-2.0 resources directory
+
+2017-06-23  udayopen  <ukari@opendap.org>
+
+	Merge pull request #10 from OPENDAP/first_deployment
+	Templating MERRA2WCS
+
+2017-06-16  udayopen  <ukari@opendap.org>
+
+	Merge branch 'first_deployment' of https://github.com/opendap/olfs into first_deployment
+
+	fix template: added proper long_names
+
+2017-06-16  ndp-opendap  <ndp@opendap.org>
+
+	Switched nativeFormat back to application/octet-stream to support existing WCS-2.0 code because the current branch is broken and will not build a functioning WCS I need to hack this in for now so the older code will accpet the merr2 CDs gen'd by Uday's ant targets.
+
+2017-06-15  udayopen  <ukari@opendap.org>
+
+	fix template: add wcs xmlns
+
+	fix template: Removed outermost
+
+	fix LFC.xml: lat, lon, time
+
+	fix LFC.xml: lower-case to upper-case field names and dap_IDs
+
+	fix wcs2-build.xml: remove name clash src.dir and dst.dir, instead use templates.dir and lfc.build.dir
+
+	merra2wcs first deployment init
+
+2017-06-13  James Gallagher  <jgallagher@opendap.org>
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+
+2017-06-05  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #9 from OPENDAP/eo-wcs-2.0
+	Eo wcs 2.0
+
+2017-05-31  ndp-opendap  <ndp@opendap.org>
+
+	Updated OLFS information for Hyrax-1.13.14 release.
+
+	Repaired minor but crippling problem with the ToolsUI.jnlp template file.
+
+2017-05-26  ndp-opendap  <ndp@opendap.org>
+
+	Merged master to eo-wcs-2.0, dealt with consequences.
+
+2017-05-24  James Gallagher  <jgallagher@opendap.org>
+
+	Added to .gitignore
+
+2017-05-24  ndp-opendap  <ndp@opendap.org>
+
+	Documentation
+
+2017-05-17  ndp-opendap  <ndp@opendap.org>
+
+	More concurrency patching
+
+	Fixed concurrency issues with log access and various null reference issues.
+
+2017-05-16  ndp-opendap  <ndp@opendap.org>
+
+	Updated REqInfo internal implmentation
+
+	Updating baselines to reflect changes to libdap4
+
+2017-03-31  ndp-opendap  <ndp@opendap.org>
+
+	olfs: Added  JSP error page and image for 504 (server timeout) error.
+
+	olfs: Disabled the code that adds the prefix "nc_" to the names of FONc response files.
+
+	olfs: Added  JSP error page and image for 504 (server timeout) error."
+
+2017-01-26  ndp-opendap  <ndp@opendap.org>
+
+	Unretired async code in favor of simply excluding it from the various production rules.
+
+	Moved the unused async code to retired_aource
+
+	Uncommented servlet-api-3.1 code for Joe
+
+	Merge branch 'master' into aws
+
+2017-01-25  ndp-opendap  <ndp@opendap.org>
+
+	Increased memory for AWS upload services when run from s3-build.xml
+
+2017-01-25  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #7 from OPENDAP/timeout_hack
+	Timeout hack
+
+2017-01-25  ndp-opendap  <ndp@opendap.org>
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1a
+
+	hack 1
+
+2017-01-24  ndp-opendap  <ndp@opendap.org>
+
+	hack 1
+
+	hack 1
+
+	hack 1
+
+	Debugging
+
+2017-01-19  ndp-opendap  <ndp@opendap.org>
+
+	Added cloudydap D4 query param and transmit it to the BES as a context.
+
+2017-01-11  ndp-opendap  <ndp@opendap.org>
+
+	Mereged master to aws
+
+	Added code to replace spaces with _ in javascript variables names built by the dap4_ifh.xsl
+
+	Patched a string handling error in path construction.
+
+2017-01-10  ndp-opendap  <ndp@opendap.org>
+
+	Updated news
+
+2017-01-10  James Gallagher  <jgallagher@opendap.org>
+
+	Spellin' in the NEWS file...
+
+	Added info about our replacing the 418 message (I'm a teapot)
+	We replaced it with something more formal
+
+	Updated NEWS and ChangeLog for the OLFS 1.16.2 (Hyrax 1.13.3) release.
+
+2016-12-03  ndp-opendap  <ndp@opendap.org>
+
+	olfs: Fixing problems with debug logging configuration..
+
+	olfs: Fixing problems with debug logging configuration..
+
+	olfs: Fixing problems with debug logging configuration..
+
+2016-12-01  ndp-opendap  <ndp@opendap.org>
+
+	olfs: Added NewPPTClient to debug logging profile.
+
+	Merged master to eo-wcs-2.0 branch
+
+2016-11-30  ndp-opendap  <ndp@opendap.org>
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+
+	eowcs: Replaced missing definition of entity FORMAT..
+
+	eowcs: Fixed small bug in request document lifecycle.
+
+	eowcs: SMall changes to proto-eowcs-tests
+
+2016-11-29  ndp-opendap  <ndp@opendap.org>
+
+	eowcs: Switched DAP2 CE generation so that array subsets are applied to the variable before/as it is passed into the grid/scale server side functions
+
+	eowcs: Changed the DAP2 CE generation so that inditial array subsets are applied the the variables before/as they are passed into the grid() server side function.
+
+2016-11-16  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Removed spurious message from error log.
+
+	olfs:   Patched NullPointerException bug in AggregationServlet.java
+
+2016-11-16  ndp-opendap  <ndp@opendap.org>
+
+	olfs; Draft WCS scaling implmentation
+
+2016-11-11  Nathan Potter  <ndp@opendap.org>
+
+	olfs:   Method Attribution
+
+	olfs: Added a missing attribution.
+
+2016-11-10  ndp-opendap  <ndp@opendap.org>
+
+	eowcs: Switching SF_1in100 data to reorder coordinates.
+
+2016-11-09  ndp-opendap  <ndp@opendap.org>
+
+	eowcs: Switching SF_1in100 data to reorder coordinates.
+
+	eowcs: Switching SF_1in100 data to reorder coordinates.
+
+	olfs: Repaired viewers.xml configuration for Godiva3
+
+	olfs: Trying to resolve Java version issues with ConcurrentHashMap
+
+2016-11-08  ndp-opendap  <ndp@opendap.org>
+
+	more logging goodness
+
+	olfs: Logging improvements
+
+	Fixing log config
+
+2016-11-04  ndp-opendap  <ndp@opendap.org>
+
+	Fixing fonc history attr, again...
+
+2016-11-03  Nathan Potter  <ndp@opendap.org>
+
+	Updating change log.
+
+	Added some release helper scripts.
+
+	olfs:   Changed BES timeout error from 418 (TeaPot) to 504 (Gateway Timeout).
+
+2016-11-02  Nathan Potter  <ndp@opendap.org>
+
+	Changelog update
+
+	olfs:   Dropped duplicate server name from fnoc history attribute entry.
+
+	olfs: Updating olfs version and release files to version 1.16.1
+
+	Updating OLFS baselines to rflect minor changes in BES error message content.
+
+2016-10-31  Nathan Potter  <ndp@opendap.org>
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+
+	Merge branch 'eo-wcs-2.0' of https://github.com/opendap/olfs into eo-wcs-2.0
+
+	more name changes
+
+2016-10-31  ndp-opendap  <ndp@opendap.org>
+
+	eowcs: Swapped the order of lat and long gml:offsetVector elements for the client. Not sure if this is the "right" thing to do...
+
+	aws: Patched comment
+
+	aws: Corrected grid offset for latitude.
+
+	aws: Changed domainSet content by adding all dataset dimenmsions.
+
+2016-10-30  ndp-opendap  <ndp@opendap.org>
+
+	aws: Made support format for netcdf x-netcdf and not x-netcdf-cf1.0
+
+	aws: Patched broken geotiff request URL.
+
+2016-10-30  Nathan Potter  <ndp@opendap.org>
+
+	FIxed gml:id values in test coverage
+
+2016-10-30  ndp-opendap  <ndp@opendap.org>
+
+	Updating coverages
+
+2016-10-30  Nathan Potter  <ndp@opendap.org>
+
+	System sync
+
+2016-10-22  ndp-opendap  <ndp@opendap.org>
+
+	Added logback-test.xml to S3 proj
+
+	aws: Added logback-test.xml to S3 distro.
+
+	aws: Abaondoned patch to S3Index.java
+
+	aws: Found source of missing LM: The repo builder had a misspelling of last-modified when creating the index.xml. Fixed. Also [patch S3Index.java to look for the misspaelling as a fall back..
+
+	.
+
+	aws: Patching code for missing LMT in index.xml.
+
+	aws: Patching code for missing LMT in index.xml.
+
+2016-10-14  Nathan Potter  <ndp@opendap.org>
+
+	team sync
+
+2016-10-14  ndp-opendap  <ndp@opendap.org>
+
+	Starting tests for eowcs
+
+	aws: Dropping override methods that no longer exist in the parent class.
+
+2016-10-12  ndp-opendap  <ndp@opendap.org>
+
+	aws: Small changes to page name.
+
+	More tweaks and bug fixes
+
+2016-10-11  ndp-opendap  <ndp@opendap.org>
+
+	eo-wcs-2.0: null pointer exception patch.
+
+	eowcs - null pointer bug fix
+
+	eo-wcs-2.0: Import optimization.
+
+	eo-wcs-2.0: Import optimization.
+
+	eo-wcs-2.0: Fixed bug in which dap variable names were not being used to build the DAP CE. Fixed bug in which EOFootprint metadata was not being updated (object lifecycle problems)
+
+2016-10-08  ndp-opendap  <ndp@opendap.org>
+
+	eo-wcs-2.0: Corrected EP meadata footprint values foe eo_ncep_metadata..
+
+	eo-wcs-2.0: plumbing in place to update EO metadata footprint information to reflect subset changes. Works as it should but coordinates are de jeur.
+
+2016-10-07  ndp-opendap  <ndp@opendap.org>
+
+	olfs: Repaired bug in the construction of dap2 constraints. New method groups server side funciton calls clauses and places them prior to the array subset clauses.
+
+	Things got a bit out of hand in change land, committing followed by cleanup
+
+2016-10-03  ndp-opendap  <ndp@opendap.org>
+
+	olfs: Updated viewers.xml file to reflect changes for ncWMS2 and Godiva3?
+
+2016-10-01  ndp-opendap  <ndp@opendap.org>
+
+	olfs-wcs:  Minor internal API changes to GetCoverageRequest
+
+2016-09-29  ndp-opendap  <ndp@opendap.org>
+
+	olfs-wcs:  Repaiered error in ncep_mode_example coverage description
+
+	olfs-wcs:  Added better error handling to DimensionSubset
+
+2016-09-27  ndp-opendap  <ndp@opendap.org>
+
+	olfs-wcs:  Rewrote problematic coverages, got subset working, sort of...
+
+	olfs-wcs:  Rewrote problematic coverages, got subset working, sort of...
+
+2016-09-23  ndp-opendap  <ndp@opendap.org>
+
+	Dropped old BoundingBox
+
+	New implementation of BoundingBox starts here
+
+	Made Dimensions clonable
+
+	olfs-wcs:  Cleaned up imports
+
+	olfs-wcs:  Fixed problem in which errors were retruning HTTP status code 200 (OK)
+
+	olfs-wcs:  DescribeEoCoverageSet request now adds matching DatasetSeries EOCoverage members to the CoverageDescriptions section of the response
+
+	olfs-eowcs: updated CoverageDescription files to correct issues with domain coordinate definitions
+
+2016-09-21  ndp-opendap  <ndp@opendap.org>
+
+	olfs-wcs:  DescribeEoCoverageSet request now adds matching DatasetSeries EOCoverage members to the CoverageDescriptions section of the response
+
+	olfs-wcs:  DescribeEoCoverageSet request now adds matching DatasetSeries EOCoverage members to the CoverageDescriptions section of the response
+
+	olfs-wcs:  DescribeEoCoverageSet request now adds matching DatasetSeries EOCoverage members to the CoverageDescriptions section of the response
+
+	olfs-wcs: Working draft of DescribeEoCoverageSet request implementation. Not feature complete (no subsetting among other deficiencies). Unique coverage names is now enforced by LocalFileCatalog. Duplicates are skipped and messages are written to the error log. EOCoverages now get returned/searched for a WCS-2.0 (Describe|Get)Coverage request.
+
+2016-09-10  ndp-opendap  <ndp@opendap.org>
+
+	Merged origin
+
+	tweaks
+
+	olfs-wcs: First draft of DescribeEoCoverageSet request implementation. Not feature complete (no subsetting among other deficiencies)
+
+2016-09-08  Nathan Potter  <ndp@opendap.org>
+
+	 Added new EOCoverageDescriptions with minimal EO metadata.
+
+2016-09-07  Nathan Potter  <ndp@opendap.org>
+
+	Merge branch 'master' into eo-wcs-2.0
+
+2016-09-04  Nathan Potter  <ndp@opendap.org>
+
+	Corrected output problems wiih S3 production rules.
+
+2016-09-02  Nathan Potter  <ndp@opendap.org>
+
+	Simplified ant targets for S3 upload and repoistory building so that command line args are speciufied in a single ant variable. DOcumentation
+
+2016-09-01  Nathan Potter  <ndp@opendap.org>
+
+	olfs:   Fixed recursive level counting in SimpleRepositoryuilder..
+
+	Adjusting .gitignore
+
+	olfs:   Got the automated repository builder (SimpleRepoBuilder) working. Using the s3-build.xml targets s3up and pushRepo one can now inject data into an s3 bucket with a simple command.
+
+2016-08-30  Nathan Potter  <ndp@opendap.org>
+
+	Fixing gitignore issues
+
+	Fixed path bug
+
+	I think the ant production rules are fixed and that the WAR file is now complete. We shal see...
+
+2016-08-29  Nathan Potter  <ndp@opendap.org>
+
+	olfs:   Repaired a bug in the BesGatewayApi (wrong method was overridden) that was breaking both the gateway and the s3 service.
+
+	team sync
+
+	Merge branch 'master' into aws
+
+	olfs:   Patching a problem with the way the XSL transforms are carried out that could have left the process running in an unexpected directory.
+
+	olfs:   Repairing s3BesAPI to work with current BesApi implementation.
+
+2016-08-27  Nathan Potter  <ndp@opendap.org>
+
+	olfs: s3 resurrection begins, API changes accomodated, code compiles
+
+2016-08-26  Nathan Potter  <ndp@opendap.org>
+
+	olfs: eo-wcs coverage descriptions etc.
+
+2016-08-11  Nathan Potter  <ndp@opendap.org>
+
+	olfs:   lineage feature prototype working.
+
+2016-08-04  Nathan Potter  <ndp@opendap.org>
+
+	 Adding modis level 3 data
+
+2016-07-29  Nathan Potter  <ndp@opendap.org>
+
+	olfs:   DatasetSeries implementation no returns DatasetSeriesSummary objects with bounding box and time period elements.
+
+	olfs:  Partially functioning DatasetSeries implementation.
+
+2016-07-03  Nathan Potter  <ndp@opendap.org>
+
+	olfs:  Silenced output being pushed onto stdout.
+
+	olfs:  Repaired a bug or two, added test commands to elicit WCS responses.
+
+2016-07-01  Nathan Potter  <ndp@opendap.org>
+
+	AWS Sync
+
+	AWS Sync
+
+	AWS Sync
+
+	Finally figured out that .gitignore had blocked adirectory name chnage from being commited. Dang that sucked.
+
+	AWS SYnc
+
+	AWS SYnc
+
+	AWS SYnc
+
+	Turned on PesutentCinfigurationHandler debugging.
+
+	Turned on WCS debugging
+
+	REpaired problems with bottstrap installation. Made like olfs.
+
+	olfs:  Updated LFC catalog for testbed-12 server.
+
+	olfs: Updating LFC information for test service.
+
+2016-06-22  Nathan Potter  <ndp@opendap.org>
+
+	draft wcs coverage model for ncep data.
+
+2016-06-10  Nathan Potter  <ndp@opendap.org>
+
+	olfs:  Added first draft of using testbed-12 data as a coverge doesn't work yet)" "
+
+2016-06-06  Nathan Potter  <ndp@opendap.org>
+
+	olfs:  Repaired variable semantics..
+
+	olfs:  Repaired variable semantics..
+
+2016-06-03  Nathan Potter  <ndp@opendap.org>
+
+	Patched issue in test
+
+	Release Candidate 1 Hyrax-1.13.1, OLFS-1.16.0
+
+	helpoer script
+
+	Repaired uninitialized variable problem in BesDapResponderTest.java
+
+	Merge pull request #6 from OPENDAP/history_attribute
+	CF "history" attribute
+
+	Merge branch 'master' into history_attribute
+
+2016-06-03  James Gallagher  <jgallagher@opendap.org>
+
+	Merge pull request #5 from OPENDAP/download_filename
+	Download filename
+
+2016-06-02  Nathan Potter  <ndp@opendap.org>
+
+	3rd draft of hisitory. This time for nc3 & nc4 from DAP, w10n, and the aggregation servlet.
+
+2016-05-26  James Gallagher  <jgallagher@opendap.org>
+
+	Fixed an issue when the filename is < 4 characters
+	Added tests for this case, too.
+
+	Changed the Dap4Responder.addTypeSuffixToDownloadFilename() behavior
+	Now the code will use the original behavior when this is false (always
+	add the suffix), or _replace_ the existing suffix if it's true. I added
+	a unit test file for Dap4Responder and wrote tests for the new code.
+
+2016-05-19  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Marked failing tests (problem with dap4 fileter expressions) as expected fails.
+
+	Updated test baselines to accomodate code changes.
+
+	Merge pull request #4 from OPENDAP/w10n_patch
+	W10n patch
+
+2016-05-18  Nathan Potter  <ndp@opendap.org>
+
+	olfs:  Patched bug in w10n related to large files.
+
+	olfs:  Candidate patch for w10n xss thing.
+
+	olfs:  Candidate patch for xss issue in w10n.
+
+	olfs:  Added a configuration option that when set attaches the current return type media-type suffix to the download filename  (which appears in the Content-Disposition header of certain  responses and affects the name given to the downloaded file by  a browser)
+
+2016-05-13  Nathan Potter  <ndp@opendap.org>
+
+	olfs:  Repaired build for WCS-2.0
+
+2016-05-02  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Fixed a null pointer issue..
+
+	olfs: Fixinf concurrency isue in BesCatalogCache
+
+2016-04-26  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Small changes to BesCatalogCache in preparation for improving the update activity.
+
+2016-04-20  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Added User-Agent information to the HyraxAccess.log
+
+	Ensured that the BES Catalog response cache can be disabled simply by omitting its configuration from the olfs.xml file.
+
+2016-04-18  Nathan Potter  <ndp@opendap.org>
+
+	Merge pull request #3 from OPENDAP/perfImprov
+	Perf improv
+
+	Wrapped up BesCatalogCache and CatalogCacheUpdater so that the configuration information is read from the olfs.xml file.
+
+2016-04-15  Nathan Potter  <ndp@opendap.org>
+
+	Dropped some uneccessary sleep calls.
+
+	Recomitted to BesCatalogCache, added ContextListener and got it working as a worker thread.
+
+2016-04-14  Nathan Potter  <ndp@opendap.org>
+
+	Testing hack in which LMT is always -1 (no checking with BES)
+
+	Merge branch 'master' into perfImprov
+
+	Repaired tests broken for a number of expected reasons. Removed or rewrote tests that referenced files not delivered via 'make install'
+
+2016-04-13  Nathan Potter  <ndp@opendap.org>
+
+	Improve code docs.
+
+	Merge remote-tracking branch 'origin/master' into perfImprov
+
+	Debugging code for AWS
+
+2016-04-12  Nathan Potter  <ndp@opendap.org>
+
+	More AWS debugging
+
+	Debugging code for AWS
+
+	Moved unused caching classes to retired_source in order to reduce 'cruft' in the active codebase.
+
+	Moved the internally correct but unused caching classes to their own package.
+
+2016-04-11  Nathan Potter  <ndp@opendap.org>
+
+	Discovered a simple way to eliminate the olfs->bes probing  for directory (catalog) responses. This eliminates the need to  utilize a durable (as in beyond a single request) cache. Which   is a very good thing.
+
+2016-04-07  James Gallagher  <jgallagher@opendap.org>
+
+	Added some comments/notes to src/opendap/noaa_s3
+
+2016-04-07  Nathan Potter  <ndp@opendap.org>
+
+	Refactoring Rresponse cache  into a catalog response cache.
+
+2016-04-05  Nathan Potter  <ndp@opendap.org>
+
+	Made BesResponseCache more durable by: - Fixed purging problems.
+
+	Made BesResponseCache more durable by: - Fixed purging problems.
+
+	Made BesResponseCache more durable by:  - Added caching of BESError objects. This reduces the probing/thrashing  of the  BES by the OLFS.  - Set a cache size (in terms of number of items) limit  - Added  a "purgeLeastRecentlyAccessed()" method to control cache size.
+
+2016-04-04  Nathan Potter  <ndp@opendap.org>
+
+	Added new appender definition for the log harvester to the logback configuration.
+
+	Updated for ne BesResponseCache. Fixed problem with the  ways errors were being handled. Errors are now cached and  rethrown (tricksy).
+
+	Factored BesResponse Cache out of RequestCache.
+
+2016-03-16  Nathan Potter  <ndp@opendap.org>
+
+	Merge branch 'master' into perfImprov
+
+	Debugging and instrumentation
+
+2016-03-02  Nathan Potter  <ndp@opendap.org>
+
+	Repaired production rules for WCS2
+
+	Fixed bug in dap4 error production that was resulting in the transmitted error document missing the required <xml?...?> declaration.
+
+	Fixed bug in dap4 error production that was resulting in the transmitted error document missing the required <xml?...?> declaration.
+
+2016-02-26  Nathan Potter  <ndp@opendap.org>
+
+	Fixed dap4_ifh.xsl so that Groups are correctly displayed. Also fixed problem with visual alignment of rendered HTML content.
+
+	Updated the Dap4RequestToDap2Request class, wrapper class for HttpServletRequest) to Servlet-3.0
+
+2016-02-16  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Made temporary non-volatile cache for BES Catalog responses for testing purposes. This replaces all points where the BES responses where being cached in the per Request (volatile) cache.
+
+2016-02-06  Nathan Potter  <ndp@opendap.org>
+
+	Updated BESConfig so that the default number of client connections is 200.
+
+2016-02-03  Nathan Potter  <ndp@opendap.org>
+
+	Updated error test baselines to reflect change in the ASCII response encoding
+
+	olfs: Made the  DAP2 ASCII response media type be text/plain because OMG browsers suck.
+
+	olfs: optimized imports
+
+	olfs: Comments and error checking.
+
+	olfs: Retired WebStartServlet. Duties now handled by ViewersServlet.
+
+	olfs: Updating various release related files for upcoming release.
+
+	Merge branch 'master' of https://github.com/OPENDAP/olfs
+
+2016-02-02  James Gallagher  <jgallagher@opendap.org>
+
+	Merge branch 'BES-97'
+
+2016-02-02  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Updated copyright notice in XSLT files.
+
+2016-02-02  James Gallagher  <jgallagher@opendap.org>
+
+	Added several tests for zero-length arrays.
+	Also modified Makefile.am so that it will pick up the env var
+	TESTSUITEFLAGS if it's set
+
+2016-01-27  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Patched tests. When build from my IDE the "normal" ant production rules are not run. The ant build  utilizes a filter step that applies version numbers to vraious componets of the software. The old  baselines have the unfiltered values. The new baselines have the default version values of "Not.A.Release"  Tests should be run against the core code prior to building with actual release numbers otherwise  the baselines never conform.
+
+2016-01-26  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Improved variable names
+
+2016-01-25  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Removed unused variable.
+
+	olfs: Removed unused variable.
+
+	olfs: Patching various issues such as unused variables, dereferencing null refs, and serializable problems and baseline updates to reflect the changes I made to the Sequence representation in the HTML requestfrom for DAP4.
+
+2016-01-23  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Pretty format changes
+
+	olfs: Turned down the log  for the document handling version of  besTransaction() from error to debug so that OLFS probing of the BES does flood the loggin with spurious error noise.
+
+2016-01-22  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Fixed the dap4 ifh for sequence so that it displays and allows the selection of child variables.
+
+2016-01-20  Nathan Potter  <ndp@opendap.org>
+
+	Updated baselines for fixed CE parseing errors.
+
+	Removed unused paramter from error api
+
+	olfs: Renamed private variable with leading _ char
+
+	Added test for incompatible media type
+
+	Updated error output for ASCII/CSV so that the returned error object format is consistent with the way that a successful request would have been encoded.
+
+2016-01-19  Nathan Potter  <ndp@opendap.org>
+
+	Added expected fails to DAP4 bad constraint expression tests because the baselines are correct but the problem is not fixed.
+
+	Updated test baseline to reflect (predicted) change in server response.
+
+	Removed redundant test calls from hyraxTests.at
+
+	Added new tests for bad constraint expression syntax.
+
+	olfs: Repaired race condition in error processing. woot...
+
+	olfs: Repaired race condition in error processing. woot...
+
+	Pruned old bes tests.
+
+	Added error tests that utilize the bes error() function to create errors. Since DAP4 doesn't yet support this function only DAP2 tests were added.
+
+2016-01-18  Nathan Potter  <ndp@opendap.org>
+
+	Added more error tests, updated server to return a simple DAP2Error when there's a problem with a csv request.
+
+	Changed error test names to match convention already in use. Renamed test macros file to reflect it's actual content.
+
+2016-01-17  Nathan Potter  <ndp@opendap.org>
+
+	Changes to Makefiles.am in support od dist(?)
+
+	Added new curl test that checks the returned document AND the http ststus (in the header). Add initial error responses tests.
+
+2016-01-15  Nathan Potter  <ndp@opendap.org>
+
+	Repaired curl test macros so that they support the optional 'xfail' parameter
+
+	Updated tests to looks for hdf4 tests in the correct location.
+
+	Retiring old test Deja-Gnu test harness.
+
+	Ported all exisiting Deja-Gnu tests to autotest. Wootgit add ../resources/hyrax/WEB-INF/logback.xmlgit add ../resources/hyrax/WEB-INF/logback.xml
+
+2016-01-14  Nathan Potter  <ndp@opendap.org>
+
+	Renamed autotest testsuite to hyrax_tests, because that what it's doing.
+
+	More changes for autotest harness
+
+	updated gitignore
+
+	first draft of autotest harness of olfs/hyrax regression testing
+
+	Merge branch 'errorRefactor' of https://github.com/OPENDAP/olfs into errorRefactor
+
+2016-01-14  James Gallagher  <jgallagher@opendap.org>
+
+	Added template code for autotest tests
+
+2016-01-14  Nathan Potter  <ndp@opendap.org>
+
+	olfs: More error handling changes. Dumped the use of XSLT in BESError processing in favor of the more reliable set of JSP pages to which all other errors are directed. This greatly streamlines the error processing, reduces complexity, and allows for a consistent pattern of error handling at the top level of our various servlets.
+
+2016-01-12  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Reworked access log so that each request has a single entry and the entries contain useful information and no duplicate information. Fixed problems in w10n with media types and errors.
+
+2016-01-11  Nathan Potter  <ndp@opendap.org>
+
+	Repaired broken tests by updating baselines. In each case the change reflected a server improvement.
+
+	Updating build files to reflect changes in the structure of the resources directory
+
+	Updating build files to reflect changes in the structure of the resources directory
+
+	Updating build files to reflect changes in the structure of the resources directory
+
+2016-01-08  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Working on problems in w0n with media types and errors.
+
+	olfs: I had to step back and change the way that the MediaType object for error processing were handled. Removed the MEdiaType object as a parameter to the BesApi a (whcih really didn't need that information) and simply toss it in the Request cache once we knpow what the target media type should be. This works much better and cleans up the API too.
+
+2016-01-05  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Refactored error handling so that actualll BES error content is caught in the BES class so that BES client connection life cycles can be better managed. This change also shifted the work of transmitting the errors to the OPeNDAPException.anyExceptionHandler() chain. By adding response media type awareness to the system we should now be in a position to handle specific errors at a high level, and return to the client an error that looks something like what they are expecting.
+
+2016-01-04  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Changed name of error XSL files for BESErrors to better reflect their purpose.
+
+	Merge branch 'master' into BES-38
+
+	olfs: Increased default BES client pool size from 10 to 200.
+
+	olfs: Minor error handling changes
+
+2015-12-29  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Added title attribute to error page images.
+
+	Changed bes_timeout units to seconds.
+
+	Repaired bootstrap bug in which the default logback configuration was not found.
+
+	olfs: Bumping timout padding.
+
+	olfs: Bumping timout padding.
+
+	olfs: formatting.
+
+	Fixing null ppointer issue.
+
+	Repaired bootstrap bug in which the default logback configuration was not found.
+
+	Fixing null ppointer issue.
+
+	Adding teapot image for OLFS errors.
+
+	Added Response code for a 418 (I'm a teapot\!) error as a response for a bes timeout.
+
+	Merged master to BES-38 branch
+
+2015-12-23  Nathan Potter  <ndp@opendap.org>
+
+	I think that this collection of changes connects the admin email address in the BES configuration(s) with the email addresses that appear in the error pages of the server.
+
+	Added a set_context call for bes_timeout based on the value in the olfs.xml file
+
+	olfs: Started adding API methods for acquiring admin email from BES.
+
+	olfs: Added http status / error code to the generic error page..
+
+2015-12-22  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Repaired deployment dependency on filtering source.
+
+	olfs: Repaired error message issues. Fixed broken web opage generation in BESError."
+
+2015-12-17  Nathan Potter  <ndp@opendap.org>
+
+	Merge branch 'master' into bootstrapRepair
+
+	Fixed bug in Web UI caused by a failure to correctly initialize a variable.
+
+2015-12-15  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Made the configuration installer thread safe and added a call in ViewersServlet so that there is a configuration available for ViewersServlet AND DispatchServlet no matter who starts first.
+
+	Debugging instrumentation to better understand the hang-up issues.
+
+2015-12-04  Nathan Potter  <ndp@opendap.org>
+
+	olfs: More changes in support of configuration location.
+
+	olfs: Added missing semaphore file for the default config install during bootstrap.
+
+	olfs: Reworked the way that the OLFS finds a localized configuration. Now it will look for the environment variable OLFS_CONFIG_DIR and use it. Lacking that it will check for /etc/olfs, and lacking that it will utilize the default configuration deployed with the OLFS application. This ensures that the OLFS can start without a new user having to do much."
+
+	olfs: Reworked the way that the OLFS finds a localized configuration. Now it will look for the environment variable OLFS_CONFIG_DIR and use it. Lacking that it will check for /etc/olfs, and lacking that it will utilize the default configuration deployed with the OLFS application. This ensures that the OLFS can start without a new user having to do much."
+
+2015-12-02  Nathan Potter  <ndp@opendap.org>
+
+	Added build script that tags release with git information.
+
+2015-11-19  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Fixed broken links in the dap4 IFH.
+
+2015-11-18  Nathan Potter  <ndp@opendap.org>
+
+	Repaired a bug in which DAP4 query string handling was being applied to the DAP2 request. This was causing the {}{}}{} request syntax to be dropped from the request.
+
+2015-10-27  Nathan Potter  <ndp@opendap.org>
+
+	Updating olfs version and release files to version 1.14.1
+
+2015-10-23  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Switched to UTF-8 encoding.
+
+2015-10-21  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Dropped unused imports
+
+	olfs: Conversion to UTF-8 Charset.
+
+2015-10-20  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Conversion to UTF-8 Charset.
+
+	Fixed test target for newly functioning test
+
+	olfs: Conversion to UTF-8 Charset.
+
+	olfs: Conversion to UTF-8 Charset.
+
+	olfs: Conversion to UTF-9 Charset.
+
+	olfs: More comments.
+
+	olfs: Started managing the String encodings of the Hyrax output. Previously this has been left to the platform's default encoding. Now it will be specified.
+
+	olfs: Comments added to viewers.xml
+
+	olfs: Repaired bad test in the ingest method.
+
+	Commented out WMS and Godiva configurations in default config. This way they are not enabled in the default distribution.
+
+2015-09-21  Nathan Potter  <ndp@opendap.org>
+
+	Updated ChangeLog
+
+2015-09-17  James Gallagher  <jgallagher@opendap.org>
+
+	Merge branch 'version-1.14' of https://github.com/opendap/olfs into version-1.14
+
+	3B42...HDF is now called 3B42...HDF.gz
+	This was changed in the bes/module/hdf4_handler code to
+	reduce the space needed by the source code. I updated
+	the tests and baselines as needed here.
+
+2015-09-17  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Clenaed up imports
+
+	olfs: Fixed bug in opendap.dap4.QueryParameters in which an immutable object was modified.
+
+	Added testsuite/logs/.gitignore to make sure the directory testsuite/logs gets into the soup
+
+	olfs: Updated release date in README and NEWS
+
+2015-09-16  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Updated WAR file read me for current version and ncWMS inclusion.
+
+	olfs: Updated version for release 1.14.0
+
+	olfs: Added copyright headers where missing.
+
+	olfs: Added copyright headers where missing.
+
+	olfs: Updated olfs.xml file in the deployment respources by commneting the Timer option.
+
+	olfs: In DispatchServlet.init() - Dropped redunant call to Timer.enable()
+
+	olfs: Updated error message for failure to encode a string as UTF-8.
+
+	olfs: Changed manner in which Map content is iterated over.
+
+	olfs: Dropped catch of java.lang.Exception in favor of catching catagorized exceptions.
+
+	olfs: Dropped use of unused field.
+
+	olfs: Repaired concuurent modification of Map issue..
+
+	olfs: Repaired lock release problem with nesting try/catch/finally blocks.
+
+	olfs: Sorted javadoc comments. Dropped unused method, unused field.
+
+	olfs: Removed overly broad catch clause.
+
+2015-09-15  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Tried to mitigate dubious method calls.
+
+	olfs: Migrated string concatenation from using '+' to StringBuilder.append()
+
+	olfs: Minor code reorganiztion for legibility.
+
+	olfs: Removed unused fields, made inner classes static..
+
+	olfs: Removed unused fields, and two unused classes.
+
+	olfs: Removed unused fields, and two unused classes.
+
+	olfs: Rewound Java8 code to Java7.
+
+	Unwound patch to MediaType, removed unused field from JsonDR
+
+	olfs: Fixed inefficient use of keySet() in favor of values() methods.
+
+	olfs: Attempted to fix problem with unreleased locks. Attempted to addres String encoding issue. There are multiple instances of these problems here and in other classes and I need to determine if these changes are in fact remedies.
+
+	olfs: Repaired bad call to HashMap.contains() - needed to be HashMap.containsKey(). and it is now.
+
+	olfs: Repaired concurrency porblems with modifications of HashMaps
+
+	olfs: Fixed potential null pointer dereference."
+
+2015-09-14  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Refactored BESManager so that calls to getBES() that fail cause a BadConfigurationException to be thrown. Additional modified classes represent the ripple effect of this change."
+
+	olfs: Updated instance creation syntax .
+
+	olfs: Implemented equals() method to correctly complete the implementation of the Comparable interface .
+
+	olfs: Improved error checking for file and directory creation.
+
+	olfs: Dropped unused private variable. Updated syntax for templated variable assignment.
+
+	olfs: Fixed minor bugs.
+
+	olfs: Eliminated unused variables.
+
+	olfs: Repaired  concurrent modification issue in Timer.
+
+	Switched .travis.yml file to use docker containers.
+
+	Added coverity_scan branch to .travis.yml file
+
+	Added coverity info to .travis.yml
+
+	Moved unused class out of production
+
+	olfs: Repaired  concurrent modification of Vector membership error.
+
+	olfs: Repaired potential (although unlikely) divide by zero problem...
+
+	olfs: Repaired null pointer dereference issue.
+
+	olfs: Added write lock protection to destroy() method.
+
+	olfs: Removed commented out code section, added debugging.
+
+	olfs: Removed unused (and potentially un-threadsafe) method.
+
+	olfs: Repaired null pointer dereferencing issue.
+
+2015-09-11  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Repaired null pointer dereferencing issues. Repaired bad spelling in method name
+
+	olfs: Repaired null pointer dereferencing issues.
+
+	olfs: Repaired null pointer dereferencing issues.
+
+	olfs: Repaired null pointer dereferencing issues.
+
+	olfs: Repaired null pointer dereferencing issues.
+
+	olfs: Repaired null pointer dereferencing issues.
+
+	olfs: Repaired null pointer dereferencing issues.
+
+	olfs: Repaired null pointer dereferencing issues.
+
+	olfs: Repaired null pointer dereferencing issues.
+
+	olfs: Repaired null pointer dereferencing issues.
+
+	olfs: Repaired null pointer dereferencing issues.
+
+	olfs: Repaired null pointer dereferencing issues.
+
+	olfs: Repaired concurrency issue in AggregationServlet. Modified log messages.
+
+	olfs: Repaired potential null pointer dereference.
+
+	olfs: Repaired potential null pointer dereference.
+
+	olfs: Repaired potential null pointer dereference.
+
+	olfs: Repaired potential null pointer dereference. Adjusted error messages.
+
+	olfs: Removed unused method.
+
+	olfs: Repaired potential null pointer dereferencing issue.
+
+	olfs: Repaired use of FileInputStream to avoid opening and then never using said stream.
+
+2015-09-08  Nathan Potter  <ndp@opendap.org>
+
+	Merge branch 'master' of https://github.com/OPENDAP/olfs
+
+	Fixed issue HR-45 in which the OLFS had stopped setting Content-Disposition headers for fileout-netdcf responses.
+
+2015-06-11  James Gallagher  <jgallagher@opendap.org>
+
+	Added 'notifications' to the travis.yml file
+
+	Added travis.yml
+
+	Added tests/demo text files for teh aggregation servlet
+
+2015-05-22  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Changed content of request IDs.
+
+2015-05-20  James Gallagher  <jgallagher@opendap.org>
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+
+	Added the aggregation handler/servlet demo info to git
+
+2015-05-19  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Improved Timer class for better reporting.
+
+2015-05-11  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Dropped Java 8 syntax for accessing Vector.
+
+2015-05-08  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Fixed DSR response so that it's available not only from the dataset URL in DAP4 mode, but also from the datasetURL with a .dsr suffix, even when in DAP2 mode.
+
+	olfs: Improved conversion of wildcard to regex in Filter
+
+2015-05-07  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Updated version for release 1.13.2
+
+	olfs: Fixed syntax error - incorrect placement of double quote.
+
+	olfs: Fixed bug in Filter.
+
+	Merge branch 'master' of https://github.com/OPENDAP/olfs
+
+	olfs: Instrumentation fixes.
+
+	olfs: Fixed bug in datasetScan filter. Instrumentation, fix bug where datasetScan catalogs where getting crawled into the static catalog list.
+
+2015-05-07  James Gallagher  <jgallagher@opendap.org>
+
+	URI-encoded the href output by contents.xsl
+	This was part of the fix for the NASA/Raytheon issue where directories
+	that contain colons were not working. Part of the fix was to change how
+	URL/URIs are scrubbed. However, to get the HTML pages to work in a
+	browser, the href elements built by centents.xsl had to use
+	encode-for-uri(@name) and not just @name.
+
+	Added colon to the set of chars allowed in a url.
+	... based on a bug report from NASA/Raytheon.
+
+2015-05-07  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Reoaired vague debugging ouput.
+
+2015-04-28  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Changed the title of the  DAP4 request form to something more apropriate than IFH
+
+2015-04-24  Nathan Potter  <ndp@opendap.org>
+
+	Suppressed doclint in java doc because I don't have time to fix it all the javadoc issues  (>100 errors)
+
+	Updated README, NEWS, ChangeLog
+
+	Created an example datasetScan in the default catalog.xml file
+
+	Merge branch 'datasetScan'
+
+	olfs: Fixed problems with service path/link generation.
+
+	olfs: Added serviceContext to parameter lost for thredds xslt.
+
+	olfs: Fixed presentation so that it uses css and not lists to manage formatting.
+
+2015-04-23  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Repaired fixed the emssion of &#160; characters in the THREDDS catalog code. These things still exist in the  (currently unused) AWS code and in the WCS code.
+
+	olfs: Added collapsing lists to DMR and THREDDS datasetDetail pages
+
+2015-04-22  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Added authentication controls to THREDDS pages. Fixed link, path, and ID construction  issues.
+
+2015-04-21  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Fixed the way that services are managed in the new DatasetScan class. Now it uses the Hyrax ServiceRegistry and allows for the catalog datasetScan elements to inject other services.
+
+2015-04-21  James Gallagher  <jgallagher@opendap.org>
+
+	Added files in resources/aggregation to gitignore
+
+	Merge branch 'master' of https://github.com/opendap/olfs.git
+
+	Updates to doc comments
+
+2015-04-20  Nathan Potter  <ndp@opendap.org>
+
+	olfs: New DatasetScan fixed a timezone issue with LatestComplete
+
+2015-04-19  Nathan Potter  <ndp@opendap.org>
+
+	olfs: New DatasetScan 'addProxies' is now working.
+
+	olfs: New DatasetScan 'addTimeCoverage' is now working.
+
+2015-04-18  Nathan Potter  <ndp@opendap.org>
+
+	olfs: New DatasetScan 'namer' is now working.
+
+2015-04-17  Nathan Potter  <ndp@opendap.org>
+
+	olfs: New DatasetScan implementation that works directly with the BES. First Draft. Inherited metadata and filters working.
+
+2015-04-15  Nathan Potter  <ndp@opendap.org>
+
+	Starting datasetScan refactor (new version  will work directly with BES and not just provide pointers into the default catalog)
+
+	olfs: Commented out AuthenticationControls for the default DirectroyDispathHandler config.
+
+2015-04-07  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Updating version numbers to 1.13.0
+
+	olfs: Repaired small bug in services presentation.
+
+	olfs: Disabling ncWMS by deault for the moment.
+
+	olfs: Updated test targets to reflect changes in HTML form buttons and comments.
+
+	olfs: Removing unused security restrictions from web.xml
+
+2015-04-06  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Repaired some issues with unreleased streams.
+
+2015-04-06  James Gallagher  <jgallagher@opendap.org>
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+
+2015-04-06  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Removed prototype auth/authz code from build and distro. Scrubbed some w10n output.".
+
+2015-03-26  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Repaired a bug in THREDDS catalog ingest where the value of the serviceType attribute  of thredds:service elements was being assessed in a case sensitive manner.  Made it a case-insensitive test.
+
+2015-03-24  James Gallagher  <jgallagher@opendap.org>
+
+	Ignored the resources/aggregation/tests/demo directory
+
+	Added a note about tar.gz responses
+
+2015-03-23  Nathan Potter  <ndp@opendap.org>
+
+	Instrumentation for auth related output
+
+	Instrumentation for auth related output
+
+	Instrumentation for auth related output
+
+2015-03-20  Nathan Potter  <ndp@opendap.org>
+
+	Commented out PEPFilter from web.xml file.
+
+2015-03-20  James Gallagher  <jgallagher@opendap.org>
+
+	Fixed web.xml
+	After the merge this file listed the aggregation servlet twice.
+
+	Merge branch 'jg_agg'
+	This merges all my additions of/for the aggregation servlet. Both
+	the CSV and netCDF/zip aggregation responses are supported.
+
+	Conflicts:
+		build.xml
+		resources/hyrax/WEB-INF/urlrewrite.xml
+		resources/hyrax/WEB-INF/web.xml
+		src/opendap/aggregation/AggregationServlet.java
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+	Conflicts:
+		resources/hyrax/WEB-INF/urlrewrite.xml
+		resources/hyrax/WEB-INF/web.xml
+
+2015-03-20  Nathan Potter  <ndp@opendap.org>
+
+	Made default PEPFilter configuration allow all access
+
+2015-03-13  James Gallagher  <jgallagher@opendap.org>
+
+	Added a test for dependent vars with greater rank then the independent vars.
+	It's a mouthful... Anyway, the code actually limits the
+	difference in rank to just one additional dimension.
+
+2015-03-11  James Gallagher  <jgallagher@opendap.org>
+
+	Modified gitignore
+
+	Build changes for the aggregation servlet
+	Fir my aggregation servlet JUnit tests, I used apache commons io and
+	so I added that jar to the lib dir and then to the build.xml file. The
+	commons io jar is only installed for the opendap.war file; there are
+	other targets in the build.xml file where it does not seem to be a
+	factor.
+
+	Update/fix for FilterAsciiHeaderStream.java
+	IJ Idea suggested I add @NotNull to the byte[] parameter
+	of the write() methods my FilterStream specialization
+	overrode, but that broke the ant build. It worked in the
+	IDE. I removed the change for now.
+
+	Added a number of test input and baseline files
+	These are for the aggregation servlet.
+
+2015-03-06  James Gallagher  <jgallagher@opendap.org>
+
+	Modified text files to use the new &operation= parameter
+	...and added a text file that requests the servlet version
+	information.
+
+	Modified how operation is provided
+	The operation to perform was derived from the URL, using the
+	last part of the path. I dropped that in favor of using a query
+	string parameter so that this servlet will work with our json
+	code (at least in theory; I'm not sure how it'll work in practice).
+	I also fixed an issue where POST would redirect when the URL
+	did not end in a slash - this is good behavior for GET, but it
+	breaks POST because clients like curl don't expect POST to
+	get a redirect.
+
+	Added the CSV feature to the servlet
+	This includes some changes to the way the input parameters
+	are parsed, depending on how the servlet is called. The CSV
+	response along with the netcdf3/4 and ascii responses use
+	the same input parameters.
+
+	I moved the unit-test sources and baselines to resources
+	I'm not sure this is the best place, but I want to have my test
+	code part of typical distributions.
+
+2015-03-05  James Gallagher  <jgallagher@opendap.org>
+
+	Added FilterAsciiHeaderStream
+	...and tests
+
+	Minor refactor of method names
+
+	Added two new response types: nc4 and ASCII
+
+2015-03-04  James Gallagher  <jgallagher@opendap.org>
+
+	Aggregation servlet 1.0 beta
+	Fixed some warning issues, documentation, unused code, ...
+	Also, added the sole unit test file to build.xml and hacked
+	in the README file a bit.
+
+2015-03-04  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Fixed use of DEPLOYMENT_CONTEXT in production rules.
+
+2015-03-03  James Gallagher  <jgallagher@opendap.org>
+
+	Added unit tests for AggregationParams
+	These are mostly a token effort, but I wanted to go through the
+	process since I suspect that when I'm working on the CSV stuff
+	the tests will matter.
+
+	The aggregation server now uses the swath subsetting function.
+	The bbox query string parameter is now parsed and its value
+	is used to build the subsetting expression along with the list
+	of variable names. However, bbox is not required and it's
+	possible to use the var parameter to pass in a complete CE
+	(for now at least).
+
+2015-02-25  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Removed json-simple library and replaced with gson
+
+	olfs: Changes to supported modified opendap.dap.Request API
+
+2015-02-24  Nathan Potter  <ndp@opendap.org>
+
+	Merge remote-tracking branch 'origin/managed-access'
+	Conflicts:
+		ChangeLog
+		NEWS
+		README
+		besclient-build.xml
+		build.xml
+		glacier-build.xml
+		k_means.xml
+		reap_crawler_build.xml
+		resources/WebStart/ToolsUI.jnlp
+		resources/hyrax/WEB-INF/logback-test.xml
+		resources/hyrax/WEB-INF/logback.xml
+		resources/hyrax/WEB-INF/urlrewrite.xml
+		resources/hyrax/WEB-INF/web.xml
+		resources/hyrax/admin/jsp/besctl.jsp
+		resources/hyrax/admin/jsp/index.jsp
+		resources/hyrax/admin/jsp/olfsLogView.jsp
+		resources/hyrax/initialContent/olfs.xml
+		resources/hyrax/xsl/contents.xsl
+		resources/metacat/ddx2eml-2.0.xsl
+		retired_source/opendap/bes/dapResponders/DatasetFileAccess.java
+		s3-build.xml
+		src/opendap/async/AsyncDispatcher.java
+		src/opendap/bes/BESError.java
+		src/opendap/bes/BESManager.java
+		src/opendap/bes/BESThreddsDispatchHandler.java
+		src/opendap/bes/BesDapDispatcher.java
+		src/opendap/bes/DirectoryDispatchHandler.java
+		src/opendap/bes/FileDispatchHandler.java
+		src/opendap/bes/Version.java
+		src/opendap/bes/dap2Responders/BesApi.java
+		src/opendap/bes/dap2Responders/Iso19115.java
+		src/opendap/bes/dap2Responders/Iso19115Rubric.java
+		src/opendap/bes/dap4Responders/DataResponse/CsvDR.java
+		src/opendap/bes/dap4Responders/DataResponse/GeoTiffDR.java
+		src/opendap/bes/dap4Responders/DataResponse/GmlJpeg2000DR.java
+		src/opendap/bes/dap4Responders/DataResponse/IjsonDR.java
+		src/opendap/bes/dap4Responders/DataResponse/JsonDR.java
+		src/opendap/bes/dap4Responders/DataResponse/Netcdf3DR.java
+		src/opendap/bes/dap4Responders/DataResponse/Netcdf4DR.java
+		src/opendap/bes/dap4Responders/DataResponse/NormativeDR.java
+		src/opendap/bes/dap4Responders/DataResponse/XmlDR.java
+		src/opendap/bes/dap4Responders/DatasetMetadata/HtmlDMR.java
+		src/opendap/bes/dap4Responders/DatasetMetadata/IjsonDMR.java
+		src/opendap/bes/dap4Responders/DatasetMetadata/JsonDMR.java
+		src/opendap/bes/dap4Responders/DatasetMetadata/NormativeDMR.java
+		src/opendap/bes/dap4Responders/DatasetMetadata/RdfDMR.java
+		src/opendap/bes/dap4Responders/DatasetMetadata/XmlDMR.java
+		src/opendap/bes/dap4Responders/DatasetServices/HtmlDSR.java
+		src/opendap/bes/dap4Responders/DatasetServices/NormativeDSR.java
+		src/opendap/bes/dap4Responders/DatasetServices/XmlDSR.java
+		src/opendap/bes/dap4Responders/FileAccess.java
+		src/opendap/bes/dap4Responders/Iso19115/IsoDMR.java
+		src/opendap/bes/dap4Responders/Iso19115/IsoRubricDMR.java
+		src/opendap/bes/dap4Responders/MediaType.java
+		src/opendap/coreServlet/DispatchServlet.java
+		src/opendap/coreServlet/ReqInfo.java
+		src/opendap/coreServlet/RequestCache.java
+		src/opendap/coreServlet/ServletUtil.java
+		src/opendap/coreServlet/Util.java
+		src/opendap/dap/Request.java
+		src/opendap/dap4/Dap4Error.java
+		src/opendap/dap4/QueryParameters.java
+		src/opendap/gateway/GatewayForm.java
+		src/opendap/hai/DispatchServlet.java
+		src/opendap/logging/LogUtil.java
+		src/opendap/namespaces/BES.java
+		src/opendap/ncml/NcmlFileDispatcher.java
+		src/opendap/ppt/NewPPTClient.java
+		src/opendap/services/ServicesRegistry.java
+		src/opendap/threddsHandler/StaticCatalogDispatch.java
+		src/opendap/viewers/GodivaWebService.java
+		src/opendap/viewers/NcWmsService.java
+		src/opendap/viewers/ViewersServlet.java
+		src/opendap/wcs/v1_1_2/http/Util.java
+		src/opendap/wcs/v2_0/http/Util.java
+		src/opendap/webstart/WebStartServlet.java
+		testsuite/gateway/fnoc1.nc.dmr.xml
+		wcs-build.xml
+		wcs2-build.xml
+
+2015-02-24  James Gallagher  <jgallagher@opendap.org>
+
+	Updated copyright date in the Aggregation servlet.
+
+	Fixed the redirect issue
+	URLs to the base servlet need trailing slashes. I copied
+	Nathan's redirect code so this will work. I also used the
+	Idea code analysis to fix up some minor issues.
+
+	Added just tiny bit to the Servlets doc comment.
+
+	Added POST support; fixed minor issues
+	POST and GET now both work. I added an extensive comment
+	that includes an example call using curl. I fixed an issue
+	where the Set<String> used to find name collisions in
+	the files to be added to the zip archive was not reset
+	between calls. Also, the servlet now adds ".nc" when
+	netCDF3 files are requested, no matter what the type of
+	the source files.
+
+	First working version; no support for POST yet
+	This version of the Aggregation servlet will return a zip file
+	of arbitrary files or netcdf3 files built from any type of file
+	the BES recognizes. In the latter case, a CE is applied to the
+	source file before the result is returned as a netCDF3 file.
+
+2015-02-23  James Gallagher  <jgallagher@opendap.org>
+
+	Added more features
+	The servlet can get small text files and return them
+	in a single zip file. It seems to gag on netcdf files,
+	but that's for tomorrow...
+
+2015-02-23  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Updated inner class for compatibility with the servlet 3.0 specification
+
+	olfs: Corrected pattern for request cache initiation.
+
+2015-02-23  James Gallagher  <jgallagher@opendap.org>
+
+	Hacking toward some sort of BES interaction...
+
+2015-02-20  James Gallagher  <jgallagher@opendap.org>
+
+	Hacks to AggregationServlet.java
+	The AggregationServlet has been hacked so that it talks to the
+	BES and gets a version response. I think. Not working yet, but
+	my 'just do a pull' hijinks on Friday afternoon left me nervous
+	about loosing code, so in it goes.
+
+	More merge maddness
+	I did a pull for some changes Nathan added and used stash
+	to hold onto the work I was doing on my agg branch, but
+	somehow botched the stash apply or something. I think I
+	inadvertantly have merged my branch to the master...
+
+	pull/merge/deleted files... Friday afternoon...
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+
+2015-02-20  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Updated servlet api to 3.0. Tomcat 7.x uses 3.0 so we are moving forawrd. The 3.0 api utilizes generics and so this will get rid of a bunch of unchecked warnings. woot.
+
+	olfs: Updated servlet api to 3.0. Tomcat 7.x uses 3.0 so we are moving forawrd. The 3.0 api utilizes generics and so this will get rid of a bunch of unchecked warnings. woot.
+
+	olfs: Updated servlet api to 3.0. Tomcat 7.x uses 3.0 so we are moving forawrd. The 3.0 api utilizes generics and so this will get rid of a bunch of unchecked warnings. woot.
+
+2015-02-20  James Gallagher  <jgallagher@opendap.org>
+
+	Switched from a child of opendap.DispatchServlet to HttpServlet
+	This should simplify things and is more likely what I need.
+	There is likely considerable simplification I can do to the
+	code in this directory (opendap/aggregation), but I want to
+	get some basic I/O working before I hack away at stuff.
+
+2015-02-19  James Gallagher  <jgallagher@opendap.org>
+
+	Added to gitignore
+
+	Merge branch 'master' into jg_agg
+	Conflicts:
+		.gitignore
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+	Conflicts:
+		.gitignore
+
+	Added .gitignore
+
+2015-02-18  Nathan Potter  <ndp@opendap.org>
+
+	Tweaks..
+
+	Changed w10n.type for datasets to 'dap.2'. Added .gitignore file
+
+2015-02-18  James Gallagher  <jgallagher@opendap.org>
+
+	Initial commit - started at home; not working
+
+2015-02-18  Nathan Potter  <ndp@opendap.org>
+
+	olfs:  Implemented w10n "traverse" query string parameter, but limited the scope of it's applicability to datasets and their variables. The "traverse" parameter is ignored at the filesystem level. Because, well, think about it...
+
+	olfs:  Made JSON output indented
+
+	Replaced json-simple library with Gson because the json-simple library was blowing it when encoding complex string attribute values
+
+2015-02-17  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Minor API cleanup. Comments!
+
+	olfs: Refactored use of w10nRequest object to simplify the internal API and to coalesce methods into the w10nRequest class so that the code can be more easily understood. Re worker the use of "path" and "identifier" to correctly represent section 3 of the w10n specification.
+
+2015-02-13  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Added w10n meta object to w10n json data responses.
+
+	olfs: Implement netcdf-3, netcdf-4, and dap2 data responses. Groomed MediaType stack
+
+	olfs: Production rules repair and small fixes to both w10n and DAP catalog navigation.
+
+2015-02-12  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Functional w10n service prototype.
+
+2015-01-22  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Creating w10n servlet.
+
+	olfs: Updated ToolsUI JNLP, fixed minor bug in Error management
+
+2015-01-20  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Fixed log message that was erroneously sent to error (now debug)
+
+2015-01-15  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Failed to patch the NcWMS service, fixed now.
+
+	olfs: Patched the generation of Godiva links to accommodate the new (old?) TDS like arrangement where the Dynamic Service dataset name appears in the URL path and not in the query string as the value of the "dataset" parameter. (Because the former is WMS compliant and the latter is not)
+
+	olfs: Moved around some utility methods so that similar tools are kept together.
+
+2015-01-05  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Updating version numbers, NEWS, ChangeLog, and README for HYrax 1.10.1 / OLFS 1.12.1
+
+	olfs: Dropped broken test for dataset WMSness. Will have to revisit in the future, as users will likely dislike false positives (showing WMS and Godiva links for incompatible datasets) almost as much as false negatives (not showing WMS and Godiva links for valid WMS datasets)
+
+2014-12-15  Nathan Potter  <ndp@opendap.org>
+
+	Updating News ChangeLog
+
+2014-11-26  Nathan Potter  <ndp@opendap.org>
+
+	olfs: Added ClickjackFilter.
+
+	Merge branch 'master' of https://github.com/OPENDAP/olfs
+
+	olfs: Added ClickjackFilter.
+
+	olfs-managed-access: New configuration bootstrap.
+
+2014-11-25  James Gallagher  <jgallagher@opendap.org>
+
+	Merge branch 'master' of https://github.com/opendap/olfs
+
+	Applied patch from LARC for X-Frame-Options: DENY.
+
+2014-11-18  Nathan Potter  <ndp@opendap.org>
+
+	olfs-managed-access: New configuration bootstrap.
+
+	olfs-managed-access: New configuration bootstrap.
+
+	olfs-managed-access: Minor bug fix in production rules for SimplePDP
+
+	olfs-managed-access: Changed build name
+
+	olfs-managed-access: Adding access logging to logback-tes.xml
+
+	olfs-managed-access: Updated production rules for PDPService
+
+2014-11-18  James Gallagher  <jgallagher@opendap.org>
+
+	Moved the managed access branch code to the top level out of the features directory.
+
+2014-11-11  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-managed-access: Sync for cloud instance.
+
+2014-11-10  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	oplfs-managed-access: Sytnc for cloud
+
+	olfs-managed-access: Sync for cloud instance.
+
+2014-10-28  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-managed-access: Sync for cloud instance.
+
+	olfs-managed-access: Sync for cloud instance.
+
+	olfs-managed-access: Sync for cloud instance.
+
+	olfs-managed-access: Sync for cloud instance.
+
+	olfs-managed-access: Sync for cloud instance.
+
+	olfs-managed-access: Sync for cloud instance.
+
+	olfs-managed-access: Sync for cloud instance.
+
+	olfs-managed-access: Sync for cloud instance.
+
+2014-10-23  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-managed-access: repairs to URS.
+
+	olfs-managed-access: repairs to URS.
+
+	olfs-managed-access: repairs to URS.
+
+	olfs-managed-access: repairs to URS.
+
+	olfs-managed-access: Refactored logout procedures..
+
+	olfs-managed-access: Added ShibbolethLogin gizwat.
+
+	olfs-managed-access: Added ShibbolethLogin gizwat.
+
+2014-10-22  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-managed-access: Sync check in for AWS cloud.
+
+	olfs-managed-access: Sync check in for AWS cloud.
+
+	olfs-managed-access: FIxing build issues
+
+2014-10-20  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Oops. Wrong version #..
+
+	olfs: Updated minor version number prior to minor release of OLFS.
+
+2014-10-14  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-managed-access: Adding simple JSON lib
+
+2014-10-09  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Checking in Managed Access Test Mule code.
+
+	olfs: Checking in Managed Access Test Mule code.
+
+	olfs: Checking in Managed Access Test Mule code.
+
+2014-10-08  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Checking in Managed Access Test Mule code.
+
+	olfs: Creating a branch of the trunk to use for developing the Managed Access features for the ANU.
+
+2014-08-29  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Repaired bug that was introducing whitespace characters into the MIME Type strings extracted from the clients Accept header, and thus causing the server to incorrectly return a HTTP status of 406..
+
+	olfs: Tweeks to S3 service and production  rules for same.
+
+2014-08-27  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Fixed up build files to accomodate library move. Also added run target for SimpleS3Uploader to the s3-build.xml file
+
+	olfs: Moved libs for AWS into AWS resources.
+
+	olfs: Moved libs for AWS into AWS resources.
+
+	olfs: Updated NOAA S3 code to work again. Built bucket for testing.
+
+2014-08-25  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Soliciting the DAP2 ASCII response is now a "returnAs" attribute of the get DAP2 Data request.
+
+2014-08-20  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Improvements ton DAP4 Data Request form.
+
+2014-08-19  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added XSLT to make the Data Request form from a DMR.
+
+	olfs: Added XSLT to make the Data Request form from a DMR.
+
+	olfs: Added XSLT to make the Data Request form from a DMR.
+
+2014-08-18  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Repaired DAP2 fileout NetCDF4. Started sorting out HTML Data request forms.
+
+	olfs: Replumbed so that all DAP4 requests now solicit DAP4 material from the BES.
+
+2014-08-15  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Renamed DapDispatcher to BesDapDispatcher
+
+	olfs: moved DapDispatcher to opendap.bes package
+
+	olfs: Renamed dapREsponders package to a more trthful dap2Responders
+
+2014-08-13  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Updated release related files.
+
+	olfs: Updated release related files.
+
+	olfs: Refactored OLFS configuration. Added JSON and IJSN data responses to DAP2 resource URL scheme.
+
+2014-07-29  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Integrated ncWMS Dynamic services into Hyrax so that WMS services can be used.
+
+	olfs: Integrated ncWMS Dynamic services into Hyrax so that WMS services can be used.
+
+	olfs: Integrated ncWMS Dynamic services into Hyrax so that WMS services can be used.
+
+2014-07-23  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Adding second JSON representation, IJSON (for what that's worth) suffix=.ijsn
+
+2014-07-18  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Checking in schema.org changes to our contents.xsl submitted by Stefan Zednick."
+
+	olfs: Checking in dispatch support for JSON encodings of data and dmr.
+
+2014-07-02  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: check in for 1.11.3 release (Hyrax 1.9.7)
+
+	olfs: rewinding a failed check in
+
+	olfs: Updated version information for 1.11.3
+
+	olfs: Repaired bug that was breaking Hyrax's ability to serve plain files (not otherwise recognized as 'data' by the BES)" .
+
+2014-06-06  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Repaired broken nciso production rule.
+
+2014-05-22  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Updated version numbers in NEWS, README. Updated Changelog
+
+	olfs: Fixed bug in WebStartServlet.
+
+2014-05-01  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Updated baselines for changes in hdf4_handler
+
+2014-04-24  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Prerelease check in for version 1.11.0
+
+2014-04-01  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Updated README, ChangeLog, News
+
+2014-03-31  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Fixed test classpath
+
+	olfs: Changes in response to audit.
+
+	olfs: Added processing to handle the HTTP response headers for the async behavior of the store_result requests.
+
+2014-03-27  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Repairs to the admin interface that include improved logging for the JSP code and corrected behavior for the connection to the daemon process.
+
+2014-03-25  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Repaired test baselines to reflect the netcdf_handler default change to ShowSharedDimensions
+
+2014-03-24  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2014-03-14  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Adjustments to XML commands generated by BesApi for DAP4 requests
+
+2014-03-11  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: DAP4 Stored result support. DAP4 Async Support. New test baselines (FreeForm changes and all DDX output is now version 3.2)
+
+2014-03-04  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Fixed OPeNDAPClient so that when run as standalone that it exits more gracefully.
+
+2014-03-04  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Added a target to besclient-build.xml so that the client, once built, can be run easily.
+
+	Change so that closeConnection()'s informServer is false when an error is detected.
+
+2014-03-04  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Debug codes
+
+	olfs: Debug codes
+
+	olfs: Debug codes
+
+	olfs: Added timeout to creation of BES socket connection.
+
+	olfs: Added timeout to creation of BES socket connection.
+
+	olfs: Added timeout to creation of BES socket connection.
+
+2014-02-21  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Dropped unused class StaticContentServlet.
+
+2014-02-03  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added new configuration parameter for the olfs.xml file in which each BES instance can have a "timeOut" parameter set to dictate how long the OLFS will wait for the BES to respond to a command before the OLFS times out the connection.
+
+	olfs: Added new configuration parameter for the olfs.xml file in which each BES instance can have a "timeOut" parameter set to dictate how long the OLFS will wait for the BES to respond to a command before the OLFS times out the connection.
+
+	olfs: Added new configuration parameter for the olfs.xml file in which each BES instance can have a "timeOut" parameter set to dictate how long the OLFS will wait for the BES to respond to a command before the OLFS times out the connection.
+
+2014-01-28  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added support for a DAP4 query string storeResult parameter.
+
+2013-12-30  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Set DDX version to 3.2 (always). Tweaked dsr and dmr links in dap4contents.xsl so that xml is specifically requested (no content negotiation)
+
+2013-12-03  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added DMR response (Well a DDX masquerading as a DMR) to glacier service...
+
+2013-11-21  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Updated units for async delay from milliseconds to seconds.
+
+2013-11-18  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Instrumentation
+
+	olfs: Instrumentation
+
+	olfs: Instrumentation
+
+	olfs: Instrumentation
+
+	olfs: Instrumentation
+
+	olfs: Instrumentation
+
+	olfs: Instrumentation
+
+	olfs: Instrumentation
+
+	olfs: Instrumentation
+
+2013-11-17  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Instrumentation
+
+	olfs: Instrumentation
+
+	olfs: Instrumentation
+
+	olfs: Instrumentation
+
+	olfs: Instrumentation
+
+	olfs: Added main() to OPeNDAPClient and production rules to allow us to send commands to the BES from a java env without using tomcat.
+
+	olfs: Added main() to OPeNDAPClient and production rules to allow us to send commands to the BES from a java env without using tomcat.
+
+2013-11-14  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	test takes = and maybe == won't be portable; changed
+
+	Added some code to capture the error conditions and return an overall status for use with the nightly build.
+	M    make-check
+
+2013-11-14  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Commented out the BadArgs and SwapCoordinates test for geogrid.
+
+	olfs: New baselines for changes in HTML form
+
+	olfs: Coalesced MediaType child classes into MediaType. Fixed copy-pasta related bug in fileout netcdf-3 response that was returning DAP2Data.
+
+2013-11-13  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: updated baselines to reflect changes in html form and attribute value escaping.
+
+2013-11-12  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Made DAP4 Content-Description match Content-Type
+
+	olfs: Optimized Imports. Started work to eliminate unnecessarily complex inheritance for Dap4Responder. Removed org. from DAP4 media type names.
+
+2013-11-11  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Fixed bug in the way that media types where mapped into the Content-Type header
+
+2013-11-06  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Attempting to address bug associated with creating a new PPT connection to the BES.
+
+2013-11-05  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Attempting to address bug associated with creating a new PPT connection to the BES.
+
+	olfs: Attempting to address bug associated with creating a new PPT connection to the BES.
+
+	olfs: Attempting to address bug associated with creating a new PPT connection to the BES.
+
+	olfs: Added error trap to PPT client impl
+
+2013-10-30  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added error trap to PPT client impl
+
+2013-10-23  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: added buttons for collapsible lists
+
+	olfs: Changed production rules to allow deployment context to be supplied at build time. Added a new DSR view using collapsible lists
+
+2013-10-22  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Repaired damaged string value
+
+2013-10-21  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2013-10-17  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Glacier service bug fixes.
+
+2013-10-16  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Stepwise check in. Added inventory downloads, vault purge/removal, and purge duplicates methods to Vault
+
+2013-10-15  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Stepwise check in. Implmenting inventory downloads and vault purge/removal.
+
+2013-10-10  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Stepwise check in. Implmenting inventory downloads and vault purge/removal.
+
+2013-10-08  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Tweaking for use outside my dev system
+
+	olfs: Adding new apache http client 4.3 for the AWS libraries  (different API than version 3.1 that we have)
+
+	olfs: Adding new apache commons io library.
+
+	olfs: Adding new apache commons io library.
+
+	olfs: spelling correction.
+
+	olfs: Adding new apache commons io library.
+
+	olfs: Sorted out libraries, production rules, and added AWS credentials to the configuration/commandline inputs for Glacier code.
+
+2013-10-07  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Sorted out libraries, production rules, and added AWS credentials to the configuration/commandline inputs for Glacier code.
+
+	olfs: Repairing a messed up copyright update...
+
+2013-10-05  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs/glacier: Working on errors. I need to check in - the code may not compiling.
+
+2013-10-04  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Refactored Responders so that they use the BesApi.get*() and BeaApi.write*() API to handle requests. This means that teh BesApi is more useful to subclassing for the purpose of providing specific responses via another channel. Overriding the BesApi.besTansaction() interface is still and this change should not affect code that utilizes that path for subclassing.
+
+	olfs: Hard limits on memory cached GlacierRecords. Metadata responses from cached metadata implemented.
+
+	olfs: Created size limited memory cache for GlacierRecords that eliminates the oldest (by time since last access)  when adding new records to the collection.
+
+2013-10-03  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Glacier service uses configuration file to determine glacier end point and local archive directory.
+
+2013-10-01  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Updating copyright
+
+	olfs: Checking in first (mostly) working prototype of an async service for AWS Glacier.
+
+2013-09-24  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Simplification of ANT production rules.
+
+	olfs: Minor changes to AWS prototype code.
+
+2013-09-19  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Updating default olfs.xml file so that the default server behavior is to return DAP2 style responses when the dataset resource URL is requested
+
+2013-09-18  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added immutable max POST body size. Added comments about how to enable POST for the submission of the CE to the default olfs.xml file.
+
+	olfs: Updated baselines to reflect changes in datasets and server side function behavior.
+
+	olfs: Updated hdf4 baselines to reflect new hdf4_handler default behavior.
+
+2013-09-13  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Converting string concatination to method calls in debug line
+
+2013-09-11  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Adding NEWS file, updating ChangeLog, README, etc. for Hyrax 1.9 branch.
+
+2013-08-28  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Checking in Glacier service resources.
+
+2013-08-27  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Checking in protoype code for working wth S3 and Glacier.
+
+	olfs: Improving the implementation of suffix removal using a regex.
+
+	olfs: Adding execution timing
+
+2013-08-26  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added minor changes to the way CEs are accepted via POST
+
+	olfs: Moved the initialContent directory to a more sensible location
+
+2013-08-02  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs:  Fixed bug in which the suffix regex was being accessed as a private variable and not via the API which was preventing child classes from providing alternate values by overriding API access methods.
+
+2013-07-03  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs:  Fixed bug in BESManager that caused the manager to incorrectly assign ALL BES instances in the configuration to BESGroup with prefix '/' (ouch).
+
+2013-06-28  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs:  Optimized imports.
+
+	olfs: Checking in spurious mods to retired source (why? let's just say because I said so...)
+
+	olfs:  Renamed BesDataSource to BesResource. Fixed bug that was causing the server to omit last modified time headers from its responses.
+
+2013-06-20  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: removed spurious import statement
+
+2013-06-19  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs:  Added Prototype support for POST requests that contain a CE in the request body.
+
+2013-06-18  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs:  NOAA S3 minor changes.
+
+	olfs:  Modified media type for netcdf-4 fileout
+
+2013-04-01  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs:  Added netcdf-4 fileout support (suffix = .nc4)
+
+2013-03-14  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs:  Fixed s3 catalog and dap service dispatch issues. Using request cache for last modified times of s3 data resources.
+
+	olfs:  Fixed s3 catalog and dap service dispatch issues. Using request cache for last modified times of s3 data resources.
+
+	olfs:  Fixed s3 catalog and dap service dispatch issues. Using request cache for last modified times of s3 data resources.
+
+	olfs: Added multiple bucket support for s3 catalog. Fixed s3 catalog dispatch issues.
+
+2013-03-06  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Bug fix for Async Prototype
+
+	olfs: Bug fix for Async Prototype
+
+	olfs: Production rules...
+
+2013-03-04  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Prototype s3 index service
+
+	olfs: Prototype s3 index service
+
+	olfs: Prototype s3 index service
+
+2013-02-20  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Retiring unused code from active code base.
+
+	olfs: Retiring unused code from active code base.
+
+	olfs: Retiring unused code from active code base.
+
+	olfs: Retiring unused code from active code base.
+
+	olfs: Retiring unused code from active code base.
+
+	olfs: Retiring unused code from active code base.
+
+	olfs: Retiring unused code from active code base.
+
+	olfs: Retiring unused code from active code base.
+
+	olfs: Retiring unused code from active code base.
+
+	olfs: Retiring unused code from active code base.
+
+	olfs: Retiring unused code.
+
+	olfs: Retiring unused code from active code base.
+
+	olfs: Repaired broken DAP4, DAP2, gateway, and ncmlHandler dispatch.
+
+2013-01-18  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added geotiff and gmljp2 responses as dap4 alternate data representations
+
+2013-01-16  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Merging branch/olfs/1.9.0 to trunk against the tags/olfs/1.9.6 tag. Created tags/olfs/1.9.7 tag.
+
+	olfs: Small mods to the HTTP request diagnostic tool EchoServlet
+
+2013-01-03  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Repaired bug in the way that RequestCache was being used by the WebStartServlet.
+
+2013-01-02  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Repaired bug in the way that RequestCache was being used by the WebStartServlet.
+
+	WCS-2.0:  Reformatted presentation view of a CoverageDescription
+
+	WCS-2.0:  Loosened collection type used in by getCoverageSummaryElements()
+
+	WCS-2.0:  Protecting request cache api from null pointers
+
+	WCS-2.0:  Started Sorting Coverages by coverageId
+
+	WCS-2.0:  Fixed id's and names in wcs contnet. Made server accept WCS request parameters in a non case sensitive manner.
+
+	WCS-2.0:  Fixed id's and names in wcs contnet. Made server accept WCS request parameters in a non case sensitive manner.
+
+	WCS-2.0:  Fixed id's and names in wcs contnet. Made server accept WCS request parameters in a non case sensitive manner.
+
+2012-12-31  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Adding GEOTIFF and GML-JPEG2000 responses.
+
+	WCS-2.0:  Optimized imports. Removed more crufty references to version 1_1_2 code.
+
+2012-12-21  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	WCS-2.0:  Removed cruft files. Dropped ServerIDs thingy in the xsl and code (cruft from 1.1.2).
+
+2012-12-20  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	WCS-2.0:  Renamed CE method more accurately, comments.
+
+	WCS-2.0:  Added checks to prevent mixed mode (value vs array index) subsetting requests and to correctly detect time value types during CE construction.
+
+	WCS-2.0:  Corrected errors in  coverage descriptions.
+
+	WCS-2.0:  Dropped cruft classes. Added comments to TimConversion methods
+
+	WCS-2.0:  Added support for domain sub-setting by value and by array index. Added support for time domain sub-setting.
+
+2012-12-17  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	WCS-2.0:  Added geotiff as supported format and modified capabilities.xsl to display that information.
+
+	WCS-2.0:  Added geotiff as supported format and modified capabilities.xsl to display that information.
+
+2012-12-14  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	WCS-2.0:  Added geotiff as supported format and modified capabilities.xsl to display that information.
+
+2012-12-13  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	WCS-2.0:  Added geotiff as supported format and modified capabilities.xsl to display that information.
+
+	WCS-2.0:  Added geotiff as supported format and modified capabilities.xsl to display that information.
+
+2012-12-05  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Set content-type and content-disposition headers in GeoTiff
+
+2012-12-04  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added GEoTiff response. Fixed issue with XmlData handler
+
+2012-11-07  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	WCS-2.0:  Made WCS KVP key set case insensitive.
+
+	WCS-2.0:  Made WCS KVP key set case insensitive.
+
+2012-11-01  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	WCS-2.0:  UI adjustments
+
+	WCS-2.0:  New production rules for WCS-2.0.
+
+	WCS-2.0:  Fixing service test harness.
+
+	WCS-2.0:  Fixing service test harness.
+
+	WCS-2.0:  GetCoverage working. Both "format" and "GML" (aka multipart) responses.
+
+	WCS-2.0:  GetCoverage working. Both "format" and "GML" (aka multipart) responses.
+
+	WCS-2.0:  GetCoverage working. Both "format" and "GML" (aka multipart) responses.
+
+2012-10-28  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	WCS-2.0:  GetCapabilites and DescribeCoverage working via kvp. Both response documents validate.
+
+2012-10-25  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	WCS: Two example WCS-2.0 CoverageDescriptions
+
+2012-10-23  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-1.9.0: Repaired pathFunction processing so that the DAP suffixes are found at the end of the pathFunctionblock
+
+2012-10-22  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	WCS: Relaxed usage of HashMap to Map
+
+	olfs-1.9.0: Disabled LicenseManager until the year 2222 ;)
+
+	olfs-1.9.0: Added support for path based server side functions calls that conform to the F-TDS/GDS syntax.
+
+2012-10-18  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	WCS: Relaxed usage of HashMap to Map
+
+2012-10-17  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	WCS: Creating specific resource trees for versions 1.1.2 and 2.0
+	A    https://scm.opendap.org/svn/trunk/olfs/resources/WCS/2.0
+
+	WCS: Creating resources specific for versions 1.1.2 and 2.0
+
+2012-10-15  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	wcs: Updated package names for the classes in the newly created WCS 2.0 package.
+
+	wcs: Creating WCS 2.0 implmentation starting point by cloning WCS 1.1.2 code because the amount of similarity between the two versions leads me to beleive that this will save time.
+
+2012-09-17  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added instrumentation to HAI to monitor ChunkReadBuffer size for each BesClient
+
+2012-09-14  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Improvements to memory allocation/use in Chunked communications.
+
+	olfs: Fixed flaws in destroy() and drain() methods
+
+2012-09-11  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Comitting merge from 1.9.0 release branch (using the 1.9.5 tag). Merged code contains BES load balancing implementation.
+
+2012-09-10  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-1.9.0: Support for load balancing in BES Groups (multiple BES's with the same prefix)
+
+	olfs: First implementation of DAP4 Web Services
+
+2012-08-29  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Unwinding bad changes sprayed about the code by refactor tools run mad.
+
+2012-08-21  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: debugging hai...
+
+2012-08-20  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: debugging hai...
+
+2012-08-16  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Updated async responses so that the use of "pending" and "gone" can be switched off (404 response in their place).
+
+	olfs: Updated async to emit and ingest time periods as seconds (formerly milliseconds).
+
+	olfs: Updated aysnc example to reflect version 3 of the draft.
+
+	olfs: Updated aysnc example to reflect version 3 of the draft.
+
+2012-08-15  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Updated aysnc example to reflect version 3 of the draft.
+
+	olfs: Updated aysnc example to reflect version 3 of the draft.
+
+	olfs: Updated aysnc example to reflect version 3 of the draft.
+
+2012-08-02  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Fixed bug in getLastModifed() (again?)
+
+2012-08-01  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Post merge adding new SOAPRequestDispatcher.java class - lost as a casuality of tree conflicts in the merge.
+
+	olfs: Merged 1.9.0 branch to trunk using 1.9.4 tag. Created 1.9.5 tag
+
+2012-07-30  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Mothballing SOAP handler because it's not in use.
+
+	olfs: Mothballing SOAP handler because, well, nobody cares.
+
+	olfs: Mothballing SOAP handler because, well, nobody cares.
+
+	olfs: Mothballing SOAP handler because, well, nobody cares. Evidence suggests that no one has ever issued a single legitimate SOAP request to a Hyrax server.
+
+2012-07-27  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Cleaned up logging and other details.
+
+	olfs: Updated POST handlers.
+
+	olfs: Updated POST handlers.
+
+	olfs: Updated POST handlers.
+
+2012-07-09  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Fixed bug in DapDispatcher.getLastModified()
+
+	olfs: Fixed bug in DapDispatcher.getLastModified()
+
+2012-06-28  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: SVN test
+
+2012-04-25  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: updated test controls
+
+2012-04-24  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added a response blocking filer to the BotBlocker so that crawl bots can be stopped from accessing data services but can still get metadata and catalog information.
+
+2012-04-21  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added a response blocking filer to the BotBlocker so that crawl bots can be stopped from accessing data services but can still get metadata and catalog information.
+
+2012-04-18  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added an XSL that processes the Async response for a browser
+
+	olfs-1.9.0: Updated ToolsUI.jnlp file to utilize the new, version invariant distribution scheme! Woo Hoo! New versions are now automatic!
+
+	olfs: Added an XSL that processes the Async response for a browser
+
+	olfs: Added an XSL that processes the Async response for a browser
+
+	olfs: Added an XSL that processes the Async response for a browser
+
+	olfs: Added an XSL that processes the Async response for a browser
+
+2012-04-17  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added configurable response delay and cache persist time to asynchronous response prototype
+
+	olfs: Added asynchronous response prototype
+
+2012-04-15  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-1.9.0: Updated ToolsUI.jnlp file to utilize the new, version invariant distribution scheme! Woo Hoo! New versions are now automatic!
+
+2012-04-02  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Updated DataServices response to use Service information generated by DapResponders. (minor edits)
+
+2012-04-02  jdcorral  <jdcorral@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	added use of canonical in template check-reserved.  M. Benno Blumenthal.  Check in by J. del Corral
+
+2012-03-30  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Updated DataServices response to use Service information generated by DapResponders.
+
+	olfs: Updated DataServices response to use Service information generated by DapResponders.
+
+	olfs: Updated DataServices response to use Service information generated by DapResponders.
+
+2012-03-28  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Updating olfs.xml to reflect the retirement of the NcmlFileDistacher and comments regarding the DatasetServices response.
+
+	olfs: Updating olfs.xml to reflect the retirement of the NcmlFileDistacher and comments regarding the DatasetServices response.
+
+2012-03-27  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Deprecated NcmlFileDispatcher by adding it's logic to DatasetFileAccess
+
+	olfs: Deprecated NcmlFileDispatcher by adding it's logic to DatasetFileAccess
+
+	olfs: Cleaning up unused imports.
+
+	olfs: Commented out debugging alerts in the javascript code of the HAI. Fixed an async problem  that when committing changes. Updated default logging configs.
+
+	olfs: First working draft of services description response. Changed a number of things to allow this to be turned on and off via the olfs.xml configuration.
+
+2012-03-26  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Merged 1.9.0 branch to trunk using 1.9.3 tag. Created 1.9.4 tag
+
+	olfs: Merged 1.9.0 branch to trunk using 1.9.3 tag. Created 1.9.4 tag
+
+	olfs-1.9.0: Fixed resource leak in BES.getClient. See Ticket http://scm.opendap.org/trac/ticket/1893
+
+	olfs-1.9.0: Added AutoPlot handler for webstart.
+
+2012-03-15  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-1.9.0: Removed unused idvBundle.jnlp file.
+
+	olfs-1.9.0: Updated IDV webstart JNLP file.
+
+	olfs-1.9.0: Fixed shutdown bug in the BES.destroy() method that was causing null pointer exceptions when destroy() was called multiple times on the same class instance in GlassFish (WTF GlassFish!?!?)
+
+2012-03-07  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	wcs: updating inital config file
+
+	olfs: Changes to WCS production rules and version tagging.
+
+2012-03-06  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Merged olfs-1.9.3 to trunk.
+
+2012-03-03  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Fixed bug in WCS deployment that was causing the DocServlet not to be included.
+
+2012-03-01  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-1.9.0: Fixed bug Thredds catalogs. When the catalogs contained multiple references to the same catalog dynamic updates would fail because the purge catalog method were getting borked by null pointer exceptions.
+
+2012-02-28  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-1.9.0: Fixed bug in FileDispatchHandler that was causing browsers to download instead of display every file returned by from the BES, regardless of the file type.
+
+2012-02-23  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-1.9.0: Fixed bug in gateway servlet that was causing null pointer exceptions to be thrown when the destroy() method was called.
+
+2012-02-22  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-1.9.0: Fixed bug in gateway servlet that was causing null pointer exceptions to be thrown when the destroy() method was called.
+
+2012-02-13  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: MErged 1.9 relase brach back to trunk using previous 1.9.1 tag. Created 1.9.2 tag
+
+	WCS: Updated supported format and mime-type strings.
+
+2012-02-09  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	WCS: Added multipart mime responses. Fixed many bits.
+
+	olfs: Fixed namespace of localId to be in the dapObj namespace.
+
+	WCS: Updating test XML request files.
+
+2012-02-08  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	WCS: Adding tests for the XML POST and SOAP interfaces.
+
+2012-02-07  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Changed the default BES port to 10022 because of a conflict on CentOS 6
+
+	Changed the default port number for the BES.
+
+2012-01-27  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Merged 1.9.1 back to trunk.
+
+	olfs-1.9.0: Disabled "AllowDirectDataSourceAccess" in the default olfs.xml file.
+
+2012-01-26  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-1.9.0: Updated ToolsUI.jnlp to use the latest version (4.2) if the netcdf tools ui.
+
+2012-01-24  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	lfs: removing json dev dir becaue it got done another way.
+
+	olfs: Creating branch for the development of a JSON based user interface.
+
+	lfs: Creating branch structure for feature adds.
+
+2012-01-23  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Merged 1.9.0 branch back to trunk
+
+	olfs-1.9.0: Fixed The way that request suffix regex's are handled to be more explicitly regexy and not just suffixy
+
+	olfs-1.9.0: Fixed The way that request suffix regex's are handled to be more explicitly regexy and not just suffixy
+
+2012-01-20  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-1.9.0: fixed problem with dataset URL in HTML data request form response. This involved reworking teh way that we compute xml:base for a dataset so that we actually use the regexp engine correctly.
+
+	olfs-1.9.0: Improved mkTestPatch
+
+	olfs-1.9.0: Merging trunk to 1.9.0 branch
+
+	olfs-1.9.0: Merging trunk to 1.9.0 branch
+
+2012-01-19  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Removing eclipse detritus from code base
+
+	olfs-1.9.0: Small changes for post merge work on service description
+
+2012-01-18  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-1.9.0: Cleaning up error messages in HAI javascript
+
+2012-01-15  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-1.9.0: Cleaned up logic BES.getClient().
+
+2012-01-14  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-1.9.0: Cleaned up logic BES.getClient().
+
+2012-01-13  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-1.9.0: Repairs to HAI UI.
+
+2012-01-11  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-1.9.0: I think this fixes the WCS problem with retrieving last modified times for Coverages.
+
+	olfs-1.9.0: Fussing with WCS problems.
+
+2012-01-10  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-1.9.0: WCS updates.
+
+2012-01-09  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-1.9.0: Refactoring HAI for robustness
+
+2012-01-06  jdcorral  <jdcorral@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	fixed section of code in addChildren where order is not specified. JdC
+
+2011-12-28  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-1.9.0: RDF output correction. Re-implementing the computation of xml:base attribute to accommodate urlRewriting.
+
+	olfs-1.9.0: RDF output correction. Re-implementing the computation of xml:base attribute to accommodate urlRewriting.
+
+	olfs-1.9.0: RDF output correction. Re-implementing the computation of xml:base attribute to accommodate urlRewriting.
+
+2011-12-21  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Added a comment.
+
+2011-12-20  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-1.9.0: WCS repairs.
+
+	olfs-1.9.0: WCS repairs.
+
+2011-12-19  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-1.9.0: WCS repairs.
+
+2011-12-16  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-1.9.0: Fixed NcmlHandler so that it to respects the FileDispatchHandler.allowDirectDatasourceAccess() condition
+
+	olfs-1.9.0: WCS repairs
+
+	olfs-1.9.0: WCS repairs
+
+	olfs-1.9.0: RDF fix.
+
+2011-12-15  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Repairs to RDF reprsentation. Elimination of static method class BesXMLApi.java
+
+2011-12-02  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-1.9.0: Adding localID attribute to DAP variables during RDF production
+
+2011-11-30  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-1.9.0: Missed this one when I checked in xml:base changes.
+
+	olfs-1.9.0: Reworked design to better determine xml:base for various XML responses.
+
+2011-11-15  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-1.9.0:
+
+	olfs-1.9.0: Tweaked RDF transform to get xml:base into the top level RDF element
+
+2011-11-09  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-1.9.0: Second effort at a new RDF response implementation. This time used daisy chained saxon XsltTransformer objects
+
+2011-11-08  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-1.9.0: This is a patch for the RDF version of the DDX based on a more generic (and more robust) RDF representation of the DDX.
+
+	olfs-1.9.0: Added ERRORS and INCLUDES to urlrewrite filter
+
+2011-10-21  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-1.9.0: Reorganized deployment and runtime manifestation so that we are using the default tomcat servlet and JspServlet in the manner that the Tomcat crew thinks is "normal". Moved all crucial application documents out of the docs dir and into the web application dir so that the users won;t overwrite them if they supply their own docs bundle (style sheets, images, html pages, etc)
+
+	olfs-1.9.0: Adding urlRewriteFilter so we can rewrite URLs
+
+2011-10-17  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Restructuring disribution and code base
+
+2011-10-08  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-1.9.0: Reworked OLFS log viewer to utilize improved execution model used in BES log viewer.
+
+2011-10-07  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-1.9.0: Made 1000 lines default for bes tail log
+
+	olfs-1.9.0: Cleaned up commit logging configuration commit code and added session=false to jsp pages outside of the HAI to temporarily address ticket 1814
+
+	olfs-1.9.0: Reverted to original logging config commit methodology
+
+	olfs-1.9.0: Made bes logging configuration window close after commit. Still not restarting BES after commit.
+
+	olfs-1.9.0: Made the focus default to the username in the login form.
+
+	olfs-1.9.0: Checking a test that eliminates BES restart after committing a logging configuration.
+
+	olfs-1.9.0: Comments!
+
+	olfs-1.9.0: Comments!
+
+2011-10-06  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-1.9.0: Comments!
+
+	olfs-1.9.0: Fixed stop logging button (race condition) and made logging stop when logging configuration window is opened.
+
+	olfs-1.9.0: UNDOING move of  assignment for stopUpdatingLog flag to startTailing() from getBesLog()
+
+	olfs-1.9.0: MOved assinment for stopUpdatingLog flag to startTailing() from getBesLog()
+
+	olfs-1.9.0: Fixed a broken link on olfsLogViewing page.
+
+	olfs-1.9.0: Simplified default lagging responses.
+
+2011-10-04  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-1.9.0: Added file service access for datasets in bes thredds catalogs depending on AllowDirectDataSourceAccess
+
+	olfs-1.9.0: Added file service links to datasets depending on AllowDirectDataSourceAccess
+
+2011-09-30  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-1.9.0: Changed logging output escaping.
+
+2011-09-29  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-1.9.0: Fixed ticket 1780 by adding support for logging level "off".
+
+	olfs-1.9.0: Code clean up.
+
+	olfs-1.9.0: Made the start method use start_worker and had start_worker accept a state change handler. Then I used this to have the logging configuration window/page close after  the commit button procedure.
+
+2011-09-28  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-1.9.0: Fixed bugs where the HAI was not producing useful results when confronted with a misconfigured or offline BES.
+
+2011-09-28  jdcorral  <jdcorral@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	removed references to trree.jar, no longer necessary
+
+	updated sesame2  lib
+
+	updated  owlim lib
+
+	fixed coding problems in RdfImporter, RepositoryOps, and XMLfromRDF and updated Sesame2 and OWLim libs
+
+2011-09-27  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: (Re)branching the OLFS 1.9.0 from the trunk.
+
+	olfs: Commented out debugging alerts in the javascript code of the HAI. Fixed an async problem  that when committing changes. Updated default logging configs.
+
+2011-09-23  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Fixed bug in HAI that was causing it to fail silently when the BES admin port was not configured in the olfs.xml file.
+
+2011-09-21  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Hyrax 1.8
+
+2011-09-20  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Fixed problems in WCS service caused by other modifications to the code base.
+
+2011-09-19  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added links to the HAI on the default page.
+
+	olfs: Checking changes in support of migration to JSP (switching to default Tomcat servlet from the docs servlet).
+
+	olfs: Checking changes in support of migration to JSP (switching to default Tomcat servlet from the docs servlet).
+
+2011-08-25  jdcorral  <jdcorral@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	added work around for file:/// URIs
+
+2011-08-22  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: More ticket 1796
+
+2011-08-22  jdcorral  <jdcorral@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	removed check for http:// from query string constructor. JdC.
+
+	test of modifying IRISail
+
+2011-08-20  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: More ticket 1796
+
+2011-08-19  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: More ticket 1796
+
+2011-08-18  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Repaired the generation of data access links in THREDDS catalogs.(ticket 1796)
+
+2011-08-10  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-hai: Added form based login. Added logout
+
+2011-07-14  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	I changed the way that stopNice_worker is called so thet the stop nice command is sent to the besdaemon synchronously. This ensures that the stop command always precedes the start command. Running the commands in the reverse order means that the beslistener is started when it's already running (which has no effect) and then stopped. That leaves the server in a stopped state. You can restart it by hand (but no one but us will every relaize that).
+
+2011-07-13  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added copyright headers to new code..
+
+	olfs: Cleaned up some libraries.
+
+2011-07-07  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: BES logging configuration changes.
+
+	olfs: BES logging configuration changes.
+
+	olfs: BES logging configuration changes.
+
+2011-06-30  pwest  <pwest@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Merge hyrax 1.7 branch to trunk
+
+2011-06-21  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Integrated BES logging and controls. Logging control prototype working.
+
+	olfs: Integrated BES logging and controls. Logging control prototype working.
+
+2011-06-20  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added double quotes to Content-Disposition filename component.
+
+	olfs: Patched Content-Disposition in 1.8.0 branch (added quotes to filename component)
+
+2011-06-17  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Bes Logging control prototype check in
+
+2011-06-16  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Patched Content-Disposition in 1.8.0 branch
+
+	olfs: Fixed bug in Content-Disposition header for netcdf file out response.
+
+2011-06-15  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: HAI prototype limitation of non-authenticated user response size.
+
+2011-06-09  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: HAI prototype limitation of non-authenticated user response size.
+
+	olfs: HAI prototype limitation of non-authenticated user response size.
+
+	olfs: HAI prototype limitation of non-authenticated user response size.
+
+2011-05-29  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: HAI prototype olfs log viewer working with controls!
+
+	olfs: HAI prototype bes log viewer working.
+
+	olfs: HAI prototype bes log viewer working.
+
+2011-05-28  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: HAI prototype bes log viewer working.
+
+	olfs: HAI prototype bes log viewer working.
+
+	olfs: HAI prototype bes log viewer working.
+
+	olfs: HAI prototype bes log viewer working.
+
+2011-05-27  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: HAI GetConfig and configuration display prototype
+
+	olfs: HAI GetConfig and configuration display prototype
+
+	olfs: HAI GetConfig and configuration display prototype
+
+	olfs: HAI GetConfig and configuration display prototype
+
+	olfs: HAI GetConfig and configuration display prototype
+
+	olfs: HAI GetConfig and configuration display prototype
+
+	olfs: HAI GetConfig and configuration display prototype
+
+	olfs: HAI GetConfig and configuration display prototype
+
+2011-05-26  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Renamed method respondToHttpRequest in HttpResponder to respondToHttpGetRequest
+
+	olfs: Renamed method respondToHttpRequest in HttpResponder to respondToHttpGetRequest
+
+	olfs: Mods to admin interface
+
+	olfs: Mods to admin interface
+
+	olfs: Mods to admin interface
+
+	olfs: Mods to admin interface
+
+	olfs: Mods to admin interface
+
+	olfs: Mods to admin interface
+
+2011-05-25  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Mods to admin interface
+
+	olfs: Mods to admin interface
+
+	olfs: Mods to admin interface
+
+2011-05-24  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Repaired DirectoryDispatch so that it correctly  finds nodes without trailing slashes in their URLs.
+
+2011-05-20  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Checking in prototype jsp code for the admin interface
+
+	olfs: Checking in prototype jsp code for the admin interface
+
+	olfs: Checking in prototype jsp code for the admin interface
+
+	olfs: Checking in prototype jsp code for the admin interface
+
+	olfs: Checking in prototype jsp code for the admin interface
+
+2011-05-19  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Checking in prototype jsp code for the admin interface
+
+2011-05-18  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Checking prototype besctl for the HAI
+
+	olfs: Checking prototype besctl for the HAI
+
+	olfs: Checking prototype besctl for the HAI
+
+2011-05-12  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added prototype Ncml Handler.
+
+2011-05-02  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: updated defualt logback.xml file
+
+	olfs: updated defualt logback.xml file
+
+	olfs: updated defualt logback.xml file
+
+2011-05-02  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Missing gateway.xml file no longer an error - this prevents a failure of the olfs to boot if that file is absent.
+	M    src/opendap/gateway/DispatchServlet.java
+
+2011-05-02  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Checked in minor changes prior to 1.8.0 release
+
+2011-04-28  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added security constraints to the web.xml in order to protect the admin interface. Added first draft of OLFS log viewing to admin interface along with an ajax tool for a log "tail" function. Dropping Admin Servlet for a DispatchServlet built like the gateway.
+
+	olfs: Added security constraints to the web.xml in order to protect the admin interface. Added first draft of OLFS log viewing to admin interface along with an ajax tool for a log "tail" function. Dropping Admin Servlet for a DispatchServlet built like the gateway.
+
+2011-04-20  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Hyrax 1.7 release
+
+2011-04-20  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: fixed the netcdf fileout response for the gateway - the content type was being set to application/octet-stream
+
+	olfs: dropped hao package
+
+	olfs: dropped hao package
+
+	olfs: Added call to NcMLManager
+
+2011-04-14  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added call to NcMLManager
+
+2011-04-08  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	commemts update
+
+	owlim3.5
+
+2011-03-17  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2011-03-09  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	new owlim
+
+2011-03-08  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Merge for hyrax	1.7 from the hyrax_1.6.2_release branch	of shrew to the	trunk
+	_M   .
+	A  + mkPackage
+	_M   src/opendap/coreServlet
+	_M   src/opendap/ppt
+	_M   src/opendap/bes
+	M    testsuite/config/unix.exp
+	M    build.xml
+	_M   doc
+	_M   doc/xsl/dap_2.0_ddxToRdfTriples.xsl
+	AM + resources/osx
+	A  + resources/osx/InstallationCheck
+	A  + resources/osx/License.txt
+	A  + resources/osx/update_mac_package_contents.pl
+	A  + resources/osx/Info.plist
+	A  + resources/osx/InstallationCheck.strings
+	A  + resources/osx/ReadMe.txt
+	A  + resources/osx/Description.plist
+	A  + resources/osx/Welcome.html
+	A  + resources/osx/background.jpg
+
+2011-02-18  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	New internal startingpoint, updated construct rules
+
+	update openrdf-sesame-2.3.2-onejar
+
+2011-02-18  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Improved error message mechanism
+
+2011-02-17  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Improved error message mechanism
+
+2011-02-16  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Improved error message content for RDF response.
+
+2011-02-11  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2011-02-10  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	I fixed up the name of the file(s) written by eml_writer and also added some better verbose options
+
+2011-02-09  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	shrew: More updates to production rules
+
+	 Updating production rules
+
+	olfs: Bug fix for ncml dispatcher.
+
+	olfs: Collecting  resurces for OSX build.
+
+2011-02-04  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Updated ISO metadata XSL and analysis code
+
+2011-02-03  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added ISO metadata XSL and analysis code from Dave Neufeld
+
+2011-02-02  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added XSL transformation (using the ddx2rdf transform code as a place holder) to the nciso .DispatchHandler. This should provide an easy framework for Dave to work with.
+
+	olfs: Added XSL transformation (using the ddx2rdf transform code as a place holder) to the nciso .DispatchHandler. This should provide an easy framework for Dave to work with.
+
+	olfs: Copyright update.
+
+	olfs: Copyright update.
+
+	olfs: Copyright update.
+
+	gateway-service: Implemented netCDF fileout responder.
+
+	gateway-service: Implemented Xml Data response.
+
+	olfs: Implemented DAP4 DataDDX response.
+
+	olfs: Implemented gateway as a DispatchHandler.
+
+2011-02-01  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Checking in first draft of the gateway service.
+
+	olfs: Checking in first draft of the gateway service.
+
+	olfs: Checking in first draft of the gateway service.
+
+	olfs: Checking in first draft of the gateway service.
+
+2011-01-28  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added a DispatchHandler to mend NcML files coming from the BES so that the location attributes are correct for the server from a clients perspective.
+
+2011-01-27  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Renamed the commons-cli lib to match our naming convention
+
+2011-01-26  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs:  Included apache-commons-lang in ant build
+
+	olfs-wcs:  Added various things to WCS semantics
+
+	olfs-wcs:  Added ISO response Dispatch Handler.
+
+2011-01-20  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Reset the logging for the default case do that it is not so verbose.
+
+	Fixed the iso-time template in the xsl and also an errant eml tag.
+
+	Added '.eml' to the end of the created eml files
+
+2010-12-22  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Several minor fixes plus a big one - new patterns added for grouping that drop the count of groups on the NDOC archive from 8,000+ to 56.
+
+2010-12-21  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	In URLClassifier I used continue when I could/should have used break. Switching to break runs the code much faster (3:50 to process 127,000 urls with continue; 0:29 for the same 127,000 urls with break). The difference is that with break the searching stops at the first match of a URL and a group. I also added a size() method to URLGroups.
+
+	Added the old NCMLWriter and testStackSave classes
+
+2010-12-15  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	close http connection after using
+
+2010-12-14  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2010-12-10  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	owl-horst-optimized
+
+	dropWithMemoryStoreDeleteDir
+
+2010-11-24  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Changes to the crawler code so that we can do stuff like build NCML from the raw results of a crawl, better builds for the executables, fixes for some common issues in URLs, stuff like that.
+
+2010-11-22  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	omit duplicate xsl, update RDF Docs when xsl is updated
+
+2010-11-15  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Latest version of the classifier code - quasi-rule-based
+
+2010-11-15  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2010-11-10  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Now recognizes lat/lon bounding box info in dsp files
+
+2010-11-09  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Filter udplicate statements in getUrlForTransformToRdf
+
+2010-11-05  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	First version that builds NCML
+
+	Removed main() and the stuff it imported. Use EMLWriter.java instead.
+
+2010-11-04  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	XMLfromRDF(RepositoryConnection con)
+
+2010-11-03  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Updates for the main programs (Java classes with main() methods, ant stuff to make executable jar files and shell scripts that call the code) to crawl, classify/group and write EML automatically.
+
+2010-11-03  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-wcs:  Fixed problem with tracking repository changes.
+
+	olfs-wcs:  Fixed problem with tracking repository changes.
+
+	olfs-wcs:  Fixed problem with tracking repository changes.
+
+	olfs-wcs:  Fixed problem with tracking repository changes.
+
+2010-11-03  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2010-11-03  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-wcs:  Fine tuned exception handling to satisfy fortify...
+
+	olfs-wcs:  Removed catch for InterruptedException from drop method
+
+	olfs-wcs: This is a major re-working of the way in which errors are handled in the WCS. Prior to this we were absorbing all exceptions (by catching java.lang.Exception) close to where they were being thrown and simply logging the errors. This was an effective way to ensure that processing code always run to completeion but not very useful for production code that is running as a service and that needs to be stopped. I reworked the exception handling to catch individual exception types and added java.lang.InterruptedException to the throws clause on almost every method in the semantic processing. This, in conjunction with the finally blocks already in place, allows a supervisory thread to call Thread.interrupt() on the semantic processing thread and cause it to quit. Mostly. There are still (as yet to identified) places in the code that seem to be swallowing InterruptedException. In order to ameliorate this I added a ProcessManager class that carries flags that can be checked to see if processing should be stopped. I added calls to this in a number of critical places in the semantic processing. Additionally, I had to change the logic of RepositoryOps.updateSemanticRepository() to accomodate the situation where all of the required documents have been read in, but processing was stopped before or during the running of the construct rules. Without the logic change the construct rules would never have been run again, and thus the catalog would never be update correctly.
+
+2010-11-02  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Updates and checkpoint - DateString is broken.
+
+	Moved
+
+	Moved/added
+
+2010-11-02  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-wcs: Uncommented <root> logging element in order to supress noise from logback
+
+	olfs-wcs: Fixed logback files to use "encoder" instead of "layout"
+
+2010-11-01  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Some copyright changes and made some classes serializable. Testing if the latter is a workable solution to moving state between command line tools.
+
+2010-11-01  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-wcs: Improved error handling in the DocServlet
+
+	olfs: Updated builds to use slf4j version 1.6.1
+
+	olfs-wcs:
+
+	olfs-wcs: REpaired bug (Ticket 1662) which was preventing the catalog update thread from exiting smoothly when Tomcat was shut down.
+
+2010-10-31  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Adjusting some loggin levels
+
+2010-10-29  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Update to README; added copyrights
+
+2010-10-29  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Merged branch/olfs/1.7.1 to trunk. Made changes to intgrate alteration of openda.dap.Request object behavior
+
+2010-10-29  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Some partial fixes for the ctrl-c issue - where java makes it hard to trap ctrl-c and save state so the code can restart later.
+
+	Spelling in comments...
+
+2010-10-29  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Adjusting some loggin levels
+
+	olfs: Adjusting some loggin levels
+
+	olfs: Sorting out production rules
+
+	olfs: Sorting out production rules
+
+	olfs: Cleaned up open resources, impred exception handling.
+
+	olfs: Removed unsed assignments and null pointer issues.
+
+	olfs: Removed unsed assignments and null pointer issues.
+
+2010-10-28  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Code cleaning...
+
+2010-10-28  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Fixed the way postgres caches are used. Now each site gets its own cache by default (i.e., it's own table in the crawl_cache db in postgres). Here 'site' is really the 'cacheName' parameter passed to ddx_crawler.sh but that defaults to the host name of teh catalog root URL. Reading from the cache has been fixed too. Also, I fixed a bug in the TCU class where catalogs were accessed twice (over the net); once to get the refs and once to get the data urls. Now the second access always uses the cache unless some combination of options has completely disabled it. A better solution would be to rewrite the TCU code.
+
+	ThreddsCatalogUtil and DDXCrawler are fixed so that the crawler does not require that the cache files be deleted on subsequent runs. But the TCU code still is making several references to the same catalog using SAXBuilder which uses lots of time.
+
+2010-10-28  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	log changes
+
+2010-10-27  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Working on a consistent set of tools...
+
+2010-10-27  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Modify query to elimate duplicates in query results.
+
+2010-10-27  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Refactor: variable name changes
+
+2010-10-27  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	clean up comments
+
+2010-10-27  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Moved dapTestPreload.owl to http://xml.opendap.org/semantics/Dap_To_Wcs-1.1.owl
+
+	olfs: Refactoring WCS service
+
+	olfs: Refactoring WCS service
+
+	olfs: Refactoring WCS service
+
+2010-10-26  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	modified log output
+
+2010-10-25  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Cleaning up cruft code.
+
+	olfs: Moved and renamed opendap.semantics.IRISail.NewStaticRDFCatalog to opendap.semanitcs.wcs.StaticRdfCatalog.
+
+2010-10-25  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Correct top NS for Coverage DOC, Add cast function to replace xsString
+
+2010-10-25  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2010-10-21  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Refactored WCS web application
+
+2010-10-21  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	owlim-2738 dropping bug fixed
+
+2010-10-21  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Refactored WCS web application
+
+2010-10-21  benno  <benno@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	corrected namespace for a number of elements
+
+2010-10-20  benno  <benno@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	added targetNamespace property to RDF version of Schema
+
+2010-10-20  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added rdf:ID handling.
+
+	olfs: Added rdf:ID handling.
+
+	olfs: Reformat
+
+2010-10-18  benno  <benno@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	fixed to omit # for namespaces ending in ? or :
+
+2010-10-14  benno  <benno@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	different solution to no namespace problem -- now the equivalence is confined to the proper class, which is semantically correct.
+
+	changed owl:equivalentProperty to xsd2owl:superPropertyOf so that I could limit the inferencing to be only from nonamespace to namespace
+
+2010-10-12  benno  <benno@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	fix $targetns to be set from $targetNamespaceDelimited
+
+	changed namespace delimiting to add # only if it does not end in # or / or :
+
+2010-10-07  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Ncml Post service
+
+2010-10-05  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs/wcs: Documentation
+
+2010-10-01  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Documentation, mostly
+
+	olfs: Changed implmentation of the coverages map for an ordered map implementation..
+
+2010-09-24  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Updated XSL generated HTML pages for WCS service.
+
+2010-09-23  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs:  Moving branch 1.7.0 to 1.7.1 to reflect the release of a patch to the OLFS associated with the Hyrax 1.6.2 release.
+
+	olfs: Chnages to repair trac ticket 1645
+
+2010-09-22  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	file://
+
+	bug fix, the rule was evaluated twice, now only once
+
+2010-09-20  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	update swiftowlim-3.3.2660
+
+2010-09-17  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	document
+
+	document
+
+	document
+
+2010-09-17  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Removed comments form xsl; fixed file/dir installs in ant xml
+
+	Added an output option to the classify and build eml exec
+
+2010-09-17  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added a link to the wcs:CoverageDescription to our HTML page for the Coverage.
+
+2010-09-17  benno  <benno@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	fix to openning javadoc
+
+	fix
+
+	fix to isReplacedBy
+
+	fix to rdfType
+
+2010-09-17  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Documentation
+
+	olfs: Copyright additions, and changes to Terms
+
+2010-09-17  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	document change
+
+2010-09-17  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Copyright additions, and changes to Terms
+
+2010-09-16  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-1.7.0: Minor patches for release.
+
+2010-09-16  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	document change
+
+	document change
+
+2010-09-16  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Updated baselines for regression tests
+
+2010-09-16  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	document change
+
+2010-09-16  benno  <benno@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	update
+
+	more javadoc
+
+	added javadoc
+
+2010-09-15  benno  <benno@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	added javadoc
+
+2010-09-15  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	document change
+
+2010-09-15  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Branching for 1.7.0 release (Hyrax 1.6.2)
+
+	olfs:
+
+	olfs:
+
+2010-09-15  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	add importIS = httpConnection.getInputStream() in line 331, elimating "null" value error for http://marinemetadata.org/cf
+
+	flushRepositoryOnDrop = true
+
+2010-09-15  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Utilized localResource map in RdfImporter
+
+	olfs: Utilized localResource map in RdfImporter
+
+	olfs: added localResource map to Terms
+
+	olfs: javadocs changes
+
+	olfs: logging changes
+
+2010-09-15  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	drop bug fix from owlim
+
+2010-09-14  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added build target for javadocs to wcs-build.xml/ Changes in support of geogrid compatibility
+
+2010-09-14  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	log info for getDapGridId
+
+	getDapGridId
+
+2010-09-14  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added stubs to get the name of the DAP GRid variable associated with each field in a coverage.
+
+	olfs: Added stubs to get the name of the DAP GRid variable associated with each field in a coverage.
+
+2010-09-13  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: WebStart changes.
+
+2010-09-12  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	document
+
+	document
+
+	document
+
+	document
+
+	document
+
+	document
+
+	document
+
+	document
+
+	document
+
+	document
+
+	document
+
+2010-09-10  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Improved RdfImporter's use of XSLT transforms.
+
+2010-09-10  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	documents
+
+2010-09-10  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Improved RdfImporter's use of XSLT transforms.
+
+	olfs: Improved RdfImporter's use of XSLT transforms.
+
+	olfs: Improved RdfImporter's use of XSLT transforms.
+
+2010-09-10  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	documents
+
+2010-09-10  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Improved RdfImporter's use of XSLT transforms.
+
+2010-09-10  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	documents
+
+	documents
+
+	documents
+
+	documents
+
+	documents
+
+	documents
+
+	documents
+
+	documents
+
+	documents
+
+2010-09-10  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added copyright statement
+
+2010-09-10  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	documents
+
+2010-09-10  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added copyright statement
+
+2010-09-10  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	documents
+
+2010-09-10  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Chnged the usages os StreamSource in transforms
+
+2010-09-10  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	change createCoordinateUnitsIdQuery to  createCoordinateUnitsQuery
+
+	fix bug in getTimeUnits
+
+2010-09-09  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	This check in includes new code to build EML for collections of URLs that vary by date as well as data sets that are made up of single URLs. It can also insert the EML into metacat. See the Java program ClassifyServerBuildEML
+
+2010-09-09  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Chnged the usages os StreamSource in transforms
+
+	olfs:
+
+	olfs:
+
+	ioos: logging changes
+
+	ioos: logging changes
+
+	olfs: Refactored webstart servlet and webstart application wrappers.
+
+2010-09-09  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	delete unused method
+
+	getXsltTransformation -->getXsltStylesheet
+
+	clean up getXsltTransformation
+
+	clean up getXsltTransformation
+
+2010-09-09  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Refactored webstart servlet and webstart application wrappers.
+
+2010-09-09  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	getTimeUnits(RepositoryConnection con, String coverageId, String fieldId)
+
+2010-09-08  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	improved getXsltTransformation
+
+	new xslttransformation method
+
+	new xslttransformation method
+
+2010-09-08  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2010-09-07  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Added classifier targets
+
+2010-09-05  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added prototype support for time and elevation subsetting.
+
+2010-09-02  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	javadoc update
+
+2010-09-02  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs:
+
+	olfs:
+
+	olfs: Fixed build to include WebStart resources.
+
+2010-09-02  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	contenttype -->Content-type
+
+2010-09-01  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	change comments.
+
+	add IRIHTTPRepository.java
+
+2010-09-01  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Documentation
+
+2010-08-31  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Documentation changes
+
+	olfs: Changes in support of Ticket 1335
+
+2010-08-31  benno  <benno@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	changed it to dependsOn
+
+	changed another seeAlso to owl:imports
+
+	changed seeAlso to xsd2owl:imports so that we can infer SchemaType
+
+2010-08-31  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Cleaning up documentation
+
+2010-08-28  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Fixing problems with THREDDS catalog IDs, urlPaths, and redirecting requests for just the service name.
+
+2010-08-27  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Factored the fixed strings representing servlet context and servlet name out of most (all?) of the xsl and html documents. This is a candidate fix for bug 1537 The web app can now run in a context other than 'opendap'. Woo!Hoo!
+
+	olfs: Correcting destroy() to interrupt the processing thread and stop processing prior to attempting to acquire the write lock for the repository.
+
+	olfs: More refactoring changes.
+
+	olfs: Added ProcessingState class to provide a cntral place for the processing steps to check to see if the system is trying to stop things. (A thread management activity)
+
+2010-08-26  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Spelling fixes + a change from LinkedList to ArrayList
+
+2010-08-26  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: More refactoring changes.
+
+	olfs: More refactoring changes.
+
+	olfs: More refactoring changes.
+
+	olfs:
+
+	olfs:
+
+	olfs:
+
+	olfs:  Switched code from using the more specific IRISailRepository and SailRepository to using the interface Repository.
+
+	olfs:  Switched code from using the more specific IRISailRepository and SailRepository to using the interface Repository.
+
+	olfs:  Switched code from using the more specific IRISailRepository and SailRepository to using the interface Repository.
+
+	olfs:  Refactoring IRISailRepository. New ConstructRuleEvaluator class.
+
+	olfs:  Refactoring IRISailRepository. New ConstructRuleEvaluator class.
+
+	olfs:  Refactoring IRISailRepository. New ConstructRuleEvaluator class.
+
+	olfs:  Refactoring IRISailRepository. New ConstructRuleEvaluator class.
+
+2010-08-26  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Added DateString which provides a way to sort dates using the Collections.sort() algorithm.
+
+	Changes to the printing code - now it is smart enough to print just the first and last URLs for each group, where first and last is either the discovery order or the date ordering.
+
+2010-08-25  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Switched to ordered collections for the URLs
+
+	Now sorts dates correctly
+
+2010-08-25  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs:  Refactoring Drop activities.
+
+	olfs:  Refactoring Drop activities.
+
+	olfs:  Refactoring Drop activities.
+
+	olfs:  Refactoring Drop activities.
+
+	olfs:  Refactoring Drop activities.
+
+	olfs:  Refactoring Drop activities.
+
+	olfs:  Refactoring Drop activities.
+
+	olfs:  Refactoring Drop activities.
+
+	olfs:  Refactoring Drop activities.
+
+	olfs: Created and started using a Terms class to hold various important strings throughout the repository activities.
+
+	olfs: Created and started using a Terms class to hold various important strings throughout the repository activities.
+
+	olfs:
+
+	olfs:
+
+	olfs:
+
+	olfs:
+
+	olfs:
+
+	olfs:
+
+	olfs:
+
+	olfs:
+
+	olfs:
+
+	olfs:
+
+	olfs:
+
+	olfs:
+
+	olfs:
+
+2010-08-23  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Changes for dates and the start of sorting code to help choose the DDXs
+
+2010-08-23  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Add notImport as a Vector holding doc not supposed to import
+
+2010-08-21  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Updated Java WebStart example code.
+
+	olfs:
+
+2010-08-20  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	remove methods no longer using
+
+	removing StaticRDFCatalog no longer using
+
+2010-08-20  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs:
+
+	olfs: Updates in support of WebStart for NetCDF ToolsUI
+
+	olfs:
+
+2010-08-19  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Patched repository test code to read the trig frile from subversions HTTP interface
+
+	olfs: Patched repository test code to read the trig frile from subversions HTTP interface
+
+	olfs: Added the rdf file test.trig so that the RepoTest class can work from anywhere.
+
+2010-08-19  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Basic date recognition.
+
+2010-08-19  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs:
+
+2010-08-19  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	add RDFa2RDFXML.xsl
+
+2010-08-19  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs:
+
+	olfs:
+
+2010-08-18  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs:
+
+	olfs:
+
+	olfs:
+
+2010-08-18  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	changes of various sorts
+
+2010-08-18  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs:
+
+	olfs:
+
+	olfs:
+
+	olfs:
+
+	olfs:
+
+	olfs:
+
+	olfs:
+
+	olfs:
+
+	olfs:
+
+	olfs:
+
+	olfs:
+
+	olfs:
+
+	olfs:
+
+	olfs:
+
+	olfs:
+
+	olfs:
+
+	olfs:
+
+	olfs: Updated wcs-build.xml to use new SwiftOwl and Sesame libraries.
+
+	olfs: removing older swiftowl libraries
+
+	olfs: Centralized the defintion of the cache context and lastModified context.
+
+	olfs: Centralized the defintion of the cache context and lastModified context.
+
+2010-08-18  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	new owlim
+
+2010-08-18  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Centralized the defintions of the context names.
+
+2010-08-17  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Improved comments.
+
+	olfs: Repository update logic for drop fixed.
+
+	olfs: Incremntal changes (not complete) in repository update logic.
+
+	olfs: Incremntal changes (not complete) in repository update logic.
+
+	olfs: Incremntal changes (not complete) in repository update logic.
+
+	olfs: Incremntal changes (not complete) in repository update logic.
+
+	olfs: Incremntal changes (not complete) in repository update logic.
+
+	olfs: Incremntal changes (not complete) in repository update logic.
+
+	olfs: Incremntal changes (not complete) in repository update logic.
+
+	olfs: Fixing drop code
+
+	olfs: Fixing drop code
+
+	olfs: Cleaning up drop code.
+
+	olfs: Cleaning up drop code.
+
+	olfs: Cleaning up drop code.
+
+	olfs: Cleaning up drop code.
+
+	olfs: Made the WCS service re-read the config with each update.
+
+	olfs:
+
+	olfs:
+
+	olfs:
+
+	olfs:
+
+2010-08-17  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Comments - spelling
+
+	Fixes - k-means runs and shows the components that were grouped.
+
+2010-08-16  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs:
+
+2010-08-13  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Metacat code now builds a histogram for each group and has more data stored internally. I added results from a set of crawls, plus the raw DDX URL cache files, to the resources/metacat directory. This hold information for about 3.5 millon URLs and 270+ groups.
+	Will commit in batches
+
+	Metacat code now builds a histogram for each group and has more data stored internally. I added results from a set of crawls, plus the raw DDX URL cache files, to the resources/metacat directory. This hold information for about 3.5 millon URLs and 270+ groups.
+	Will commit in batches
+
+2010-08-13  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	handle RDFa in an XHTML file
+
+2010-08-13  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2010-08-12  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Patched problem with catalog nupdate in which memory resident catalog was not cleared.
+
+	olfs: Enabled WCS catalog to be trigged by web access. TEST ONLY
+
+2010-08-11  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Fixed problem with DAP dispatch handling
+
+	olfs: Changes in support of getXXXCoordinateDapId functions...
+
+2010-08-11  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Fixed the query for coordinates
+
+	Fixed the query for coordinates
+
+2010-08-10  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added ".xdods" response to Dap Dispatch for hyrax
+
+2010-08-10  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Added the cache files from a URLs-only run of the crawler at CSIRO.
+	AM   resources/opendap.csiro.au_urls_onlyDDX_Visited.save
+	AM   resources/opendap.csiro.au_urls_onlyTC_Visited.save
+
+2010-08-10  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added ".xdods" response to Dap Dispatch for hyrax
+
+	olfs: Changes in support of getXXXXCoordinateId activities.
+
+	olfs: Changes in support of getXXXXCoordinateId activities.
+
+	olfs: Changes in support of getXXXXCoordinateId activities.
+
+	olfs: Changes in support of getXXXXCoordinateId activities.
+
+	olfs: Changes in support of getXXXXCoordinateId activities.
+
+	olfs: Changes in support of getXXXXCoordinateId activities.
+
+	olfs: Changes in support of getXXXXCoordinateId activities.
+
+	olfs: Changes in support of getXXXXCoordinateId activities.
+
+	olfs: Changes in support of getXXXXCoordinateId activities.
+
+	olfs: Changes in support of getXXXXCoordinateId activities.
+
+	olfs: Changes in support of getXXXXCoordinateId activities.
+
+2010-08-10  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	new query for createCoordinateIdQuery
+
+2010-08-10  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Changes in support of getXXXXCoordinateId activities.
+
+	olfs: Changes in support of getXXXXCoordinateId activities.
+
+	olfs: Changes in support of getXXXXCoordinateId activities.
+
+	olfs: Changes in support of getXXXXCoordinateId activities.
+
+2010-08-10  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Removed some warnings...
+
+	Got sick of seeing these as broken so I renamed tham .not_java
+	D    old_code/DapIngestOrig.java
+	A  + old_code/DapIngestOrig.not_java
+	D    old_code/ResponseCacheMetacat.java
+	A  + old_code/ResponseCacheMetacat.not_java
+	D    old_code/ResponseCache.java
+	A  + old_code/ResponseCache.not_java
+
+	Modified the k_means code so that it will work with the URL components and three dimensions. Untested...
+
+2010-08-09  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Added start of KMeans class for URL components.
+
+	Moved the cluster code to a subdir/package called cluster_example.
+
+2010-08-09  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Adding prototype WebStart JNLP files...
+
+	olfs: Changes in support of factoring the hardwired servlet context out of various XSLT and HTML docs.
+
+	olfs: Changes in support of Java WebStart
+
+	olfs: Changes in support retrieving coordinate variable ID's
+
+	olfs: Changes in support retrieving coordinate variable ID's
+
+	olfs: Changes in support of dropping RDF starting points.
+
+	olfs: Changes in support of dropping RDF starting points.
+
+	olfs: Changes in support of dropping RDF starting points.
+
+	olfs: Changes in support of dropping RDF starting points.
+
+	olfs: Changes in support of dropping RDF starting points.
+
+	olfs: Changes in support of dropping RDF starting points.
+
+2010-08-07  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Changes in support of dropping RDF starting points.
+
+	olfs: Changes in support of dropping RDF starting points.
+
+2010-08-06  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Added k-means clustering code, including an ant build file. Minor edits to the DDXCrawler and UrlClassifier; change to classifier run params int he reap ant build file.
+
+2010-08-06  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Changes in support of dropping RDF starting points.
+
+2010-08-06  benno  <benno@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	added support for rdf namespace without # added support for rdf:resource
+
+2010-08-05  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Changes in support of dropping RDF starting points.
+
+	olfs: Changes in support of dropping RDF starting points.
+
+	olfs: Changes in support of dropping RDF starting points.
+
+	olfs: Changes in support of dropping RDF starting points.
+
+	olfs: Changes in support of dropping RDF starting points.
+
+	olfs: Changes in support of dropping RDF starting points.
+
+	olfs: Changes in support of dropping RDF starting points.
+
+	olfs: Changes in support of dropping RDF starting points.
+
+	olfs: Changes in support of dropping RDF starting points.
+
+	olfs: Changes in support of dropping RDF starting points.
+
+	olfs: Changes in support of dropping RDF starting points.
+
+	olfs: Changes in support of dropping RDF starting points.
+
+	olfs: Changes in support of dropping RDF starting points.
+
+2010-08-05  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	modified addNeededRDFDocuments(Vector<String> rdfDocs) to skip problem file
+
+	modified logs
+
+	modified logs
+
+2010-08-05  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Added exception handling to URLClassifier and URLgroup.
+
+2010-08-04  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	big fix in convertWRL
+
+2010-08-04  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs:
+
+	olfs:
+
+	olfs:
+
+2010-08-03  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2010-08-02  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	add conenttype to repository
+
+2010-07-30  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	new class handling repository update: RdfPersistence.java
+
+2010-07-28  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	print querys to the log
+
+2010-07-28  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs:
+
+2010-07-27  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Turn off DEBUG logging in the postgres-based cache. Better target in the ant build file.
+
+	Fixed up some stuff in the ddx crawler and added a --fetch-ddx option so that the crawler can be used to just get teh DDX URLs and not their contents - should speed up crawls where all we need is a set of URLs and not the DDXs. Fixed a bug in the ThreddsCatalogUtil: Bad logic broke the looping prevention. Use the test.opendap.org/opendap/catalog.xml to test for a loop.
+
+	Added Dan's python classifier/clustering code
+
+	Added shell scripts for crawler commands
+
+	Removed hand-built manifest files - use ant for this job
+
+	Library checkin
+
+2010-07-26  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Updated the version number printed in error messages within ddx2eml-3.1.xsl
+
+	Fixes to the classifier
+
+2010-07-24  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added local filesystem access to WebStart test.
+
+2010-07-23  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Added URL Classification code
+
+	Updates to the crawling code.
+
+	Updates to the crawling code.
+
+	Updates to the crawling code.
+
+2010-07-23  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Modified working draft of an XSLT that produces fully qualified data access links and catalogRefs for THREDDS catalogs.
+
+	olfs: Have a working draft of an XSLT that priduces fully qualified data access links and catalogRefs for THREDDS catalogs.
+
+	olfs: Working on repository update/drop/add logic.
+
+	olfs: Working on repository update/drop/add logic.
+
+	olfs: Working on repository update/drop/add logic.
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-22  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Working on repository update/drop/add logic.
+
+	olfs: Working on repository update/drop/add logic.
+
+	olfs: Working on repository update/drop/add logic.
+
+	olfs: Working on repository update/drop/add logic.
+
+	olfs: Working on repository update/drop/add logic.
+
+	olfs: Working on repository update/drop/add logic.
+
+	olfs: Working on repository update/drop/add logic.
+
+	olfs: Working on repository update/drop/add logic.
+
+	olfs: Working on repository update/drop/add logic.
+
+	olfs: Working on repository update/drop/add logic.
+
+	olfs: Working on repository update/drop/add logic.
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-22  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	startingPointExists
+
+2010-07-22  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Working on repository update/drop/add logic.
+
+	olfs: Working on repository update/drop/add logic.
+
+	olfs: Working on repository update/drop/add logic.
+
+	olfs: Working on repository update/drop/add logic.
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-21  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Working on repository update/drop/add logic.
+
+	olfs: Working on repository update/drop/add logic.
+
+	olfs: Working on repository update/drop/add logic.
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-21  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	add last_modified for external inferencing
+
+	add last_modified for external inferencing
+
+2010-07-21  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Working on repository update/drop/add logic.
+
+	olfs: Working on repository update/drop/add logic.
+
+	olfs: Working on repository update/drop/add logic.
+
+	olfs: Working on repository update/drop/add logic.
+
+	olfs: Working on repository update/drop/add logic.
+
+	olfs: Working on repository update/drop/add logic.
+
+	olfs: Working on repository update/drop/add logic.
+
+	olfs: Working on repository update/drop/add logic.
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-21  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2010-07-21  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Working on repository update/drop/add logic.
+
+	olfs: Working on repository update/drop/add logic.
+
+	olfs: Working on repository update/drop/add logic.
+
+	olfs: Working on repository update/drop/add logic.
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-21  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2010-07-21  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-21  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2010-07-20  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Working on repository update/drop/add logic.
+
+2010-07-20  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	CSVSplitter.java
+
+	add trig for dumping repository
+
+2010-07-19  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Prototyping xslt to extract dataset access links from thredds catalogs.
+
+2010-07-19  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	fn2 -->fn
+
+	functions getXXXCoordinate(String,String) are implemented
+
+2010-07-16  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	new function Value localName, improved process_fn2
+
+2010-07-14  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Updated thredds catalog handler to provide service defintions for inherited (via datasetScan) services.
+
+2010-07-13  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	update on NewStaticRDFCatalog and IRISailRepository
+
+	comment out line 516
+
+2010-07-12  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Updated WCS productio  rules to utilize new OWLIM and TTREE libraries.
+
+2010-07-12  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Add new class NewStaticRDFCatalog.java
+
+2010-07-09  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Changed the error thrown from the ResponseCache so that if a thing is not found it is not an error. A null document is returned instead, which the called can ignore. This fixes a problem where a single missing entry in the cache stops execution of an entire ingest.
+
+2010-07-09  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Checking in Java Web Start test code.
+
+2010-07-09  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Better error reporting for dap_ingest
+
+2010-07-09  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Changed representation of empty nodes.
+
+	olfs: Changed representation of empty nodes.
+
+	olfs: Changed representation of empty nodes.
+
+2010-07-09  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Minor path fix for the BuildDapIngest target's automatic Manifest generation code.
+
+	Added automatic manifest generation to reap_crawler_build.xml
+
+2010-07-09  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	add method dropStartingPoint(RepositoryConnection con, Vector <String> importURLs)
+
+	add method dropStartingPoint(RepositoryConnection con, Vector <String> importURLs)
+
+	update setStartingPoint
+
+	update setStartingPoint
+
+2010-07-08  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	update IRISailRepository
+
+	replace trree-3.0.beta9.jar with trree-3.0.beta12.jar and owlim-3.0.beta9.jar with owlim-3.0.beta12.jar
+
+2010-07-07  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Moving join() methof to RepositoryFunctions class
+
+	olfs: Moving join() methof to RepositoryFunctions class
+
+2010-07-06  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	clean up comments and a minor change in convertSWRLQueryToSeasameQuery(String queryString)
+
+2010-07-06  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Checking changes in support of adding inherited metadata from static THREDDS catlog files containing datasetScane elements to BES THREDDS catalogs.
+
+2010-07-06  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Use 1 pattern match in function process
+
+2010-07-06  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Fixed bug in CXSL that was causing the links to the dataset page (the detailed view of a thredds dataset) to break. Ticket 1591
+
+2010-07-06  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	use full URI in pred comparision and expand
+
+2010-07-05  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Fixed the bug (w/o testing the fix yet) where a bad docid (accession number?) is never incremented and so remains bad for an entire run.
+
+2010-07-02  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	More fixes to the crawler code. DapIngest now has a more sane set of features and can insert EML into Metacat. My account is hardwired into the code, however.
+
+2010-07-02  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: New methods for Transformer
+
+2010-07-01  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: THREDDS metadat inventory.
+
+	olfs: Formating
+
+2010-07-01  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	delete extra space in formating
+
+2010-07-01  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Fixed String truncation in class#function prcessing.
+
+2010-06-30  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	DapIngest rewrite. Other fixes to related classes.
+
+2010-06-30  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Tweaks to processing class and function discovery and usage.
+
+	olfs: Tweaks to class and function matching.
+
+2010-06-30  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Build files now use the commons cli 1.2 library.
+
+	Various fixes and tweaks. Now DapIngest has the code to stuff values into metacat using the web interface (and a Java class).
+	I also tidied up some code... The build file 'reap_crawler_build.xml' builds on the code here and parts elsewhere that are needed, but not the 'old code.' Two of the java files in the subdir old_code now have a correct extension.
+
+	Added apache's Commons CLI 1.2 jar
+
+2010-06-30  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Updated JDOM to 1.1.1
+
+	olfs: Updated JDOM to 1.1.1
+
+2010-06-29  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	update convertSWRLQueryToSesameQuery(String)
+
+2010-06-29  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Move old code into the old_code subdir; fiddled with comments and minor refactorings
+
+2010-06-28  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Latest version. Fixes a bug with the abstract element (had to remove the HTML tags).
+
+	Now has <coverage> for each entity (just references the dataset coverage at this stage.
+
+	This version uses a global coverage element and provides one otherEntity element for each Grid variable.
+
+	Makes valid EML!
+
+2010-06-28  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Starting to migrate the Coverage ID generation (getWcsId()) out of IRISailRepository
+
+2010-06-27  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Now valid except for the trailing ' UTC' on dates and times.
+
+	ddx2eml 3.0.0 now is close to making valid and usable EML.
+
+2010-06-25  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Updated comments and such.
+
+2010-06-24  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Updating version mechanism so that it is baked into the build process and not into the code.
+
+	olfs: Updating version mechanism so that it is baked into the build process and not into the code.
+
+	olfs: Updating version numbers.
+
+	olfs: Cleaning up details prior to tagging a new olfs release.
+
+	olfs: Cleaning up details prior to tagging a new olfs release.
+
+	olfs: Cleaning up details prior to tagging a new olfs release.
+
+	olfs: Cleaning up details prior to tagging a new olfs release.
+
+	olfs: Added a first cut at using java.reflection classes in the processing function code in the IRISailRepository
+
+2010-06-23  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added a first cut at using java.reflection classes in the processing function code in the IRISailRepository
+
+2010-06-22  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added a first cut at using java.reflection classes in the processing function code in the IRISailRepository
+
+	olfs: The JDOM Transformer class started returning invaild objects. Unable to determine the cause of the problem, I reworked it to use Saxon. Works now."
+
+2010-06-16  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Reorganized IRISailRepository to minimize conflicts while working in tandem with Haibo.
+
+2010-06-15  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Fixed _another concurrency problem with thredds catalog caching and updates. This one caused multiple catalog updates to happen instead of a single update.
+
+2010-06-11  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Fixed (I think) concurrency problem with thredds catalog caching and updates.
+
+2010-06-09  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs:
+
+	olfs: Chenged method signature for coordinate variable discovery bto include both coverageID and fieldId.
+
+2010-06-04  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Error handling and debuggin instrumentation updates.
+
+2010-06-02  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Changes for datasetScan and such in thredds catalogs.
+
+	olfs: Changes for datasetScan and such in thredds catalogs.
+
+2010-05-31  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Building THREDDS catalog ingest XSLT to process datasetScan and NcML elements.
+
+2010-05-28  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Fixed perisitence of serverID and wcsID hash maps.
+
+	olfs: Fixed (I think) a problem with repository sartup and shutdwon activities.
+
+2010-05-27  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Made all saxon imports explicit.
+
+	olfs: More clean up and intelligence for the dataseScan template.
+
+	olfs: Added some debugging statements.
+
+	olfs: Fixed datasetScan template to correctly locate dataset scan locations in the BES catalogs.
+
+2010-05-26  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	This version of DDXCrawler and ThreddsCatalogUtil is smart enough to save the state of the crawl if an exception is thrown and to restart with the next catalog that would have been visited.
+
+2010-05-26  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Fixed repository shutdown problem in StaticRDFCatalog
+
+2010-05-25  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Patched thredds:datasetScan template to correctly utilize the thredds:datsetScan@location attribute.
+
+	olfs: Range subsetting modified to return a WcsException when multiple Fields are explicitly requested.
+
+2010-05-24  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Changes in support of BES emergency exit request.
+
+2010-05-20  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs:
+
+	olfs: Fixed bad wcs:CoverageRequest object
+
+2010-05-20  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Added this because it has useful stuff for the ThreddsCatalogUtil class in terms of caching in the absence of postgres. The current code uses postgres to cache values.
+
+	This version of the DDX and THREDDS crawling code ws used to crawl the NODC ghrsst site (a subdir of the entre NODC site).
+
+2010-05-20  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Improved debugging output.
+
+2010-05-20  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	DDX Crawling works and caches the result in Postgres.
+
+2010-05-20  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	separate delet and add
+
+2010-05-20  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Improved debugging output.
+
+	olfs: Improved debugging output.
+
+	olfs: Improved debugging output.
+
+2010-05-20  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	roll back
+
+2010-05-20  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Debugging fixes
+
+2010-05-20  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	fix a bug in StaticRDFCatalog introduced yesterday
+
+2010-05-19  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added serviceIDs and wcsIDs persistence and update. Add getDataAccessUrl()
+
+	olfs: Working on getting server prefix mappings
+
+	olfs: Working on getting server prefix mappings
+
+2010-05-19  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Separate add and delete imports, add repository status (up/down as boolean)
+
+2010-05-19  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Working on getting server prefix mappings
+
+	olfs: Working on getting server prefix mappings
+
+	olfs: Trying to fix persistence bug in the servlet.
+
+2010-05-18  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2010-05-18  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Interim check in - the code need to be refactored to make it easier to use. There's a fairly confusing array of caching options. Reduce to just postgres and hash maps and do that using two distict classes.
+
+2010-05-17  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Trying to fix persistence bug in the servlet.
+
+2010-05-15  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Added comments about first successful crawl over the entire ghrsst part of the NODC site.
+
+2010-05-14  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	This version of ResponseCache can use Postgres (and has partial support for JCS, although it makes a weak persistent store since you cannot be certain items won't be removed from the disk cache). Other classes have been updated to use the Postgres-enabled cache.
+
+	Added resources for the crawler that uses the Postgres DB for a persistent store.
+
+	Snapshot of the transition to Postgress &/| JCS as the caching system. Both are in the class ResponseCache now.
+
+2010-05-14  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Moved metacat related code into metacat package where it belongs.
+
+2010-05-14  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Removed ResponseCache (from the metacat crawling work) from this class.
+
+	Added an argument to the tcc target (but commented it out so tcc doesn't recur unexpedly)
+
+2010-05-14  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Moved metacat related code into metacat package where it belongs.
+
+	olfs: Moved metacat related code into metacat package where it belongs.
+
+2010-05-12  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Metacat no longer used for caching...
+
+	Added as a precaution... This version of TCU uses metacat as a cache - not complete, but see ResponseCacheMetacat.java for a look at a start. Metacat does not make a particularly good cache because of the processing it does.
+
+	This snapshot of the crawler has changes that implement access to metacat - I tried using metacat as a cache for thredds catalogs, but it was fairly slow (as a cache) and required a schema and validation for any xml in a namespace). I'm going to try the JCS disk cache next... However, this code shows how to call metacat from Java. I will save off this version of ResponseCache to ResponseCacheMetacat so it's easy to find.
+
+2010-05-12  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Updated copyright headers
+
+	olfs: Updated copyright headers
+
+2010-05-07  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Fixed Hanging on exit problem.
+
+2010-05-05  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	updated some log statement in XMLfromRDF and StaticRDFCatalog
+
+2010-05-05  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2010-04-30  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	ThreddsCatalogUtil: modest changes to debug logback issues with executable jar files (solution, put the logback.xml in the jar file at the top level). Code in opendap/metacat: comments, minor method refactor, some variables moved closer to their first use.
+
+2010-04-30  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: WCS webapp working
+
+2010-04-28  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Added stuff
+
+	Added
+
+2010-04-28  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Fixing relative paths in XSL files for WCS webapp
+
+	olfs:
+
+2010-04-28  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	fn frame work
+
+2010-04-28  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Updated servlet api to version 2.5
+
+	olfs:
+
+2010-04-27  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Eh - fixes of various sorts.
+
+	I removed a fair amount of the logging code from the classes that are now designed to be used as 'applications' run from the command line.
+
+2010-04-27  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs:
+
+2010-04-21  haibo  <haibo@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	silent 2 logs
+
+	silent 2 logs
+
+	semantic function framwork
+
+2010-04-15  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Removed reap-related targets
+
+	reap-specific build file.
+
+2010-04-14  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	I added a second build file to tame the growing tangle of targets.
+
+2010-04-14  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Merged ioos branch to olfs trunk.
+
+2010-04-12  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Merging with 1,6,0 branch
+
+	olfs-1.6.0: Updated test targets.
+
+2010-04-08  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-1.6.0: Fixed filename bug in nectdf_ fileout return.
+
+2010-03-31  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Removed test servlet from web.xml
+
+2010-03-18  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-1.6.0: Changed ContentType from text/plain to text/xml for the DDX and RDF responses.
+
+2010-03-03  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-1.6.0: Removed an errant test servlet from the default configuration.
+
+	olfs-1.6.0: Removed thredds:dataType,  thredds:dataFormat, and thredds:authority elements from the THREDDS catalog response. They can be omitted and the values being used were hardcoded, non-sensical, and not easily configurable.
+
+2010-02-19  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-1.6.0: Updated rdf output to import ontologies from opendap.org
+
+2010-02-10  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs-1.6.0: Updated test targets for geogrid() function to accomodate changes due to bug fixes. Tests that elicit errors still need to be fixed to use wild cards.
+
+	Removing test targets for the now defunct geoarray() server side function.
+
+2010-02-03  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Creating branch for veriosn 1.6
+
+	olfs: Changed version number in the branch
+
+	olfs: Creating branch for version 1.6.0
+
+2010-02-01  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Turned on RDF links on contents pages.
+
+	olfs: Turned on RDF links on contents pages.
+
+	olfs: Checking in numerous changes.  - Improved error handling  - OtherXML support for RDF output.  - Misc changes
+
+2010-01-19  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2009-12-07  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Add a 300000 ms time out to Socket connection.
+
+2009-11-04  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Changed the dataddx Content-Description header value to dap4_data_ddx from dap_data_ddx - minor but I want to start switching to the new values.
+
+2009-09-13  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Updated version number for OLFS
+
+	olfs: Pathed test targets. Added ':' to list of sccepted characters in filenames for compatiblity with MS-Windows
+
+2009-08-21  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added supoport for DataDDX response.
+
+2009-08-04  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Merged the 1.5.2 tag back to the trunk.
+
+2009-05-11  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Merged changes from 1.5.0 tag to trunk. Changes removed unsafe uses of HttpServletResponse.reset()
+
+	olfs: merged changes from 1.5.0 tag to trunk
+
+2009-04-08  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Merged trunk with 1.5.0 tag
+
+2009-02-04  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2009-02-03  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2009-01-31  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2009-01-30  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Check in prior to branching for hyrax 1.5 release
+
+	olfs: Added missing library
+
+	olfs: Check in prior to branching for hyrax 1.5 release
+
+2009-01-27  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Fixed content header problems for DAP errors.  Automated Hyrax version numbering by tying it to the ANT build process.
+
+2009-01-16  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added per request caching of BES <showInfo> and <showCatalog> responses for performance testing.
+
+	olfs: Added per request caching of BES <showInfo> and <showCatalog> responses for performance testing.
+
+	olfs: Added per request caching of BES <showInfo> and <showCatalog> responses for performance testing.
+
+	olfs: xml -xslt-> dap -xslt->xml  style sheet development
+
+2009-01-12  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Patch for Ticket 1227 - OLFS now returns DAP2 error objects with HTTP status 404 when the resource cannot be located.
+
+	olfs: Adding Namespace objects
+
+	olfs: Sync update
+
+2009-01-11  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Sync update
+
+2009-01-07  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added prebuilt responses for WCS use cases to resources folder
+
+	olfs: Purging TDS dependant code.
+
+2009-01-06  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Small Changes.
+
+2009-01-05  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Purging TDS dependant code.
+
+2009-01-04  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Removed dependancy on UNIDATA THREDDS code.
+
+	olfs: TreddsHander Update
+
+2009-01-02  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Purging TDS dependant code.
+
+	olfs: Purging TDS dependant code.
+
+	olfs: New threddsHandler working. Remote Catalog Browsing working.
+
+2009-01-01  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: clean up
+
+	olfs: cleanup
+
+	olfs: updating saxon libraries to 9.1.0.5
+
+	olfs: clean up.
+
+	olfs: Adding remote catalog browsing to therddsHandler
+
+	olfs: threddsHandler remote catalog browsing.
+
+	olfs: Refactoring threddsHandler. Adding XSLT for dataset information page.
+
+	olfs: Refactoring threddsHandler. Dataset information pages implemented.
+
+	olfs: Refactoring threddsHandler. Dataset information pages implemented.
+
+2008-12-30  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Refactoring threddsHandler . Changes include updated thredds.xsl for generating HTML views of catalogs, lastModified support, and conversion to use Saxon for XSLT transforms.
+
+	olfs: Refactoring threddsHandler . Changes include updated thredds.xsl for generating HTML views of catalogs, lastModified support, and conversion to use Saxon for XSLT transforms.
+
+2008-12-29  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Refactoring threddsHandler . Changes include updated thredds.xsl for generating HTML views of catalogs, lastModified support, and conversion to use Saxon for XSLT transforms.
+
+	olfs: Refactoring threddsHandler . Changes include updated thredds.xsl for generating HTML views of catalogs, lastModified support, and conversion to use Saxon for XSLT transforms.
+
+2008-11-26  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Tidying up loose ends...
+
+2008-11-25  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Removing unused buildfiles
+
+	olfs: Removing unused build files.
+
+2008-11-24  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Removing schema directory because it is unused.
+
+	olfs: Refactored opendap.wcs.gatewayClient in order to move WCS activities out of the opendap.bes package. Added ReqCache object. Updated libraries.
+
+2008-11-18  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Checkpoint.
+
+2008-11-17  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2008-11-14  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added netcdf file out! WOOO! HOOO!
+
+	olfs: xmlrequest branch merged to trunk
+
+2008-10-01  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Removed bad characters (fancy quotes?) so that the docs build on linux.
+	M    src/opendap/wcs/v1_1_2/GetCoverageRequest.java
+	M    src/opendap/wcs/v1_1_2/WcsException.java
+	M    src/opendap/coreServlet/DispatchHandler.java
+
+2008-09-18  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Merged multifile branch
+
+2008-08-29  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: New subversion server test checkin
+
+	olfs: New subversion server test checkin
+
+2008-08-28  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: svn 1.5.1 check in test
+
+	olfs: svn 1.5.1 check in test
+
+2008-08-20  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added a "Validation succeeded" message.
+
+	olfs: Cleaned up source code.
+
+	olfs: Improved request document validation. Validaition errors now seem to be coming from OGC schemas and not our request documents.
+
+2008-08-19  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs:
+
+	olfs: First cut at forming GetCapabilities, DescribeCoverage, and GetCoverage request objects from KVP (URL) input .
+
+2008-08-15  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: First cut at exception handling and forming GetCapabilities request objects.
+
+	olfs: First cut at exception handling and forming GetCapabilities request objects.
+
+	olfs: First cut at exception handling and forming GetCapabilities request objects.
+
+2008-08-14  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: First cut at exception handling and forming GetCapabilities request objects.
+
+2008-08-13  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Reorganizing WCS code base in preperation for begining the 1.1.2 WCS server development.
+
+	olfs: Reorganizing WCS code base in preperation for begining the 1.1.2 WCS server development.
+
+	olfs: Reorganizing WCS code base in preperation for begining the 1.1.2 WCS server development.
+
+	olfs: Reorganizing WCS code base in preperation for begining the 1.1.2 WCS server development.
+
+	olfs: Reorganizing WCS code base in preperation for begining the 1.1.2 WCS server development.
+
+	olfs: Reorganizing WCS code base in preperation for begining the 1.1.2 WCS server development.
+
+	olfs: Moved wcs_service package to wcsGateway to improve clarity.
+
+2008-07-11  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Removed printing to stdout.
+
+	olfs: Removed printing to stdout.
+
+2008-07-05  pwest  <pwest@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Chunk size is now represented by 7 characters instead of 4. M    src/opendap/io/Chunk.java
+
+2008-06-26  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2008-06-24  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added null value checking.
+
+	olfs: Changes to accomodate changing chunk protocol to allow for larger chunks.
+
+2008-06-13  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Fixed error handling in the WcsDispatchHandler
+
+2008-06-12  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Moved XSL based THREDDS dispatch into production.
+
+	olfs: Moved XSL based THREDDS dispatch into production.
+
+	olfs: removed hashing from wcs handlers use of the coverageName
+
+2008-05-12  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Patched poorly formed tags in the HTML files.
+
+2008-05-05  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Patched poorly formed tags in the HTML files.
+
+	olfs: Patched poorly formed tags in the HTML files.
+
+	olfs: Patched poorly formed tags in the HTML files.
+
+2008-05-02  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added intelligent reloading of the THREDDS catalogs (Ticket 1105)
+
+2008-05-01  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added intelligent reloading of the THREDDS catalogs (Ticket 1105)
+
+	olfs: Added intelligent reloading of the THREDDS catalogs (Ticket 1105)
+
+	olfs: Added trusted hosts list to wcs_service.DispatchHandler (Ticket 1104)
+
+	olfs: Updating XML tools
+
+	olfs: Updating XML tools
+
+	olfs: Updating XML tools
+
+	olfs: WcsDispatchHandler - changes to more closely align debug message with code base.
+
+	olfs: WcsDispatchHandler - changes to more closely align debug message with code base.
+
+2008-04-30  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: threddsHandler.Dispatch prior to removing urlPrefix string processing.
+
+2008-04-25  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Thredds.xsl
+
+	olfs: Thredds.xsl
+
+	olfs: Thredds.xsl
+
+	olfs: Thredds.xsl
+
+	olfs: Experiments
+
+	olfs: Experiments
+
+	olfs: Experiments
+
+2008-04-24  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: First check-in of new of wcs_service and thredds catalog.
+
+	olfs:  Removed calls to "delete containers;" and "delete definitions;" from the BesAPI
+
+2008-04-18  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: threddsHandler
+
+	olfs:  Started threddsHandler
+
+2008-04-11  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs:  WcsHandler
+
+2008-03-21  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs:  Fixes ticket 1088 in which the olfs was failing to correcty set the xdods-server HTTP header.
+
+	olfs:  Fixes ticket 1088 in which the olfs was failing to correcty set the xdods-server HTTP header.
+
+2008-03-18  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs:  WCS sites now get returned in wcs.xml document order.
+
+2008-03-17  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs:  WCS handler
+
+	olfs: Checking in new WCS handler
+
+	olfs: Checking in new WCS handler
+
+2008-03-12  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Creating wcs package
+
+2008-03-10  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Wcs Changes
+
+2008-03-05  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added new tests for ChunkedOutputStream
+
+2008-02-29  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Updating test targets yet again.
+
+2008-02-28  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Updating test targets.
+
+	olfs: Updated test targets
+
+	olfs: Updated Copyright information
+
+	olfs: Added JUnit tests for Scrub.java
+
+2008-02-22  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added space and backslash to allowed characters in a URL or path
+
+2008-02-08  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: updating test targets
+
+	olfs: updating test targets
+
+	olfs: updating test targets
+
+2008-02-05  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: XLST for 403 and 500 http errors.
+
+2008-02-04  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: XLST for error codes...
+
+	olfs: XLST for error codes...
+
+	olfs: XLST for error codes...
+
+	olfs: XLST for error codes...
+
+	olfs: Added XSLT for generating dynamix pages for user generated errors.
+
+	olfs: OPeNDAP contents.html/xsl navigation repaired. Should work with multiple BES's
+
+	olfs: OPeNDAP contents.html/xsl navigation repaired. Should work with multiple BES's
+
+2008-01-30  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Out of band error handling complete. OPeNDAP contents.html changed to be generated by XSLT
+
+2008-01-19  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Chunking added. Working, but needs additional testing.
+
+2008-01-18  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Chunking added. Working, but needs additional testing.
+
+	olfs: Chunking added. Working, but needs additional testing.
+
+	olfs: Chunking added. Working, but needs additional testing.
+
+	olfs: Chunking added. Working, but needs additional testing.
+
+	olfs: Chunking added. Working, but needs additional testing.
+
+2008-01-17  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Chunking added. Working, but needs additional testing.
+
+2008-01-09  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Made wcs and catalog containers use different container names (Patch for WCS bug that's the result of a namespace collision in the BES.)
+
+2007-12-10  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Made wcs and catalog containers use different container names (Patch for WCS bug that's the result of a namespace collision in the BES.)
+
+2007-12-06  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Made wcs and catalog containers use different container names (Patch for WCS bug that's the result of a namespace collision in the BES.)
+
+2007-11-29  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Made all of the constructors for BESException public.
+
+2007-11-14  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Updated Version to 1.3.0
+
+	olfs: Updated docs page for release 1.3.0
+
+2007-11-01  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Various small repairs. Updated testsuite.
+
+2007-10-26  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Modfied static error pages.
+
+	olfs: Created static error pages that can be altered by a Hyrax admin. Added error pages to web.xml
+
+	olfs: Created static error pages that can be altered by a Hyrax admin. Added error pages to web.xml
+
+	olfs: Created static error pages that can be altered by a Hyrax admin. Added error pages to web.xml
+
+2007-10-24  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Updated THREDDS library.
+
+2007-10-23  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Updated documentation.
+
+	olfs:
+
+2007-10-10  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Updated documentation.
+
+	olfs: Trapped potential null pointr exception.
+
+2007-10-03  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Fixed various issues, updated copyright statement.
+
+	olfs: Fixed various issues, updated copyright date.
+
+2007-10-01  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Build patch
+
+2007-08-23  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Security patches.
+
+	olfs: Security patches.
+
+2007-06-29  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Updated THREDDS libraries.
+
+	olfs: Updated THREDDS initialization code to use the DataRootCatalogs.initCatalogs() method.
+
+2007-06-23  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Protoype WCS-> OPeNDAP Service
+
+2007-06-21  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs:  Removed hostname and port from BES version reporting
+
+2007-05-30  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Patched Version Response.
+
+2007-05-21  pwest  <pwest@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Updated to version 1.2.3 of olfs and 1.2.2 of hyrax M    Version.java
+
+2007-05-19  pwest  <pwest@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Fixes ticket #928, problem with finding end of transmition marker M    ppt/MarkFinder.java M    ppt/PPTClient.java
+
+2007-05-16  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Fixed bug in PPT MarkFinder
+
+2007-04-30  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Patched Version Response.
+
+	olfs: Patched Version Response to responsed to any URL ending in ".ver"
+
+2007-04-27  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Release 1.2.1, candidate 1.
+
+	olfs: Patched concurrency bug in BES client pool.
+
+	olfs: Patched concurrency bug in BES client pool.
+
+	olfs: Patched concurrency bug in BES client pool.
+
+	olfs: Patched concurrency bug in BES client pool.
+
+	olfs: Patched concurrency bug in BES client pool.
+
+	olfs: Patched concurrency bug in BES client pool.
+
+	olfs: Patched concurrency bug in BES client pool.
+
+2007-04-26  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Patched concurrency bug in BES client pool.
+
+	olfs: Patched concurrency bug in BES client pool.
+
+2007-04-25  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Limited number of commands an OPeNDAPClient may send to the BES
+
+2007-04-20  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Refactored POST Dispatch. Major changes to code and configurations.
+
+	olfs: Refactored POST Dispatch. Major changes to code and configurations.
+
+	olfs: Refactored Dispatch. Major changes to code and configurations.
+
+2007-04-19  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Refactored Dispatch. Major changes to code and configurations.
+
+	olfs:
+
+2007-04-17  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs:
+
+2007-04-16  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Support for multiple BES's added.
+
+	olfs: Support for multiple BES's added.
+
+	olfs: Support for multiple BES's added.
+
+2007-04-09  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Support for multiple BES's added.
+
+2007-04-07  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2007-04-05  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Support for multiple BES's added.
+
+2007-04-02  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added prototype BESManager and BES - precursor to multiple BES implementation
+
+2007-03-19  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Added prototype BESManager and BES - precursor to multiple BES implementation
+
+	olfs: Update THREDDS lib
+
+	olfs: Fixed ticket 862. Added THREDDS jnlp files and configured the 'view' servlet.
+
+2007-03-13  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Updating tests
+
+	olfs: UPdated Version tags
+
+	olfs: UPdated Version tags
+
+	olfs: Migrated documentation to the dpcs.opendap.org site. Removed ancillary documentation files.
+
+	olfs: Upadted THREDDS libraries to 3.14.03
+
+	olfs: Incorporated CSS into directory view and THREDDS dataset view
+
+	olfs: added folder images
+
+	olfs: added CSS for THREDDS and OPeNDAP directories
+
+	olfs: updated test targets
+
+2007-03-06  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Resolved Ticket #800 SOAPDispatchHandler now uses full THREDDS catalog implmentation and not SimpleCataligBuilder.
+
+	olfs: Resolved Ticket #785 Logging implementedadn documented.
+
+2007-03-05  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Rewrote the OPeNDAP directory response so that it sorts the entries correctly.
+
+	olfs:
+
+2007-03-01  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: THREDDS 3.14 adoption. (Ticket 786)  - Major issues fixed or work arounds established. Removed the use of /root prefix from THREDDS implementation. (Ticket 821)
+
+	olfs: THREDDS 3.14 adoption. (Ticket 786)  - Major issues fixed or work arounds established. Removed the use of /root prefix from THREDDS implementation. (Ticket 821)
+
+2007-02-28  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: THREDDS 3.14 adoption.  - Added tsf-3.14.00.jar and netcdf-2.2.18.jar  - Modifed BESCRawlableDataset.  - Significant bugs to be ironed out.  - Checking in so Ethan can get to the code.  - Check pointed code tree to tags/olfs/checkpoint-02.28.2007 prior to checking in these changes.
+
+2007-02-27  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2007-02-20  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Changed package name opendap.olfs to opendap.bes
+
+2007-02-09  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs:  Release 0.1.5 candidate 04.
+
+2007-02-09  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Fixes
+
+	TestClient.java: removed timeoutVal
+
+2007-02-09  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs:  Release 0.1.5 candidate 03.
+
+2007-02-09  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	TestClient.java: I removed the debug and related variables since they are not used.
+
+2007-02-09  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs:  Release 0.1.5 candidate 02.
+
+	olfs: Updated tests to accomodate expected changes in BES/OLFS output.
+
+	olfs:  Release 0.1.5 candidate 01.
+
+	olfs:  Tweaked logging for more accurate reporting
+
+	olfs: Changed references to Server4 into references to Hyrax. Fixed unreported bug in DocServlet.
+
+2007-02-08  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Logging changes.
+
+2007-02-07  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Implmented logging in lieu of writing to stdout. Added THREDDS reinit() based on last modified date of catalog.xml
+
+2007-02-07  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	apache.html: Updated with information about #798; index.html: minor changes.
+
+2007-02-01  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Reorganized build files. Builds from top level directory with command: "ant"
+
+2007-02-01  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	install.html, README: Updated with (more) correct information.
+
+2007-01-30  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	olfs: Changed getLastModified() to return a -1 for THREDDS catalog requests (indicates last modified date is unknown). Resolves ticket 784.
+
+	olfs: Simplified Apache integration instructions as requested by jhrg
+
+2007-01-29  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2007-01-26  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	OLFS: Rearranging files
+
+	OLFS: Rearranging files
+
+	Changing name os Server4 project to olfs, because that's what is really in there.
+
+2007-01-12  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	OLFS: Resolved  ticket 76 and added favicon.ico
+
+2007-01-02  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2006-12-27  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Server4: Release candidate 14 for 0.1.4
+
+	OLFS: All new curl tests.
+
+2006-12-26  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2006-12-22  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Server4: Release candidate 13 for 0.1.4 - Cleaned up Comments
+
+2006-12-21  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Server4: Release candidate 12 for 0.1.4 - Added NOAA sponsorship credit to OPeNDAP directory view
+
+	Server4: Release candidate 12 for 0.1.4 - Added NOAA sponsorship credit to OPeNDAP directory view
+
+2006-12-08  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Server4: Release candidate 11 for 0.1.4 - Prepared default configuration
+
+2006-12-07  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2006-12-05  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2006-12-04  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Server4: Release candidate 10 for 0.1.4 - Added improved error handling to BesAPI
+
+2006-12-01  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Server4: Release candidate 9 for 0.1.4
+
+	Server4: Release candidate 9 for 0.1.4
+
+	Server4: Release candidate 9 for 0.1.4
+
+	Server4: Retired older version of dispatch servlet
+
+	Server4: Retired older version of dispatch servlet
+
+	Server4: Retired old DispatchServlet. Promoted NewDispatch2 to DispatchServlet
+
+	Server4: Added baseline files for netcdf tests
+
+2006-11-29  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Server4: Added Testsuite
+
+2006-11-28  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2006-11-22  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2006-11-21  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Server4: Added documentation regarding Server4 integration with Apache
+
+2006-11-20  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Server4: Updated sponsorship links
+
+	Server4: New Dispatch code
+
+2006-11-15  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Server4: Release candidate 8 for 0.1.4 (added sponsorship links to directory view and documentation)
+
+2006-11-06  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Server4: Release candidate 8 for 0.1.4 (added sponsorship links to directory view and documentation)
+
+2006-10-20  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Serve4: Removed bad character in catalog.xml
+
+	Server4: Release candidate 7 for 0.1.4
+
+2006-10-18  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Server4: Release candidate 6 for 0.1.4
+
+	Server4: Release candidate 5 for 0.1.4
+
+	Server4: Release candidate 4 for 0.1.4
+
+	Server4: Release candidate 4 for 0.1.4
+
+	Server4: Release candidate 3 for 0.1.4
+
+	Server4: Release candidate 3 for 0.1.4
+
+	Server4: Release candidate 3 for 0.1.4
+
+	Server4: Release candidate 2 for 0.1.4
+
+	Server4: Release candidate 1 for 0.1.4
+
+2006-10-16  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Server4: Repaired minor bug in exception handling in PPTClient. Repaired bug in BESConfig
+
+	Server4: Added support for file vs data detection in the Directory (S4Dir) response. Added support for BESClient pooling.
+
+2006-10-14  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Server4: Appearance adjustment for S4Dir
+
+2006-10-12  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Server4: Adding File Servlet
+
+2006-10-11  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Server4: Repairing documentation issues.
+
+	Server4: Repairing documentation issues.
+
+	Server4: Made ReqInfo a collection static methods and integrated their use in to code base. Reworked implementation of conditional GET to utilize the existing servlet interface for it in Tomcat.
+
+	.Renamed ReqState to ReqInfo
+
+	.Overhauled ReqState. Made all methods static and essentially turned into a collection of stateless helper methods.
+
+2006-10-09  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	.
+
+2006-10-05  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	.Added DocsServlet, persistent security configurations and a MimeTypes class to Server4
+
+2006-09-20  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	.
+
+	.Reconfigured the nio tests to be in the package opendap.experiments. Added experiments that test peristent HTTP connections.
+
+	.
+
+	.
+
+2006-09-15  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	.Remove dependancies on Java-OPeNDAP code. Split off the SOAP TestClient as a seperate project.
+
+2006-09-14  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	.Remove dependancies on Java-OPeNDAP code. Split off the SOAP TestClient as a seperate project.
+
+2006-09-13  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	.Remove dependancies on Java-OPeNDAP code. Split off the SOAP TestClient as a seperate project.
+
+	.Remove dependancies on Java-OPeNDAP code. Split off the SOAP TestClient as a seperate project.
+
+	.Remove dependancies on Java-OPeNDAP code. Split off the SOAP TestClient as a seperate project.
+
+	.Remove dependancies on Java-OPeNDAP code. Split off the SOAP TestClient as a seperate project.
+
+2006-09-06  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	NIO Test Working.
+
+	.
+
+	.
+
+2006-09-05  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	NIO test code
+
+2006-09-01  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	.NIO Test code
+
+	.NIO Test code
+
+	.NIO Test code
+
+	.NIO Test code
+
+2006-08-25  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	.Updated SOAP code to deal with new <dataBLOB> element that replaces the <dodsBLOB> element in the DDX
+
+	.Updating docs
+
+	.Moving (promoting) ThreddsServlet to DispatchServlet
+
+	.Preparing to move ThreddsServlet to DispatchServlet
+
+2006-08-23  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	.
+
+	Checking in HTTP/1.1 caching mods for Server4.
+
+2006-08-21  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Updated THREDDS libs
+
+2006-08-03  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Updated Java-OPeNDAP library
+
+2006-08-02  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Checking in persistent content mods to OLFS.
+
+2006-07-25  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Checking in persistent content mods to OLFS.
+
+	Updated version to 0.1.2
+
+2006-07-23  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Added resources directory to Server4 project
+
+2006-07-21  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Repaired bug in PPTClient where an End Of Stream was not being detected when reading from the BES.
+
+2006-07-16  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	repaired ant build rules
+
+2006-07-15  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Updated version to 0.1.2
+
+	Updated opendap library
+
+2006-07-14  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Corrected ug in which WWW encoded id strings were improperly handled by OLFS.
+
+2006-07-10  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Updated OPeNDAP java lib to 0.0.4. This version includes WWW escaping of variable names in the DDS.
+
+2006-07-06  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Fixed bug in AsciiResponse in which the ServerVersion was not being correctly determined from the version information sent by the BES.
+
+2006-07-05  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	updated opendap java lib
+
+	.
+
+2006-06-28  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	.
+
+2006-06-23  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2006-06-13  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	docs update
+
+	Updated THREDDS LIBS
+
+	docs update
+
+2006-06-01  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	.
+
+2006-05-31  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	.
+
+2006-05-22  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2006-05-17  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2006-05-11  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2006-05-10  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Added TestCleint Libs and build rules.
+
+	Added TestCleint Libs and build rules.
+
+2006-05-09  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2006-05-08  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Added TestCleint Libs and build rules.
+
+2006-05-03  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Made the SOAP TestClient more like getURL.
+
+2006-05-02  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Added TestCleint Libs and build rules.
+
+2006-05-02  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	HtmlResponse.java: Changed the online help URL to the new location (on www.opendap.org).
+
+2006-05-01  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Added TestCleint Libs and build rules.
+
+2006-04-29  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Added SOAP interface to server.
+
+2006-04-27  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Add runtime specification of OpendapHttpDistpatchHandler implmentation. Dispath architecture seems to work.
+
+2006-04-22  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2006-04-21  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Add runtime specification of OpendapHttpDistpatchHandler implmentation. Dispath architecture seems to work.
+
+	Add runtime specification of OpendapHttpDistpatchHandler implmentation. Dispath architecture seems to work.
+
+2006-04-11  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Add runtime specification of OpendapHttpDistpatchHandler implmentation. Dispath architecture seems to work.
+
+	Add runtime specification of OpendapHttpDistpatchHandler implmentation. Dispath architecture seems to work.
+
+2006-04-05  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Add runtime specification of OpendapHttpDistpatchHandler implmentation. Dispath architecture seems to work.
+
+2006-03-31  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Add runtime specification of OpendapHttpDistpatchHandler implmentation. Dispath architecture seems to work.
+
+	Restructured Server4 to use a Dispatch/Handler model
+
+2006-02-22  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2006-02-21  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2006-02-17  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Documentation updates
+
+2006-02-16  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2006-02-16  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Edited the README and install.html to match the files in doc. Removed INSTALL and NEWS.
+
+	I removed the execute property on all the files in and under 'doc.'
+
+2006-02-16  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Documentation updates
+
+	Documentation updates
+
+2006-02-15  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Documentation updates
+
+2006-02-14  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	THREDDS might work with these changes
+
+2006-02-13  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	THREDDS might work with these changes
+
+2006-02-10  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Improved exception handling. Code now attempts to close outstanding open connections when exceptions are caught.
+
+	Improved exception handling. Code now attempts to close outstanding open connections when exceptions are caught.
+
+	Added a new getResponse() implementation that works with bytes (as opposed to chars) and that will find the "PPT_COMPLETE_DATA_TRANSMITION" sequence even when the sequence is  read from the stream in separate calls.
+
+2006-02-09  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Added a new getResponse() implementation that works with bytes (as opposed to chars) and that will find the "PPT_COMPLETE_DATA_TRANSMITION" sequence even when the sequence is  read from the stream in separate calls.
+
+2006-02-09  pwest  <pwest@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	change input stream and output stream. Changed the way COMPLETE_TRANSMITION being checked. Changed the way data written to output stream. Fixed problem reading too much from file.
+
+2006-02-09  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Changed  input stage from:  BufferedReader(InputStreamReader) to:  BufferedInputStream(DataInputStream)
+	and the output stage from: BufferedWriter(OutputStreamWriter)
+	to: BufferedOutputStream(DataOutputStream)
+
+	This should repair the incorrect byte juggling caused by the Reader/Writer pair when handling binary data.
+
+2006-02-08  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2006-02-07  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2006-02-06  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2006-02-03  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Added a blurb about copying the opendap.war file to the Tomcat webapps directory.
+
+2006-02-03  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Added directory response. (Based on the test server located at: http://test.opendap.org/opendap-3.5/nph-dods/data/nc)
+
+2006-02-03  jimg  <jimg@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Removed INSTALL, README and NEWS from doc directory
+
+	Moved INSTALL, README and NEWS to the top level directory
+
+	Initial versions of the README, NEWS and INSTALL files.
+
+2006-02-02  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Added exception handling for BES API
+
+	Added first implementation of a THREDDS CrawlableDataset
+
+2006-02-01  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Added first implementation of a THREDDS CrawlableDataset
+
+	Added first implementation of a THREDDS CrawlableDataset
+
+	Added first implementation of a THREDDS CrawlableDataset
+
+	Added first implementation of a THREDDS CrawlableDataset
+
+	Added first implementation of a THREDDS CrawlableDataset
+
+2006-01-25  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2005-12-22  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Added first implementation of a THREDDS CrawlableDataset
+
+2005-11-17  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Added ASCII response and INFO response.
+
+2005-11-03  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+2005-11-02  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Version 1.0.0 candidate
+
+2005-10-31  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Updated jdom library to version 1.0
+
+2005-08-31  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Prototype source for Server4 checked in
+
+2005-08-08  root  <root@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Auto reset of Subversion properties
+
+2005-08-01  ndp  <ndp@4ba5f37b-aaf8-0310-9c43-92a51b5764a6>
+
+	Capricious name change.
+
+	Creating Server 4 project
