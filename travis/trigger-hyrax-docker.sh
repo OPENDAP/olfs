@@ -92,7 +92,7 @@ export olfs_tag="olfs-${OLFS_BUILD_VERSION}"
 loggy "Tagging hyrax-docker with: ${olfs_tag}"
 git tag -m "${olfs_tag}" -a "${olfs_tag}"
 
-loggy "Pushing changes to hyrax-docker, branch $TARGET_OS:"
+loggy "Pushing changes to hyrax-docker. Target OS is: $TARGET_OS:"
 git push "https://${GIT_UID}:${GIT_PSWD}@github.com/OPENDAP/hyrax-docker.git" --all
 
 loggy "done"

@@ -224,7 +224,7 @@ jobs:
       name: "Triggering hyrax-docker snapshot build"
       script:
         - export STAGE=hyrax-docker
-        - echo $STAGE
+        - echo "STAGE is ${STAGE}"
         - source ./travis/compute_build_tags.sh
         - ./travis/trigger-hyrax-docker.sh
 
