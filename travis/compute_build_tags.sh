@@ -8,7 +8,8 @@ echo "#" >&2
 echo "#  pwd: $(pwd)" >&2
 echo "#" >&2
 
-echo "# TRAVIS_BUILD_NUMBER: ${TRAVIS_BUILD_NUMBER}" >&2
+echo "#      TRAVIS_BUILD_NUMBER: ${TRAVIS_BUILD_NUMBER}" >&2
+echo "# TRAVIS_OLFS_BUILD_OFFSET: ${TRAVIS_OLFS_BUILD_OFFSET}" >&2
 echo "#" >&2
 source $TRAVIS_BUILD_DIR/travis/versions_and_build_offsets.sh
 echo "#" >&2
