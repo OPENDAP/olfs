@@ -274,6 +274,7 @@ public class RejectMatrixParametersFilterTest {
         public String encodeRedirectUrl(String url) { return null; }
         public void sendError(int sc, String msg) {}
         public void sendError(int sc) throws IOException {}
+        @Override
         public void sendRedirect(String location) {}
         public void setDateHeader(String name, long date) {}
         public void addDateHeader(String name, long date) {}
@@ -286,22 +287,39 @@ public class RejectMatrixParametersFilterTest {
         public int getStatus() { return 0; }
         public String getHeader(String name) { return null; }
         public java.util.Collection<String> getHeaders(String name) { return null; }
+        @Override
         public java.util.Collection<String> getHeaderNames() { return null; }
+        @Override
         public String getCharacterEncoding() { return null; }
+        @Override
         public String getContentType() { return null; }
+        @Override
         public ServletOutputStream getOutputStream() { return null; }
+        @Override
         public java.io.PrintWriter getWriter() { return null; }
+        @Override
         public void setCharacterEncoding(String charset) {}
+        @Override
         public void setContentLength(int len) {}
+        @Override
         public void setContentLengthLong(long len) {}
+        @Override
         public void setContentType(String type) {}
+        @Override
         public void setBufferSize(int size) {}
+        @Override
         public int getBufferSize() { return 0; }
+        @Override
         public void flushBuffer() {}
+        @Override
         public void resetBuffer() {}
+        @Override
         public boolean isCommitted() { return false; }
+        @Override
         public void reset() {}
+        @Override
         public void setLocale(java.util.Locale loc) {}
+        @Override
         public java.util.Locale getLocale() { return null; }
         public void sendRedirect(String s, int i, boolean b) throws IOException { /* nothing needed here */ }
     }
