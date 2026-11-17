@@ -17,7 +17,7 @@ branches:
   only:
     - master
     - /^(.*-test-deploy)$/
-#    - el9
+    - el9
 
 notifications:
   email:
