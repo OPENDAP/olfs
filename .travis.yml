@@ -17,7 +17,7 @@ branches:
   only:
     - master
     - /^(.*-test-deploy)$/
-    - el9
+#    - el9
 
 notifications:
   email:
@@ -77,7 +77,8 @@ stages:
   - name: hyrax-docker-trigger
     if: type != pull_request OR branch =~ ^(.*-test-deploy)$ OR branch = el9
   - name: update-tracking-branch
-    if: type != pull_request AND branch != el9
+#    if: type != pull_request AND branch != el9
+    if: branch = disabled
   - name: disabled
     if: branch = disabled
 
