@@ -343,13 +343,6 @@
                         <a title="DAP4 Data Request Form (.dmr.html)"
                            itemprop="contentUrl" href="{$dap_service_url}.dmr.html">html</a>
                     </td>
-                    <td itemprop="distribution" itemscope="" itemtype="https://schema.org/DataDownload">
-                        <meta itemprop="name" content="{$dap_service_url}.dmr.rdf"/>
-                        <meta itemprop="encodingFormat" content="application/rdf+xml"/>
-                        <a title="DAP4 Metadata Response encoded as RDF (.dmr.rdf)"
-                           itemprop="contentUrl" href="{$dap_service_url}.dmr.rdf">rdf</a>
-                    </td>
-
                     <xsl:if test="$allowDirectDataSourceAccess='true'">
                         <td itemprop="distribution" itemscope="" itemtype="https://schema.org/DataDownload">
                             <meta itemprop="name" content="{@name}"/>
