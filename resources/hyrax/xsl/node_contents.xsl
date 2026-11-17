@@ -322,10 +322,6 @@
                         <meta itemprop="encodingFormat" content="text/html" />
                         <a itemprop="contentUrl" href="{encode-for-uri(@name)}.html">html</a>&NBSP;</td>
                     <td itemprop="distribution" itemscope="" itemtype="https://schema.org/DataDownload">
-                        <meta itemprop="name" content="{@name}.rdf" />
-                        <meta itemprop="encodingFormat" content="application/rdf+xml" />
-                        <a itemprop="contentUrl" href="{encode-for-uri(@name)}.rdf">rdf</a>&NBSP;</td>
-                    <td itemprop="distribution" itemscope="" itemtype="https://schema.org/DataDownload">
                         <meta itemprop="name" content="{@name}.covjson" />
                         <meta itemprop="encodingFormat" content="application/covjson" />
                         <a itemprop="contentUrl" href="{encode-for-uri(@name)}.covjson">covjson</a>&NBSP;</td>

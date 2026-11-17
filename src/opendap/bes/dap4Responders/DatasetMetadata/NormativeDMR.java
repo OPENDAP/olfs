@@ -72,7 +72,6 @@ public class NormativeDMR extends Dap4Responder {
 
         addAltRepResponder(new XmlDMR   (sysPath, pathPrefix, besApi, addFileoutTypeSuffixToDownloadFilename));
         addAltRepResponder(new HtmlDMR  (sysPath, pathPrefix, besApi, enforceRequiredUserSelection, showDmrppLink));
-        addAltRepResponder(new RdfDMR   (sysPath, pathPrefix, besApi, addFileoutTypeSuffixToDownloadFilename));
         addAltRepResponder(new JsonDMR  (sysPath, pathPrefix, besApi, addFileoutTypeSuffixToDownloadFilename));
         addAltRepResponder(new IjsonDMR (sysPath, pathPrefix, besApi, addFileoutTypeSuffixToDownloadFilename));
 
