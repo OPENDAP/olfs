@@ -36,7 +36,7 @@ import opendap.wcs.v2_0.*;
 import org.jdom.Document;
 import org.jdom.Element;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.List;

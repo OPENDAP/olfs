@@ -31,7 +31,7 @@ import opendap.services.WebServiceHandler;
 import org.jdom.Document;
 import org.jdom.Element;
 
-import javax.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServlet;
 
 
 /**

@@ -188,7 +188,7 @@ public class BESConfig  {
 
         Element host = besConfig.getChild("host");
         if( host==null ){
-            throw new BadConfigurationException("Configuration Element does not contain neccessary content. " +
+            throw new BadConfigurationException("Configuration Element does not contain necessary content. " +
                     "<BES> Element is missing <host> element.");
         }
         setHost(host.getTextTrim());
@@ -198,7 +198,7 @@ public class BESConfig  {
 
         Element port = besConfig.getChild("port");
         if( port==null ){
-            throw new BadConfigurationException("Configuration Element does not contain neccessary content. " +
+            throw new BadConfigurationException("Configuration Element does not contain necessary content. " +
                     "<BES> Element is missing <port> element.");
 
         }

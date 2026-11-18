@@ -32,7 +32,7 @@ import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.security.Principal;
 
 /**
@@ -79,8 +79,8 @@ public class AuthenticationControls {
      * pass itself into it along with the XML element that declared the
      * IsoDispatchHandler in the configuration file (usually olfs.xml). The
      * contents of this XML Element are not restricted and may (should?)
-     * contain any required information for configuration not availableInChunk by
-     * interogating the IsoDispatchHandler's methods.
+     * contain any required information for configuration not available by
+     * interrogating the IsoDispatchHandler's methods.
      *
      * @param config A JDOM Element objct containing the XML Element that
      *               announced which implementation of IsoDispatchHandler to use. It may (or

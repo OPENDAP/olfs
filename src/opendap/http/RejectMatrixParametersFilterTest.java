@@ -3,9 +3,9 @@ package opendap.http;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.*;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 import static org.junit.Assert.*;
@@ -105,6 +105,21 @@ public class RejectMatrixParametersFilterTest {
         public String getRequestURI() {
             return uri;
         }
+
+        @Override
+        public String getRequestId() {
+            return "";
+        }
+
+        @Override
+        public String getProtocolRequestId() {
+            return "";
+        }
+
+        @Override
+        public ServletConnection getServletConnection() {
+            return null;
+        }
     }
 
     private static class TestHttpServletResponse extends DummyHttpServletResponse {
@@ -125,6 +140,7 @@ public class RejectMatrixParametersFilterTest {
             this.errorCodeSent = sc;
         }
 
+
         @Override
         public String getHeader(String name) {
             return serverHeader;
@@ -140,9 +156,9 @@ public class RejectMatrixParametersFilterTest {
     }
 
     // Abstract dummy classes providing default no-op / null returns for unused Servlet interface methods
-    private abstract static class DummyHttpServletRequest implements HttpServletRequest {
+    private abstract static class DummyHttpServletRequest extends DummyServletRequest implements HttpServletRequest {
         public String getAuthType() { return null; }
-        public javax.servlet.http.Cookie[] getCookies() { return null; }
+        public jakarta.servlet.http.Cookie[] getCookies() { return null; }
         public long getDateHeader(String name) { return 0; }
         public String getHeader(String name) { return null; }
         public java.util.Enumeration<String> getHeaders(String name) { return null; }
@@ -160,8 +176,8 @@ public class RejectMatrixParametersFilterTest {
         public String getRequestURI() { return null; }
         public StringBuffer getRequestURL() { return null; }
         public String getServletPath() { return null; }
-        public javax.servlet.http.HttpSession getSession(boolean create) { return null; }
-        public javax.servlet.http.HttpSession getSession() { return null; }
+        public jakarta.servlet.http.HttpSession getSession(boolean create) { return null; }
+        public jakarta.servlet.http.HttpSession getSession() { return null; }
         public String changeSessionId() { return null; }
         public boolean isRequestedSessionIdValid() { return false; }
         public boolean isRequestedSessionIdFromCookie() { return false; }
@@ -170,50 +186,87 @@ public class RejectMatrixParametersFilterTest {
         public boolean authenticate(HttpServletResponse response) { return false; }
         public void login(String username, String password) {}
         public void logout() {}
-        public java.util.Collection<javax.servlet.http.Part> getParts() { return null; }
-        public javax.servlet.http.Part getPart(String name) { return null; }
-        public <T extends javax.servlet.http.HttpUpgradeHandler> T upgrade(Class<T> handlerClass) { return null; }
+        public java.util.Collection<jakarta.servlet.http.Part> getParts() { return null; }
+        public jakarta.servlet.http.Part getPart(String name) { return null; }
+        public <T extends jakarta.servlet.http.HttpUpgradeHandler> T upgrade(Class<T> handlerClass) { return null; }
+        @Override
         public Object getAttribute(String name) { return null; }
+        @Override
         public java.util.Enumeration<String> getAttributeNames() { return null; }
+        @Override
         public String getCharacterEncoding() { return null; }
+        @Override
         public void setCharacterEncoding(String env) {}
+        @Override
         public int getContentLength() { return 0; }
+        @Override
         public long getContentLengthLong() { return 0; }
+        @Override
         public String getContentType() { return null; }
+        @Override
         public ServletInputStream getInputStream() { return null; }
+        @Override
         public String getParameter(String name) { return null; }
+        @Override
         public java.util.Enumeration<String> getParameterNames() { return null; }
+        @Override
         public String[] getParameterValues(String name) { return null; }
+        @Override
         public java.util.Map<String, String[]> getParameterMap() { return null; }
+        @Override
         public String getProtocol() { return null; }
+        @Override
         public String getScheme() { return null; }
+        @Override
         public String getServerName() { return null; }
+        @Override
         public int getServerPort() { return 0; }
+        @Override
         public java.io.BufferedReader getReader() { return null; }
+        @Override
         public String getRemoteAddr() { return null; }
+        @Override
         public String getRemoteHost() { return null; }
+        @Override
         public void setAttribute(String name, Object o) {}
+        @Override
         public void removeAttribute(String name) {}
+        @Override
         public java.util.Locale getLocale() { return null; }
+        @Override
         public java.util.Enumeration<java.util.Locale> getLocales() { return null; }
+        @Override
         public boolean isSecure() { return false; }
+        @Override
         public RequestDispatcher getRequestDispatcher(String path) { return null; }
+        @Override
         public String getRealPath(String path) { return null; }
+        @Override
         public int getRemotePort() { return 0; }
+        @Override
         public String getLocalName() { return null; }
+        @Override
         public String getLocalAddr() { return null; }
+        @Override
         public int getLocalPort() { return 0; }
+        @Override
         public ServletContext getServletContext() { return null; }
+        @Override
         public AsyncContext startAsync() { return null; }
+        @Override
         public AsyncContext startAsync(ServletRequest servletRequest, ServletResponse servletResponse) { return null; }
+        @Override
         public boolean isAsyncStarted() { return false; }
+        @Override
         public boolean isAsyncSupported() { return false; }
+        @Override
         public AsyncContext getAsyncContext() { return null; }
+        @Override
         public DispatcherType getDispatcherType() { return null; }
     }
 
-    private abstract static class DummyHttpServletResponse implements HttpServletResponse {
-        public void addCookie(javax.servlet.http.Cookie cookie) {}
+    private abstract static class DummyHttpServletResponse extends DummyServletResponse implements HttpServletResponse {
+        public void addCookie(jakarta.servlet.http.Cookie cookie) {}
         public boolean containsHeader(String name) { return false; }
         public String encodeURL(String url) { return null; }
         public String encodeRedirectURL(String url) { return null; }
@@ -221,6 +274,7 @@ public class RejectMatrixParametersFilterTest {
         public String encodeRedirectUrl(String url) { return null; }
         public void sendError(int sc, String msg) {}
         public void sendError(int sc) throws IOException {}
+        @Override
         public void sendRedirect(String location) {}
         public void setDateHeader(String name, long date) {}
         public void addDateHeader(String name, long date) {}
@@ -233,23 +287,41 @@ public class RejectMatrixParametersFilterTest {
         public int getStatus() { return 0; }
         public String getHeader(String name) { return null; }
         public java.util.Collection<String> getHeaders(String name) { return null; }
+        @Override
         public java.util.Collection<String> getHeaderNames() { return null; }
+        @Override
         public String getCharacterEncoding() { return null; }
+        @Override
         public String getContentType() { return null; }
+        @Override
         public ServletOutputStream getOutputStream() { return null; }
+        @Override
         public java.io.PrintWriter getWriter() { return null; }
+        @Override
         public void setCharacterEncoding(String charset) {}
+        @Override
         public void setContentLength(int len) {}
+        @Override
         public void setContentLengthLong(long len) {}
+        @Override
         public void setContentType(String type) {}
+        @Override
         public void setBufferSize(int size) {}
+        @Override
         public int getBufferSize() { return 0; }
+        @Override
         public void flushBuffer() {}
+        @Override
         public void resetBuffer() {}
+        @Override
         public boolean isCommitted() { return false; }
+        @Override
         public void reset() {}
+        @Override
         public void setLocale(java.util.Locale loc) {}
+        @Override
         public java.util.Locale getLocale() { return null; }
+        public void sendRedirect(String s, int i, boolean b) throws IOException { /* nothing needed here */ }
     }
 
     private static class DummyServletRequest implements ServletRequest {
@@ -290,6 +362,10 @@ public class RejectMatrixParametersFilterTest {
         public boolean isAsyncSupported() { return false; }
         public AsyncContext getAsyncContext() { return null; }
         public DispatcherType getDispatcherType() { return null; }
+        public String getRequestId() {return "";}
+        public String getProtocolRequestId() {return "";}
+        public ServletConnection getServletConnection() {return null;}
+
     }
 
     private static class DummyServletResponse implements ServletResponse {

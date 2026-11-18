@@ -5,9 +5,9 @@ import org.apache.commons.text.StringEscapeUtils;
 import org.jdom.Document;
 import org.jdom.Element;
 
-import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.*;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Vector;
@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 
 /**
  * BotFilter
- * This implementation of the javax.servlet.Filter interface can be used to
+ * This implementation of the jakarta.servlet.Filter interface can be used to
  * block access from specific IP addresses, by a range of IP addresses using
  * a regular expression, or by the value of the requests User-Agent header using
  * a regular expression.

@@ -30,7 +30,7 @@ package opendap.ppt ;
 
 import opendap.coreServlet.OPeNDAPException;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Exception used with DODS client and server request handline.

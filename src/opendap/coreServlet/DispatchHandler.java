@@ -29,9 +29,9 @@ package opendap.coreServlet;
 import opendap.bes.BesApi;
 import org.jdom.Element;
 
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  *
@@ -58,8 +58,8 @@ public interface DispatchHandler {
      * pass itself into it along with the XML element that declared the
      * IsoDispatchHandler in the configuration file (usually olfs.xml). The
      * contents of this XML Element are not restricted and may (should?)
-     * contain any required information for configuration not availableInChunk by
-     * interogating the IsoDispatchHandler's methods.
+     * contain any required information for configuration not available by
+     * interrogating the IsoDispatchHandler's methods.
      *
      * @param servlet This should be the IsoDispatchHandler that creates the
      * instance of IsoDispatchHandler that is being intialized.
@@ -100,7 +100,7 @@ public interface DispatchHandler {
      *
      * @param req The request for which we need to get a last modified date.
      * @return The last modified date of the URI referenced in th request.
-     * @see javax.servlet.http.HttpServlet
+     * @see jakarta.servlet.http.HttpServlet
      */
     public long getLastModified(HttpServletRequest req);
 

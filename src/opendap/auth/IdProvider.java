@@ -29,9 +29,9 @@ package opendap.auth;
 import opendap.http.error.Forbidden;
 import org.jdom.Element;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 
 import static opendap.auth.IdFilter.USER_PROFILE;
@@ -126,9 +126,10 @@ public abstract class IdProvider {
         String redirectUrl = getServiceContextPath();
         HttpSession session = request.getSession(false);
         if( session != null ) {
-            invalidate((UserProfile) session.getAttribute(USER_PROFILE));
+            UserProfile up = UserProfile.fromJson((String) session.getAttribute(USER_PROFILE));
+            invalidate(up);
             if(useReturnToUrlPostLogout) {
-                String href = (String) session.getAttribute(IdFilter.RETURN_TO_URL);
+                String href = Util.stringFromJson((String) session.getAttribute(IdFilter.RETURN_TO_URL));
                 redirectUrl = href!=null?href:redirectUrl;
             }
             session.invalidate();

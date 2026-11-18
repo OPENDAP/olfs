@@ -29,7 +29,7 @@ package opendap.coreServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.net.URI;
@@ -82,7 +82,7 @@ public class Util {
 
     /**
      * ************************************************************************
-     * Default handler for OPeNDAP status requests; not publically availableInChunk,
+     * Default handler for OPeNDAP status requests; not publicly available,
      * used only for debugging
      *
      * @param response The server's <code> HttpServletResponse</code> response
@@ -119,7 +119,7 @@ public class Util {
 
     /**
      * ************************************************************************
-     * Default handler for OPeNDAP status requests; not publically availableInChunk,
+     * Default handler for OPeNDAP status requests; not publicly available,
      * used only for debugging
      *
      * @param response The server's <code> HttpServletResponse</code> response

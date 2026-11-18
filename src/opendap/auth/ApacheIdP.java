@@ -33,9 +33,9 @@ import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 
 /**
@@ -144,7 +144,7 @@ public class ApacheIdP extends IdProvider {
             session.setAttribute(IdFilter.USER_PROFILE, up);
 
             */
-            redirectUrl = (String) session.getAttribute(IdFilter.RETURN_TO_URL);
+            redirectUrl = Util.stringFromJson( (String) session.getAttribute(IdFilter.RETURN_TO_URL));
         }
         if(redirectUrl==null){
             // Since the request may come from other deployment contexts we check the request for the context.
@@ -174,7 +174,7 @@ public class ApacheIdP extends IdProvider {
         HttpSession session = request.getSession(false);
         if( session != null )
         {
-            String returnToUrl =  (String) session.getAttribute(IdFilter.RETURN_TO_URL);
+            String returnToUrl = Util.stringFromJson( (String) session.getAttribute(IdFilter.RETURN_TO_URL));
             if(returnToUrl!=null)
                 redirectUrl = returnToUrl;
             session.invalidate();
