@@ -913,6 +913,7 @@
             <zipfileset dir="${build.ngap.resources}" prefix="WEB-INF/conf">
                 <include name="logback.xml"/>
                 <include name="olfs.xml"/>
+                <include name="robots.base"/>
             </zipfileset>
 
             <zipfileset dir="${doc.dir}" prefix="docs">
