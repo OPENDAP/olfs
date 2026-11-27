@@ -53,9 +53,14 @@
         <to last="true">/docs/ngap/nasa-outline-new.svg</to>
     </rule>
 
+    <rule>
+        <!-- We need this to handle incoming bots that doing at least this part of the work. -->
+        <from>^/robots.txt$</from>
+        <to last="true">/siteMap/</to>
+    </rule>
 
     <rule>
-        <from>^/(error|docs|jsp|viewers|xsl|hyrax|js|siteMap|robots\.txt)(/.*)?$</from>
+        <from>^/(error|docs|jsp|viewers|xsl|hyrax|js|siteMap)(/.*)?$</from>
         <set name="doRedirect">0</set>
     </rule>
 
